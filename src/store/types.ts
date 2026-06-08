@@ -48,7 +48,9 @@ export interface Prefs {
   autoTTS: boolean
   ttsEngine: TtsEngine
   onlineVoice: string
-  fontSize: number   // px, 13–19
+  fontSize: number         // px, 13–19
+  studyDayMinutes: number  // FIX 3: minutes available for study per day (default 60)
+  minutesPerTask: number   // FIX 3: average minutes assumed per task (default 30)
 }
 
 export interface State {

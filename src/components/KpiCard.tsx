@@ -18,14 +18,13 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass }: Props) {
     const el = valRef.current
     if (!el) return
     const num = parseFloat(String(value))
-    if (isNaN(num) || String(value).includes('/')) return // skip non-numeric or fractions
+    if (isNaN(num) || String(value).includes('/')) return
     let start: number | null = null
     const duration = 600
-    const from = 0
     const step = (ts: number) => {
       if (start === null) start = ts
       const p = Math.min((ts - start) / duration, 1)
-      el.textContent = String(Math.round(from + (num - from) * p))
+      el.textContent = String(Math.round(num * p))
       if (p < 1) requestAnimationFrame(step)
       else el.textContent = String(value)
     }
@@ -33,7 +32,7 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass }: Props) {
   }, [value])
 
   const deltaColor = deltaClass === 'up' ? 'var(--green)' : deltaClass === 'down' ? 'var(--red)' : 'var(--muted)'
-  const deltaIcon = deltaClass === 'up' ? '↑ ' : deltaClass === 'down' ? '↓ ' : ''
+  const deltaIcon  = deltaClass === 'up' ? '↑ ' : deltaClass === 'down' ? '↓ ' : ''
 
   const icBg: Record<string, string> = {
     k1: 'var(--blue-l)', k2: 'var(--green-l)', k3: 'var(--orange-l)',
@@ -57,16 +56,30 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass }: Props) {
       whileHover={{ translateY: -4, boxShadow: 'var(--elev-3)' }}
       transition={{ duration: 0.2 }}
     >
-      {/* Icon */}
+      {/*
+        FIX 1 — RTL icon position.
+        In RTL `inline-end` is the LEFT side, matching pe-10 clearance on label/value.
+        Previously `start-[14px]` placed the icon on the RIGHT (RTL start) while
+        pe-10 cleared the LEFT — opposite sides, causing overlap.
+      */}
       <div
-        className="absolute top-[14px] start-[14px] w-[34px] h-[34px] rounded-lg flex items-center justify-center text-[.95rem]"
-        style={{ background: icBg[cls] ?? 'var(--surface3)', color: icColor[cls] ?? 'var(--text)', boxShadow: 'var(--elev-1), inset 0 1px 0 rgba(255,255,255,.45)' }}
+        className="absolute top-[14px] end-[14px] w-[34px] h-[34px] rounded-lg flex items-center justify-center text-[.95rem]"
+        style={{
+          background: icBg[cls] ?? 'var(--surface3)',
+          color: icColor[cls] ?? 'var(--text)',
+          boxShadow: 'var(--elev-1), inset 0 1px 0 rgba(255,255,255,.45)',
+        }}
         aria-hidden="true"
       >
         {icon}
       </div>
+      {/* pe-10 = padding-inline-end = left clearance in RTL — now correctly aligned with icon */}
       <div className="text-[.74rem] text-[var(--muted)] uppercase tracking-[.5px] mb-1 pe-10">{label}</div>
-      <div ref={valRef} className="text-[1.65rem] font-bold leading-[1.1] text-[var(--text)] pe-10" style={{ fontFamily: 'var(--font-display,"Plus Jakarta Sans",serif)' }}>
+      <div
+        ref={valRef}
+        className="text-[1.65rem] font-bold leading-[1.1] text-[var(--text)] pe-10"
+        style={{ fontFamily: 'var(--font-display,"Plus Jakarta Sans",serif)' }}
+      >
         {value}
       </div>
       <div className="text-[.78rem] mt-1 font-medium" style={{ color: deltaColor }}>

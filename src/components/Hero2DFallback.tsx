@@ -1,46 +1,57 @@
-import { useEffect, useRef } from 'react'
-import { useAppStore } from '@/store/useAppStore'
-import { getDaysLeft } from '@/store/useAppStore'
+import { useState, useEffect, useRef } from 'react'
+import { useAppStore, getDaysLeft } from '@/store/useAppStore'
 import { useCountdown } from '@/hooks/useCountdown'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { todayKey } from '@/lib/utils'
 
+// FIX 2 — proofreading pass:
+//   • 'يومٌ مبارك'   → 'يوم مبارك'   (drop tanwin: cleaner in digital text)
+//   • 'لنرَ'          → 'لنرى'          (standard spelling)
 const GREETINGS = [
   'أهلًا بك في NT2 Planner',
-  'يومٌ مبارك — هيا نواصل التقدّم',
+  'يوم مبارك — هيا نواصل التقدّم',
   'مرحبًا من جديد — رحلتك إلى B1 مستمرّة',
   'goedendag — مخطّط NT2 جاهز لك',
   'هيا بنا — كل يوم خطوة نحو الامتحان',
-  'سلام — لنرَ أين وصلت اليوم',
+  'سلام — لنرى أين وصلت اليوم',
 ]
 
 export function Hero2DFallback() {
-  const name = useAppStore((s) => s.name)
-  const examDate = useAppStore((s) => s.examDate)
-  const planDay = useAppStore((s) => s.planDay)
-  const streak = useAppStore((s) => s.streak)
+  const name        = useAppStore((s) => s.name)
+  const examDate    = useAppStore((s) => s.examDate)
+  const planDay     = useAppStore((s) => s.planDay)
+  const streak      = useAppStore((s) => s.streak)
   const dailyHistory = useAppStore((s) => s.dailyHistory)
-  const reduced = useReducedMotion()
-  const cardRef = useRef<HTMLDivElement>(null)
+  const reduced     = useReducedMotion()
+
+  const cardRef   = useRef<HTMLDivElement>(null)
   const embersRef = useRef<HTMLDivElement>(null)
-  const blob1Ref = useRef<HTMLDivElement>(null)
-  const blob2Ref = useRef<HTMLDivElement>(null)
-  const burstRef = useRef<HTMLDivElement>(null)
+  const blob1Ref  = useRef<HTMLDivElement>(null)
+  const blob2Ref  = useRef<HTMLDivElement>(null)
+  const burstRef  = useRef<HTMLDivElement>(null)
+
+  // FIX 2 — stable greeting: picked ONCE per mount (or when name changes).
+  // Previously Math.random() ran on every render, causing rapid flicker
+  // as the countdown ticker re-rendered the dashboard each second.
+  const [greeting] = useState<string>(() => {
+    const g = [...GREETINGS]
+    // Personalise the first two variants if we already know the name
+    const n = useAppStore.getState().name
+    if (n) {
+      g[0] = `أهلًا بك يا ${n}`
+      g[2] = `مرحبًا ${n} — رحلتك إلى B1 مستمرّة`
+    }
+    return g[Math.floor(Math.random() * g.length)]
+  })
 
   const { days } = useCountdown(examDate)
-  const daysLeft = getDaysLeft(examDate)
+  const daysLeft  = getDaysLeft(examDate)
   const todayMins = dailyHistory[todayKey()]?.mins ?? 0
-
-  // Pick greeting
-  const greetings = [...GREETINGS]
-  if (name) { greetings[0] = `أهلًا بك يا ${name}`; greetings[2] = `مرحبًا ${name} — رحلتك إلى B1 مستمرّة` }
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)]
 
   useEffect(() => {
     if (reduced) return
     const rnd = (a: number, b: number) => a + Math.random() * (b - a)
 
-    // Blob 1
     if (blob1Ref.current) {
       const el = blob1Ref.current
       const palette = [[18,38],[12,32],[320,18],[38,60],[0,18]]
@@ -56,7 +67,6 @@ export function Hero2DFallback() {
       el.style.setProperty('--blob-dur', rnd(22, 34).toFixed(0) + 's')
     }
 
-    // Blob 2
     if (blob2Ref.current) {
       const el = blob2Ref.current
       const pal2 = [[34,14],[44,20],[10,30],[28,8]]
@@ -72,7 +82,6 @@ export function Hero2DFallback() {
       el.style.setProperty('--b2-dur', rnd(26, 40).toFixed(0) + 's')
     }
 
-    // Embers
     if (embersRef.current && !embersRef.current.childElementCount) {
       const n = 3 + (Math.random() * 3 | 0)
       const warmHues = [18, 28, 38, 12, 44]
@@ -90,7 +99,6 @@ export function Hero2DFallback() {
       }
     }
 
-    // Burst
     if (burstRef.current) {
       const burst = burstRef.current
       if (!burst.querySelector('i')) burst.appendChild(document.createElement('i'))
@@ -101,7 +109,8 @@ export function Hero2DFallback() {
     }
   }, [reduced])
 
-  void days // countdown kept live via topbar
+  void days   // live countdown kept in sync via topbar pill
+  void name   // read by the stable greeting above, not needed here
 
   return (
     <div
@@ -114,18 +123,23 @@ export function Hero2DFallback() {
         isolation: 'isolate',
       }}
     >
-      {/* Decorative layers */}
-      <div ref={blob1Ref} className="hero-blob" aria-hidden="true" style={{ position:'absolute', top:'var(--blob-y,30%)', right:'var(--blob-x,-10%)', width:'var(--blob-size,360px)', height:'var(--blob-size,360px)', borderRadius:'50%', background:'conic-gradient(from var(--blob-angle,90deg), var(--blob-cool1), var(--blob-cool2), var(--blob-cool1))', filter:'blur(56px)', opacity:.55, zIndex:0, animation: reduced ? 'none' : 'blob-drift var(--blob-dur,28s) ease-in-out infinite', pointerEvents:'none', willChange:'transform' }} />
-      <div ref={blob2Ref} className="hero-blob b2" aria-hidden="true" style={{ position:'absolute', top:'var(--b2-y,42%)', left:'var(--b2-x,-8%)', right:'auto', width:'var(--b2-size,300px)', height:'var(--b2-size,300px)', borderRadius:'50%', background:'conic-gradient(from var(--b2-angle,210deg), var(--blob-cool3), transparent 58%, var(--blob-cool2))', filter:'blur(60px)', opacity:.42, zIndex:0, animation: reduced ? 'none' : 'blob-drift2 var(--b2-dur,32s) ease-in-out infinite', pointerEvents:'none', willChange:'transform' }} />
-      <div aria-hidden="true" style={{ position:'absolute', inset:0, zIndex:0, pointerEvents:'none', opacity:.05, mixBlendMode:'overlay', backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
-      <div ref={embersRef} aria-hidden="true" style={{ position:'absolute', inset:0, zIndex:0, pointerEvents:'none', overflow:'hidden' }} />
-      <div ref={burstRef} className="hero-burst" aria-hidden="true" style={{ position:'absolute', top:18, right:24, width:80, height:80, zIndex:2, pointerEvents:'none' }} />
+      {/* Decorative layers (aria-hidden — purely visual) */}
+      <div ref={blob1Ref} className="hero-blob" aria-hidden="true"
+        style={{ position:'absolute', top:'var(--blob-y,30%)', right:'var(--blob-x,-10%)', width:'var(--blob-size,360px)', height:'var(--blob-size,360px)', borderRadius:'50%', background:'conic-gradient(from var(--blob-angle,90deg), var(--blob-cool1), var(--blob-cool2), var(--blob-cool1))', filter:'blur(56px)', opacity:.55, zIndex:0, animation: reduced ? 'none' : 'blob-drift var(--blob-dur,28s) ease-in-out infinite', pointerEvents:'none', willChange:'transform' }} />
+      <div ref={blob2Ref} className="hero-blob b2" aria-hidden="true"
+        style={{ position:'absolute', top:'var(--b2-y,42%)', left:'var(--b2-x,-8%)', right:'auto', width:'var(--b2-size,300px)', height:'var(--b2-size,300px)', borderRadius:'50%', background:'conic-gradient(from var(--b2-angle,210deg), var(--blob-cool3), transparent 58%, var(--blob-cool2))', filter:'blur(60px)', opacity:.42, zIndex:0, animation: reduced ? 'none' : 'blob-drift2 var(--b2-dur,32s) ease-in-out infinite', pointerEvents:'none', willChange:'transform' }} />
+      <div aria-hidden="true"
+        style={{ position:'absolute', inset:0, zIndex:0, pointerEvents:'none', opacity:.05, mixBlendMode:'overlay', backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+      <div ref={embersRef} aria-hidden="true"
+        style={{ position:'absolute', inset:0, zIndex:0, pointerEvents:'none', overflow:'hidden' }} />
+      <div ref={burstRef} className="hero-burst" aria-hidden="true"
+        style={{ position:'absolute', top:18, right:24, width:80, height:80, zIndex:2, pointerEvents:'none' }} />
 
       {/* Content */}
       <div style={{ position:'relative', zIndex:1 }}>
         <h1 style={{ fontFamily:'var(--font-display,"Plus Jakarta Sans",serif)', fontSize:'1.8rem', fontWeight:700, color:'#F6F7FF', marginBottom:6, letterSpacing:'-.4px', position:'relative', display:'inline-block' }}>
           {greeting}
-          <span aria-hidden="true" style={{ content:'', position:'absolute', insetInlineEnd:0, bottom:-6, width:'clamp(48px,40%,120px)', height:3, borderRadius:3, background:`linear-gradient(${document.dir==='rtl'?'270deg':'90deg'},var(--hero-accent),transparent)`, opacity:.9 }} />
+          <span aria-hidden="true" style={{ position:'absolute', insetInlineEnd:0, bottom:-6, width:'clamp(48px,40%,120px)', height:3, borderRadius:3, background:'linear-gradient(270deg,var(--hero-accent),transparent)', opacity:.9 }} />
         </h1>
         <div style={{ fontSize:'.9rem', color:'rgba(233,236,250,.82)', lineHeight:1.5, marginTop:6 }}>
           منصة متكاملة للوصول إلى مستوى B1 الفعلي المطلوب في امتحان NT2 — خطة تكيّفية، تحليلات يومية وأسبوعية، محاكاة امتحان رسمية، وذكاء اصطناعي مدمج.
@@ -138,7 +152,9 @@ export function Hero2DFallback() {
             { icon:'🔥', label:'مواظبة:', value: String(streak.count), unit:'يوم' },
           ].map((ck) => (
             <div key={ck.label} style={{ background:'rgba(255,255,255,.1)', border:'1px solid rgba(255,255,255,.16)', backdropFilter:'blur(6px)', borderRadius:10, padding:'8px 14px', color:'#F2EEE2', display:'flex', alignItems:'center', gap:8, fontSize:'.85rem' }}>
-              {ck.icon} <span>{ck.label}</span> <b style={{ color:'var(--hero-accent)', fontSize:'1.05rem', fontWeight:700 }}>{ck.value}</b> <span>{ck.unit}</span>
+              {ck.icon} <span>{ck.label}</span>
+              <b style={{ color:'var(--hero-accent)', fontSize:'1.05rem', fontWeight:700 }}>{ck.value}</b>
+              <span>{ck.unit}</span>
             </div>
           ))}
         </div>

@@ -28,7 +28,7 @@ export function defaultState(): State {
     examReading: {},
     examListening: {},
     dailyHistory: {},
-    prefs: { rate: 0.9, voiceURI: '', autoTTS: true, ttsEngine: 'auto', onlineVoice: 'FennaNeural', fontSize: 15 },
+    prefs: { rate: 0.9, voiceURI: '', autoTTS: true, ttsEngine: 'auto', onlineVoice: 'FennaNeural', fontSize: 15, studyDayMinutes: 60, minutesPerTask: 30 },
     bookUnits: {},
     examWords: [],
     customDur: {},
@@ -97,9 +97,12 @@ export function applyState(parsed: any): State {
     rate:        typeof p.rate === 'number' ? clampNum(p.rate, 0.6, 1.3) : 0.9,
     voiceURI:    typeof p.voiceURI === 'string' ? p.voiceURI : '',
     autoTTS:     p.autoTTS !== false,
-    ttsEngine:   ['auto','online','browser'].includes(p.ttsEngine) ? p.ttsEngine : 'auto',
-    onlineVoice: typeof p.onlineVoice === 'string' ? p.onlineVoice : 'FennaNeural',
-    fontSize:    typeof p.fontSize === 'number' ? clampNum(p.fontSize, 13, 19) : 15,
+    ttsEngine:        ['auto','online','browser'].includes(p.ttsEngine) ? p.ttsEngine : 'auto',
+    onlineVoice:      typeof p.onlineVoice === 'string' ? p.onlineVoice : 'FennaNeural',
+    fontSize:         typeof p.fontSize === 'number' ? clampNum(p.fontSize, 13, 19) : 15,
+    // FIX 3 — new prefs with migration defaults so existing saves load cleanly
+    studyDayMinutes:  typeof p.studyDayMinutes === 'number' ? clampNum(p.studyDayMinutes, 15, 480) : 60,
+    minutesPerTask:   typeof p.minutesPerTask  === 'number' ? clampNum(p.minutesPerTask,  5,  120) : 30,
   }
 
   // v6 extensions

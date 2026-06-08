@@ -18,6 +18,10 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
   const dailyHistory = useAppStore((s) => s.dailyHistory)
   const setActiveTab = useAppStore((s) => s.setActiveTab)
 
+  // FIX 3: read user-configured study capacity
+  const minutesPerTask  = useAppStore((s) => s.prefs.minutesPerTask)
+  const studyDayMinutes = useAppStore((s) => s.prefs.studyDayMinutes)
+
   const daysLeft = getDaysLeft(examDate)
   const todayM   = dailyHistory[todayKey()]?.mins ?? 0
   const weekM    = sumLastNDays(dailyHistory, 'mins', 7)
@@ -27,7 +31,7 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
   const wkSk     = weakestSkill(skill)
   const bestNT2  = avgBestScore(skill)
   const gen      = generateTodayPlan({ planDay, done, vocab, skill })
-  const ph       = planHealth({ examDate, planDay, done })
+  const ph       = planHealth({ examDate, planDay, done }, { minutesPerTask, studyDayMinutes })
 
   const kpis = [
     { cls:'k1', icon:'📅', label:'الأيام للامتحان', value: daysLeft == null ? '—' : daysLeft, delta: ph.status==='crit'?'حالة حرجة':ph.status==='tight'?'مشدودة':'على المسار', dCls: (ph.status==='crit'?'down':ph.status==='ok'?'up':'flat') as 'up'|'down'|'flat' },

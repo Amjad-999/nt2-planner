@@ -433,19 +433,49 @@ export function tasksRemaining(done: State['done']) {
   return { rem, total }
 }
 
-export function planHealth(state: Pick<State, 'examDate' | 'planDay' | 'done'>) {
+export function planHealth(
+  state: Pick<State, 'examDate' | 'planDay' | 'done'>,
+  // FIX 3: accept user-configured study capacity (optional, defaults match migration defaults)
+  prefs?: { minutesPerTask?: number; studyDayMinutes?: number },
+) {
+  const minutesPerTask  = prefs?.minutesPerTask  ?? 30
+  const studyDayMinutes = prefs?.studyDayMinutes ?? 60
+
   const left = getDaysLeft(state.examDate)
   const { rem, total } = tasksRemaining(state.done)
   const done = total - rem
   const expectedDone = Math.round((state.planDay / TOTAL_PLAN_DAYS) * total)
-  const lag = expectedDone - done
+  const lag    = expectedDone - done
   const lagPct = total ? (lag / total) * 100 : 0
-  const needMins = left && rem ? Math.round((rem * 30) / Math.max(1, left)) : 0
+  // FIX 3: use user's minutesPerTask instead of hardcoded 30
+  const needMins = left && rem ? Math.round((rem * minutesPerTask) / Math.max(1, left)) : 0
+
   let status: 'ok' | 'tight' | 'crit', badge: string, title: string, why: string
-  if (left === null) { status = 'tight'; badge = '⚙️'; title = 'حدّد تاريخ الامتحان أوّلًا'; why = 'افتح الإعدادات لإضافة تاريخ الامتحان حتى نحسب الكثافة المطلوبة.' }
-  else if (lagPct < 5 && needMins <= 60) { status = 'ok'; badge = '✅'; title = 'الخطّة على المسار الصحيح'; why = `متبقّي ${left} يوم و${rem} مهمّة — تحتاج تقريبًا ${needMins} دقيقة/يوم لإكمال الخطّة في الموعد.` }
-  else if (lagPct < 15 && needMins <= 90) { status = 'tight'; badge = '⚠️'; title = 'الخطّة مشدودة — لكنها قابلة للتنفيذ'; why = `أنت متأخّر ${Math.max(0, lag)} مهمّة عن الإيقاع المثالي. ارفع وتيرتك إلى ~${needMins} دقيقة/يوم.` }
-  else { status = 'crit'; badge = '🚨'; title = 'حالة حرجة — إعادة توزيع تلقائية'; why = `متبقّي ${left} يوم و${rem} مهمّة. تحتاج ${needMins} دقيقة/يوم — يُنصح بإسقاط المهام الأقلّ أولوية أو زيادة كثافة الجلسات.` }
+
+  // FIX 4: recalibrated thresholds — critical must mean BEHIND, not just "many tasks remain".
+  //
+  //  ok   → lagPct < 10   (on pace regardless of workload)
+  //  tight → 10 <= lagPct < 25  OR  needMins is above daily budget but still reachable (≤ 2×)
+  //  crit  → lagPct >= 25  OR  daily need exceeds 2× user's available time
+  //
+  // This prevents Day-1 "critical" when nothing is actually overdue.
+  if (left === null) {
+    status = 'tight'; badge = '⚙️'
+    title = 'حدّد تاريخ الامتحان أوّلًا'
+    why   = 'افتح الإعدادات لإضافة تاريخ الامتحان حتى نحسب الكثافة المطلوبة.'
+  } else if (lagPct < 10) {
+    status = 'ok'; badge = '✅'
+    title = 'الخطّة على المسار الصحيح'
+    why   = `متبقّي ${left} يوم و${rem} مهمّة — تحتاج تقريبًا ${needMins} دقيقة/يوم لإكمال الخطّة في الموعد.`
+  } else if (lagPct < 25 || needMins <= studyDayMinutes * 2) {
+    status = 'tight'; badge = '⚠️'
+    title = 'الخطّة مشدودة — لكنها قابلة للتنفيذ'
+    why   = `أنت متأخّر ${Math.max(0, lag)} مهمّة عن الإيقاع المثالي. ارفع وتيرتك إلى ~${needMins} دقيقة/يوم (لديك ${studyDayMinutes} د/يوم متاحة).`
+  } else {
+    status = 'crit'; badge = '🚨'
+    title = 'حالة حرجة — إعادة توزيع تلقائية'
+    why   = `متبقّي ${left} يوم و${rem} مهمّة. تحتاج ${needMins} دقيقة/يوم — يتجاوز ضعف وقتك المتاح (${studyDayMinutes} د). يُنصح بإسقاط المهام الأقلّ أولوية.`
+  }
   return { status, badge, title, why, left, rem, total, done, needMins, lag, lagPct }
 }
 

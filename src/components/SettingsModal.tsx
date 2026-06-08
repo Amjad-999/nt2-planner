@@ -15,6 +15,9 @@ export function SettingsModal({ onClose }: Props) {
   const [ttsEngine, setTtsEngine] = useState(s.prefs.ttsEngine)
   const [onlineVoice, setOnlineVoice] = useState(s.prefs.onlineVoice)
   const [voiceURI, setVoiceURI] = useState(s.prefs.voiceURI)
+  // FIX 3: study capacity prefs
+  const [studyDayMinutes, setStudyDayMinutes] = useState(String(s.prefs.studyDayMinutes ?? 60))
+  const [minutesPerTask,  setMinutesPerTask]  = useState(String(s.prefs.minutesPerTask  ?? 30))
   const [testResult, setTestResult] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -25,7 +28,12 @@ export function SettingsModal({ onClose }: Props) {
       name: name.trim(),
       examDate: examDate ? new Date(examDate + 'T09:00:00').toISOString() : s.examDate,
       planDay: Math.min(TOTAL_PLAN_DAYS, Math.max(1, parseInt(planDay) || 1)),
-      prefs: { rate: parseFloat(rate) || 0.9, ttsEngine, onlineVoice, voiceURI },
+      prefs: {
+        rate: parseFloat(rate) || 0.9,
+        ttsEngine, onlineVoice, voiceURI,
+        studyDayMinutes: Math.min(480, Math.max(15, parseInt(studyDayMinutes) || 60)),
+        minutesPerTask:  Math.min(120, Math.max(5,   parseInt(minutesPerTask)  || 30)),
+      },
     })
     onClose()
   }
@@ -56,6 +64,27 @@ export function SettingsModal({ onClose }: Props) {
       <Field label="اسمك (اختياري)"><input className="form-in" value={name} onChange={(e)=>setName(e.target.value)} placeholder="اسمك" /></Field>
       <Field label="تاريخ الامتحان"><input className="form-in" type="date" value={examDate} onChange={(e)=>setExamDate(e.target.value)} /></Field>
       <Field label="اليوم الحالي في الخطّة (1–46)"><input className="form-in" type="number" value={planDay} onChange={(e)=>setPlanDay(e.target.value)} min={1} max={46} /></Field>
+      {/* FIX 3 — study capacity inputs */}
+      <Field label="دقائق الدراسة المتاحة يوميًا">
+        <input
+          className="form-in"
+          type="number"
+          value={studyDayMinutes}
+          onChange={(e) => setStudyDayMinutes(e.target.value)}
+          min={15} max={480}
+          style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)' }}
+        />
+      </Field>
+      <Field label="متوسّط دقائق التمرين الواحد">
+        <input
+          className="form-in"
+          type="number"
+          value={minutesPerTask}
+          onChange={(e) => setMinutesPerTask(e.target.value)}
+          min={5} max={120}
+          style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)' }}
+        />
+      </Field>
       <Field label="سرعة النطق الهولندي">
         <select className="form-in" value={rate} onChange={(e)=>setRate(e.target.value)}>
           <option value="0.8">بطيئة (0.8×)</option>

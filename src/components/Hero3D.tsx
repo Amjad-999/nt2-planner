@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useMemo } from 'react'
+import { lazy, Suspense, useState, useMemo, Component, type ReactNode, type ErrorInfo } from 'react'
 import { useAppStore, getDaysLeft, avgBestScore } from '@/store/useAppStore'
 import { todayKey } from '@/lib/utils'
 import { useReducedMotion3D } from '@/three/useReducedMotion3D'
@@ -7,6 +7,35 @@ import { Hero2DFallback } from './Hero2DFallback'
 /* Lazy-import the heavy 3D scene — only loaded when 3D is enabled */
 const Scene      = lazy(() => import('@/three/Scene').then((m) => ({ default: m.Scene })))
 const CanalScene = lazy(() => import('@/three/CanalScene').then((m) => ({ default: m.CanalScene })))
+
+/* ── ErrorBoundary — catches R3F / WebGL init failures and shows 2D fallback ── */
+interface EBState { error: Error | null }
+class HeroErrorBoundary extends Component<{ children: ReactNode }, EBState> {
+  state: EBState = { error: null }
+  static getDerivedStateFromError(error: Error): EBState {
+    console.warn('[NT2 3D] Canvas error caught by HeroErrorBoundary:', error.message)
+    return { error }
+  }
+  componentDidCatch(_err: Error, info: ErrorInfo) {
+    console.warn('[NT2 3D] componentDidCatch:', info.componentStack?.slice(0, 200))
+  }
+  render() {
+    if (this.state.error) return <Hero2DFallback />
+    return this.props.children
+  }
+}
+
+// FIX 2 — proofreading pass (mirrors Hero2DFallback):
+//   'يومٌ مبارك' → 'يوم مبارك'   (tanwin dropped)
+//   'لنرَ'        → 'لنرى'         (standard spelling)
+const GREETINGS_3D = [
+  'أهلًا بك في NT2 Planner',
+  'يوم مبارك — هيا نواصل التقدّم',
+  'مرحبًا من جديد — رحلتك إلى B1 مستمرّة',
+  'goedendag — مخطّط NT2 جاهز لك',
+  'هيا بنا — كل يوم خطوة نحو الامتحان',
+  'سلام — لنرى أين وصلت اليوم',
+]
 
 export function Hero3D() {
   const reducedMotion = useReducedMotion3D()
@@ -23,13 +52,8 @@ export function Hero3D() {
   const progress    = avgBestScore(skill)
   const streakCount = streak.count
 
-  // Always render the 2D content as an accessible text layer behind/beside the canvas
-  const textContent = (
-    <Hero2DFallback />
-  )
-
-  // Fall back to 2D if reduced motion or WebGL unavailable
-  if (reducedMotion) return textContent
+  // Render 2D fallback when the OS requests reduced motion
+  if (reducedMotion) return <Hero2DFallback />
 
   return (
     <div
@@ -39,29 +63,30 @@ export function Hero3D() {
         position: 'relative',
         marginBottom: 20,
         minHeight: 280,
-        // Dark indigo gradient behind the 3D canvas
         background: 'var(--grad-hero)',
         border: '1px solid rgba(255,255,255,.10)',
         boxShadow: 'var(--elev-3), inset 0 1px 0 rgba(255,255,255,.10)',
       }}
     >
-      {/* 3D canvas layer */}
-      {visible && (
-        <Suspense fallback={null}>
-          <Scene onVisibilityChange={setVisible}>
-            <CanalScene
-              progress={progress}
-              streak={streakCount}
-              daysLeft={daysLeft}
-              planDay={planDay}
-              todayMins={todayMins}
-              streakCount={streakCount}
-            />
-          </Scene>
-        </Suspense>
-      )}
+      {/* 3D canvas — ErrorBoundary catches WebGL failures → shows 2D fallback */}
+      <HeroErrorBoundary>
+        {visible && (
+          <Suspense fallback={null}>
+            <Scene onVisibilityChange={setVisible}>
+              <CanalScene
+                progress={progress}
+                streak={streakCount}
+                daysLeft={daysLeft}
+                planDay={planDay}
+                todayMins={todayMins}
+                streakCount={streakCount}
+              />
+            </Scene>
+          </Suspense>
+        )}
+      </HeroErrorBoundary>
 
-      {/* Text overlay — always on top of the canvas, readable at all times */}
+      {/* Text overlay — always on top, readable regardless of 3D state */}
       <div
         style={{
           position: 'relative',
@@ -75,38 +100,30 @@ export function Hero3D() {
           planDay={planDay}
           todayMins={todayMins}
           streakCount={streakCount}
-          progress={progress}
-          examDate={examDate}
         />
       </div>
     </div>
   )
 }
 
-/* ── The readable text layer that sits on top of the 3D canvas ── */
+/* ── Text overlay rendered on top of the 3D canvas ── */
 interface TextProps {
   daysLeft:    number | null
   planDay:     number
   todayMins:   number
   streakCount: number
-  progress:    number
-  examDate:    string
 }
-
-const GREETINGS = [
-  'أهلًا بك في NT2 Planner',
-  'يومٌ مبارك — هيا نواصل التقدّم',
-  'مرحبًا من جديد — رحلتك إلى B1 مستمرّة',
-  'goedendag — مخطّط NT2 جاهز لك',
-  'هيا بنا — كل يوم خطوة نحو الامتحان',
-  'سلام — لنرَ أين وصلت اليوم',
-]
 
 function HeroTextOverlay({ daysLeft, planDay, todayMins, streakCount }: TextProps) {
   const name = useAppStore((s) => s.name)
+
+  // FIX 2 — stable greeting chosen once per mount (same logic as Hero2DFallback)
   const greeting = useMemo(() => {
-    const g = [...GREETINGS]
-    if (name) { g[0] = `أهلًا بك يا ${name}`; g[2] = `مرحبًا ${name} — رحلتك إلى B1 مستمرّة` }
+    const g = [...GREETINGS_3D]
+    if (name) {
+      g[0] = `أهلًا بك يا ${name}`
+      g[2] = `مرحبًا ${name} — رحلتك إلى B1 مستمرّة`
+    }
     return g[Math.floor(Math.random() * g.length)]
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name])
@@ -131,10 +148,10 @@ function HeroTextOverlay({ daysLeft, planDay, todayMins, streakCount }: TextProp
       </div>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         {[
-          { icon: '📅', label: 'المتبقّي:', value: daysLeft == null ? '—' : String(daysLeft), unit: 'يومًا' },
-          { icon: '📍', label: 'اليوم:', value: String(planDay), unit: '/ 46' },
-          { icon: '⏱️', label: 'درست اليوم:', value: String(todayMins), unit: 'دقيقة' },
-          { icon: '🔥', label: 'مواظبة:', value: String(streakCount), unit: 'يوم' },
+          { icon: '📅', label: 'المتبقّي:',    value: daysLeft == null ? '—' : String(daysLeft), unit: 'يومًا' },
+          { icon: '📍', label: 'اليوم:',        value: String(planDay),   unit: '/ 46'   },
+          { icon: '⏱️', label: 'درست اليوم:',  value: String(todayMins), unit: 'دقيقة'  },
+          { icon: '🔥', label: 'مواظبة:',       value: String(streakCount), unit: 'يوم'  },
         ].map((ck) => (
           <div
             key={ck.label}

@@ -4,8 +4,11 @@ export function PlanHealth() {
   const examDate = useAppStore((s) => s.examDate)
   const planDay  = useAppStore((s) => s.planDay)
   const done     = useAppStore((s) => s.done)
+  // FIX 3: read user-configured study capacity and pass to planHealth
+  const minutesPerTask  = useAppStore((s) => s.prefs.minutesPerTask)
+  const studyDayMinutes = useAppStore((s) => s.prefs.studyDayMinutes)
 
-  const ph = planHealth({ examDate, planDay, done })
+  const ph = planHealth({ examDate, planDay, done }, { minutesPerTask, studyDayMinutes })
 
   const borderColor = ph.status === 'ok' ? 'var(--green)' : ph.status === 'tight' ? 'var(--amber)' : 'var(--red)'
   const badgeBg     = ph.status === 'ok' ? 'var(--green-l)' : ph.status === 'tight' ? 'var(--amber-l)' : 'var(--red-l)'
