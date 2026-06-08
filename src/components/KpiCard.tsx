@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 
 interface Props {
@@ -8,13 +8,25 @@ interface Props {
   value: string | number
   delta: string
   deltaClass: 'up' | 'down' | 'flat'
+  /* Optional inline editing — when `editable`, a small "✎ تعديل" button appears below.
+     Provide `onSave` for a single inline input, or `onEditClick` to open a custom editor. */
+  editable?: boolean
+  editKind?: 'number' | 'date'
+  editRaw?: string
+  min?: number
+  max?: number
+  onSave?: (val: string) => void
+  onEditClick?: () => void
 }
 
-export function KpiCard({ cls, icon, label, value, delta, deltaClass }: Props) {
+export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, editKind = 'number', editRaw, min, max, onSave, onEditClick }: Props) {
   const valRef = useRef<HTMLDivElement>(null)
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState('')
 
-  // Animate number on mount / value change
+  // Animate number on mount / value change (skipped while editing)
   useEffect(() => {
+    if (editing) return
     const el = valRef.current
     if (!el) return
     const num = parseFloat(String(value))
@@ -29,7 +41,7 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass }: Props) {
       else el.textContent = String(value)
     }
     requestAnimationFrame(step)
-  }, [value])
+  }, [value, editing])
 
   const deltaColor = deltaClass === 'up' ? 'var(--green)' : deltaClass === 'down' ? 'var(--red)' : 'var(--muted)'
   const deltaIcon  = deltaClass === 'up' ? '↑ ' : deltaClass === 'down' ? '↓ ' : ''
@@ -42,6 +54,14 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass }: Props) {
     k1: 'var(--blue)', k2: 'var(--green)', k3: 'var(--orange)',
     k4: 'var(--purple)', k5: 'var(--amber)', k6: 'var(--teal)',
   }
+
+  const startEdit = () => {
+    if (onEditClick) { onEditClick(); return }
+    setDraft(editRaw ?? String(value))
+    setEditing(true)
+  }
+  const commit = () => { onSave?.(draft); setEditing(false) }
+  const cancel = () => setEditing(false)
 
   return (
     <motion.div
@@ -56,35 +76,66 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass }: Props) {
       whileHover={{ translateY: -4, boxShadow: 'var(--elev-3)' }}
       transition={{ duration: 0.2 }}
     >
-      {/*
-        FIX 1 — RTL icon position.
-        In RTL `inline-end` is the LEFT side, matching pe-10 clearance on label/value.
-        Previously `start-[14px]` placed the icon on the RIGHT (RTL start) while
-        pe-10 cleared the LEFT — opposite sides, causing overlap.
-      */}
-      <div
-        className="absolute top-[14px] end-[14px] w-[34px] h-[34px] rounded-lg flex items-center justify-center text-[.95rem]"
-        style={{
-          background: icBg[cls] ?? 'var(--surface3)',
-          color: icColor[cls] ?? 'var(--text)',
-          boxShadow: 'var(--elev-1), inset 0 1px 0 rgba(255,255,255,.45)',
-        }}
-        aria-hidden="true"
-      >
-        {icon}
-      </div>
-      {/* pe-10 = padding-inline-end = left clearance in RTL — now correctly aligned with icon */}
+      {/* Icon (top inline-end) — hidden while editing so it never overlaps the input */}
+      {!editing && (
+        <div
+          className="absolute top-[14px] end-[14px] w-[34px] h-[34px] rounded-lg flex items-center justify-center text-[.95rem]"
+          style={{
+            background: icBg[cls] ?? 'var(--surface3)',
+            color: icColor[cls] ?? 'var(--text)',
+            boxShadow: 'var(--elev-1), inset 0 1px 0 rgba(255,255,255,.45)',
+          }}
+          aria-hidden="true"
+        >
+          {icon}
+        </div>
+      )}
+
       <div className="text-[.74rem] text-[var(--muted)] uppercase tracking-[.5px] mb-1 pe-10">{label}</div>
-      <div
-        ref={valRef}
-        className="text-[1.65rem] font-bold leading-[1.1] text-[var(--text)] pe-10"
-        style={{ fontFamily: 'var(--font-display,"Plus Jakarta Sans",serif)' }}
-      >
-        {value}
-      </div>
+
+      {editing ? (
+        <input
+          autoFocus
+          type={editKind}
+          defaultValue={draft}
+          min={min}
+          max={max}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') commit(); else if (e.key === 'Escape') cancel() }}
+          onBlur={commit}
+          aria-label={`قيمة ${label}`}
+          className="w-full text-[1.4rem] font-bold leading-[1.1] text-[var(--text)]"
+          style={{ background: 'var(--surface)', border: '1px solid var(--orange)', borderRadius: 10, padding: '6px 10px', fontFamily: 'inherit', outline: 'none' }}
+        />
+      ) : (
+        <div
+          ref={valRef}
+          className="text-[1.65rem] font-bold leading-[1.1] text-[var(--text)] pe-10"
+          style={{ fontFamily: 'var(--font-display,"Plus Jakarta Sans",serif)' }}
+        >
+          {value}
+        </div>
+      )}
+
       <div className="text-[.78rem] mt-1 font-medium" style={{ color: deltaColor }}>
         {deltaIcon}{delta}
       </div>
+
+      {/* Edit affordance — in normal flow (never overlaps icon or status text) */}
+      {editable && !editing && (
+        <button
+          type="button"
+          onClick={startEdit}
+          aria-label={`تعديل ${label}`}
+          className="mt-2.5 inline-flex items-center gap-1 cursor-pointer text-[.72rem] font-semibold rounded-lg px-2.5 py-1"
+          style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', color: 'var(--orange)', boxShadow: 'var(--elev-1)' }}
+        >
+          ✎ تعديل
+        </button>
+      )}
+      {editing && (
+        <div className="mt-2 text-[.7rem]" style={{ color: 'var(--muted)' }}>اضغط Enter للحفظ · Esc للإلغاء</div>
+      )}
     </motion.div>
   )
 }

@@ -4,7 +4,8 @@ import { Hero3D } from '@/components/Hero3D'
 import { PlanHealth } from '@/components/PlanHealth'
 import { KpiCard } from '@/components/KpiCard'
 import { InsightCard } from '@/components/InsightCard'
-import { todayKey } from '@/lib/utils'
+import { useState } from 'react'
+import { todayKey, dayKeyOffset } from '@/lib/utils'
 
 interface Props { onOpenStudyTime?: () => void }
 
@@ -17,6 +18,9 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
   const streak   = useAppStore((s) => s.streak)
   const dailyHistory = useAppStore((s) => s.dailyHistory)
   const setActiveTab = useAppStore((s) => s.setActiveTab)
+  const setDayMinutes = useAppStore((s) => s.setDayMinutes)
+  const saveSettings = useAppStore((s) => s.saveSettings)
+  const [weekEdit, setWeekEdit] = useState(false)
 
   // FIX 3: read user-configured study capacity
   const minutesPerTask  = useAppStore((s) => s.prefs.minutesPerTask)
@@ -33,13 +37,23 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
   const gen      = generateTodayPlan({ planDay, done, vocab, skill })
   const ph       = planHealth({ examDate, planDay, done }, { minutesPerTask, studyDayMinutes })
 
-  const kpis = [
-    { cls:'k1', icon:'📅', label:'الأيام للامتحان', value: daysLeft == null ? '—' : daysLeft, delta: ph.status==='crit'?'حالة حرجة':ph.status==='tight'?'مشدودة':'على المسار', dCls: (ph.status==='crit'?'down':ph.status==='ok'?'up':'flat') as 'up'|'down'|'flat' },
-    { cls:'k2', icon:'⏱️', label:'دقائق اليوم', value: todayM, delta: todayM>=30?'هدف اليوم محقّق':`تحتاج ${Math.max(0,30-todayM)} د`, dCls: (todayM>=30?'up':'flat') as 'up'|'down'|'flat' },
-    { cls:'k3', icon:'📊', label:'دقائق الأسبوع', value: weekM, delta: `${dWeek>=0?'+':''}${dWeek}٪ مقابل الأسبوع الماضي`, dCls: (dWeek>0?'up':dWeek<0?'down':'flat') as 'up'|'down'|'flat' },
-    { cls:'k4', icon:'📚', label:'كلمات متقنة', value: `${totW.learned}/${totW.all}`, delta: totW.learned?`${Math.round((totW.learned/Math.max(1,totW.all))*100)}٪ نسبة الإتقان`:'ابدأ المراجعة', dCls: 'flat' as const },
-    { cls:'k5', icon:'🎯', label:'معدّل امتحاناتك', value: `${bestNT2}٪`, delta: bestNT2>=PASS_THRESHOLD?'✓ فوق عتبة النجاح':`تبعد ${PASS_THRESHOLD-bestNT2}٪ عن النجاح`, dCls: (bestNT2>=PASS_THRESHOLD?'up':'down') as 'up'|'down'|'flat' },
-    { cls:'k6', icon:'🔥', label:'مواظبة', value: `${streak.count} يوم`, delta: `${SKILL_AR[wkSk]??wkSk} هي الأضعف`, dCls: 'flat' as const },
+  type KpiItem = {
+    cls: string; icon: string; label: string; value: string | number; delta: string; dCls: 'up'|'down'|'flat'
+    editable?: boolean; editKind?: 'number'|'date'; editRaw?: string; min?: number; max?: number
+    onSave?: (v: string) => void; onEditClick?: () => void
+  }
+  const kpis: KpiItem[] = [
+    { cls:'k1', icon:'📅', label:'الأيام للامتحان', value: daysLeft == null ? '—' : daysLeft, delta: ph.status==='crit'?'حالة حرجة':ph.status==='tight'?'مشدودة':'على المسار', dCls: (ph.status==='crit'?'down':ph.status==='ok'?'up':'flat'),
+      editable:true, editKind:'number', editRaw: daysLeft==null?'':String(daysLeft), min:1, max:400,
+      onSave:(v)=>{ const n=parseInt(v); if(n>0){ const d=new Date(); d.setDate(d.getDate()+n); d.setHours(9,0,0,0); saveSettings({ examDate:d.toISOString() }) } } },
+    { cls:'k2', icon:'⏱️', label:'دقائق اليوم', value: todayM, delta: todayM>=studyDayMinutes?'هدف اليوم محقّق':`تحتاج ${Math.max(0,studyDayMinutes-todayM)} د`, dCls: (todayM>=studyDayMinutes?'up':'flat'),
+      editable:true, editKind:'number', editRaw:String(todayM), min:0, max:600,
+      onSave:(v)=>{ setDayMinutes(todayKey(), parseInt(v)||0) } },
+    { cls:'k3', icon:'📊', label:'دقائق الأسبوع', value: weekM, delta: `${dWeek>=0?'+':''}${dWeek}٪ مقابل الأسبوع الماضي`, dCls: (dWeek>0?'up':dWeek<0?'down':'flat'),
+      editable:true, onEditClick:()=> setWeekEdit((o)=>!o) },
+    { cls:'k4', icon:'📚', label:'كلمات متقنة', value: `${totW.learned}/${totW.all}`, delta: totW.learned?`${Math.round((totW.learned/Math.max(1,totW.all))*100)}٪ نسبة الإتقان`:'ابدأ المراجعة', dCls: 'flat' },
+    { cls:'k5', icon:'🎯', label:'معدّل امتحاناتك', value: `${bestNT2}٪`, delta: bestNT2>=PASS_THRESHOLD?'✓ فوق عتبة النجاح':`تبعد ${PASS_THRESHOLD-bestNT2}٪ عن النجاح`, dCls: (bestNT2>=PASS_THRESHOLD?'up':'down') },
+    { cls:'k6', icon:'🔥', label:'مواظبة', value: `${streak.count} يوم`, delta: `${SKILL_AR[wkSk]??wkSk} هي الأضعف`, dCls: 'flat' },
   ]
 
   const due = vocab.filter((w)=>(w.due??0)<=Date.now()&&(w.box??0)<LEARNED_BOX).length
@@ -67,8 +81,33 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
 
       <h2 style={SH}><span style={{ color:'var(--orange)' }}>🎯</span> مؤشّرات اليوم</h2>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(165px,1fr))', gap:12, marginBottom:18 }}>
-        {kpis.map((k) => <KpiCard key={k.cls} cls={k.cls} icon={k.icon} label={k.label} value={k.value} delta={k.delta} deltaClass={k.dCls} />)}
+        {kpis.map((k) => <KpiCard key={k.cls} cls={k.cls} icon={k.icon} label={k.label} value={k.value} delta={k.delta} deltaClass={k.dCls} editable={k.editable} editKind={k.editKind} editRaw={k.editRaw} min={k.min} max={k.max} onSave={k.onSave} onEditClick={k.onEditClick} />)}
       </div>
+
+      {weekEdit && (
+        <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:'14px 16px', marginBottom:18, boxShadow:'var(--elev-1)' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
+            <div style={{ fontSize:'.88rem', fontWeight:600, color:'var(--text)' }}>✏️ عدّل دقائق آخر 7 أيام</div>
+            <button onClick={()=>setWeekEdit(false)} style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'1rem' }} aria-label="إغلاق">✕</button>
+          </div>
+          <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+            {Array.from({ length: 7 }, (_, i) => {
+              const key = dayKeyOffset(-i)
+              const mins = dailyHistory[key]?.mins ?? 0
+              const lbl = i===0 ? 'اليوم' : i===1 ? 'أمس' : `قبل ${i} يوم`
+              return (
+                <label key={key} style={{ display:'flex', flexDirection:'column', gap:4, fontSize:'.72rem', color:'var(--muted)' }}>
+                  <span>{lbl}</span>
+                  <input type="number" min={0} max={600} defaultValue={mins}
+                    onChange={(e)=> setDayMinutes(key, parseInt(e.target.value)||0)}
+                    aria-label={`دقائق ${lbl}`}
+                    style={{ width:64, padding:'6px 8px', border:'1px solid var(--border2)', borderRadius:8, background:'var(--surface)', color:'var(--text)', fontFamily:'inherit', fontSize:'.85rem' }} />
+                </label>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       <h2 style={SH}><span style={{ color:'var(--orange)' }}>💡</span> رؤى ذكية</h2>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:12, marginBottom:18 }}>

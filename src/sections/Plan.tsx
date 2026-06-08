@@ -5,7 +5,7 @@ import { PHASES, planTaskId, SKILL_AR } from '@/data/phases'
 interface Props {}
 
 export default function Plan(_: Props) {
-  const { planDay, done, vocab, skill, customDur, toggleTaskDone } = useAppStore()
+  const { planDay, done, vocab, skill, customDur, toggleTaskDone, setCustomDur } = useAppStore()
   const gen = generateTodayPlan({ planDay, done, vocab, skill })
 
   return (
@@ -48,7 +48,13 @@ export default function Plan(_: Props) {
                       <input type="checkbox" checked={!!done[t.id]} onChange={() => toggleTaskDone(t.id)} aria-label={`إكمال: ${t.name}`} style={{ accentColor:'var(--orange)' }} />
                     </td>
                     <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontWeight:500, color:'var(--text)', textDecoration: done[t.id] ? 'line-through' : 'none' }}>{t.name}</td>
-                    <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'.86rem', color:'var(--text2)' }}>{customDur[t.id] ?? t.mins}د</td>
+                    <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'.86rem', color:'var(--text2)', whiteSpace:'nowrap' }}>
+                      <input type="number" min={5} max={180} value={customDur[t.id] ?? t.mins}
+                        onChange={(e)=>{ const n=parseInt(e.target.value); if(!isNaN(n)) setCustomDur(t.id, n) }}
+                        aria-label={`دقائق المهمّة: ${t.name}`}
+                        style={{ width:54, padding:'4px 6px', border:'1px solid var(--border2)', borderRadius:8, background:'var(--surface)', color:'var(--text)', fontFamily:'inherit', fontSize:'.84rem' }} />
+                      <span style={{ marginInlineStart:4, color:'var(--muted)' }}>د</span>
+                    </td>
                     <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'.86rem', color:'var(--text2)' }}>{SKILL_AR[t.skill] ?? t.skill}</td>
                     <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'.78rem', color:'var(--muted)' }}>{t.why}</td>
                   </tr>

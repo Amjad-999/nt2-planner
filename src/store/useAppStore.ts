@@ -75,6 +75,7 @@ export interface AppStore extends State {
   bumpHist: (field: keyof Omit<State['dailyHistory'][string], 'examTaken'>, n?: number) => void
   bumpStreak: () => void
   recordStudyMinutes: (mins: number) => void
+  setDayMinutes: (dayKey: string, mins: number) => void
 
   // Vocab
   vocabAdd: (dutch: string, arabic: string, example: string, level: string) => boolean
@@ -169,6 +170,17 @@ export const useAppStore = create<AppStore>()(
         set((st) => ({ studySec: st.studySec + mins * 60 }))
         get().bumpHist('mins', mins)
         get().bumpStreak()
+        get().save()
+      },
+
+      // Set a given day's studied minutes to an absolute value (inline editing).
+      setDayMinutes: (dayKey, mins) => {
+        const m = Math.min(600, Math.max(0, Math.round(mins) || 0))
+        set((st) => {
+          const prev = st.dailyHistory[dayKey] ?? { mins: 0, tasks: 0, wordsAdded: 0, wordsLearned: 0, examTaken: [] }
+          return { dailyHistory: { ...st.dailyHistory, [dayKey]: { ...prev, mins: m } } }
+        })
+        if (dayKey === todayKey() && m > 0) get().bumpStreak()
         get().save()
       },
 
