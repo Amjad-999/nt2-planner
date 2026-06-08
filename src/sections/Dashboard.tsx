@@ -1,6 +1,6 @@
 import { useAppStore, getDaysLeft, totalLearnedWords, avgBestScore, weakestSkill, sumLastNDays, sumPrevNDays, generateTodayPlan, planHealth } from '@/store/useAppStore'
 import { PASS_THRESHOLD, SKILL_AR, LEARNED_BOX } from '@/data/phases'
-import { Hero2DFallback } from '@/components/Hero2DFallback'
+import { Hero3D } from '@/components/Hero3D'
 import { PlanHealth } from '@/components/PlanHealth'
 import { KpiCard } from '@/components/KpiCard'
 import { InsightCard } from '@/components/InsightCard'
@@ -58,7 +58,7 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
 
   return (
     <div style={{ padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto' }}>
-      <Hero2DFallback />
+      <Hero3D />
       <PlanHealth />
 
       <h2 style={SH}><span style={{ color:'var(--orange)' }}>🎯</span> مؤشّرات اليوم</h2>
