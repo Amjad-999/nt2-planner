@@ -1,0 +1,90 @@
+@import './tokens.css';
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Reduced motion global kill ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: var(--font-size-base, 15px);
+  scroll-behavior: smooth;
+  direction: rtl;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Cairo', 'Readex Pro', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100dvh;
+  transition: background .25s ease, color .25s ease;
+  -webkit-tap-highlight-color: transparent;
+  background: transparent;
+}
+
+/* Mesh gradient background */
+html { background: var(--bg); }
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 760px at 8% -10%, var(--mesh1), transparent 60%),
+    radial-gradient(1000px 700px at 102% 2%, var(--mesh2), transparent 58%),
+    radial-gradient(900px 820px at 50% 118%, var(--mesh3), transparent 60%);
+}
+
+/* ── Focus ── */
+:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ── Screen-reader only ── */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Scrollbar hide ── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { scrollbar-width: none; }
+
+/* ── Backdrop filter fallback ── */
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+  :root { --glass-bg: rgba(255,255,255,.92); --glass-bg-strong: rgba(255,255,255,.97); }
+  :root[data-theme="dark"] { --glass-bg: rgba(32,35,60,.94); --glass-bg-strong: rgba(32,35,60,.98); }
+}
+
+/* ── Common animation keyframes ── */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes secIn { from { opacity: 0; transform: translateY(10px) scale(.995); } to { opacity: 1; transform: none; } }
+@keyframes popIn { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes blob-drift { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(var(--blob-dx,-18px),var(--blob-dy,12px)) scale(1.08); } }
+@keyframes blob-drift2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(var(--b2-dx,20px),var(--b2-dy,-12px)) scale(1.1); } }
+@keyframes ember-rise { 0% { transform: translateY(0) translateX(0) scale(.6); opacity: 0; } 12% { opacity: .85; } 80% { opacity: .55; } 100% { transform: translateY(calc(-1 * var(--erise,150px))) translateX(var(--edx,14px)) scale(1); opacity: 0; } }
+@keyframes flame-flicker { 0%,100% { transform: scale(1) rotate(-1deg); } 50% { transform: scale(1.06) rotate(1deg); } }
+@keyframes burst-a { 0% { transform: translate(0,0) scale(.4); opacity: 1; } 100% { transform: translate(-40px,-22px) scale(.8); opacity: 0; } }
+@keyframes burst-b { 0% { transform: translate(0,0) scale(.4); opacity: 1; } 100% { transform: translate(-58px,8px) scale(.8); opacity: 0; } }
+@keyframes burst-c { 0% { transform: translate(0,0) scale(.4); opacity: 1; } 100% { transform: translate(-28px,28px) scale(.6); opacity: 0; } }
