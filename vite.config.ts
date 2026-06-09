@@ -52,6 +52,7 @@ export default defineConfig({
           if (id.includes('framer-motion') || id.includes('gsap')) return 'motion'
           if (id.includes('react-pdf') || id.includes('pdfjs-dist')) return 'pdf'
           if (id.includes('wavesurfer')) return 'audio'
+          if (id.includes('@dnd-kit')) return 'exercises'
         },
       },
     },

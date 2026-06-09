@@ -12,13 +12,14 @@ const Plan       = lazy(() => import('@/sections/Plan'))
 const Vocab      = lazy(() => import('@/sections/Vocab'))
 const Books      = lazy(() => import('@/sections/Books'))
 const Exam       = lazy(() => import('@/sections/Exam'))
+const Exercises  = lazy(() => import('@/sections/Exercises'))
 const Stats      = lazy(() => import('@/sections/Stats'))
 const Resources  = lazy(() => import('@/sections/Resources'))
 const Platform   = lazy(() => import('@/sections/Platform'))
 
 const SECTION_MAP = {
   dashboard: Dashboard, plan: Plan, vocab: Vocab, books: Books,
-  exam: Exam, stats: Stats, resources: Resources, platform: Platform,
+  exam: Exam, exercises: Exercises, stats: Stats, resources: Resources, platform: Platform,
 } as const
 
 const SectionLoader = () => (
