@@ -16,8 +16,8 @@ export default defineConfig({
         name: 'NT2 Planner — مخطط الاستعداد لامتحان NT2 (B1)',
         short_name: 'NT2 Planner',
         description: 'منصة شاملة ومجانية للاستعداد لامتحان اللغة الهولندية NT2 على مستوى B1',
-        theme_color: '#5B57F0',
-        background_color: '#E9ECF6',
+        theme_color: '#109B8E',
+        background_color: '#E8EEEC',
         display: 'standalone',
         dir: 'rtl',
         lang: 'ar',
@@ -50,6 +50,7 @@ export default defineConfig({
           if (id.includes('three') || id.includes('@react-three')) return 'three-core'
           if (id.includes('chart.js') || id.includes('react-chartjs-2')) return 'chart'
           if (id.includes('framer-motion') || id.includes('gsap')) return 'motion'
+          if (id.includes('react-pdf') || id.includes('pdfjs-dist')) return 'pdf'
         },
       },
     },
