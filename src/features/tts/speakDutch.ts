@@ -2,7 +2,7 @@ import { useAppStore } from '@/store/useAppStore'
 import { _bestNlVoice, loadVoices, pickVoice, unlockTTS, _voices } from './voices'
 import { chunkText, playOneClip, stopAudio, _audioQueue, setQueue } from './audioQueue'
 
-function streamElementsURL(text: string, voice: string): string {
+export function streamElementsURL(text: string, voice?: string): string {
   const v = voice || useAppStore.getState().prefs.onlineVoice || 'FennaNeural'
   return `https://api.streamelements.com/kappa/v2/speech?voice=${encodeURIComponent(v)}&text=${encodeURIComponent(text)}`
 }

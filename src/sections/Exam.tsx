@@ -1,11 +1,12 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import { EXAM_READING, EXAM_LISTENING, EXAM_WRITING, EXAM_SPEAKING } from '@/data/examContent'
 import { PASS_THRESHOLD, LEARNED_BOX } from '@/data/phases'
-import { speakDutch, stopSpeak } from '@/features/tts/speakDutch'
+import { streamElementsURL } from '@/features/tts/speakDutch'
 import { FlashCard } from '@/components/FlashCard'
 import { WordCard } from '@/components/WordCard'
 import { SpeakAndCheck } from '@/components/SpeakAndCheck'
+import { WaveAudio } from '@/components/WaveAudio'
 import { wordCount } from '@/lib/utils'
 import type { AppStore } from '@/store/useAppStore'
 
@@ -124,7 +125,7 @@ function ListeningView({ s }: { s: S }) {
         return (
           <Card key={it.id}>
             <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.1rem', fontWeight:700, color:'var(--text)', margin:'0 0 6px' }}>🎙️ {it.title} <span style={{ fontSize:'.78rem', color:'var(--muted)', fontWeight:400 }}>— {it.ar}</span></h3>
-            <AudioRow transcript={it.transcript} />
+            <WaveAudio src={streamElementsURL(it.transcript)} title={it.title} />
             <details><summary style={{ cursor:'pointer', color:'var(--text2)', fontSize:'.86rem', margin:'8px 0' }}>📜 إظهار/إخفاء النصّ</summary>
               <Passage title="" text={it.transcript} pre /></details>
             {it.questions.map((q,qi) => {
@@ -220,7 +221,6 @@ function SpeakingView({ s }: { s: S }) {
           <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'18px 0 10px' }}>{grp.n}</h3>
           {grp.arr.map((sp)=>{
             const saved = s.examSpeaking[sp.id]??{score:0,at:0}
-            const ref = { current: null as HTMLButtonElement|null }
             return (
               <Card key={sp.id}>
                 <div style={{ fontWeight:600, color:'var(--text)', marginBottom:6 }}>🎤 {sp.ar}</div>
@@ -228,10 +228,7 @@ function SpeakingView({ s }: { s: S }) {
                   <p><strong>Situatie:</strong> {sp.situatieNl}</p><p style={{ fontSize:'.85rem', color:'var(--text2)', marginTop:4 }}>{sp.situatieAr}</p>
                   <p style={{ marginTop:8 }}><strong>Taak:</strong> {sp.taakNl}</p><p style={{ fontSize:'.85rem', color:'var(--text2)', marginTop:4 }}>{sp.taakAr}</p>
                 </div>
-                <div style={{ display:'flex', alignItems:'center', gap:8, background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:8, padding:'8px 12px', margin:'8px 0' }}>
-                  <button ref={ref} onClick={()=>speakDutch(sp.voorbeeldNl,ref.current)} style={{ background:'var(--glass-bg)', border:'1px solid var(--glass-border)', borderRadius:8, padding:'7px 12px', fontSize:'.8rem', cursor:'pointer', fontFamily:'inherit', color:'var(--text2)' }}>🔊 استمع للنموذج</button>
-                  <button onClick={()=>stopSpeak()} style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:8, padding:'7px 12px', fontSize:'.8rem', cursor:'pointer', fontFamily:'inherit', color:'var(--text2)' }}>⏹ إيقاف</button>
-                </div>
+                <WaveAudio src={streamElementsURL(sp.voorbeeldNl)} title="الجواب النموذجي" />
                 <details style={{ marginTop:8 }}><summary style={{ cursor:'pointer', color:'var(--text2)', fontSize:'.86rem' }}>📜 إظهار النموذج</summary>
                   <div style={{ marginTop:6, padding:10, background:'var(--surface2)', borderRadius:6, fontSize:'.9rem', color:'var(--text)', lineHeight:1.6 }}>{sp.voorbeeldNl}</div>
                 </details>
@@ -288,15 +285,6 @@ function Passage({ title, text, pre }: { title: string; text: string; pre?: bool
       {title && <h4 style={{ fontFamily:'var(--font-display)', fontSize:'1.2rem', fontWeight:700, color:'var(--text)', marginBottom:6 }}>{title}</h4>}
       {pre ? text : text.split('\n\n').map((p,i)=><p key={i} style={{ margin:'8px 0' }}>{p}</p>)}
       <div style={{ fontSize:'.74rem', color:'var(--muted)', marginTop:10, fontStyle:'italic' }}>مُعايَر على أسلوب DUO openbaar examen (المحتوى أصلي)</div>
-    </div>
-  )
-}
-function AudioRow({ transcript }: { transcript: string }) {
-  const ref = useRef<HTMLButtonElement>(null)
-  return (
-    <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap', background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:8, padding:'8px 12px', margin:'8px 0' }}>
-      <button ref={ref} onClick={()=>speakDutch(transcript,ref.current)} style={{ background:'var(--grad-primary)', color:'#fff', border:'none', borderRadius:8, padding:'7px 12px', fontSize:'.8rem', cursor:'pointer', fontWeight:600, fontFamily:'inherit', boxShadow:'var(--elev-1)' }}>▶️ شغّل الصوت الكامل</button>
-      <button onClick={()=>stopSpeak()} style={{ background:'var(--glass-bg)', border:'1px solid var(--glass-border)', borderRadius:8, padding:'7px 12px', fontSize:'.8rem', cursor:'pointer', fontFamily:'inherit', color:'var(--text2)' }}>⏹ إيقاف</button>
     </div>
   )
 }

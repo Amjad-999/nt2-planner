@@ -51,6 +51,7 @@ export default defineConfig({
           if (id.includes('chart.js') || id.includes('react-chartjs-2')) return 'chart'
           if (id.includes('framer-motion') || id.includes('gsap')) return 'motion'
           if (id.includes('react-pdf') || id.includes('pdfjs-dist')) return 'pdf'
+          if (id.includes('wavesurfer')) return 'audio'
         },
       },
     },
