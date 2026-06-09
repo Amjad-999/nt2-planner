@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { speakDutch } from '@/features/tts/speakDutch'
+import { SpeakAndCheck } from '@/components/SpeakAndCheck'
 import type { VocabWord, ExamWord } from '@/store/types'
 
 type Word = VocabWord | ExamWord
@@ -27,6 +28,7 @@ const LEVEL_STYLE: Record<string, { bg: string; color: string }> = {
 
 export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4 }: Props) {
   const btnRef = useRef<HTMLButtonElement>(null)
+  const [showPractice, setShowPractice] = useState(false)
   const nl = getNl(word)
   const ar = getAr(word)
   const ex = getEx(word)
@@ -35,9 +37,8 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4 }: Pro
 
   return (
     <motion.div
-      className="rounded-[10px] p-[12px_14px] mb-2 grid items-center gap-2"
+      className="rounded-[10px] p-[12px_14px] mb-2"
       style={{
-        gridTemplateColumns: '1fr auto',
         background: 'var(--glass-bg-strong)',
         border: '1px solid var(--glass-border)',
         boxShadow: 'var(--elev-1)',
@@ -45,41 +46,67 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4 }: Pro
       whileHover={{ translateY: -2, boxShadow: 'var(--elev-2)', borderColor: 'var(--orange-m)' }}
       transition={{ duration: 0.18 }}
     >
-      <div>
-        <div className="flex items-center gap-2 font-semibold text-[var(--text)] text-[.98rem]">
-          {nl}
-          <button
-            ref={btnRef}
-            onClick={() => speakDutch(nl, btnRef.current)}
-            className="text-[.78rem] px-1.5 py-0.5 rounded border border-[var(--border2)] bg-[var(--surface)] text-[var(--muted)] cursor-pointer hover:text-[var(--orange)] hover:border-[var(--orange)]"
-            title="استمع للنطق"
-            aria-label={`استمع لنطق ${nl}`}
-          >🔊</button>
+      <div className="grid items-center gap-2" style={{ gridTemplateColumns: '1fr auto' }}>
+        <div>
+          <div className="flex items-center gap-2 font-semibold text-[var(--text)] text-[.98rem]">
+            {nl}
+            <button
+              ref={btnRef}
+              onClick={() => speakDutch(nl, btnRef.current)}
+              className="text-[.78rem] px-1.5 py-0.5 rounded border border-[var(--border2)] bg-[var(--surface)] text-[var(--muted)] cursor-pointer hover:text-[var(--orange)] hover:border-[var(--orange)]"
+              title="استمع للنطق"
+              aria-label={`استمع لنطق ${nl}`}
+            >🔊</button>
+          </div>
+          <div className="text-[var(--text2)] text-[.88rem] mt-0.5">{ar}</div>
+          {ex && (
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="text-[var(--muted)] text-[.82rem] italic">"{ex}"</span>
+              <button
+                onClick={() => setShowPractice((v) => !v)}
+                aria-label={showPractice ? 'أخفِ تمرين النطق' : 'تدرّب على نطق جملة المثال'}
+                aria-expanded={showPractice}
+                title="🎙️ كرّر بعدي"
+                className="text-[.72rem] px-1 py-[1px] rounded border cursor-pointer"
+                style={{
+                  borderColor: showPractice ? 'var(--orange)' : 'var(--border2)',
+                  color: showPractice ? 'var(--orange)' : 'var(--muted)',
+                  background: showPractice ? 'var(--orange-l)' : 'transparent',
+                  flexShrink: 0,
+                }}
+              >
+                🎙️
+              </button>
+            </div>
+          )}
+          <div className="flex gap-1.5 items-center flex-wrap mt-1.5">
+            <span className="inline-block px-2 py-[2px] rounded-full text-[.7rem] font-semibold" style={{ background: lvStyle.bg, color: lvStyle.color }}>{word.level}</span>
+            <span className="inline-block px-2 py-[2px] rounded-full text-[.7rem] font-semibold bg-[var(--surface3)] text-[var(--muted)]">📦 {word.box}/{5}</span>
+            {isDue && <span className="inline-block px-2 py-[2px] rounded-full text-[.7rem] font-semibold" style={{ background: 'var(--orange-l)', color: 'var(--orange)' }}>⏰ مستحقّة</span>}
+          </div>
         </div>
-        <div className="text-[var(--text2)] text-[.88rem] mt-0.5">{ar}</div>
-        {ex && <div className="text-[var(--muted)] text-[.82rem] mt-0.5 italic">"{ex}"</div>}
-        <div className="flex gap-1.5 items-center flex-wrap mt-1.5">
-          <span className="inline-block px-2 py-[2px] rounded-full text-[.7rem] font-semibold" style={{ background: lvStyle.bg, color: lvStyle.color }}>{word.level}</span>
-          <span className="inline-block px-2 py-[2px] rounded-full text-[.7rem] font-semibold bg-[var(--surface3)] text-[var(--muted)]">📦 {word.box}/{5}</span>
-          {isDue && <span className="inline-block px-2 py-[2px] rounded-full text-[.7rem] font-semibold" style={{ background: 'var(--orange-l)', color: 'var(--orange)' }}>⏰ مستحقّة</span>}
+        <div className="flex gap-1.5">
+          {showAdd && onAdd && (
+            <button
+              onClick={() => onAdd(word)}
+              className="text-[.8rem] px-3 py-1.5 rounded-[8px] border border-[var(--orange)] bg-[var(--orange)] text-white cursor-pointer font-semibold hover:brightness-110"
+            >➕ بنك</button>
+          )}
+          {onDelete && (
+            <button
+              onClick={() => { if (confirm('حذف هذه الكلمة؟')) onDelete(word.id) }}
+              className="text-[.8rem] px-2.5 py-1.5 rounded-[8px] border cursor-pointer"
+              style={{ borderColor: 'var(--red)', color: 'var(--red)', background: 'transparent' }}
+              aria-label={`حذف ${nl}`}
+            >🗑</button>
+          )}
         </div>
       </div>
-      <div className="flex gap-1.5">
-        {showAdd && onAdd && (
-          <button
-            onClick={() => onAdd(word)}
-            className="text-[.8rem] px-3 py-1.5 rounded-[8px] border border-[var(--orange)] bg-[var(--orange)] text-white cursor-pointer font-semibold hover:brightness-110"
-          >➕ بنك</button>
-        )}
-        {onDelete && (
-          <button
-            onClick={() => { if (confirm('حذف هذه الكلمة؟')) onDelete(word.id) }}
-            className="text-[.8rem] px-2.5 py-1.5 rounded-[8px] border cursor-pointer"
-            style={{ borderColor: 'var(--red)', color: 'var(--red)', background: 'transparent' }}
-            aria-label={`حذف ${nl}`}
-          >🗑</button>
-        )}
-      </div>
+
+      {/* Collapsible pronunciation practice for the example sentence */}
+      {showPractice && ex && (
+        <SpeakAndCheck targetNl={ex} label="كرّر جملة المثال" />
+      )}
     </motion.div>
   )
 }

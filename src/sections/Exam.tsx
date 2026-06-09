@@ -5,6 +5,7 @@ import { PASS_THRESHOLD, LEARNED_BOX } from '@/data/phases'
 import { speakDutch, stopSpeak } from '@/features/tts/speakDutch'
 import { FlashCard } from '@/components/FlashCard'
 import { WordCard } from '@/components/WordCard'
+import { SpeakAndCheck } from '@/components/SpeakAndCheck'
 import { wordCount } from '@/lib/utils'
 import type { AppStore } from '@/store/useAppStore'
 
@@ -234,6 +235,7 @@ function SpeakingView({ s }: { s: S }) {
                 <details style={{ marginTop:8 }}><summary style={{ cursor:'pointer', color:'var(--text2)', fontSize:'.86rem' }}>📜 إظهار النموذج</summary>
                   <div style={{ marginTop:6, padding:10, background:'var(--surface2)', borderRadius:6, fontSize:'.9rem', color:'var(--text)', lineHeight:1.6 }}>{sp.voorbeeldNl}</div>
                 </details>
+                <SpeakAndCheck targetNl={sp.voorbeeldNl} label="كرّر الجواب النموذجي" />
                 <div style={{ marginTop:10 }}>
                   <label style={{ display:'block', fontSize:'.85rem', fontWeight:500, color:'var(--text2)', marginBottom:6 }}>قيّم نفسك (٠–١٠٠):</label>
                   <div style={{ display:'flex', gap:6, alignItems:'center' }}>
