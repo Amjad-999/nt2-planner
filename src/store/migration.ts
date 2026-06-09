@@ -35,6 +35,7 @@ export function defaultState(): State {
     examWords: [],
     customDur: {},
     onboarded: false,
+    unlockedBadges: [],
     _v: 6,
     _savedAt: 0,
   }
@@ -129,9 +130,10 @@ export function applyState(parsed: any): State {
   }
 
   // v6 extensions
-  S.bookUnits  = (parsed.bookUnits  && typeof parsed.bookUnits  === 'object') ? parsed.bookUnits  : {}
-  S.customDur  = (parsed.customDur  && typeof parsed.customDur  === 'object') ? parsed.customDur  : {}
-  S.onboarded  = typeof parsed.onboarded === 'boolean' ? parsed.onboarded : !!(parsed.name || parsed.examDate)
+  S.bookUnits       = (parsed.bookUnits  && typeof parsed.bookUnits  === 'object') ? parsed.bookUnits  : {}
+  S.customDur       = (parsed.customDur  && typeof parsed.customDur  === 'object') ? parsed.customDur  : {}
+  S.onboarded       = typeof parsed.onboarded === 'boolean' ? parsed.onboarded : !!(parsed.name || parsed.examDate)
+  S.unlockedBadges  = Array.isArray(parsed.unlockedBadges) ? parsed.unlockedBadges.filter((x: unknown) => typeof x === 'string') : []
 
   // ExamWords
   S.examWords = (Array.isArray(parsed.examWords) ? parsed.examWords : [])

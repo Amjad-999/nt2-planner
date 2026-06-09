@@ -1,4 +1,5 @@
 import { useAppStore, getDaysLeft, totalLearnedWords, avgBestScore, weakestSkill, sumLastNDays, sumPrevNDays, generateTodayPlan, planHealth } from '@/store/useAppStore'
+import { AchievementsPanel } from '@/components/AchievementsPanel'
 import { PASS_THRESHOLD, SKILL_AR, LEARNED_BOX } from '@/data/phases'
 import { Hero3D } from '@/components/Hero3D'
 import { PlanHealth } from '@/components/PlanHealth'
@@ -12,6 +13,7 @@ interface Props { onOpenStudyTime?: () => void }
 export default function Dashboard({ onOpenStudyTime }: Props) {
   const examDate = useAppStore((s) => s.examDate)
   const planDay  = useAppStore((s) => s.planDay)
+  const planStart = useAppStore((s) => s.planStart)
   const done     = useAppStore((s) => s.done)
   const vocab    = useAppStore((s) => s.vocab)
   const skill    = useAppStore((s) => s.skill)
@@ -34,8 +36,8 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
   const totW     = totalLearnedWords(vocab)
   const wkSk     = weakestSkill(skill)
   const bestNT2  = avgBestScore(skill)
-  const gen      = generateTodayPlan({ planDay, done, vocab, skill })
-  const ph       = planHealth({ examDate, planDay, done }, { minutesPerTask, studyDayMinutes })
+  const gen      = generateTodayPlan({ planDay, done, vocab, skill, planStart, examDate })
+  const ph       = planHealth({ examDate, planDay, done, planStart }, { minutesPerTask, studyDayMinutes })
 
   type KpiItem = {
     cls: string; icon: string; label: string; value: string | number; delta: string; dCls: 'up'|'down'|'flat'
@@ -129,6 +131,9 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
           >{b.label}</button>
         ))}
       </div>
+
+      <h2 style={SH}><span style={{ color:'var(--orange)' }}>🏅</span> إنجازاتي</h2>
+      <AchievementsPanel />
     </div>
   )
 }

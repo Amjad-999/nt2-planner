@@ -88,6 +88,7 @@ export interface State {
   examWords: ExamWord[]
   customDur: Record<string, number>
   onboarded: boolean
+  unlockedBadges: string[]
   _v: number
   _savedAt: number
 }

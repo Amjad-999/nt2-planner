@@ -6,6 +6,7 @@ import { NavTabs } from './NavTabs'
 import { SettingsModal } from './SettingsModal'
 import { OnboardModal } from './OnboardModal'
 import { StudyTimeModal } from './StudyTimeModal'
+import { useBadgeCheck } from '@/hooks/useBadgeCheck'
 
 const Dashboard  = lazy(() => import('@/sections/Dashboard'))
 const Plan       = lazy(() => import('@/sections/Plan'))
@@ -36,6 +37,8 @@ export function AppShell() {
   const [showInstall, setShowInstall] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [deferredInstall, setDeferredInstall] = useState<any>(null)
+
+  useBadgeCheck()
 
   // Show onboarding on first load
   useEffect(() => { if (!onboarded) setTimeout(() => setShowOnboard(true), 300) }, [onboarded])

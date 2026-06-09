@@ -4,8 +4,9 @@ import { todayKey, dayKeyOffset, daysBetween } from '@/lib/utils'
 import { idbGet, idbSet } from '@/lib/idb'
 import { defaultState, applyState } from './migration'
 import type { State, VocabWord, ExamWord, SkillKey, TabId } from './types'
-import { TOTAL_PLAN_DAYS, LEARNED_BOX, planTaskId, scaledPhases, SKILL_AR } from '@/data/phases'
+import { TOTAL_PLAN_DAYS, LEARNED_BOX, PASS_THRESHOLD, planTaskId, scaledPhases, SKILL_AR } from '@/data/phases'
 import { scheduleCard, isFsrsLearned, type FsrsQuality } from '@/features/vocab/fsrs'
+import { celebrate } from '@/lib/celebrate'
 
 /* ── localStorage keys (match original) ── */
 const SK6 = 'nt2planner_v6'
@@ -78,6 +79,9 @@ export interface AppStore extends State {
   recordStudyMinutes: (mins: number) => void
   setDayMinutes: (dayKey: string, mins: number) => void
 
+  // Gamification
+  unlockBadge: (id: string) => void
+
   // Vocab
   vocabAdd: (dutch: string, arabic: string, example: string, level: string) => boolean
   removeVocab: (id: string) => void
@@ -118,6 +122,12 @@ export const useAppStore = create<AppStore>()(
       activeTab: 'dashboard',
 
       setActiveTab: (tab) => set({ activeTab: tab }),
+
+      unlockBadge: (id) => {
+        if (get().unlockedBadges.includes(id)) return
+        set((st) => ({ unlockedBadges: [...st.unlockedBadges, id] }))
+        get().save()
+      },
 
       toggleTheme: () => {
         const theme = get().theme === 'dark' ? 'light' : 'dark'
@@ -164,6 +174,7 @@ export const useAppStore = create<AppStore>()(
         const y = dayKeyOffset(-1)
         const count = streak.last === y ? streak.count + 1 : 1
         set({ streak: { count, last: t } })
+        if ([3, 7, 14, 30].includes(count)) celebrate('streak')
       },
 
       recordStudyMinutes: (mins) => {
@@ -226,7 +237,8 @@ export const useAppStore = create<AppStore>()(
               const { due, intervalDays: ivl, fsrsFields } = scheduleCard(w, quality)
               intervalDays = ivl
               const updated = { ...w, ...fsrsFields, due, reps: w.reps + 1 }
-              if (isFsrsLearned(updated)) get().bumpHist('wordsLearned', 1)
+              const justLearned = !isFsrsLearned(w) && isFsrsLearned(updated)
+              if (justLearned) { get().bumpHist('wordsLearned', 1); celebrate('word') }
               return updated
             })
             return { vocab }
@@ -237,10 +249,17 @@ export const useAppStore = create<AppStore>()(
       },
 
       toggleTaskDone: (id) => {
+        const alreadyDone = !!get().done[id]
         const done = { ...get().done }
-        if (done[id]) { delete done[id] }
+        if (alreadyDone) { delete done[id] }
         else { done[id] = true; get().bumpHist('tasks', 1); get().bumpStreak() }
         set({ done })
+        // Celebrate when all today's plan tasks are completed
+        if (!alreadyDone) {
+          const st = get()
+          const remaining = generateTodayPlan(st).tasks.filter(t => t.id !== 'srs')
+          if (remaining.length === 0) celebrate('tasks')
+        }
         get().save()
       },
 
@@ -258,6 +277,7 @@ export const useAppStore = create<AppStore>()(
           }
         })
         get().bumpStreak()
+        if (pct >= PASS_THRESHOLD) celebrate('exam')
         get().save()
       },
 
