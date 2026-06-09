@@ -7,8 +7,24 @@ import { FlashCard } from '@/components/FlashCard'
 import { WordCard } from '@/components/WordCard'
 import { SpeakAndCheck } from '@/components/SpeakAndCheck'
 import { WaveAudio } from '@/components/WaveAudio'
+import { useFuzzySearch, getMatchIndices } from '@/hooks/useFuzzySearch'
 import { wordCount } from '@/lib/utils'
 import type { AppStore } from '@/store/useAppStore'
+import type { ExamWord } from '@/store/types'
+import type { IFuseOptions } from 'fuse.js'
+
+const EXAM_FUSE_OPTIONS: IFuseOptions<ExamWord> = {
+  keys: [
+    { name: 'nl', weight: 0.5 },
+    { name: 'ar', weight: 0.35 },
+    { name: 'ex', weight: 0.15 },
+  ],
+  threshold: 0.4,
+  includeMatches: true,
+  includeScore: true,
+  minMatchCharLength: 2,
+  ignoreLocation: true,
+}
 
 type ExamView = 'reading' | 'listening' | 'writing' | 'speaking' | 'words'
 
@@ -254,19 +270,55 @@ function WordsView({ s }: { s: S }) {
   const [reviewing, setReviewing] = useState(false)
   const { examWords, removeExamWord, gradeFlash, addExamWord } = s
   const dueExam = examWords.filter((w)=>(w.due??0)<=Date.now()&&(w.box??0)<LEARNED_BOX)
-  const filtered = examWords.filter((w)=>{ if(!search)return true; const q=search.toLowerCase(); return w.nl.toLowerCase().includes(q)||w.ar.includes(search) })
+
+  const fuseResults = useFuzzySearch(examWords, EXAM_FUSE_OPTIONS, search)
+  const filtered = fuseResults ? fuseResults.map(r => r.item) : examWords
+  const resultMap = new Map(fuseResults?.map(r => [r.item.id, r]) ?? [])
+
   const openAdd = () => { const nl=prompt('الكلمة الهولندية:'); if(!nl)return; const ar=prompt('المعنى بالعربية:'); if(!ar)return; const ex=prompt('جملة مثال (اختياري):')?? ''; const lvl=(prompt('المستوى (B1):')?? 'B1').toUpperCase(); addExamWord(nl,ar,ex,lvl) }
   return (
     <div>
       <InfoBox color="blue">🆕 <strong>كلمات الامتحانات الجديدة</strong> — كل كلمة جديدة تصادفها، أضِفها هنا.</InfoBox>
       <div style={{ display:'flex', gap:10, alignItems:'center', marginBottom:14, flexWrap:'wrap' }}>
-        <input type="text" value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="🔍 ابحث..." style={{ flex:1, minWidth:200, padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)' }} />
+        <div style={{ position:'relative', flex:1, minWidth:200 }}>
+          <input
+            type="text"
+            value={search}
+            onChange={(e)=>setSearch(e.target.value)}
+            placeholder="🔍 ابحث بشكل مرن..."
+            aria-label="بحث مرن في كلمات الامتحان"
+            style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)', boxSizing:'border-box' }}
+          />
+          {search && (
+            <button onClick={()=>setSearch('')} aria-label="مسح البحث"
+              style={{ position:'absolute', insetInlineEnd:10, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'var(--muted)', fontSize:'1rem' }}>✕</button>
+          )}
+        </div>
         <PrimaryBtn onClick={openAdd}>➕ إضافة كلمة</PrimaryBtn>
         {dueExam.length>0 && <GhostBtn onClick={()=>setReviewing(true)}>🎴 مراجعة ({dueExam.length})</GhostBtn>}
       </div>
-      {reviewing ? <FlashCard queue={dueExam} onGrade={(id,q)=>gradeFlash(id,q,true)} onDone={()=>setReviewing(false)} />
-        : filtered.length===0 ? <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--r-sm)', padding:'14px 18px', fontSize:'.9rem', color:'var(--text2)' }}>🆕 لا توجد كلمات بعد.</div>
-        : filtered.map((w) => <WordCard key={w.id} word={w} onDelete={removeExamWord} learnedBox={LEARNED_BOX} />)}
+      {search.trim() && (
+        <div style={{ fontSize:'.8rem', color:'var(--muted)', marginBottom:8 }} aria-live="polite" aria-atomic="true">
+          {filtered.length > 0 ? `${filtered.length} نتيجة` : 'لا توجد نتائج'}
+        </div>
+      )}
+      {reviewing
+        ? <FlashCard queue={dueExam} onGrade={(id,q)=>gradeFlash(id,q,true)} onDone={()=>setReviewing(false)} />
+        : filtered.length===0
+          ? <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--r-sm)', padding:'14px 18px', fontSize:'.9rem', color:'var(--text2)' }}>
+              {examWords.length===0 ? '🆕 لا توجد كلمات بعد.' : '🔍 لا توجد نتائج تطابق بحثك.'}
+            </div>
+          : filtered.map((w) => {
+              const r = resultMap.get(w.id)
+              return (
+                <WordCard key={w.id} word={w} onDelete={removeExamWord} learnedBox={LEARNED_BOX}
+                  hlNl={r ? getMatchIndices(r, 'nl') : undefined}
+                  hlAr={r ? getMatchIndices(r, 'ar') : undefined}
+                  hlEx={r ? getMatchIndices(r, 'ex') : undefined}
+                />
+              )
+            })
+      }
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useRef, useState } from 'react'
 import { speakDutch } from '@/features/tts/speakDutch'
 import { SpeakAndCheck } from '@/components/SpeakAndCheck'
+import { HighlightText } from '@/components/HighlightText'
 import type { VocabWord, ExamWord } from '@/store/types'
 
 type Word = VocabWord | ExamWord
@@ -10,12 +11,18 @@ function getNl(w: Word) { return 'dutch' in w ? w.dutch : w.nl }
 function getAr(w: Word) { return 'arabic' in w ? w.arabic : w.ar }
 function getEx(w: Word) { return 'example' in w ? w.example : w.ex }
 
+type Ranges = ReadonlyArray<readonly [number, number]>
+
 interface Props {
   word: Word
   onDelete?: (id: string) => void
   onAdd?: (word: Word) => void   // for themas view
   showAdd?: boolean
   learnedBox?: number
+  // Optional highlight ranges from Fuse.js match indices
+  hlNl?: Ranges
+  hlAr?: Ranges
+  hlEx?: Ranges
 }
 
 const LEVEL_STYLE: Record<string, { bg: string; color: string }> = {
@@ -26,7 +33,7 @@ const LEVEL_STYLE: Record<string, { bg: string; color: string }> = {
   C1: { bg: 'var(--purple-l)', color: 'var(--purple)' },
 }
 
-export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4 }: Props) {
+export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4, hlNl, hlAr, hlEx }: Props) {
   const btnRef = useRef<HTMLButtonElement>(null)
   const [showPractice, setShowPractice] = useState(false)
   const nl = getNl(word)
@@ -49,7 +56,7 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4 }: Pro
       <div className="grid items-center gap-2" style={{ gridTemplateColumns: '1fr auto' }}>
         <div>
           <div className="flex items-center gap-2 font-semibold text-[var(--text)] text-[.98rem]">
-            {nl}
+            <HighlightText text={nl} indices={hlNl} />
             <button
               ref={btnRef}
               onClick={() => speakDutch(nl, btnRef.current)}
@@ -58,10 +65,10 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4 }: Pro
               aria-label={`استمع لنطق ${nl}`}
             >🔊</button>
           </div>
-          <div className="text-[var(--text2)] text-[.88rem] mt-0.5">{ar}</div>
+          <div className="text-[var(--text2)] text-[.88rem] mt-0.5"><HighlightText text={ar} indices={hlAr} /></div>
           {ex && (
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-[var(--muted)] text-[.82rem] italic">"{ex}"</span>
+              <span className="text-[var(--muted)] text-[.82rem] italic">"<HighlightText text={ex} indices={hlEx} />"</span>
               <button
                 onClick={() => setShowPractice((v) => !v)}
                 aria-label={showPractice ? 'أخفِ تمرين النطق' : 'تدرّب على نطق جملة المثال'}

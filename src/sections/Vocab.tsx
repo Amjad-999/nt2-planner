@@ -6,15 +6,30 @@ import { FlashCard } from '@/components/FlashCard'
 import { B1_THEMAS } from '@/data/themas'
 import { LEARNED_BOX } from '@/data/phases'
 import { isFsrsLearned } from '@/features/vocab/fsrs'
+import { useFuzzySearch, getMatchIndices } from '@/hooks/useFuzzySearch'
 import type { VocabWord } from '@/store/types'
+import type { IFuseOptions } from 'fuse.js'
 
 type View = 'bank' | 'due' | 'review' | 'themas'
+
+const FUSE_OPTIONS: IFuseOptions<VocabWord> = {
+  keys: [
+    { name: 'dutch',   weight: 0.5 },
+    { name: 'arabic',  weight: 0.35 },
+    { name: 'example', weight: 0.15 },
+  ],
+  threshold: 0.4,          // 0 = exact, 1 = match anything
+  includeMatches: true,     // needed for highlight indices
+  includeScore: true,
+  minMatchCharLength: 2,
+  ignoreLocation: true,     // don't penalise matches far from string start
+}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export default function Vocab(_: {}) {
   const { vocab, removeVocab, gradeFlash, vocabAdd } = useAppStore()
-  const [view, setView] = useState<View>('bank')
-  const [search, setSearch] = useState('')
+  const [view, setView]               = useState<View>('bank')
+  const [search, setSearch]           = useState('')
   const [levelFilter, setLevelFilter] = useState('')
   const [selectedThema, setSelectedThema] = useState(0)
 
@@ -22,15 +37,25 @@ export default function Vocab(_: {}) {
     w.fsrs_state !== undefined ? isFsrsLearned(w) : w.box >= LEARNED_BOX
   const dueWords = vocab.filter((w) => (w.due ?? 0) <= Date.now() && !isLearned(w))
 
-  const filteredBank = vocab.filter((w) => {
-    if (levelFilter && w.level !== levelFilter) return false
-    if (search) { const s = search.toLowerCase(); return w.dutch.toLowerCase().includes(s) || w.arabic.includes(search) }
-    return true
-  }).sort((a, b) => (a.box - b.box) || (a.due - b.due))
+  // Level-filtered list is the base for fuzzy search
+  const levelFiltered = levelFilter
+    ? vocab.filter(w => w.level === levelFilter)
+    : vocab
+
+  const fuseResults = useFuzzySearch(levelFiltered, FUSE_OPTIONS, search)
+
+  // When no query: show all level-filtered words sorted by box/due
+  // When query:   show Fuse-ranked results (already scored)
+  const filteredBank = fuseResults
+    ? fuseResults.map(r => r.item)
+    : [...levelFiltered].sort((a, b) => (a.box - b.box) || (a.due - b.due))
+
+  // Map itemId → FuseResult for highlight lookup (O(1) per card)
+  const resultMap = new Map(fuseResults?.map(r => [r.item.id, r]) ?? [])
 
   const SEG: { id: View; label: string }[] = [
-    { id:'bank', label:'🗂️ بنك المفردات' },
-    { id:'due', label:`⏰ مستحقّة (${dueWords.length})` },
+    { id:'bank',   label:'🗂️ بنك المفردات' },
+    { id:'due',    label:`⏰ مستحقّة (${dueWords.length})` },
     { id:'review', label:'🎴 جلسة مراجعة (SRS)' },
     { id:'themas', label:'🎨 مواضيع B1' },
   ]
@@ -57,17 +82,63 @@ export default function Vocab(_: {}) {
       {view === 'bank' && (
         <>
           <div style={{ display:'flex', gap:10, alignItems:'center', marginBottom:14, flexWrap:'wrap' }}>
-            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 ابحث في كلماتك..." autoComplete="off"
-              style={{ flex:1, minWidth:200, padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', backdropFilter:'blur(6px)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)' }} />
-            <select value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)}
-              style={{ padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)', maxWidth:140 }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="🔍 ابحث بالهولندية أو العربية أو جملة المثال..."
+                autoComplete="off"
+                aria-label="بحث مرن في المفردات"
+                style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', backdropFilter:'blur(6px)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)', boxSizing: 'border-box' }}
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  aria-label="مسح البحث"
+                  style={{ position:'absolute', insetInlineEnd:10, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'var(--muted)', fontSize:'1rem', lineHeight:1 }}
+                >✕</button>
+              )}
+            </div>
+            <select
+              value={levelFilter}
+              onChange={(e) => setLevelFilter(e.target.value)}
+              aria-label="تصفية حسب المستوى"
+              style={{ padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)', maxWidth:140 }}
+            >
               <option value="">كل المستويات</option>
               {['A1','A2','B1','B2','C1'].map((l) => <option key={l} value={l}>{l}</option>)}
             </select>
           </div>
+
+          {/* Result count when searching */}
+          {search.trim() && (
+            <div style={{ fontSize:'.8rem', color:'var(--muted)', marginBottom:8 }} aria-live="polite" aria-atomic="true">
+              {filteredBank.length > 0
+                ? `${filteredBank.length} نتيجة`
+                : 'لا توجد نتائج'}
+            </div>
+          )}
+
           {filteredBank.length === 0 ? (
-            <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--r-sm)', padding:'14px 18px', fontSize:'.9rem', color:'var(--text2)' }}>📚 بنك مفرداتك فارغ — استخدم خانة AI أعلاه لإضافة كلمات هولندية.</div>
-          ) : filteredBank.map((w) => <WordCard key={w.id} word={w} onDelete={removeVocab} />)}
+            <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--r-sm)', padding:'14px 18px', fontSize:'.9rem', color:'var(--text2)' }}>
+              {vocab.length === 0
+                ? '📚 بنك مفرداتك فارغ — استخدم خانة AI أعلاه لإضافة كلمات هولندية.'
+                : '🔍 لا توجد كلمات تطابق بحثك.'}
+            </div>
+          ) : filteredBank.map((w) => {
+            const r = resultMap.get(w.id)
+            return (
+              <WordCard
+                key={w.id}
+                word={w}
+                onDelete={removeVocab}
+                hlNl={r ? getMatchIndices(r, 'dutch')   : undefined}
+                hlAr={r ? getMatchIndices(r, 'arabic')  : undefined}
+                hlEx={r ? getMatchIndices(r, 'example') : undefined}
+              />
+            )
+          })}
         </>
       )}
 
