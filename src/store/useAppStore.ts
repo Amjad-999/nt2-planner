@@ -1,10 +1,11 @@
 import { create } from 'zustand'
 import { persist, type StorageValue } from 'zustand/middleware'
-import { todayKey, dayKeyOffset } from '@/lib/utils'
+import { todayKey, dayKeyOffset, daysBetween } from '@/lib/utils'
 import { idbGet, idbSet } from '@/lib/idb'
 import { defaultState, applyState } from './migration'
 import type { State, VocabWord, ExamWord, SkillKey, TabId } from './types'
-import { TOTAL_PLAN_DAYS, LEARNED_BOX, planTaskId, PHASES, SKILL_AR } from '@/data/phases'
+import { TOTAL_PLAN_DAYS, LEARNED_BOX, planTaskId, scaledPhases, SKILL_AR } from '@/data/phases'
+import { scheduleCard, isFsrsLearned, type FsrsQuality } from '@/features/vocab/fsrs'
 
 /* ── localStorage keys (match original) ── */
 const SK6 = 'nt2planner_v6'
@@ -80,7 +81,7 @@ export interface AppStore extends State {
   // Vocab
   vocabAdd: (dutch: string, arabic: string, example: string, level: string) => boolean
   removeVocab: (id: string) => void
-  gradeFlash: (wordId: string, quality: 0 | 2 | 4, isExamWord?: boolean) => void
+  gradeFlash: (wordId: string, quality: FsrsQuality, isExamWord?: boolean) => number
 
   // Plan
   toggleTaskDone: (id: string) => void
@@ -207,13 +208,14 @@ export const useAppStore = create<AppStore>()(
       },
 
       gradeFlash: (wordId, quality, isExamWord = false) => {
+        let intervalDays = 1
         if (isExamWord) {
           set((st) => {
             const words = st.examWords.map((w) => {
               if (w.id !== wordId) return w
-              const box = quality < 2 ? 0 : Math.min(SRS_INTERVALS.length - 1, w.box + 1)
-              const days = SRS_INTERVALS[box] ?? 1
-              return { ...w, box, due: Date.now() + days * 86400000, reps: w.reps + 1 }
+              const { due, intervalDays: ivl, fsrsFields } = scheduleCard(w, quality)
+              intervalDays = ivl
+              return { ...w, ...fsrsFields, due, reps: w.reps + 1 }
             })
             return { examWords: words }
           })
@@ -221,15 +223,17 @@ export const useAppStore = create<AppStore>()(
           set((st) => {
             const vocab = st.vocab.map((w) => {
               if (w.id !== wordId) return w
-              const box = quality < 2 ? 0 : Math.min(SRS_INTERVALS.length - 1, w.box + 1)
-              const days = SRS_INTERVALS[box] ?? 1
-              if (box >= LEARNED_BOX) get().bumpHist('wordsLearned', 1)
-              return { ...w, box, due: Date.now() + days * 86400000, reps: w.reps + 1 }
+              const { due, intervalDays: ivl, fsrsFields } = scheduleCard(w, quality)
+              intervalDays = ivl
+              const updated = { ...w, ...fsrsFields, due, reps: w.reps + 1 }
+              if (isFsrsLearned(updated)) get().bumpHist('wordsLearned', 1)
+              return updated
             })
             return { vocab }
           })
         }
         get().save()
+        return intervalDays
       },
 
       toggleTaskDone: (id) => {
@@ -346,7 +350,7 @@ export const useAppStore = create<AppStore>()(
         const { name, examDate, planDay, prefs } = patch
         set((st) => ({
           ...(name !== undefined && { name }),
-          ...(examDate !== undefined && { examDate }),
+          ...(examDate !== undefined && { examDate, planStart: st.planStart || new Date().toISOString() }),
           ...(planDay !== undefined && { planDay: Math.min(TOTAL_PLAN_DAYS, Math.max(1, planDay)) }),
           ...(prefs && { prefs: { ...st.prefs, ...prefs } }),
           onboarded: true,
@@ -406,8 +410,23 @@ export function getDaysLeft(examDate: string): number | null {
   return Math.max(0, Math.ceil((new Date(examDate).getTime() - Date.now()) / 86400000))
 }
 
+/* ── Date-driven plan window: the plan adapts to the user's exam date ── */
+export function getPlanTotal(s: { planStart?: string; examDate?: string }): number {
+  if (s.planStart && s.examDate) return Math.max(1, daysBetween(s.planStart, s.examDate))
+  return TOTAL_PLAN_DAYS
+}
+export function getCurrentDay(s: { planStart?: string; planDay?: number }, totalDays: number): number {
+  if (s.planStart) {
+    const elapsed = daysBetween(s.planStart, new Date().toISOString())
+    return Math.min(totalDays, Math.max(1, elapsed + 1))
+  }
+  return Math.min(totalDays, Math.max(1, s.planDay ?? 1))
+}
+
 export function totalLearnedWords(vocab: State['vocab']) {
-  return { all: vocab.length, learned: vocab.filter((w) => w.box >= LEARNED_BOX).length }
+  const isLearned = (w: VocabWord) =>
+    w.fsrs_state !== undefined ? isFsrsLearned(w) : w.box >= LEARNED_BOX
+  return { all: vocab.length, learned: vocab.filter(isLearned).length }
 }
 
 export function avgBestScore(skill: State['skill']): number {
@@ -435,9 +454,9 @@ export function sumPrevNDays(history: State['dailyHistory'], field: 'mins' | 'ta
   return s
 }
 
-export function tasksRemaining(done: State['done']) {
+export function tasksRemaining(done: State['done'], planDays: number = TOTAL_PLAN_DAYS) {
   let rem = 0, total = 0
-  PHASES.forEach((ph) => {
+  scaledPhases(planDays).forEach((ph) => {
     for (let d = ph.dayFrom; d <= ph.dayTo; d++) {
       ph.tasks.forEach((_t, i) => { total++; if (!done[planTaskId(ph.id, d, i)]) rem++ })
     }
@@ -446,17 +465,21 @@ export function tasksRemaining(done: State['done']) {
 }
 
 export function planHealth(
-  state: Pick<State, 'examDate' | 'planDay' | 'done'>,
+  state: Pick<State, 'examDate' | 'planDay' | 'done'> & { planStart?: string },
   // FIX 3: accept user-configured study capacity (optional, defaults match migration defaults)
   prefs?: { minutesPerTask?: number; studyDayMinutes?: number },
 ) {
   const minutesPerTask  = prefs?.minutesPerTask  ?? 30
   const studyDayMinutes = prefs?.studyDayMinutes ?? 60
 
+  // FIX: total days + current day derive from the user's real exam window (planStart→examDate)
+  const planDays = getPlanTotal({ planStart: state.planStart, examDate: state.examDate })
+  const curDay   = getCurrentDay({ planStart: state.planStart, planDay: state.planDay }, planDays)
+
   const left = getDaysLeft(state.examDate)
-  const { rem, total } = tasksRemaining(state.done)
+  const { rem, total } = tasksRemaining(state.done, planDays)
   const done = total - rem
-  const expectedDone = Math.round((state.planDay / TOTAL_PLAN_DAYS) * total)
+  const expectedDone = Math.round((curDay / planDays) * total)
   const lag    = expectedDone - done
   const lagPct = total ? (lag / total) * 100 : 0
   // FIX 3: use user's minutesPerTask instead of hardcoded 30
@@ -491,21 +514,25 @@ export function planHealth(
   return { status, badge, title, why, left, rem, total, done, needMins, lag, lagPct }
 }
 
-export function generateTodayPlan(state: Pick<State, 'planDay' | 'done' | 'vocab' | 'skill'>) {
-  const { planDay, done, vocab, skill } = state
+export function generateTodayPlan(state: Pick<State, 'planDay' | 'done' | 'vocab' | 'skill'> & { planStart?: string; examDate?: string }) {
+  const { done, vocab, skill } = state
+  // FIX: derive plan length + current day from the exam window; scale the 5 phases to fit.
+  const planDays = getPlanTotal({ planStart: state.planStart, examDate: state.examDate })
+  const day      = getCurrentDay({ planStart: state.planStart, planDay: state.planDay }, planDays)
+  const phases   = scaledPhases(planDays)
   const wkSkill = weakestSkill(skill)
   const overdue: { id: string; name: string; mins: number; skill: string; why: string; phase: string }[] = []
-  PHASES.forEach((ph) => {
-    for (let d = ph.dayFrom; d <= Math.min(planDay, ph.dayTo); d++) {
+  phases.forEach((ph) => {
+    for (let d = ph.dayFrom; d <= Math.min(day, ph.dayTo); d++) {
       ph.tasks.forEach((task, i) => {
         const id = planTaskId(ph.id, d, i)
         if (!done[id]) overdue.push({ id, name: task.name, mins: task.mins, skill: task.skill, why: 'متأخّرة عن اليوم ' + d, phase: ph.title })
       })
     }
   })
-  const todayPhase = PHASES.find((p) => planDay >= p.dayFrom && planDay <= p.dayTo) ?? PHASES[0]
+  const todayPhase = phases.find((p) => day >= p.dayFrom && day <= p.dayTo) ?? phases[0]
   const t = todayPhase.tasks
-    .map((task, i) => ({ id: planTaskId(todayPhase.id, planDay, i), name: task.name, mins: task.mins, skill: task.skill, why: 'مهمّة اليوم ' + planDay, phase: todayPhase.title }))
+    .map((task, i) => ({ id: planTaskId(todayPhase.id, day, i), name: task.name, mins: task.mins, skill: task.skill, why: 'مهمّة اليوم ' + day, phase: todayPhase.title }))
     .filter((x) => !done[x.id])
   overdue.sort((a, b) => (b.skill === wkSkill ? 1 : 0) - (a.skill === wkSkill ? 1 : 0))
   let added = 0
@@ -513,7 +540,9 @@ export function generateTodayPlan(state: Pick<State, 'planDay' | 'done' | 'vocab
     if (added >= 2) break
     if (!t.find((x) => x.id === od.id)) { t.push(od); added++ }
   }
-  const due = (vocab ?? []).filter((w) => (w.due ?? 0) <= Date.now() && (w.box ?? 0) < LEARNED_BOX).length
+  const isLearned = (w: VocabWord) =>
+    w.fsrs_state !== undefined ? isFsrsLearned(w) : w.box >= LEARNED_BOX
+  const due = (vocab ?? []).filter((w) => (w.due ?? 0) <= Date.now() && !isLearned(w)).length
   if (due > 0) t.push({ id: 'srs', name: `راجع ${due} كلمة مستحقّة (SRS)`, mins: Math.min(20, Math.max(5, Math.round(due * 0.6))), skill: 'vocab', why: due + ' كلمة وصلت موعد المراجعة', phase: '' })
   return { tasks: t, weakestSkill: SKILL_AR[wkSkill] ?? wkSkill }
 }

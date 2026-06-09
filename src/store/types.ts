@@ -11,9 +11,16 @@ export interface VocabWord {
   arabic: string
   example: string
   level: Level
-  box: number       // 0–5
+  box: number       // 0–5 (Leitner, kept for compat)
   due: number       // epoch ms
   reps: number
+  // FSRS fields (optional — absent on legacy words until first FSRS review)
+  fsrs_stability?: number
+  fsrs_difficulty?: number
+  fsrs_state?: number        // ts-fsrs State enum: 0=New 1=Learning 2=Review 3=Relearning
+  fsrs_last_review?: number  // epoch ms
+  fsrs_lapses?: number
+  fsrs_scheduled_days?: number
 }
 
 export interface ExamWord {
@@ -26,6 +33,13 @@ export interface ExamWord {
   due: number
   reps: number
   added: number
+  // FSRS fields (optional — absent on legacy words until first FSRS review)
+  fsrs_stability?: number
+  fsrs_difficulty?: number
+  fsrs_state?: number
+  fsrs_last_review?: number
+  fsrs_lapses?: number
+  fsrs_scheduled_days?: number
 }
 
 export interface SkillRecord {
@@ -57,6 +71,7 @@ export interface State {
   name: string
   examDate: string
   planDay: number
+  planStart: string
   done: Record<string, true>
   studySec: number
   theme: ThemeKey

@@ -5,6 +5,7 @@ import { WordCard } from '@/components/WordCard'
 import { FlashCard } from '@/components/FlashCard'
 import { B1_THEMAS } from '@/data/themas'
 import { LEARNED_BOX } from '@/data/phases'
+import { isFsrsLearned } from '@/features/vocab/fsrs'
 import type { VocabWord } from '@/store/types'
 
 type View = 'bank' | 'due' | 'review' | 'themas'
@@ -17,7 +18,9 @@ export default function Vocab(_: {}) {
   const [levelFilter, setLevelFilter] = useState('')
   const [selectedThema, setSelectedThema] = useState(0)
 
-  const dueWords = vocab.filter((w) => (w.due ?? 0) <= Date.now() && (w.box ?? 0) < LEARNED_BOX)
+  const isLearned = (w: VocabWord) =>
+    w.fsrs_state !== undefined ? isFsrsLearned(w) : w.box >= LEARNED_BOX
+  const dueWords = vocab.filter((w) => (w.due ?? 0) <= Date.now() && !isLearned(w))
 
   const filteredBank = vocab.filter((w) => {
     if (levelFilter && w.level !== levelFilter) return false

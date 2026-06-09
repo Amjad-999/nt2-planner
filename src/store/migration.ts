@@ -1,5 +1,6 @@
 import type { State, VocabWord, ExamWord, SkillKey } from './types'
 import { clampNum } from '@/lib/utils'
+import { boxToFsrsFields } from '@/features/vocab/fsrs'
 
 const TOTAL_PLAN_DAYS = 46
 const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'] as const
@@ -12,6 +13,7 @@ export function defaultState(): State {
     name: '',
     examDate: d.toISOString(),
     planDay: 1,
+    planStart: new Date().toISOString(),
     done: {},
     studySec: 0,
     theme: 'light',
@@ -48,22 +50,43 @@ export function applyState(parsed: any): State {
   S.done = parsed.done && typeof parsed.done === 'object' ? parsed.done : {}
   S.studySec = Math.max(0, parseInt(String(parsed.studySec)) || 0)
   S.planDay = clampNum(parseInt(String(parsed.planDay)) || 1, 1, TOTAL_PLAN_DAYS)
+  // FIX: plan window anchor. Keep an existing start; otherwise back-date so the
+  // returning user stays on roughly the same plan day while the window now runs
+  // from this anchor to their exam date.
+  if (parsed.planStart && !isNaN(new Date(parsed.planStart).getTime())) {
+    S.planStart = parsed.planStart
+  } else {
+    const ps = new Date(); ps.setDate(ps.getDate() - (S.planDay - 1)); S.planStart = ps.toISOString()
+  }
   S.theme = parsed.theme === 'dark' ? 'dark' : 'light'
 
   // Vocab
   S.vocab = (Array.isArray(parsed.vocab) ? parsed.vocab : [])
     .filter((w: unknown) => w && typeof w === 'object' && 'dutch' in (w as object) && 'arabic' in (w as object))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .map((w: any): VocabWord => ({
-      id: w.id || 'w' + Math.random().toString(36).slice(2, 9),
-      dutch: String(w.dutch).trim(),
-      arabic: String(w.arabic).trim(),
-      example: w.example ? String(w.example).trim() : '',
-      level: LEVELS.includes(w.level) ? w.level : 'B1',
-      box: clampNum(parseInt(String(w.box)) || 0, 0, 5),
-      due: typeof w.due === 'number' ? w.due : 0,
-      reps: Math.max(0, parseInt(String(w.reps)) || 0),
-    }))
+    .map((w: any): VocabWord => {
+      const box = clampNum(parseInt(String(w.box)) || 0, 0, 5)
+      const due = typeof w.due === 'number' ? w.due : 0
+      // Preserve existing FSRS fields if present, otherwise migrate from box
+      const fsrsFromBox = (w.fsrs_state === undefined && box > 0) ? boxToFsrsFields(box, due) : {}
+      return {
+        id: w.id || 'w' + Math.random().toString(36).slice(2, 9),
+        dutch: String(w.dutch).trim(),
+        arabic: String(w.arabic).trim(),
+        example: w.example ? String(w.example).trim() : '',
+        level: LEVELS.includes(w.level) ? w.level : 'B1',
+        box, due,
+        reps: Math.max(0, parseInt(String(w.reps)) || 0),
+        ...(w.fsrs_state !== undefined ? {
+          fsrs_stability:      typeof w.fsrs_stability      === 'number' ? w.fsrs_stability      : undefined,
+          fsrs_difficulty:     typeof w.fsrs_difficulty     === 'number' ? w.fsrs_difficulty     : undefined,
+          fsrs_state:          typeof w.fsrs_state          === 'number' ? w.fsrs_state          : undefined,
+          fsrs_last_review:    typeof w.fsrs_last_review    === 'number' ? w.fsrs_last_review    : undefined,
+          fsrs_lapses:         typeof w.fsrs_lapses         === 'number' ? w.fsrs_lapses         : undefined,
+          fsrs_scheduled_days: typeof w.fsrs_scheduled_days === 'number' ? w.fsrs_scheduled_days : undefined,
+        } : fsrsFromBox),
+      }
+    })
 
   // Streak
   S.streak = parsed.streak && typeof parsed.streak === 'object'
@@ -114,17 +137,29 @@ export function applyState(parsed: any): State {
   S.examWords = (Array.isArray(parsed.examWords) ? parsed.examWords : [])
     .filter((w: unknown) => w && typeof w === 'object' && 'nl' in (w as object) && 'ar' in (w as object))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .map((w: any): ExamWord => ({
-      id: w.id || 'ew' + Math.random().toString(36).slice(2, 9),
-      nl: String(w.nl).trim(),
-      ar: String(w.ar).trim(),
-      ex: w.ex ? String(w.ex).trim() : '',
-      level: LEVELS.includes(w.level) ? w.level : 'B1',
-      box: clampNum(parseInt(String(w.box)) || 0, 0, 5),
-      due: typeof w.due === 'number' ? w.due : 0,
-      reps: Math.max(0, parseInt(String(w.reps)) || 0),
-      added: typeof w.added === 'number' ? w.added : Date.now(),
-    }))
+    .map((w: any): ExamWord => {
+      const box = clampNum(parseInt(String(w.box)) || 0, 0, 5)
+      const due = typeof w.due === 'number' ? w.due : 0
+      const fsrsFromBox = (w.fsrs_state === undefined && box > 0) ? boxToFsrsFields(box, due) : {}
+      return {
+        id: w.id || 'ew' + Math.random().toString(36).slice(2, 9),
+        nl: String(w.nl).trim(),
+        ar: String(w.ar).trim(),
+        ex: w.ex ? String(w.ex).trim() : '',
+        level: LEVELS.includes(w.level) ? w.level : 'B1',
+        box, due,
+        reps: Math.max(0, parseInt(String(w.reps)) || 0),
+        added: typeof w.added === 'number' ? w.added : Date.now(),
+        ...(w.fsrs_state !== undefined ? {
+          fsrs_stability:      typeof w.fsrs_stability      === 'number' ? w.fsrs_stability      : undefined,
+          fsrs_difficulty:     typeof w.fsrs_difficulty     === 'number' ? w.fsrs_difficulty     : undefined,
+          fsrs_state:          typeof w.fsrs_state          === 'number' ? w.fsrs_state          : undefined,
+          fsrs_last_review:    typeof w.fsrs_last_review    === 'number' ? w.fsrs_last_review    : undefined,
+          fsrs_lapses:         typeof w.fsrs_lapses         === 'number' ? w.fsrs_lapses         : undefined,
+          fsrs_scheduled_days: typeof w.fsrs_scheduled_days === 'number' ? w.fsrs_scheduled_days : undefined,
+        } : fsrsFromBox),
+      }
+    })
 
   S._v = 6
   if (!S.examDate || isNaN(new Date(S.examDate).getTime())) S.examDate = fresh.examDate

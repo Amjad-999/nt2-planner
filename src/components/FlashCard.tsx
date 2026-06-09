@@ -2,6 +2,8 @@ import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { speakDutch } from '@/features/tts/speakDutch'
 import type { VocabWord, ExamWord } from '@/store/types'
+import type { FsrsQuality } from '@/features/vocab/fsrs'
+import { formatIntervalAr } from '@/features/vocab/fsrs'
 
 type Word = VocabWord | ExamWord
 const getNl = (w: Word) => 'dutch' in w ? w.dutch : w.nl
@@ -10,13 +12,21 @@ const getEx = (w: Word) => 'example' in w ? w.example : w.ex
 
 interface Props {
   queue: Word[]
-  onGrade: (wordId: string, quality: 0 | 2 | 4) => void
+  onGrade: (wordId: string, quality: FsrsQuality) => number
   onDone: () => void
 }
+
+const GRADE_BUTTONS: { quality: FsrsQuality; label: string; icon: string; color: string; bg: string }[] = [
+  { quality: 0, label: 'لم أعرفها', icon: '❌', color: 'var(--red)',   bg: 'var(--red-l)'   },
+  { quality: 1, label: 'صعبة',      icon: '🤔', color: 'var(--amber)', bg: 'var(--amber-l)' },
+  { quality: 2, label: 'عرفتها',    icon: '👍', color: 'var(--blue)',  bg: 'var(--blue-l)'  },
+  { quality: 3, label: 'سهلة',      icon: '✅', color: 'var(--green)', bg: 'var(--green-l)' },
+]
 
 export function FlashCard({ queue, onGrade, onDone }: Props) {
   const [idx, setIdx] = useState(0)
   const [flipped, setFlipped] = useState(false)
+  const [nextInterval, setNextInterval] = useState<string | null>(null)
   const btnRef = useRef<HTMLButtonElement>(null)
 
   if (!queue.length) {
@@ -34,11 +44,15 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
   const ar = getAr(word)
   const ex = getEx(word)
 
-  const grade = (q: 0 | 2 | 4) => {
-    onGrade(word.id, q)
+  const grade = (q: FsrsQuality) => {
+    const days = onGrade(word.id, q)
+    setNextInterval(formatIntervalAr(days))
     setFlipped(false)
-    if (idx + 1 >= queue.length) onDone()
-    else setIdx(idx + 1)
+    setTimeout(() => {
+      setNextInterval(null)
+      if (idx + 1 >= queue.length) onDone()
+      else setIdx(idx + 1)
+    }, 1400)
   }
 
   return (
@@ -51,18 +65,31 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
         🔊 استمع
       </button>
 
+      {/* Interval toast shown after grading */}
       <AnimatePresence>
-        {flipped ? (
+        {nextInterval && (
+          <motion.div key="interval" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+            style={{ marginTop: 14, padding: '8px 16px', borderRadius: 10, background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', display: 'inline-block', fontSize: '.9rem', color: 'var(--text2)' }}>
+            🗓 {nextInterval}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {!nextInterval && flipped ? (
           <motion.div key="back" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
             <div className="mt-5 text-[1.15rem] text-[var(--text)] font-medium">{ar}</div>
             {ex && <div className="mt-2.5 text-[.92rem] text-[var(--text2)] italic">"{ex}"</div>}
             <div className="flex gap-2 mt-[18px] justify-center flex-wrap">
-              <button onClick={() => grade(0)} className="grade-btn" style={{ color: 'var(--red)', borderColor: 'var(--red)', background: 'var(--red-l)', borderRadius: 10, padding: '8px 18px', border: '1px solid', cursor: 'pointer', fontSize: '.88rem', fontWeight: 600 }}>❌ لم أعرفها</button>
-              <button onClick={() => grade(2)} className="grade-btn" style={{ color: 'var(--amber)', borderColor: 'var(--amber)', background: 'var(--amber-l)', borderRadius: 10, padding: '8px 18px', border: '1px solid', cursor: 'pointer', fontSize: '.88rem', fontWeight: 600 }}>🤔 صعبة</button>
-              <button onClick={() => grade(4)} className="grade-btn" style={{ color: 'var(--green)', borderColor: 'var(--green)', background: 'var(--green-l)', borderRadius: 10, padding: '8px 18px', border: '1px solid', cursor: 'pointer', fontSize: '.88rem', fontWeight: 600 }}>✅ سهلة</button>
+              {GRADE_BUTTONS.map(({ quality, label, icon, color, bg }) => (
+                <button key={quality} onClick={() => grade(quality)}
+                  style={{ color, borderColor: color, background: bg, borderRadius: 10, padding: '8px 14px', border: '1px solid', cursor: 'pointer', fontSize: '.85rem', fontWeight: 600 }}>
+                  {icon} {label}
+                </button>
+              ))}
             </div>
           </motion.div>
-        ) : (
+        ) : !nextInterval ? (
           <motion.div key="front" className="mt-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <button
               onClick={() => setFlipped(true)}
@@ -72,7 +99,7 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
               اقلب البطاقة
             </button>
           </motion.div>
-        )}
+        ) : null}
       </AnimatePresence>
     </div>
   )
