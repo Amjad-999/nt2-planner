@@ -53,6 +53,7 @@ export default defineConfig({
           if (id.includes('react-pdf') || id.includes('pdfjs-dist')) return 'pdf'
           if (id.includes('wavesurfer')) return 'audio'
           if (id.includes('@dnd-kit')) return 'exercises'
+          if (id.includes('react-markdown') || id.includes('remark') || id.includes('rehype') || id.includes('unified') || id.includes('micromark') || id.includes('mdast') || id.includes('hast') || id.includes('vfile')) return 'grammar'
         },
       },
     },

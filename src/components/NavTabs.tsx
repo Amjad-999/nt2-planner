@@ -9,6 +9,7 @@ const TABS: { id: TabId; icon: string; label: string }[] = [
   { id: 'books',     icon: '📖', label: 'الكتب' },
   { id: 'exam',      icon: '📝', label: 'محاكاة الامتحان' },
   { id: 'exercises', icon: '🎮', label: 'تمارين' },
+  { id: 'grammar',   icon: '📖', label: 'قواعد' },
   { id: 'stats',     icon: '📈', label: 'التحليلات' },
   { id: 'resources', icon: '🔗', label: 'مصادر DUO' },
   { id: 'platform',  icon: '⭐', label: 'منصّتي' },
