@@ -21,7 +21,11 @@ const customStorage = {
       const raw = localStorage.getItem(name)
       if (raw) {
         const parsed = JSON.parse(raw)
-        if (parsed && parsed.state) return parsed as StorageValue<State>
+        if (parsed && parsed.state) {
+          // Older save() builds persisted activeTab — tab choice is per-session
+          delete parsed.state.activeTab
+          return parsed as StorageValue<State>
+        }
         // Original app stores raw S — migrate it
         return { state: applyState(parsed), version: 6 }
       }
@@ -145,7 +149,9 @@ export const useAppStore = create<AppStore>()(
       },
 
       save: () => {
-        const state = get()
+        // Exclude activeTab — parity with the persist partialize below
+        const { activeTab, ...state } = get()
+        void activeTab
         try {
           const s = JSON.stringify({ state, version: 6 })
           localStorage.setItem(SK6, s)
@@ -431,6 +437,13 @@ export const useAppStore = create<AppStore>()(
     {
       name: SK6,
       storage: customStorage,
+      // Must match the version save() writes — on a mismatch with no migrate()
+      // zustand logs an error and DISCARDS the persisted state (data loss)
+      version: 6,
+      // Handles 5 (legacy nt2planner_v5) and 0 (payloads written by this
+      // middleware before `version` was set). applyState normalizes any shape;
+      // zustand's merge re-attaches the live actions on top
+      migrate: (persisted) => applyState(persisted) as unknown as Omit<AppStore, 'activeTab'>,
       partialize: (state) => {
         const { activeTab, ...rest } = state
         void activeTab
