@@ -40,7 +40,7 @@ const RAW: [string, string, string, string, string, string, string][] = [
   ['proberen','يحاول','ww','','A2','Ik probeer elke dag te oefenen.','أحاول التدرّب كل يوم.'],
   ['begrijpen','يفهم','ww','','B1','Begrijp je wat ik bedoel?','هل تفهم ما أقصده؟'],
   ['verwachten','يتوقّع','ww','','B1','Ik verwacht je rond zes uur.','أتوقّعك حوالي السادسة.'],
-  ['veranderen','يغيّر','ww','','B1','De wet is veranderd in 2024.','تغيّر القانون عام ٢٠٢٤.'],
+  ['veranderen','يغيّر','ww','','B1','De wet is veranderd in 2024.','تغيّر القانون عام 2024.'],
   ['verbeteren','يحسّن','ww','','B1','Ik wil mijn Nederlands verbeteren.','أريد تحسين هولنديتي.'],
   ['regelen','يدبّر/ينظّم','ww','','B1','Kun je dat voor me regelen?','هل يمكنك أن تدبّر لي ذلك؟'],
   ['voorstellen','يقترح/يقدّم','ww','','B1','Mag ik u even voorstellen aan mijn collega?','هل تأذن لي أن أقدّمك إلى زميلي؟'],

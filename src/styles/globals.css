@@ -1,9 +1,16 @@
 @import './tokens.css';
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── Phosphor icon helpers ── */
+/* Flip direction-sensitive icons (arrows, external-link) in RTL contexts */
+[dir="rtl"] .icon-flip-rtl { transform: scaleX(-1); }
+
+/* Loading spinner for CircleNotch icon */
+.ph-spin { animation: ph-spin .85s linear infinite; }
+@keyframes ph-spin { to { transform: rotate(360deg); } }
 
 /* ── Reduced motion global kill ── */
 @media (prefers-reduced-motion: reduce) {
@@ -23,7 +30,7 @@ input[type='number']::-webkit-outer-spin-button { -webkit-appearance: none; appe
 input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
 
 html {
-  font-size: var(--font-size-base, 15px);
+  font-size: var(--font-size-base, 16px);
   scroll-behavior: smooth;
   direction: rtl;
 }
@@ -31,13 +38,20 @@ html {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Cairo', 'Readex Pro', sans-serif;
+  font-family: var(--font-ar);
   font-weight: 400;
   line-height: 1.6;
+  letter-spacing: 0;  /* Arabic requires zero tracking */
   min-height: 100dvh;
   transition: background .25s ease, color .25s ease;
   -webkit-tap-highlight-color: transparent;
   background: transparent;
+}
+
+/* Dutch / Latin content: Inter, left-to-right */
+:lang(nl) {
+  font-family: var(--font-latin);
+  letter-spacing: -0.01em;
 }
 
 /* Mesh gradient background */
@@ -79,7 +93,64 @@ body::before {
 /* ── Backdrop filter fallback ── */
 @supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
   :root { --glass-bg: rgba(255,255,255,.92); --glass-bg-strong: rgba(255,255,255,.97); }
-  :root[data-theme="dark"] { --glass-bg: rgba(32,35,60,.94); --glass-bg-strong: rgba(32,35,60,.98); }
+  :root[data-theme="dark"] { --glass-bg: rgba(44,44,41,.94); --glass-bg-strong: rgba(44,44,41,.98); }
+}
+
+/* ── Glow card — cursor spotlight + hover accent ──────────────────────────
+   Add class="glow-card" + position:relative + overflow:hidden to any card.
+   spotlight.ts sets --mx / --my on each hovered .glow-card via mousemove.
+   The glow uses ::after so zero extra DOM nodes are needed.
+   Colour/glow always fires; transforms are gated for reduced-motion users.
+───────────────────────────────────────────────────────────────────────── */
+
+/* Glow overlay */
+.glow-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    600px circle at var(--mx, 50%) var(--my, 50%),
+    var(--spot-color) 0%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.glow-card:hover::after { opacity: 1; }
+
+/* Lift + highlight ring */
+.glow-card { transition: transform 200ms ease, box-shadow 200ms ease; }
+.glow-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 0 1.5px var(--orange-m), var(--elev-2) !important;
+  opacity: 1 !important;
+}
+
+/* Icon: springy scale + accent colour */
+.card-icon {
+  transition: color 150ms ease, background-color 150ms ease,
+              transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.glow-card:hover .card-icon { color: var(--orange) !important; }
+
+/* Primary value / title colour boost + Inter tabular for dashboard numbers */
+.card-value {
+  transition: color 150ms ease;
+  font-family: var(--font-latin);
+  font-feature-settings: 'tnum';
+}
+.glow-card:hover .card-value { color: var(--card-fg-hover); }
+
+/* Reduced-motion: re-enable colour/glow, keep transforms off */
+@media (prefers-reduced-motion: reduce) {
+  .glow-card          { transition: none !important; }
+  .glow-card:hover    { transform: none !important; }
+  .glow-card::after   { transition: opacity 150ms ease !important; }
+  .card-icon          { transition: color 150ms ease, background-color 150ms ease !important; }
+  .glow-card:hover .card-icon { transform: none !important; }
+  .card-value         { transition: color 150ms ease !important; }
 }
 
 /* ── Common animation keyframes ── */

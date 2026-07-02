@@ -15,6 +15,12 @@ export function dayKeyOffset(off: number): string {
   return todayKey(d)
 }
 
+export function daysBetween(aISO: string, bISO: string): number {
+  const a = new Date(aISO).getTime(), b = new Date(bISO).getTime()
+  if (isNaN(a) || isNaN(b)) return 0
+  return Math.round((b - a) / 86400000)
+}
+
 export function escapeHtml(s: unknown): string {
   return String(s == null ? '' : s).replace(
     /[&<>"']/g,

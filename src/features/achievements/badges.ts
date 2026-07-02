@@ -30,7 +30,7 @@ export const BADGE_DEFS: BadgeDef[] = [
   },
   {
     id: 'streak_3', emoji: '🔥', tier: 'bronze',
-    title: '٣ أيام متواصلة', desc: 'دراسة ثلاثة أيام بلا انقطاع',
+    title: '3 أيام متواصلة', desc: 'دراسة ثلاثة أيام بلا انقطاع',
     celeb: 'streak',
     condition: b => b.streak >= 3,
   },
@@ -42,13 +42,13 @@ export const BADGE_DEFS: BadgeDef[] = [
   },
   {
     id: 'streak_14', emoji: '💎', tier: 'gold',
-    title: 'أسبوعان متواصلان', desc: '١٤ يومًا بلا انقطاع',
+    title: 'أسبوعان متواصلان', desc: '14 يومًا بلا انقطاع',
     celeb: 'streak',
     condition: b => b.streak >= 14,
   },
   {
     id: 'streak_30', emoji: '👑', tier: 'platinum',
-    title: 'شهر من الدراسة', desc: '٣٠ يومًا متواصلًا — استثنائي!',
+    title: 'شهر من الدراسة', desc: '30 يومًا متواصلًا — استثنائي!',
     celeb: 'streak',
     condition: b => b.streak >= 30,
   },
@@ -68,19 +68,19 @@ export const BADGE_DEFS: BadgeDef[] = [
   },
   {
     id: 'words_10', emoji: '📚', tier: 'silver',
-    title: '١٠ كلمات متقنة', desc: 'حفظت ١٠ كلمات هولندية في الذاكرة',
+    title: '10 كلمات متقنة', desc: 'حفظت 10 كلمات هولندية في الذاكرة',
     celeb: 'badge',
     condition: b => b.learnedWords >= 10,
   },
   {
     id: 'words_50', emoji: '🧠', tier: 'gold',
-    title: '٥٠ كلمة متقنة', desc: 'مفردات B1 في متناول يدك',
+    title: '50 كلمة متقنة', desc: 'مفردات B1 في متناول يدك',
     celeb: 'badge',
     condition: b => b.learnedWords >= 50,
   },
   {
     id: 'words_100', emoji: '🏆', tier: 'platinum',
-    title: '١٠٠ كلمة متقنة', desc: 'مفردات على مستوى الامتحان',
+    title: '100 كلمة متقنة', desc: 'مفردات على مستوى الامتحان',
     celeb: 'badge',
     condition: b => b.learnedWords >= 100,
   },
@@ -94,7 +94,7 @@ export const BADGE_DEFS: BadgeDef[] = [
   },
   {
     id: 'exam_pass', emoji: '🎓', tier: 'gold',
-    title: `أوّل نجاح (≥${PASS_THRESHOLD}٪)`, desc: 'تجاوزت عتبة ٦٥٪ في المحاكاة',
+    title: `أوّل نجاح (≥${PASS_THRESHOLD}%)`, desc: 'تجاوزت عتبة 65% في المحاكاة',
     celeb: 'exam',
     condition: b => b.examPassed,
   },
@@ -102,7 +102,7 @@ export const BADGE_DEFS: BadgeDef[] = [
   // ── Daily work ────────────────────────────────────────────────────
   {
     id: 'daily_tasks_3', emoji: '✅', tier: 'bronze',
-    title: 'إنجاز مهام اليوم', desc: 'أكملت ٣ مهام في يوم واحد',
+    title: 'إنجاز مهام اليوم', desc: 'أكملت 3 مهام في يوم واحد',
     celeb: 'tasks',
     condition: b => b.dailyTasks >= 3,
   },
@@ -115,5 +115,5 @@ export const TIER_LABEL: Record<BadgeDef['tier'], string> = {
   bronze: 'برونزي', silver: 'فضّي', gold: 'ذهبي', platinum: 'بلاتيني',
 }
 export const TIER_COLOR: Record<BadgeDef['tier'], string> = {
-  bronze: '#cd7f32', silver: '#9E9E9E', gold: '#D98A2B', platinum: '#0EA7A2',
+  bronze: '#cd7f32', silver: '#9E9E9E', gold: '#D98A2B', platinum: '#467434',
 }

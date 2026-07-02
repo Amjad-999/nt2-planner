@@ -37,8 +37,8 @@ export function chunkText(text: string, maxLen = 180): string[] {
 export function playOneClip(url: string, label: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const a = ensureAudio()
-    try { a.pause() } catch {}
-    try { a.currentTime = 0 } catch {}
+    try { a.pause() } catch { /* pause on a fresh element may throw — safe to ignore */ }
+    try { a.currentTime = 0 } catch { /* throws before any media is loaded — safe to ignore */ }
     a.src = url
     a.playbackRate = Math.max(0.6, Math.min(1.4, useAppStore.getState().prefs.rate ?? 1.0))
     a.volume = 1.0
@@ -55,7 +55,7 @@ export function playOneClip(url: string, label: string): Promise<string> {
 }
 
 export function stopAudio() {
-  try { window.speechSynthesis?.cancel() } catch {}
+  try { window.speechSynthesis?.cancel() } catch { /* synthesis in an odd state — nothing to cancel */ }
   try {
     if (_audioEl) {
       _audioEl.pause()
@@ -63,7 +63,7 @@ export function stopAudio() {
       _audioEl.removeAttribute('src')
       _audioEl.load()
     }
-  } catch {}
+  } catch { /* teardown failure is harmless — the element is being reset anyway */ }
   _audioQueue = Promise.resolve()
 }
 

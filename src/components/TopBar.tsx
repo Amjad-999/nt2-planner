@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import { getDaysLeft } from '@/store/useAppStore'
 import { useTheme } from '@/hooks/useTheme'
+import { AppIcon } from './AppIcon'
+import { CalendarDots, Fire, DownloadSimple, Moon, Sun, GearSix } from '@phosphor-icons/react'
 
 interface Props {
   onOpenSettings: () => void
@@ -67,7 +69,7 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
         style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
         title="الأيام المتبقية حتى الامتحان"
       >
-        <span>📅</span>
+        <AppIcon icon={CalendarDots} size={15} style={{ color: 'var(--orange)' }} />
         <strong style={{ color: 'var(--orange)', fontWeight: 600 }}>
           {daysLeft == null ? '—' : daysLeft}
         </strong>
@@ -80,7 +82,7 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
         style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
         title="عدد أيام المواظبة المتتالية"
       >
-        <span>🔥</span>
+        <AppIcon icon={Fire} size={15} style={{ color: 'var(--orange)' }} />
         <strong style={{ color: 'var(--orange)', fontWeight: 600 }}>{streak.count}</strong>
         <span>يوم</span>
       </div>
@@ -99,18 +101,19 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
           style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }}
           aria-label="تثبيت التطبيق"
         >
-          ⬇️ تثبيت
+          <AppIcon icon={DownloadSimple} size={16} />
+          تثبيت
         </button>
       )}
 
       {/* Theme toggle */}
       <IconBtn onClick={toggleTheme} aria-label="تبديل المظهر" title={isDark ? 'الوضع الفاتح' : 'الوضع الداكن'}>
-        🌓
+        <AppIcon icon={isDark ? Sun : Moon} size={18} />
       </IconBtn>
 
       {/* Settings */}
       <IconBtn onClick={onOpenSettings} aria-label="الإعدادات" title="الإعدادات">
-        ⚙️
+        <AppIcon icon={GearSix} size={18} />
       </IconBtn>
     </header>
   )

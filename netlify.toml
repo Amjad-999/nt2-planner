@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# يخدم الملفّات الثابتة كما هي، وأي مسار غير موجود يعود إلى index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

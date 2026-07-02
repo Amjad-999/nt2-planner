@@ -55,23 +55,10 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
     else setIdx(idx + 1)
   }, [idx, queue.length, onDone])
 
-  if (!queue.length) {
-    return (
-      <div className="info-box" style={{ background: 'var(--green-l)', border: '1px solid var(--glass-border)', borderInlineStart: '3px solid var(--green)', borderRadius: 'var(--r-sm)', padding: '14px 18px', fontSize: '.9rem', color: 'var(--text2)' }}>
-        ✅ لا كلمات مستحقّة الآن. أضف كلمات جديدة عبر AI لبدء جلسة لاحقًا.
-      </div>
-    )
-  }
-
-  const word = queue[idx]
-  if (!word) { onDone(); return null }
-
-  const nl = getNl(word)
-  const ar = getAr(word)
-  const ex = getEx(word)
+  const word: Word | undefined = queue[idx]
 
   const grade = (q: FsrsQuality) => {
-    if (nextInterval) return          // already grading — block double-fire
+    if (!word || nextInterval) return // no card / already grading — block double-fire
     const days = onGrade(word.id, q)
     setNextInterval(formatIntervalAr(days))
     setFlipped(false)
@@ -86,33 +73,50 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
   // ── Keyboard shortcuts ────────────────────────────────────────────────────
   // enableOnFormTags defaults to false in react-hotkeys-hook v5, so these
   // never fire when the user is typing in an <input> or <textarea>.
+  // Hooks must run on every render (before the early returns below);
+  // `enabled: !!word` keeps them inert while no card is showing.
+  const hotkeyOpts = { enabled: !!word }
 
   // Space / Enter → flip (front only)
   useHotkeys(['space', 'enter'], (e) => {
     e.preventDefault()
     if (!flipped && !nextInterval) setFlipped(true)
-  })
+  }, hotkeyOpts)
 
   // 1–4 → grade (back only, not during interval display)
-  useHotkeys('1', () => { if (flipped && !nextInterval) grade(0) })
-  useHotkeys('2', () => { if (flipped && !nextInterval) grade(1) })
-  useHotkeys('3', () => { if (flipped && !nextInterval) grade(2) })
-  useHotkeys('4', () => { if (flipped && !nextInterval) grade(3) })
+  useHotkeys('1', () => { if (flipped && !nextInterval) grade(0) }, hotkeyOpts)
+  useHotkeys('2', () => { if (flipped && !nextInterval) grade(1) }, hotkeyOpts)
+  useHotkeys('3', () => { if (flipped && !nextInterval) grade(2) }, hotkeyOpts)
+  useHotkeys('4', () => { if (flipped && !nextInterval) grade(3) }, hotkeyOpts)
 
   // ArrowRight → flip if on front, or skip interval delay if grading
   useHotkeys('arrowright', () => {
     if (nextInterval) advance()
     else if (!flipped) setFlipped(true)
-  })
+  }, hotkeyOpts)
 
   // Esc → exit (close help first if open, then exit)
   useHotkeys('escape', () => {
     if (helpOpen) { setHelpOpen(false); return }
     onDone()
-  })
+  }, hotkeyOpts)
 
   // ? → toggle help
-  useHotkeys('shift+slash', (e) => { e.preventDefault(); setHelpOpen(o => !o) })
+  useHotkeys('shift+slash', (e) => { e.preventDefault(); setHelpOpen(o => !o) }, hotkeyOpts)
+
+  if (!queue.length) {
+    return (
+      <div className="info-box" style={{ background: 'var(--green-l)', border: '1px solid var(--glass-border)', borderInlineStart: '3px solid var(--green)', borderRadius: 'var(--r-sm)', padding: '14px 18px', fontSize: '.9rem', color: 'var(--text2)' }}>
+        ✅ لا كلمات مستحقّة الآن. أضف كلمات جديدة عبر AI لبدء جلسة لاحقًا.
+      </div>
+    )
+  }
+
+  if (!word) { onDone(); return null }
+
+  const nl = getNl(word)
+  const ar = getAr(word)
+  const ex = getEx(word)
 
   return (
     <div

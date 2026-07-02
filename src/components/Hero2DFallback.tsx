@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useAppStore, getDaysLeft } from '@/store/useAppStore'
+import { useAppStore, getDaysLeft, getPlanTotal, getCurrentDay } from '@/store/useAppStore'
 import { useCountdown } from '@/hooks/useCountdown'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { todayKey } from '@/lib/utils'
@@ -21,6 +21,7 @@ export function Hero2DFallback() {
   const examDate    = useAppStore((s) => s.examDate)
   const planDay     = useAppStore((s) => s.planDay)
   const streak      = useAppStore((s) => s.streak)
+  const planStart   = useAppStore((s) => s.planStart)
   const dailyHistory = useAppStore((s) => s.dailyHistory)
   const reduced     = useReducedMotion()
 
@@ -46,6 +47,8 @@ export function Hero2DFallback() {
 
   const { days } = useCountdown(examDate)
   const daysLeft  = getDaysLeft(examDate)
+  const planTotal = getPlanTotal({ planStart, examDate })
+  const planDayNow = getCurrentDay({ planStart, planDay }, planTotal)
   const todayMins = dailyHistory[todayKey()]?.mins ?? 0
 
   useEffect(() => {
@@ -147,7 +150,7 @@ export function Hero2DFallback() {
         <div style={{ display:'flex', gap:16, marginTop:14, flexWrap:'wrap' }}>
           {[
             { icon:'📅', label:'المتبقّي:', value: daysLeft == null ? '—' : String(daysLeft), unit:'يومًا' },
-            { icon:'📍', label:'اليوم:', value: String(planDay), unit:'/ 46' },
+            { icon:'📍', label:'اليوم:', value: String(planDayNow), unit:`/ ${planTotal}` },
             { icon:'⏱️', label:'درست اليوم:', value: String(todayMins), unit:'دقيقة' },
             { icon:'🔥', label:'مواظبة:', value: String(streak.count), unit:'يوم' },
           ].map((ck) => (

@@ -22,5 +22,7 @@ export async function idbSet(value: string): Promise<void> {
 export async function idbDel(): Promise<void> {
   try {
     await del(IDB_KEY)
-  } catch {}
+  } catch {
+    // IDB unavailable — nothing to delete
+  }
 }

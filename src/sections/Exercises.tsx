@@ -1,4 +1,5 @@
 import { useState, useId, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import {
   DndContext, DragOverlay,
   useDraggable, useDroppable,
@@ -21,7 +22,7 @@ import {
   buildMatchExercise, checkMatching,
   buildSortExercise,  checkSortOrder,
   buildGapExercise,   checkGap,
-  type Pair, type SortWord, type Chip, type GapExercise,
+  type Pair, type SortWord, type Chip, type GapExercise, type SortExercise,
 } from '@/features/exercises/logic'
 
 // ── Shared helpers ────────────────────────────────────────────────────────────
@@ -38,9 +39,15 @@ function useWords() {
   return THEMA_WORDS.map(w => ({ nl: w.nl, ar: w.ar, ex: w.ex ?? '' }))
 }
 
+// Split each multi-sentence example paragraph into individual sentences before
+// filtering, so short sentences inside longer paragraphs are still usable.
 const SORT_SENTENCES = EXAM_SPEAKING
-  .map(s => s.voorbeeldNl)
-  .filter(s => s.split(' ').length >= 5 && s.split(' ').length <= 12)
+  .flatMap(s => s.voorbeeldNl.replace(/[.!?]+/g, '|').split('|'))
+  .map(s => s.trim())
+  .filter(s => {
+    const wc = s.split(/\s+/).filter(Boolean).length
+    return wc >= 5 && wc <= 12
+  })
 
 // ── Shared token styles ──────────────────────────────────────────────────────
 function chip(active = false, correct?: boolean, incorrect?: boolean): React.CSSProperties {
@@ -93,7 +100,7 @@ function ResetBtn({ onClick }: { onClick: () => void }) {
 function DraggableNlChip({ pair, selected, result }: {
   pair: Pair; selected: boolean; result?: boolean
 }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: pair.id })
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: pair.id })
   return (
     <div
       ref={setNodeRef}
@@ -102,10 +109,10 @@ function DraggableNlChip({ pair, selected, result }: {
       aria-label={`اسحب الكلمة: ${pair.nl}`}
       style={{
         ...chip(selected, result === true, result === false),
-        opacity: isDragging ? 0.35 : 1,
-        transform: CSS.Translate.toString(transform),
+        opacity: isDragging ? 0.25 : 1,
         outline: selected ? '2px solid var(--orange)' : undefined,
         outlineOffset: 2,
+        cursor: isDragging ? 'grabbing' : 'grab',
       }}
     >
       {pair.nl}
@@ -125,8 +132,9 @@ function DroppableArSlot({ pair, placed, result, onTap }: {
       aria-label={`الهدف: ${pair.ar}${placed ? ' — موضوع: ' + placed.nl : ''}`}
       style={{
         minHeight: 48, borderRadius: 10, padding: '8px 14px',
-        border: `2px dashed ${isOver ? 'var(--orange)' : hasResult ? (result ? 'var(--green)' : 'var(--red)') : 'var(--border2)'}`,
+        border: `2px ${isOver ? 'solid' : 'dashed'} ${isOver ? 'var(--orange)' : hasResult ? (result ? 'var(--green)' : 'var(--red)') : 'var(--border2)'}`,
         background: isOver ? 'var(--orange-l)' : hasResult ? (result ? 'var(--green-l)' : 'var(--red-l)') : 'var(--glass-bg)',
+        boxShadow: isOver ? '0 0 0 3px color-mix(in srgb, var(--orange) 30%, transparent)' : undefined,
         display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center', justifyContent: 'center',
         cursor: 'pointer', transition: 'border-color .15s, background .15s',
       }}
@@ -272,13 +280,23 @@ function MatchingExercise() {
           </div>
         </div>
 
-        <DragOverlay dropAnimation={reducedMotion ? null : undefined}>
-          {activePair && (
-            <div style={{ ...chip(true), boxShadow: 'var(--elev-2)', pointerEvents: 'none' }}>
-              {activePair.nl}
-            </div>
-          )}
-        </DragOverlay>
+        {createPortal(
+          <DragOverlay dropAnimation={reducedMotion ? null : undefined}>
+            {activePair && (
+              <div style={{
+                ...chip(true),
+                boxShadow: 'var(--elev-2), 0 8px 24px rgba(0,0,0,0.18)',
+                pointerEvents: 'none',
+                transform: 'scale(1.05)',
+                transformOrigin: 'center center',
+                cursor: 'grabbing',
+              }}>
+                {activePair.nl}
+              </div>
+            )}
+          </DragOverlay>,
+          document.body
+        )}
       </DndContext>
 
       <div style={{ marginTop: 16, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -339,10 +357,12 @@ function SortingExercise() {
   const reducedMotion = useReducedMotion()
   const uid = useId()
 
-  const [s, setS] = useState(() =>
-    buildSortExercise(SORT_SENTENCES[Math.floor(Math.random() * SORT_SENTENCES.length)], seed())
+  const [s, setS] = useState<SortExercise | null>(() =>
+    SORT_SENTENCES.length
+      ? buildSortExercise(SORT_SENTENCES[Math.floor(Math.random() * SORT_SENTENCES.length)], seed())
+      : null
   )
-  const [items, setItems] = useState<SortWord[]>(s.words)
+  const [items, setItems] = useState<SortWord[]>(() => s?.words ?? [])
   const [checked, setChecked] = useState(false)
   const [activeItem, setActiveItem] = useState<SortWord | null>(null)
 
@@ -352,7 +372,8 @@ function SortingExercise() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 
-  const correct = checked && checkSortOrder(items.map(i => i.id), s.correctIds)
+  // safe with short-circuit when s is null
+  const correct = checked && !!s && checkSortOrder(items.map(i => i.id), s.correctIds)
 
   const announcements = {
     ...defaultAnnouncements,
@@ -381,12 +402,23 @@ function SortingExercise() {
   }
 
   const reset = () => {
+    if (!SORT_SENTENCES.length) return
     const next = buildSortExercise(
       SORT_SENTENCES[Math.floor(Math.random() * SORT_SENTENCES.length)], seed()
     )
+    if (!next) return
     setS(next)
     setItems(next.words)
     setChecked(false)
+  }
+
+  // All hooks called above — safe to return early now
+  if (!s) {
+    return (
+      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text2)', fontSize: '.9rem' }}>
+        📝 لا توجد جمل للتدريب حالياً — ستُضاف قريباً.
+      </div>
+    )
   }
 
   return (
@@ -421,13 +453,24 @@ function SortingExercise() {
           </div>
         </SortableContext>
 
-        <DragOverlay dropAnimation={reducedMotion ? null : undefined}>
-          {activeItem && (
-            <div style={{ ...chip(true), direction: 'ltr', boxShadow: 'var(--elev-2)', pointerEvents: 'none' }}>
-              {activeItem.word}
-            </div>
-          )}
-        </DragOverlay>
+        {createPortal(
+          <DragOverlay dropAnimation={reducedMotion ? null : undefined}>
+            {activeItem && (
+              <div style={{
+                ...chip(true),
+                direction: 'ltr',
+                boxShadow: 'var(--elev-2), 0 8px 24px rgba(0,0,0,0.18)',
+                pointerEvents: 'none',
+                transform: 'scale(1.05)',
+                transformOrigin: 'center center',
+                cursor: 'grabbing',
+              }}>
+                {activeItem.word}
+              </div>
+            )}
+          </DragOverlay>,
+          document.body
+        )}
       </DndContext>
 
       {checked && (
@@ -462,7 +505,7 @@ function SortingExercise() {
 function DraggableChip({ chip: c, used, selected, onTap }: {
   chip: Chip; used?: boolean; selected?: boolean; onTap: () => void
 }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: c.id, disabled: used,
   })
   return (
@@ -474,9 +517,8 @@ function DraggableChip({ chip: c, used, selected, onTap }: {
       aria-label={`كلمة: ${c.word}${used ? ' (مستخدمة)' : ''}`}
       style={{
         ...chip(selected, undefined, undefined),
-        opacity: used ? 0.3 : isDragging ? 0.35 : 1,
-        cursor: used ? 'not-allowed' : 'grab',
-        transform: CSS.Translate.toString(transform),
+        opacity: used ? 0.3 : isDragging ? 0.25 : 1,
+        cursor: used ? 'not-allowed' : isDragging ? 'grabbing' : 'grab',
         outline: selected ? '2px solid var(--orange)' : undefined, outlineOffset: 2,
         direction: 'ltr',
       }}
@@ -486,8 +528,8 @@ function DraggableChip({ chip: c, used, selected, onTap }: {
   )
 }
 
-function GapDropZone({ ex, placed, isOver, result, onTap }: {
-  ex: GapExercise; placed: Chip | null; isOver: boolean; result?: boolean; onTap: () => void
+function GapDropZone({ placed, isOver, result, onTap }: {
+  placed: Chip | null; isOver: boolean; result?: boolean; onTap: () => void
 }) {
   const hasResult = result !== undefined
   return (
@@ -533,6 +575,7 @@ function FillGapExercise() {
   const [placed, setPlaced] = useState<Chip | null>(null)
   const [tapSel, setTapSel] = useState<string | null>(null) // chip id
   const [result, setResult] = useState<boolean | null>(null)
+  const [activeChipId, setActiveChipId] = useState<string | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -550,7 +593,11 @@ function FillGapExercise() {
     )
   }
 
+  const activeChip = activeChipId ? ex.chips.find(x => x.id === activeChipId) ?? null : null
+
+  const onDragStart = ({ active }: DragStartEvent) => setActiveChipId(String(active.id))
   const onDragEnd = ({ active, over }: DragEndEvent) => {
+    setActiveChipId(null)
     if (!over || over.id !== 'blank') return
     const c = ex.chips.find(x => x.id === active.id)
     if (c) { setPlaced(c); setTapSel(null) }
@@ -595,7 +642,7 @@ function FillGapExercise() {
         اسحب الكلمة الصحيحة لملء الفراغ. على الهاتف: اضغط كلمة ثمّ اضغط الفراغ.
       </p>
 
-      <DndContext id={uid} sensors={sensors} onDragEnd={onDragEnd} accessibility={{ announcements }}>
+      <DndContext id={uid} sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} accessibility={{ announcements }}>
         {/* Gapped sentence */}
         <div style={{
           padding: '14px 18px', borderRadius: 'var(--r-sm)',
@@ -604,7 +651,7 @@ function FillGapExercise() {
         }}>
           <span>{ex.before}</span>
           <span ref={setBlankRef}>
-            <GapDropZone ex={ex} placed={placed} isOver={isOver} result={result ?? undefined} onTap={handleBlankTap} />
+            <GapDropZone placed={placed} isOver={isOver} result={result ?? undefined} onTap={handleBlankTap} />
           </span>
           <span>{ex.after}</span>
         </div>
@@ -622,9 +669,24 @@ function FillGapExercise() {
           ))}
         </div>
 
-        <DragOverlay dropAnimation={reducedMotion ? null : undefined}>
-          {null}
-        </DragOverlay>
+        {createPortal(
+          <DragOverlay dropAnimation={reducedMotion ? null : undefined}>
+            {activeChip && (
+              <div style={{
+                ...chip(true),
+                direction: 'ltr',
+                boxShadow: 'var(--elev-2), 0 8px 24px rgba(0,0,0,0.18)',
+                pointerEvents: 'none',
+                transform: 'scale(1.05)',
+                transformOrigin: 'center center',
+                cursor: 'grabbing',
+              }}>
+                {activeChip.word}
+              </div>
+            )}
+          </DragOverlay>,
+          document.body
+        )}
       </DndContext>
 
       {result !== null && (
@@ -669,8 +731,7 @@ const MODES: { id: Mode; icon: string; label: string; desc: string }[] = [
   { id: 'gap',      icon: '⬜', label: 'ملء الفراغ',      desc: 'اسحب الكلمة الصحيحة لإكمال الجملة' },
 ]
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export default function Exercises(_: {}) {
+export default function Exercises() {
   const [mode, setMode] = useState<Mode>('matching')
   // Key forces remount when mode changes, resetting all exercise state
   const [key, setKey] = useState(0)

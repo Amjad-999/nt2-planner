@@ -37,18 +37,25 @@ export function SpeakAndCheck({ targetNl, label }: Props) {
   // Track whether we initiated this listening session so auto-stop fires correctly
   const ours = useRef(false)
 
-  // Compute score once listening stops (auto-stop or manual)
+  // Compute score once listening stops (auto-stop or manual).
+  // setState runs on a cancellable 0 ms timer — never synchronously in the
+  // effect body — while ours.current flips synchronously to keep the
+  // cross-effect session guard race-free
   useEffect(() => {
     if (!ours.current) return
     if (!listening && transcript) {
       ours.current = false
       const pct = speakScore(transcript, targetNl)
-      setScore(pct)
-      setPhase('scored')
+      const t = setTimeout(() => {
+        setScore(pct)
+        setPhase('scored')
+      }, 0)
+      return () => clearTimeout(t)
     } else if (!listening && !transcript && phase === 'listening') {
       // recognition ended without a result (e.g. silence timeout)
       ours.current = false
-      setPhase('idle')
+      const t = setTimeout(() => setPhase('idle'), 0)
+      return () => clearTimeout(t)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listening])
@@ -57,8 +64,11 @@ export function SpeakAndCheck({ targetNl, label }: Props) {
   useEffect(() => {
     if (!isMicrophoneAvailable && phase === 'listening') {
       ours.current = false
-      setErrorMsg(NO_MIC_MSG)
-      setPhase('error')
+      const t = setTimeout(() => {
+        setErrorMsg(NO_MIC_MSG)
+        setPhase('error')
+      }, 0)
+      return () => clearTimeout(t)
     }
   }, [isMicrophoneAvailable, phase])
 
@@ -186,7 +196,7 @@ export function SpeakAndCheck({ targetNl, label }: Props) {
         <div style={{ marginTop: 10 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
             <span style={{ fontSize: '.82rem', color: lbl.color, fontWeight: 600 }}>{lbl.text}</span>
-            <span style={{ fontSize: '.88rem', fontWeight: 700, color: lbl.color }}>{score}٪</span>
+            <span style={{ fontSize: '.88rem', fontWeight: 700, color: lbl.color }}>{score}%</span>
           </div>
           <div
             role="progressbar"

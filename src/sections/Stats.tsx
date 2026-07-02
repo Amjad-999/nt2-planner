@@ -4,8 +4,7 @@ import { PASS_THRESHOLD, SKILL_AR } from '@/data/phases'
 import { dayKeyOffset, hexA } from '@/lib/utils'
 import { InsightCard } from '@/components/InsightCard'
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export default function Stats(_: {}) {
+export default function Stats() {
   const skill        = useAppStore((s) => s.skill)
   const vocab        = useAppStore((s) => s.vocab)
   const streak       = useAppStore((s) => s.streak)
@@ -25,9 +24,9 @@ export default function Stats(_: {}) {
     prev ? Math.round(((now - prev) / prev) * 100) : (now > 0 ? 100 : 0)
 
   const weekInsights: { kind:'good'|'warn'; icon:string; title:string; desc:string }[] = [
-    { kind: weekM>=lastWM?'good':'warn', icon:'⏱️', title:'دقائق الدراسة', desc:`${weekM} د هذا الأسبوع مقابل ${lastWM} د سابقًا (${pctChg(weekM,lastWM)>=0?'+':''}${pctChg(weekM,lastWM)}٪)` },
-    { kind: weekT>=lastWT?'good':'warn', icon:'✅', title:'المهام المنجزة', desc:`${weekT} مهمّة هذا الأسبوع مقابل ${lastWT} سابقًا (${pctChg(weekT,lastWT)>=0?'+':''}${pctChg(weekT,lastWT)}٪)` },
-    { kind: weekW>=lastWW?'good':'warn', icon:'📚', title:'كلمات جديدة مُضافة', desc:`${weekW} كلمة هذا الأسبوع مقابل ${lastWW} سابقًا (${pctChg(weekW,lastWW)>=0?'+':''}${pctChg(weekW,lastWW)}٪)` },
+    { kind: weekM>=lastWM?'good':'warn', icon:'⏱️', title:'دقائق الدراسة', desc:`${weekM} د هذا الأسبوع مقابل ${lastWM} د سابقًا (${pctChg(weekM,lastWM)>=0?'+':''}${pctChg(weekM,lastWM)}%)` },
+    { kind: weekT>=lastWT?'good':'warn', icon:'✅', title:'المهام المنجزة', desc:`${weekT} مهمّة هذا الأسبوع مقابل ${lastWT} سابقًا (${pctChg(weekT,lastWT)>=0?'+':''}${pctChg(weekT,lastWT)}%)` },
+    { kind: weekW>=lastWW?'good':'warn', icon:'📚', title:'كلمات جديدة مُضافة', desc:`${weekW} كلمة هذا الأسبوع مقابل ${lastWW} سابقًا (${pctChg(weekW,lastWW)>=0?'+':''}${pctChg(weekW,lastWW)}%)` },
   ]
 
   // Chart rendering — re-runs on theme change
@@ -46,9 +45,9 @@ export default function Stats(_: {}) {
       const c = {
         txt:    color('--text2',   '#444A66'),
         grid:   color('--border',  '#E4DECE'),
-        orange: color('--orange',  '#5B57F0'),
+        orange: color('--orange',  '#F58F20'),
         blue:   color('--blue',    '#2F77E0'),
-        green:  color('--green',   '#0FB47E'),
+        green:  color('--green',   '#467434'),
         purple: color('--purple',  '#8B5CF6'),
         amber:  color('--amber',   '#D98A2B'),
       }
@@ -56,7 +55,7 @@ export default function Stats(_: {}) {
       Chart.defaults.borderColor = c.grid
       Chart.defaults.font.family = "'Cairo','Readex Pro',sans-serif"
 
-      const kill = (id: string) => { try { Chart.getChart(document.getElementById(id) as HTMLCanvasElement)?.destroy() } catch {} }
+      const kill = (id: string) => { try { Chart.getChart(document.getElementById(id) as HTMLCanvasElement)?.destroy() } catch { /* chart already destroyed */ } }
 
       // 14-day data
       const days14: string[] = [], studyD: number[] = [], taskD: number[] = []
@@ -99,7 +98,7 @@ export default function Stats(_: {}) {
           g.strokeStyle=c.green; g.lineWidth=2; g.setLineDash([6,4])
           g.beginPath(); g.moveTo(px,area.top); g.lineTo(px,area.bottom); g.stroke()
           g.setLineDash([]); g.fillStyle=c.green; g.font="600 11px 'Cairo',sans-serif"
-          g.textAlign='center'; g.textBaseline='bottom'; g.fillText('عتبة ٦٥٪',px,area.top-3); g.restore()
+          g.textAlign='center'; g.textBaseline='bottom'; g.fillText('عتبة 65%',px,area.top-3); g.restore()
         }
       }
       kill('chSkills')
@@ -109,7 +108,7 @@ export default function Stats(_: {}) {
       if (csk) new Chart(csk, {
         type:'bar',
         data:{ labels:skL, datasets:[{ label:'أفضل نتيجة', data:skS, backgroundColor:skS.map((v)=>hexA(v>=PASS_THRESHOLD?c.green:c.orange,.8)), borderColor:skS.map((v)=>v>=PASS_THRESHOLD?c.green:c.orange), borderWidth:1, borderRadius:6, borderSkipped:false }]},
-        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, layout:{padding:{top:16}}, scales:{ x:{min:0,max:100,grid:{color:c.grid},ticks:{color:c.txt,stepSize:25,callback:(v)=>v+'٪'}}, y:{grid:{display:false},ticks:{color:c.txt,font:{size:13}}} }, plugins:{ legend:{display:false}, tooltip:{backgroundColor:c.txt,titleColor:'#fff',bodyColor:'#fff',callbacks:{label:(ctx)=>(ctx.parsed.x??0)+'٪'+((ctx.parsed.x??0)>=PASS_THRESHOLD?' ✓ فوق العتبة':' — تحت العتبة')}} } },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, layout:{padding:{top:16}}, scales:{ x:{min:0,max:100,grid:{color:c.grid},ticks:{color:c.txt,stepSize:25,callback:(v)=>v+'%'}}, y:{grid:{display:false},ticks:{color:c.txt,font:{size:13}}} }, plugins:{ legend:{display:false}, tooltip:{backgroundColor:c.txt,titleColor:'#fff',bodyColor:'#fff',callbacks:{label:(ctx)=>(ctx.parsed.x??0)+'%'+((ctx.parsed.x??0)>=PASS_THRESHOLD?' ✓ فوق العتبة':' — تحت العتبة')}} } },
         plugins:[passPlugin]
       })
 
@@ -130,7 +129,7 @@ export default function Stats(_: {}) {
       const cols = [c.blue,c.green,c.amber,c.purple]
       kill('chExamTrend')
       const ce = document.getElementById('chExamTrend') as HTMLCanvasElement|null
-      if (ce) new Chart(ce, { type:'line', data:{ datasets: sk.map((k,i)=>({ label:SKILL_AR[k], data:(skill[k].history??[]).map((h)=>({x:h.date,y:h.score})), borderColor:cols[i], backgroundColor:hexA(cols[i],.1), tension:.3, pointRadius:4, fill:false })) }, options:{ responsive:true, maintainAspectRatio:false, scales:{ x:{type:'category',ticks:{color:c.txt+'aa'}}, y:{min:0,max:100,grid:{color:c.grid},ticks:{color:c.txt+'aa',callback:(v)=>v+'٪'}} }, plugins:{ legend:{position:'bottom',labels:{color:c.txt}}, tooltip:{callbacks:{label:(ctx)=>ctx.dataset.label+': '+ctx.parsed.y+'٪'}} } } })
+      if (ce) new Chart(ce, { type:'line', data:{ datasets: sk.map((k,i)=>({ label:SKILL_AR[k], data:(skill[k].history??[]).map((h)=>({x:h.date,y:h.score})), borderColor:cols[i], backgroundColor:hexA(cols[i],.1), tension:.3, pointRadius:4, fill:false })) }, options:{ responsive:true, maintainAspectRatio:false, scales:{ x:{type:'category',ticks:{color:c.txt+'aa'}}, y:{min:0,max:100,grid:{color:c.grid},ticks:{color:c.txt+'aa',callback:(v)=>v+'%'}} }, plugins:{ legend:{position:'bottom',labels:{color:c.txt}}, tooltip:{callbacks:{label:(ctx)=>ctx.dataset.label+': '+ctx.parsed.y+'%'}} } } })
 
       void key
     }
@@ -167,10 +166,10 @@ export default function Stats(_: {}) {
           const C = 2*Math.PI*42; const offset = C-(C*v/100)
           return (
             <div key={k} style={{ background:'var(--glass-bg)', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, textAlign:'center', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
-              <svg viewBox="0 0 100 100" style={{ width:96, height:96, display:'block', margin:'0 auto 8px' }} role="img" aria-label={`${SKILL_AR[k]}: ${v}٪`}>
+              <svg viewBox="0 0 100 100" style={{ width:96, height:96, display:'block', margin:'0 auto 8px' }} role="img" aria-label={`${SKILL_AR[k]}: ${v}%`}>
                 <circle cx="50" cy="50" r="42" fill="none" stroke="var(--surface3)" strokeWidth="8"/>
                 <circle cx="50" cy="50" r="42" fill="none" stroke={col} strokeWidth="8" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={offset} transform="rotate(-90 50 50)"/>
-                <text x="50" y="56" textAnchor="middle" style={{ fontFamily:'var(--font-display)', fontSize:'1.4rem', fontWeight:700, fill:'var(--text)' }}>{v}٪</text>
+                <text x="50" y="56" textAnchor="middle" style={{ fontFamily:'var(--font-display)', fontSize:'1.4rem', fontWeight:700, fill:'var(--text)' }}>{v}%</text>
               </svg>
               <div style={{ fontSize:'.85rem', color:'var(--text2)', fontWeight:600 }}>
                 {['📖','🎧','✍️','🗣️'][i]} {SKILL_AR[k]}
@@ -187,7 +186,7 @@ export default function Stats(_: {}) {
       <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'18px 0 10px' }}>📊 الاتّجاهات الأسبوعية</h3>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))', gap:14, marginBottom:18 }}>
         {[
-          { id:'chStudy',  title:'دقائق الدراسة اليومية (آخر ١٤ يوم)' },
+          { id:'chStudy',  title:'دقائق الدراسة اليومية (آخر 14 يوم)' },
           { id:'chTasks',  title:'المهام المنجزة يوميًا' },
           { id:'chWords',  title:'الكلمات المُكتسبة (تراكمي)' },
           { id:'chSkills', title:'المهارات مقابل عتبة النجاح' },
@@ -221,7 +220,7 @@ export default function Stats(_: {}) {
       {/* Exam trend */}
       <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'18px 0 10px' }}>📈 تقدّم نتائج الامتحان</h3>
       <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1)', marginBottom:18 }}>
-        <div style={{ fontSize:'.78rem', color:'var(--muted)', marginBottom:12 }}>آخر محاولات لكلّ مهارة — الخطّ الأخضر هو عتبة النجاح في NT2 (٦٥٪)</div>
+        <div style={{ fontSize:'.78rem', color:'var(--muted)', marginBottom:12 }}>آخر محاولات لكلّ مهارة — الخطّ الأخضر هو عتبة النجاح في NT2 (65%)</div>
         <div style={{ position:'relative', height:300 }}><canvas id="chExamTrend" /></div>
       </div>
 

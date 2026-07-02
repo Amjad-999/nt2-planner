@@ -30,12 +30,17 @@ export async function speakOnline(text: string, voice?: string): Promise<string>
 export function speakBrowser(text: string): Promise<string> {
   return new Promise((resolve, reject) => {
     if (!('speechSynthesis' in window)) return reject(new Error('no speechSynthesis'))
-    if (!_voices.length) { try { loadVoices() } catch {} }
-    try { window.speechSynthesis.cancel() } catch {}
+    if (!_voices.length) { try { loadVoices() } catch { /* voice list unavailable — pickVoice falls back to null */ } }
+    try { window.speechSynthesis.cancel() } catch { /* synthesis in an odd state — nothing to cancel */ }
     const chunks = chunkText(text)
     const v = pickVoice()
     let i = 0, spokeAny = false, settled = false
-    const fin = (ok: boolean, err?: Error) => { if (settled) return; settled = true; ok ? resolve('browser') : reject(err ?? new Error('speech err')) }
+    const fin = (ok: boolean, err?: Error) => {
+      if (settled) return
+      settled = true
+      if (ok) resolve('browser')
+      else reject(err ?? new Error('speech err'))
+    }
     function speakNext() {
       if (settled) return
       if (i >= chunks.length) return fin(true)
@@ -73,7 +78,7 @@ export function speakDutch(text: string, btnEl?: HTMLElement | null): Promise<vo
 
   const job = (async () => {
     const engine = useAppStore.getState().prefs.ttsEngine ?? 'auto'
-    if (!_voices.length) { try { loadVoices() } catch {} }
+    if (!_voices.length) { try { loadVoices() } catch { /* voice list unavailable — engine fallbacks below cover it */ } }
     const hasNativeDutch = !!_bestNlVoice
 
     try {

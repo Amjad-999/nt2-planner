@@ -36,6 +36,7 @@ export function defaultState(): State {
     customDur: {},
     onboarded: false,
     unlockedBadges: [],
+    grammarProgress: {},
     _v: 6,
     _savedAt: 0,
   }
@@ -134,6 +135,7 @@ export function applyState(parsed: any): State {
   S.customDur       = (parsed.customDur  && typeof parsed.customDur  === 'object') ? parsed.customDur  : {}
   S.onboarded       = typeof parsed.onboarded === 'boolean' ? parsed.onboarded : !!(parsed.name || parsed.examDate)
   S.unlockedBadges  = Array.isArray(parsed.unlockedBadges) ? parsed.unlockedBadges.filter((x: unknown) => typeof x === 'string') : []
+  S.grammarProgress = (parsed.grammarProgress && typeof parsed.grammarProgress === 'object' && !Array.isArray(parsed.grammarProgress)) ? parsed.grammarProgress : {}
 
   // ExamWords
   S.examWords = (Array.isArray(parsed.examWords) ? parsed.examWords : [])

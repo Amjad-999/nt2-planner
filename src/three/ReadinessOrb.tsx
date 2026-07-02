@@ -7,21 +7,21 @@ interface Props {
   streak:   number   // streak days (drives intensity)
 }
 
-/** Maps 0–100 readiness to a hue: 0%=red, 65%=indigo, 100%=teal */
+/** Maps 0–100 readiness to a hue: 0%=red, 50%=tangerine, 100%=leaf green */
 function progressToHSL(p: number): THREE.Color {
   const t = Math.max(0, Math.min(100, p)) / 100
-  // Lerp across three colour stops
+  // Lerp across three colour stops — warm brand ramp (bad → good)
   let h: number, s: number, l: number
   if (t < 0.5) {
-    // red(0°) → indigo(248°)
-    h = THREE.MathUtils.lerp(0, 248, t * 2)
+    // red(6°) → tangerine(32°)
+    h = THREE.MathUtils.lerp(6, 32, t * 2)
     s = 0.9
-    l = THREE.MathUtils.lerp(0.55, 0.60, t * 2)
+    l = THREE.MathUtils.lerp(0.55, 0.56, t * 2)
   } else {
-    // indigo(248°) → teal(180°)
-    h = THREE.MathUtils.lerp(248, 180, (t - 0.5) * 2)
-    s = 0.8
-    l = THREE.MathUtils.lerp(0.60, 0.55, (t - 0.5) * 2)
+    // tangerine(32°) → leaf green(96°)
+    h = THREE.MathUtils.lerp(32, 96, (t - 0.5) * 2)
+    s = 0.7
+    l = THREE.MathUtils.lerp(0.56, 0.42, (t - 0.5) * 2)
   }
   return new THREE.Color().setHSL(h / 360, s, l)
 }
@@ -119,7 +119,7 @@ export function ReadinessOrb({ progress, streak }: Props) {
       />
 
       {/* Very soft fill light */}
-      <pointLight color="#B9C2FF" intensity={0.3} distance={5} decay={2} />
+      <pointLight color="#F6C68A" intensity={0.3} distance={5} decay={2} />
     </group>
   )
 }

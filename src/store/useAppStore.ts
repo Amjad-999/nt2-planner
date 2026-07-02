@@ -12,7 +12,6 @@ import { celebrate } from '@/lib/celebrate'
 const SK6 = 'nt2planner_v6'
 const SK5 = 'nt2planner_v5'
 const SK_BACKUP = 'nt2planner_v6_backup'
-const SRS_INTERVALS = [0, 1, 3, 7, 14, 30]
 
 /* ── Custom storage: reads Zustand-wrapped OR original raw JSON ── */
 const customStorage = {
@@ -32,7 +31,9 @@ const customStorage = {
       // Backup key
       const bk = localStorage.getItem(SK_BACKUP)
       if (bk) return { state: applyState(JSON.parse(bk)), version: 6 }
-    } catch {}
+    } catch {
+      // corrupt JSON or storage blocked — fall through to a fresh state
+    }
     return null
   },
   setItem(name: string, value: StorageValue<State>): void {
@@ -41,7 +42,9 @@ const customStorage = {
       localStorage.setItem(name, str)
       localStorage.setItem(SK_BACKUP, str)
       idbSet(str).catch(() => {})
-    } catch {}
+    } catch {
+      // quota exceeded or storage blocked — persisting is best-effort
+    }
   },
   removeItem(name: string): void {
     localStorage.removeItem(name)
@@ -58,7 +61,9 @@ export async function idbRestoreIfNeeded(set: (s: Partial<AppStore>) => void) {
     const parsed = JSON.parse(raw)
     const state = parsed?.state ? applyState(parsed.state) : applyState(parsed)
     set(state)
-  } catch {}
+  } catch {
+    // corrupt IDB payload — keep the default state
+  }
 }
 
 /* ── Store interface ── */
@@ -113,6 +118,9 @@ export interface AppStore extends State {
   setCustomDur: (taskId: string, mins: number) => void
   resetAll: () => void
   importData: (raw: string) => boolean
+
+  // Grammar exercises progress
+  markGrammarDone: (topicId: string, exIndex: number) => void
 }
 
 export const useAppStore = create<AppStore>()(
@@ -391,7 +399,9 @@ export const useAppStore = create<AppStore>()(
           localStorage.removeItem(SK6)
           localStorage.removeItem(SK5)
           localStorage.removeItem(SK_BACKUP)
-        } catch {}
+        } catch {
+          // storage blocked — still reset the in-memory state below
+        }
         const fresh = defaultState()
         set({ ...fresh, activeTab: 'dashboard' })
         document.documentElement.setAttribute('data-theme', 'light')
@@ -410,12 +420,18 @@ export const useAppStore = create<AppStore>()(
           return false
         }
       },
+
+      markGrammarDone: (topicId, exIndex) => {
+        const cur = get().grammarProgress[topicId] ?? []
+        if (cur.includes(exIndex)) return
+        set((st) => ({ grammarProgress: { ...st.grammarProgress, [topicId]: [...(st.grammarProgress[topicId] ?? []), exIndex] } }))
+        get().save()
+      },
     }),
     {
       name: SK6,
       storage: customStorage,
       partialize: (state) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { activeTab, ...rest } = state
         void activeTab
         return rest

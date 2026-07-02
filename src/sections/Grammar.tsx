@@ -1,10 +1,24 @@
 import { useState, useEffect, Suspense, lazy } from 'react'
 import { LESSONS } from '@/data/lessons'
+import { GrammarExercises } from '@/components/GrammarExercises'
+import type { Level } from '@/store/types'
 
 // Lazy-load the heavy Markdown renderer so it stays out of the initial bundle
 const Lesson = lazy(() =>
   import('@/components/Lesson').then(m => ({ default: m.Lesson }))
 )
+
+// المستويات — كل مستوى في قسمه الخاصّ
+const LEVELS: { key: Level; label: string; sub: string }[] = [
+  { key: 'A1', label: 'A1', sub: 'المبتدئون' },
+  { key: 'A2', label: 'A2', sub: 'متوسّط' },
+  { key: 'B1', label: 'B1', sub: 'متقدّم' },
+  { key: 'B2', label: 'B2', sub: 'Staatsexamen' },
+]
+
+function lessonsOf(level: Level) {
+  return LESSONS.filter(l => (l.level ?? 'B1') === level)
+}
 
 function LessonLoader() {
   return (
@@ -14,15 +28,23 @@ function LessonLoader() {
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export default function Grammar(_: {}) {
-  const [activeId, setActiveId] = useState(LESSONS[0].id)
+export default function Grammar() {
+  const [level, setLevel] = useState<Level>('A1')
+  const [activeId, setActiveId] = useState(lessonsOf('A1')[0].id)
   const [markdown, setMarkdown] = useState<string | null>(null)
   const [loading, setLoading]   = useState(false)
 
+  const levelLessons = lessonsOf(level)
   const activeMeta = LESSONS.find(l => l.id === activeId) ?? LESSONS[0]
 
+  function pickLevel(lv: Level) {
+    setLevel(lv)
+    const first = lessonsOf(lv)[0]
+    if (first) setActiveId(first.id)
+  }
+
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- مؤثّر تحميل غير متزامن للدرس
     setLoading(true)
     setMarkdown(null)
     activeMeta.file()
@@ -40,19 +62,41 @@ export default function Grammar(_: {}) {
       }}>
         <span style={{ color: 'var(--orange)' }}>📖</span> قواعد ونصائح
       </h2>
-      <p style={{ fontSize: '.88rem', color: 'var(--text2)', marginBottom: 20, lineHeight: 1.6 }}>
-        دروس قواعد هولندية مختصرة ومُعايَرة على مستوى B1 — اقرأها قبل جلسة المراجعة.
+      <p style={{ fontSize: '.88rem', color: 'var(--text2)', marginBottom: 18, lineHeight: 1.6 }}>
+        كل المستويات A1 · A2 · B1 · B2 — اختر مستوًى ثمّ درسًا، وبعد كل درس تمارين تفاعلية.
       </p>
 
-      {/* Lesson selector */}
-      <div
-        role="tablist"
-        aria-label="اختر درسًا"
-        style={{
-          display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24,
-        }}
-      >
-        {LESSONS.map(lesson => {
+      {/* Level selector — كل مستوى قسم مستقلّ */}
+      <div role="tablist" aria-label="اختر المستوى"
+        style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+        {LEVELS.map(lv => {
+          const on = lv.key === level
+          const count = lessonsOf(lv.key).length
+          return (
+            <button key={lv.key} role="tab" aria-selected={on}
+              onClick={() => pickLevel(lv.key)}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
+                padding: '8px 16px', minWidth: 92,
+                border: `1px solid ${on ? 'var(--orange)' : 'var(--glass-border)'}`,
+                borderRadius: 12,
+                background: on ? 'var(--orange)' : 'var(--glass-bg)',
+                color: on ? '#fff' : 'var(--text2)',
+                fontFamily: 'inherit', cursor: 'pointer',
+                fontWeight: on ? 700 : 600,
+                transition: 'border-color .15s, background .15s',
+              }}>
+              <span style={{ fontSize: '.95rem', fontWeight: 800 }}>{lv.label}</span>
+              <span style={{ fontSize: '.66rem', opacity: on ? 0.9 : 0.7 }}>{lv.sub} · {count}</span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Lesson selector — دروس المستوى المختار فقط */}
+      <div role="tablist" aria-label="اختر درسًا"
+        style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
+        {levelLessons.map(lesson => {
           const active = lesson.id === activeId
           return (
             <button
@@ -111,6 +155,9 @@ export default function Grammar(_: {}) {
           </Suspense>
         )}
       </div>
+
+      {/* تمارين تفاعلية مرتبطة بالدرس الحالي — key يعيد الضبط عند تبديل الدرس */}
+      <GrammarExercises key={activeId} lessonId={activeId} />
     </div>
   )
 }

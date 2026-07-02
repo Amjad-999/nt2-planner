@@ -132,7 +132,7 @@ export function ExamPdfViewer({ src, title }: Props) {
         {/* Zoom controls */}
         <TbBtn onClick={zoomOut} disabled={!fitWidth && scale <= MIN_SCALE} aria-label="تصغير" title="تصغير (-)">−</TbBtn>
         <span style={{ fontSize: '.78rem', color: 'var(--text2)', minWidth: 40, textAlign: 'center' }}>
-          {fitWidth ? 'عرض' : `${Math.round(scale * 100)}٪`}
+          {fitWidth ? 'عرض' : `${Math.round(scale * 100)}%`}
         </span>
         <TbBtn onClick={zoomIn} disabled={!fitWidth && scale >= MAX_SCALE} aria-label="تكبير" title="تكبير (+)">+</TbBtn>
         <TbBtn

@@ -14,7 +14,7 @@ interface Props {
 type Speed = 0.75 | 1 | 1.25
 
 const SPEEDS: Speed[] = [0.75, 1, 1.25]
-const SPEED_LABELS: Record<Speed, string> = { 0.75: '٠.٧٥×', 1: '١×', 1.25: '١.٢٥×' }
+const SPEED_LABELS: Record<Speed, string> = { 0.75: '0.75×', 1: '1×', 1.25: '1.25×' }
 
 function fmtTime(s: number): string {
   if (!isFinite(s) || s < 0) return '–:––'
@@ -72,18 +72,22 @@ export function WaveAudio({ src, audioBuffer, title }: Props) {
   const abBRef = useRef<number | null>(null)
   const abOnRef = useRef(false)
 
-  abARef.current = abA
-  abBRef.current = abB
-  abOnRef.current = abOn
+  // Mirror A–B state into refs after commit (not during render) so the
+  // wavesurfer callbacks registered once at init always read latest values
+  useEffect(() => {
+    abARef.current = abA
+    abBRef.current = abB
+    abOnRef.current = abOn
+  }, [abA, abB, abOn])
 
   const { isDark } = useTheme()
   const reducedMotion = useReducedMotion()
 
   // Build wavesurfer colors from CSS vars
   const waveColors = () => ({
-    waveColor:     cssVar('--orange-m') || '#9BDED6',
-    progressColor: cssVar('--orange')   || '#109B8E',
-    cursorColor:   cssVar('--orange-d') || '#0B7C70',
+    waveColor:     cssVar('--orange-m') || '#F6C283',
+    progressColor: cssVar('--orange')   || '#F58F20',
+    cursorColor:   cssVar('--orange-d') || '#CC7012',
   })
 
   // ── Init wavesurfer on mount / src change ──
@@ -180,7 +184,6 @@ export function WaveAudio({ src, audioBuffer, title }: Props) {
   useEffect(() => {
     if (!wsRef.current || !ready) return
     wsRef.current.setOptions(waveColors())
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDark, ready])
 
   // ── Sync playback rate ──

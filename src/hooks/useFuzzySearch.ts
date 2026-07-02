@@ -18,10 +18,10 @@ export function useFuzzySearch<T>(
 ): FuseResult<T>[] | null {
   const [debounced, setDebounced] = useState(query)
 
-  // Debounce
+  // Debounce — a blank query resets on a 0 ms timer: still async, so the
+  // effect body never calls setState synchronously
   useEffect(() => {
-    if (!query.trim()) { setDebounced(''); return }
-    const t = setTimeout(() => setDebounced(query), DEBOUNCE_MS)
+    const t = setTimeout(() => setDebounced(query), query.trim() ? DEBOUNCE_MS : 0)
     return () => clearTimeout(t)
   }, [query])
 

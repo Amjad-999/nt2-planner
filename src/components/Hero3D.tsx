@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState, useMemo, Component, type ReactNode, type ErrorInfo } from 'react'
-import { useAppStore, getDaysLeft, avgBestScore } from '@/store/useAppStore'
+import { useAppStore, getDaysLeft, avgBestScore, getPlanTotal, getCurrentDay } from '@/store/useAppStore'
 import { todayKey } from '@/lib/utils'
 import { useReducedMotion3D } from '@/three/useReducedMotion3D'
 import { Hero2DFallback } from './Hero2DFallback'
@@ -46,11 +46,14 @@ export function Hero3D() {
   const streak       = useAppStore((s) => s.streak)
   const dailyHistory = useAppStore((s) => s.dailyHistory)
   const skill        = useAppStore((s) => s.skill)
+  const planStart    = useAppStore((s) => s.planStart)
 
   const daysLeft    = getDaysLeft(examDate)
   const todayMins   = useMemo(() => dailyHistory[todayKey()]?.mins ?? 0, [dailyHistory])
   const progress    = avgBestScore(skill)
   const streakCount = streak.count
+  const planTotal   = getPlanTotal({ planStart, examDate })
+  const planDayNow  = getCurrentDay({ planStart, planDay }, planTotal)
 
   // Render 2D fallback when the OS requests reduced motion
   if (reducedMotion) return <Hero2DFallback />
@@ -77,7 +80,7 @@ export function Hero3D() {
                 progress={progress}
                 streak={streakCount}
                 daysLeft={daysLeft}
-                planDay={planDay}
+                planDay={planDayNow}
                 todayMins={todayMins}
                 streakCount={streakCount}
               />
@@ -97,7 +100,8 @@ export function Hero3D() {
       >
         <HeroTextOverlay
           daysLeft={daysLeft}
-          planDay={planDay}
+          planDay={planDayNow}
+          total={planTotal}
           todayMins={todayMins}
           streakCount={streakCount}
         />
@@ -110,23 +114,23 @@ export function Hero3D() {
 interface TextProps {
   daysLeft:    number | null
   planDay:     number
+  total:       number
   todayMins:   number
   streakCount: number
 }
 
-function HeroTextOverlay({ daysLeft, planDay, todayMins, streakCount }: TextProps) {
-  const name = useAppStore((s) => s.name)
-
-  // FIX 2 — stable greeting chosen once per mount (same logic as Hero2DFallback)
-  const greeting = useMemo(() => {
+function HeroTextOverlay({ daysLeft, planDay, total, todayMins, streakCount }: TextProps) {
+  // FIX 2 — stable greeting picked ONCE per mount, inside the useState lazy
+  // initializer so render stays pure (same pattern as Hero2DFallback)
+  const [greeting] = useState<string>(() => {
     const g = [...GREETINGS_3D]
+    const name = useAppStore.getState().name
     if (name) {
       g[0] = `أهلًا بك يا ${name}`
       g[2] = `مرحبًا ${name} — رحلتك إلى B1 مستمرّة`
     }
     return g[Math.floor(Math.random() * g.length)]
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name])
+  })
 
   return (
     <>
@@ -149,7 +153,7 @@ function HeroTextOverlay({ daysLeft, planDay, todayMins, streakCount }: TextProp
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         {[
           { icon: '📅', label: 'المتبقّي:',    value: daysLeft == null ? '—' : String(daysLeft), unit: 'يومًا' },
-          { icon: '📍', label: 'اليوم:',        value: String(planDay),   unit: '/ 46'   },
+          { icon: '📍', label: 'اليوم:',        value: String(planDay),   unit: `/ ${total}` },
           { icon: '⏱️', label: 'درست اليوم:',  value: String(todayMins), unit: 'دقيقة'  },
           { icon: '🔥', label: 'مواظبة:',       value: String(streakCount), unit: 'يوم'  },
         ].map((ck) => (
@@ -172,7 +176,7 @@ function HeroTextOverlay({ daysLeft, planDay, todayMins, streakCount }: TextProp
           >
             {ck.icon}
             <span style={{ opacity: .8 }}>{ck.label}</span>
-            <b style={{ color: '#C7CCFF', fontWeight: 700, fontSize: '1rem' }}>{ck.value}</b>
+            <b style={{ color: 'var(--hero-accent)', fontWeight: 700, fontSize: '1rem' }}>{ck.value}</b>
             <span style={{ opacity: .7 }}>{ck.unit}</span>
           </div>
         ))}

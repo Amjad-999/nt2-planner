@@ -95,8 +95,7 @@ export function boxToFsrsFields(box: number, due: number): FsrsFields {
 export function formatIntervalAr(days: number): string {
   if (days < 1) return 'قريبًا'
   const n = Math.round(days)
-  const digits = String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d])
   if (n === 1) return 'بعد يوم'
   if (n === 2) return 'بعد يومين'
-  return `بعد ${digits} أيام`
+  return `بعد ${n} أيام`
 }

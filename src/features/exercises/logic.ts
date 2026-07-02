@@ -71,8 +71,10 @@ export function checkMatching(
 }
 
 // ── Sentence ordering ────────────────────────────────────────────────────────
-export function buildSortExercise(sentence: string, seed?: number): SortExercise {
+export function buildSortExercise(sentence: string | undefined, seed?: number): SortExercise | null {
+  if (!sentence?.trim()) return null
   const raw = sentence.trim().split(/\s+/).filter(Boolean)
+  if (raw.length < 2) return null
   const words: SortWord[] = raw.map((w, i) => ({ id: `w${i}`, word: w }))
   return {
     sentence,

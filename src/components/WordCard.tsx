@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import { speakDutch } from '@/features/tts/speakDutch'
 import { SpeakAndCheck } from '@/components/SpeakAndCheck'
 import { HighlightText } from '@/components/HighlightText'
+import { useNow } from '@/hooks/useNow'
 import type { VocabWord, ExamWord } from '@/store/types'
 
 type Word = VocabWord | ExamWord
@@ -36,11 +37,12 @@ const LEVEL_STYLE: Record<string, { bg: string; color: string }> = {
 export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4, hlNl, hlAr, hlEx }: Props) {
   const btnRef = useRef<HTMLButtonElement>(null)
   const [showPractice, setShowPractice] = useState(false)
+  const now = useNow()
   const nl = getNl(word)
   const ar = getAr(word)
   const ex = getEx(word)
   const lvStyle = LEVEL_STYLE[word.level] ?? { bg: 'var(--surface3)', color: 'var(--muted)' }
-  const isDue = (word.due ?? 0) <= Date.now() && (word.box ?? 0) < learnedBox
+  const isDue = (word.due ?? 0) <= now && (word.box ?? 0) < learnedBox
 
   return (
     <motion.div

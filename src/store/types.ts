@@ -89,6 +89,7 @@ export interface State {
   customDur: Record<string, number>
   onboarded: boolean
   unlockedBadges: string[]
+  grammarProgress: Record<string, number[]>   // topicId → indices of correctly-answered exercises
   _v: number
   _savedAt: number
 }

@@ -7,6 +7,7 @@ import { B1_THEMAS } from '@/data/themas'
 import { LEARNED_BOX } from '@/data/phases'
 import { isFsrsLearned } from '@/features/vocab/fsrs'
 import { useFuzzySearch, getMatchIndices } from '@/hooks/useFuzzySearch'
+import { useNow } from '@/hooks/useNow'
 import type { VocabWord } from '@/store/types'
 import type { IFuseOptions } from 'fuse.js'
 
@@ -25,17 +26,17 @@ const FUSE_OPTIONS: IFuseOptions<VocabWord> = {
   ignoreLocation: true,     // don't penalise matches far from string start
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export default function Vocab(_: {}) {
+export default function Vocab() {
   const { vocab, removeVocab, gradeFlash, vocabAdd } = useAppStore()
   const [view, setView]               = useState<View>('bank')
   const [search, setSearch]           = useState('')
   const [levelFilter, setLevelFilter] = useState('')
   const [selectedThema, setSelectedThema] = useState(0)
 
+  const now = useNow()
   const isLearned = (w: VocabWord) =>
     w.fsrs_state !== undefined ? isFsrsLearned(w) : w.box >= LEARNED_BOX
-  const dueWords = vocab.filter((w) => (w.due ?? 0) <= Date.now() && !isLearned(w))
+  const dueWords = vocab.filter((w) => (w.due ?? 0) <= now && !isLearned(w))
 
   // Level-filtered list is the base for fuzzy search
   const levelFiltered = levelFilter

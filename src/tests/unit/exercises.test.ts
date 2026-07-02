@@ -76,12 +76,14 @@ describe('buildMatchExercise', () => {
 describe('buildSortExercise', () => {
   it('splits into correct word count', () => {
     const ex = buildSortExercise('Ik ga naar huis morgen', 1)
-    expect(ex.words.length).toBe(5)
-    expect(ex.correctIds).toEqual(['w0', 'w1', 'w2', 'w3', 'w4'])
+    expect(ex).not.toBeNull()
+    expect(ex!.words.length).toBe(5)
+    expect(ex!.correctIds).toEqual(['w0', 'w1', 'w2', 'w3', 'w4'])
   })
   it('contains all original words', () => {
     const ex = buildSortExercise('De kat zit op de mat', 2)
-    const found = ex.words.map(w => w.word).sort()
+    expect(ex).not.toBeNull()
+    const found = ex!.words.map(w => w.word).sort()
     expect(found).toEqual(['De', 'de', 'kat', 'mat', 'op', 'zit'].sort())
   })
 })

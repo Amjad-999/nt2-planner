@@ -125,14 +125,14 @@ describe('formatIntervalAr', () => {
     expect(formatIntervalAr(2)).toBe('بعد يومين')
   })
 
-  it('uses Eastern Arabic digits for > 2 days', () => {
+  it('uses Western digits for > 2 days', () => {
     const result = formatIntervalAr(3)
-    expect(result).toContain('٣')
+    expect(result).toContain('3')
     expect(result).toContain('أيام')
   })
 
   it('formats double-digit days correctly', () => {
     const result = formatIntervalAr(14)
-    expect(result).toContain('١٤')
+    expect(result).toContain('14')
   })
 })

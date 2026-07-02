@@ -17,3 +17,27 @@ Object.defineProperty(window, 'speechSynthesis', { value: { getVoices: () => [],
 
 // Mock indexedDB
 Object.defineProperty(window, 'indexedDB', { value: null, writable: true })
+
+// Mock matchMedia (required by useReducedMotion and dnd-kit)
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: (query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  }),
+})
+
+// Mock ResizeObserver (required by some dnd-kit internals)
+Object.defineProperty(window, 'ResizeObserver', {
+  writable: true,
+  value: class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  },
+})

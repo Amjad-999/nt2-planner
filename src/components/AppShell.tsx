@@ -6,6 +6,7 @@ import { NavTabs } from './NavTabs'
 import { SettingsModal } from './SettingsModal'
 import { OnboardModal } from './OnboardModal'
 import { StudyTimeModal } from './StudyTimeModal'
+import { TabErrorBoundary } from './TabErrorBoundary'
 import { useBadgeCheck } from '@/hooks/useBadgeCheck'
 
 const Dashboard  = lazy(() => import('@/sections/Dashboard'))
@@ -89,9 +90,11 @@ export function AppShell() {
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.22, ease: [0.2, 0.7, 0.2, 1] }}
           >
-            <Suspense fallback={<SectionLoader />}>
-              <ActiveSection onOpenStudyTime={() => setShowStudyTime(true)} />
-            </Suspense>
+            <TabErrorBoundary tabKey={activeTab}>
+              <Suspense fallback={<SectionLoader />}>
+                <ActiveSection onOpenStudyTime={() => setShowStudyTime(true)} />
+              </Suspense>
+            </TabErrorBoundary>
           </motion.div>
         </AnimatePresence>
       </main>

@@ -1,10 +1,9 @@
 import { useState, useRef } from 'react'
-import { aiLookup } from '@/features/ai/lookup'
+import { aiLookup, type LookupResult } from '@/features/ai/lookup'
 import { useAppStore } from '@/store/useAppStore'
 import { speakDutch } from '@/features/tts/speakDutch'
-import type { DictEntry } from '@/data/coreDict'
 
-type Result = DictEntry & { tier: number }
+type Result = LookupResult
 
 export function AiLookup() {
   const [input, setInput] = useState('')
@@ -94,8 +93,26 @@ export function AiLookup() {
             <span style={{ background: 'var(--purple-l)', color: 'var(--purple)', borderRadius: 99, padding: '2px 8px', fontSize: '.72rem', fontWeight: 600 }}>{result.source}</span>
           </div>
           <div className="text-[var(--text)] text-[1rem] mb-2 font-medium">📖 {result.ar}</div>
-          {result.exampleNL && <div className="text-[var(--text2)] text-[.88rem] py-2 px-2.5 rounded-md italic mb-1" style={{ background: 'var(--surface2)' }}>"{result.exampleNL}"</div>}
-          {result.exampleAR && <div className="text-[var(--muted)] text-[.82rem] px-2.5 pb-2">{result.exampleAR}</div>}
+          {result.examples && result.examples.length > 0 ? (
+            <div className="mb-1">
+              <div className="text-[var(--muted)] text-[.78rem] mb-1.5">📝 أمثلة لفهم المعنى في سياقه:</div>
+              {result.examples.map((ex, i) => (
+                <div key={i} className="py-2 px-2.5 rounded-md mb-1.5" style={{ background: 'var(--surface2)' }}>
+                  <div className="flex items-start gap-1.5">
+                    <span dir="ltr" lang="nl" className="flex-1 text-[var(--text2)] text-[.88rem] italic">"{ex.nl}"</span>
+                    <button
+                      onClick={(e) => speakDutch(ex.nl, e.currentTarget)}
+                      aria-label="استمع لنطق الجملة"
+                      className="shrink-0 text-[.72rem] px-1.5 py-0.5 rounded border border-[var(--border2)] bg-[var(--surface)] text-[var(--muted)] cursor-pointer hover:text-[var(--orange)] hover:border-[var(--orange)]"
+                    >🔊</button>
+                  </div>
+                  {ex.ar && <div className="text-[var(--muted)] text-[.82rem] mt-1">{ex.ar}</div>}
+                </div>
+              ))}
+            </div>
+          ) : (
+            result.exampleNL && <div className="text-[var(--text2)] text-[.88rem] py-2 px-2.5 rounded-md italic mb-1" style={{ background: 'var(--surface2)' }}>"{result.exampleNL}"</div>
+          )}
           <div className="flex gap-1.5 justify-end flex-wrap mt-2">
             <button onClick={addWithEdit} className="text-[.8rem] px-3 py-1.5 rounded-[10px] border border-[var(--border2)] bg-[var(--glass-bg)] text-[var(--text2)] cursor-pointer hover:text-[var(--orange)] hover:border-[var(--orange-m)]">✏️ تعديل قبل الإضافة</button>
             <button onClick={addNow} className="text-[.8rem] px-3 py-1.5 rounded-[10px] border-0 text-white cursor-pointer font-semibold" style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-1), inset 0 1px 0 rgba(255,255,255,.35)' }}>➕ أضف إلى بنك المفردات</button>

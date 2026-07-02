@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import { ONLINE_VOICES, _voices, loadVoices } from '@/features/tts/voices'
 import { testAudio } from '@/features/tts/speakDutch'
-import { TOTAL_PLAN_DAYS } from '@/data/phases'
+import { CloudPanel } from './CloudPanel'
 
 interface Props { onClose: () => void }
 
@@ -10,7 +10,6 @@ export function SettingsModal({ onClose }: Props) {
   const s = useAppStore()
   const [name, setName] = useState(s.name)
   const [examDate, setExamDate] = useState(() => { try { return new Date(s.examDate).toISOString().slice(0,10) } catch { return '' } })
-  const [planDay, setPlanDay] = useState(String(s.planDay))
   const [rate, setRate] = useState(String(s.prefs.rate))
   const [ttsEngine, setTtsEngine] = useState(s.prefs.ttsEngine)
   const [onlineVoice, setOnlineVoice] = useState(s.prefs.onlineVoice)
@@ -27,7 +26,6 @@ export function SettingsModal({ onClose }: Props) {
     s.saveSettings({
       name: name.trim(),
       examDate: examDate ? new Date(examDate + 'T09:00:00').toISOString() : s.examDate,
-      planDay: Math.min(TOTAL_PLAN_DAYS, Math.max(1, parseInt(planDay) || 1)),
       prefs: {
         rate: parseFloat(rate) || 0.9,
         ttsEngine, onlineVoice, voiceURI,
@@ -61,9 +59,11 @@ export function SettingsModal({ onClose }: Props) {
       <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.35rem', fontWeight:700, color:'var(--text)', marginBottom:8 }}>⚙️ الإعدادات</h3>
       <p style={{ color:'var(--muted)', fontSize:'.88rem', marginBottom:14 }}>اضبط بياناتك واستهدافك للامتحان.</p>
 
+      <CloudPanel />
+
       <Field label="اسمك (اختياري)"><input className="form-in" value={name} onChange={(e)=>setName(e.target.value)} placeholder="اسمك" /></Field>
       <Field label="تاريخ الامتحان"><input className="form-in" type="date" value={examDate} onChange={(e)=>setExamDate(e.target.value)} /></Field>
-      <Field label="اليوم الحالي في الخطّة (1–46)"><input className="form-in" type="number" value={planDay} onChange={(e)=>setPlanDay(e.target.value)} min={1} max={46} /></Field>
+      <Field label="مدّة الخطّة"><div style={{ fontSize:'.85rem', color:'var(--muted)', padding:'4px 0' }}>تُحسب تلقائيًا من تاريخ الامتحان — يومك الحالي في الخطّة يتقدّم وحده مع الأيام.</div></Field>
       {/* FIX 3 — study capacity inputs */}
       <Field label="دقائق الدراسة المتاحة يوميًا">
         <input
@@ -158,6 +158,7 @@ export function Field({ label, children }: { label: string; children: React.Reac
   return <div style={{ marginBottom:10 }}><label style={{ display:'block', fontSize:'.85rem', fontWeight:500, color:'var(--text2)', marginBottom:6 }}>{label}</label>{children}</div>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- مساعد أنماط (ليس مكوّنًا)
 export function btnStyle(variant: 'primary'|'ghost'|'danger') {
   const base = { display:'inline-flex', alignItems:'center', justifyContent:'center', gap:6, padding:'10px 18px', borderRadius:14, fontFamily:'inherit', fontSize:'.9rem', fontWeight:600, cursor:'pointer', border:'1px solid transparent', transition:'.18s' } as const
   if (variant==='primary') return { ...base, background:'var(--grad-primary)', color:'#fff', border:'none', boxShadow:'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }

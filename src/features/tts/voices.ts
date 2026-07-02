@@ -48,7 +48,7 @@ export function unlockTTS() {
     u.volume = 0; u.lang = 'nl-NL'
     window.speechSynthesis.speak(u)
     _ttsUnlocked = true
-  } catch {}
+  } catch { /* unlock is best-effort — speech can still work without it */ }
 }
 
 export function initVoices() {

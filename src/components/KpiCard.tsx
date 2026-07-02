@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
 
 interface Props {
   cls: string   // k1..k6
-  icon: string
+  icon: React.ReactNode
   label: string
   value: string | number
   delta: string
   deltaClass: 'up' | 'down' | 'flat'
-  /* Optional inline editing — when `editable`, a small "✎ تعديل" button appears below.
-     Provide `onSave` for a single inline input, or `onEditClick` to open a custom editor. */
   editable?: boolean
   editKind?: 'number' | 'date'
   editRaw?: string
@@ -24,7 +21,6 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
 
-  // Animate number on mount / value change (skipped while editing)
   useEffect(() => {
     if (editing) return
     const el = valRef.current
@@ -64,8 +60,8 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
   const cancel = () => setEditing(false)
 
   return (
-    <motion.div
-      className="relative overflow-hidden rounded-card p-[14px_16px]"
+    <div
+      className="relative overflow-hidden rounded-card p-[14px_16px] glow-card"
       style={{
         background: 'var(--glass-bg-strong)',
         backdropFilter: 'blur(16px) saturate(1.3)',
@@ -73,13 +69,10 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
         border: '1px solid var(--glass-border)',
         boxShadow: 'var(--elev-1), inset 0 1px 0 var(--glass-hi)',
       }}
-      whileHover={{ translateY: -4, boxShadow: 'var(--elev-3)' }}
-      transition={{ duration: 0.2 }}
     >
-      {/* Icon (top inline-end) — hidden while editing so it never overlaps the input */}
       {!editing && (
         <div
-          className="absolute top-[14px] end-[14px] w-[34px] h-[34px] rounded-lg flex items-center justify-center text-[.95rem]"
+          className="absolute top-[14px] end-[14px] w-[34px] h-[34px] rounded-lg flex items-center justify-center card-icon"
           style={{
             background: icBg[cls] ?? 'var(--surface3)',
             color: icColor[cls] ?? 'var(--text)',
@@ -110,7 +103,7 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
       ) : (
         <div
           ref={valRef}
-          className="text-[1.65rem] font-bold leading-[1.1] text-[var(--text)] pe-10"
+          className="text-[1.65rem] font-bold leading-[1.1] text-[var(--text)] pe-10 card-value"
           style={{ fontFamily: 'var(--font-display,"Plus Jakarta Sans",serif)' }}
         >
           {value}
@@ -121,7 +114,6 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
         {deltaIcon}{delta}
       </div>
 
-      {/* Edit affordance — in normal flow (never overlaps icon or status text) */}
       {editable && !editing && (
         <button
           type="button"
@@ -136,6 +128,6 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
       {editing && (
         <div className="mt-2 text-[.7rem]" style={{ color: 'var(--muted)' }}>اضغط Enter للحفظ · Esc للإلغاء</div>
       )}
-    </motion.div>
+    </div>
   )
 }

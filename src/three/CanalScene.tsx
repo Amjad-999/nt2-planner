@@ -1,5 +1,5 @@
-import { useRef, useMemo, Suspense } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useRef, useEffect, useState, Suspense } from 'react'
+import { useFrame } from '@react-three/fiber'
 import { RoundedBox, Stars } from '@react-three/drei'
 import * as THREE from 'three'
 import { ReadinessOrb } from './ReadinessOrb'
@@ -33,7 +33,7 @@ function GlassPanel({
     <group ref={ref} position={position} rotation={rotation as unknown as THREE.Euler}>
       <RoundedBox args={[width, height, 0.025]} radius={0.06} smoothness={3}>
         <meshPhysicalMaterial
-          color="#6E8BFF"
+          color="#E0974A"
           transmission={0.85}
           thickness={0.02}
           roughness={0.05}
@@ -45,7 +45,7 @@ function GlassPanel({
       </RoundedBox>
       {/* thin border highlight */}
       <RoundedBox args={[width + 0.015, height + 0.015, 0.005]} radius={0.065} smoothness={3}>
-        <meshBasicMaterial color="#C7CCFF" transparent opacity={0.12} side={THREE.BackSide} />
+        <meshBasicMaterial color="#F6C283" transparent opacity={0.12} side={THREE.BackSide} />
       </RoundedBox>
     </group>
   )
@@ -62,20 +62,20 @@ function Windmill({ position }: { position: [number, number, number] }) {
       {/* Tower body */}
       <mesh position={[0, 0.6, 0]}>
         <cylinderGeometry args={[0.07, 0.13, 1.2, 6]} />
-        <meshStandardMaterial color="#3A3870" opacity={0.55} transparent />
+        <meshStandardMaterial color="#3A3A34" opacity={0.55} transparent />
       </mesh>
       {/* Blades */}
       <group ref={bladeRef} position={[0, 1.26, 0]}>
         {[0, 1, 2, 3].map((i) => (
           <mesh key={i} rotation={[0, 0, (Math.PI / 2) * i]} position={[0.28, 0, 0.01]}>
             <boxGeometry args={[0.52, 0.07, 0.012]} />
-            <meshStandardMaterial color="#4A4595" opacity={0.5} transparent />
+            <meshStandardMaterial color="#52613F" opacity={0.5} transparent />
           </mesh>
         ))}
         {/* Hub */}
         <mesh>
           <cylinderGeometry args={[0.06, 0.06, 0.04, 8]} />
-          <meshStandardMaterial color="#6060A0" />
+          <meshStandardMaterial color="#6E6A5E" />
         </mesh>
       </group>
     </group>
@@ -95,7 +95,7 @@ function WaterPlane() {
     <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, -2.2, 0]}>
       <planeGeometry args={[30, 20]} />
       <meshStandardMaterial
-        color="#1E2A6E"
+        color="#20281A"
         metalness={0.6}
         roughness={0.15}
         transparent
@@ -107,7 +107,9 @@ function WaterPlane() {
 
 /* ── Particle field (glowing dots) ── */
 function ParticleField() {
-  const [positions, sizes] = useMemo(() => {
+  // Random field generated ONCE per mount inside the useState lazy
+  // initializer, keeping render pure (react-hooks/purity)
+  const [[positions, sizes]] = useState(() => {
     const n = 180
     const pos = new Float32Array(n * 3)
     const sz  = new Float32Array(n)
@@ -117,8 +119,8 @@ function ParticleField() {
       pos[i * 3 + 2] = (Math.random() - 0.5) * 10 - 2
       sz[i]           = Math.random() * 0.025 + 0.008
     }
-    return [pos, sz]
-  }, [])
+    return [pos, sz] as const
+  })
 
   const ref = useRef<THREE.Points>(null)
   useFrame(({ clock }) => {
@@ -132,7 +134,7 @@ function ParticleField() {
         <bufferAttribute attach="attributes-size"     args={[sizes, 1]}     />
       </bufferGeometry>
       <pointsMaterial
-        color="#8899FF"
+        color="#F6C283"
         size={0.04}
         sizeAttenuation
         transparent
@@ -145,17 +147,19 @@ function ParticleField() {
 
 /* ── Camera pointer parallax ── */
 function CameraRig() {
-  const { camera } = useThree()
   const targetRef = useRef({ x: 0, y: 0 })
 
-  useFrame(() => {
+  // Camera comes from the frame-loop state (not useThree) — mutating it
+  // here runs in the R3F animation loop, outside React render
+  useFrame(({ camera }) => {
     camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetRef.current.x * 0.7, 0.04)
     camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetRef.current.y * 0.4 + 0.2, 0.04)
     camera.lookAt(0, 0.1, 0)
   })
 
-  // Track pointer via DOM — safe even when canvas is off-screen
-  useMemo(() => {
+  // Track pointer via DOM — safe even when canvas is off-screen.
+  // useEffect (not useMemo) so the cleanup actually runs on unmount
+  useEffect(() => {
     const handler = (e: PointerEvent) => {
       targetRef.current.x = (e.clientX / window.innerWidth - 0.5) * 2.0
       targetRef.current.y = -(e.clientY / window.innerHeight - 0.5) * 1.2
@@ -172,12 +176,12 @@ export function CanalScene({ progress, streak, daysLeft, planDay, todayMins, str
   return (
     <>
       {/* Environment */}
-      <color attach="background" args={['#0D0F1E']} />
-      <fog attach="fog" args={['#0D0F1E', 12, 28]} />
+      <color attach="background" args={['#161614']} />
+      <fog attach="fog" args={['#161614', 12, 28]} />
 
       {/* Ambient light — kept dim so the orb glow stands out */}
-      <ambientLight color="#2A2A5A" intensity={0.6} />
-      <directionalLight position={[4, 6, 4]} color="#8899FF" intensity={0.4} />
+      <ambientLight color="#4A3C28" intensity={0.6} />
+      <directionalLight position={[4, 6, 4]} color="#F9C079" intensity={0.4} />
 
       {/* Stars background */}
       <Stars radius={30} depth={20} count={600} factor={2.5} fade speed={0.4} />
@@ -211,8 +215,8 @@ export function CanalScene({ progress, streak, daysLeft, planDay, todayMins, str
           floatSpeed={0.65}
           floatAmplitude={0.07}
         >
-          <div style={{ color: '#F6F7FF', fontSize: 13, lineHeight: 1.5 }}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: '#C7CCFF', lineHeight: 1 }}>
+          <div style={{ color: '#FBF6EE', fontSize: 13, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 22, fontWeight: 800, color: '#FBC07A', lineHeight: 1 }}>
               {daysLeft == null ? '—' : daysLeft}
             </div>
             <div style={{ fontSize: 11, opacity: 0.75, marginTop: 2 }}>يومًا للامتحان</div>

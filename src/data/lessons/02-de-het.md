@@ -10,7 +10,7 @@
 
 | الحالة | مثال |
 |---|---|
-| معظم الأسماء (٧٠٪) | *de* man، *de* vrouw، *de* tafel |
+| معظم الأسماء (70%) | *de* man، *de* vrouw، *de* tafel |
 | أسماء الأشخاص والمهن | *de* dokter، *de* leraar |
 | الجمع دائمًا | *de* huizen، *de* boeken |
 | الأسماء المنتهية بـ `-ing` | *de* woning، *de* vergadering |
