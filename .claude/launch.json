@@ -7,6 +7,13 @@
       "runtimeArgs": ["run", "dev", "--", "--port", "5183", "--strictPort"],
       "port": 5183,
       "autoPort": false
+    },
+    {
+      "name": "nt2-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "preview", "--", "--port", "5184", "--strictPort"],
+      "port": 5184,
+      "autoPort": false
     }
   ]
 }

@@ -43,19 +43,10 @@ export default defineConfig({
       },
     }),
   ],
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id: string) {
-          if (id.includes('three') || id.includes('@react-three')) return 'three-core'
-          if (id.includes('chart.js') || id.includes('react-chartjs-2')) return 'chart'
-          if (id.includes('framer-motion') || id.includes('gsap')) return 'motion'
-          if (id.includes('react-pdf') || id.includes('pdfjs-dist')) return 'pdf'
-          if (id.includes('wavesurfer')) return 'audio'
-          if (id.includes('@dnd-kit')) return 'exercises'
-          if (id.includes('react-markdown') || id.includes('remark') || id.includes('rehype') || id.includes('unified') || id.includes('micromark') || id.includes('mdast') || id.includes('hast') || id.includes('vfile')) return 'grammar'
-        },
-      },
-    },
-  },
+  // No manualChunks: every heavy library here has a single lazy consumer
+  // (three→3D hero, dnd-kit→Exercises, markdown→Grammar, chart→Stats,
+  // pdf/wavesurfer→Exam), so default chunking already keeps them out of the
+  // eager critical path. Hand-grouping them pulled shared modules (react-dom,
+  // jsx-runtime, zustand) into those chunks and forced the entry to
+  // modulepreload 1.4 MB of lazy vendor code at startup.
 })
