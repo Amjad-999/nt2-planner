@@ -127,11 +127,21 @@ export interface AppStore extends State {
   markGrammarDone: (topicId: string, exIndex: number) => void
 }
 
+/* Deep-link support: ?tab=exam opens the app on that tab (never persisted) */
+const VALID_TABS: TabId[] = ['dashboard', 'plan', 'vocab', 'books', 'exam', 'exercises', 'grammar', 'stats', 'resources', 'platform']
+function initialTab(): TabId {
+  try {
+    const t = new URLSearchParams(window.location.search).get('tab') as TabId | null
+    if (t && VALID_TABS.includes(t)) return t
+  } catch { /* no window (tests) — fall through */ }
+  return 'dashboard'
+}
+
 export const useAppStore = create<AppStore>()(
   persist(
     (set, get) => ({
       ...defaultState(),
-      activeTab: 'dashboard',
+      activeTab: initialTab(),
 
       setActiveTab: (tab) => set({ activeTab: tab }),
 

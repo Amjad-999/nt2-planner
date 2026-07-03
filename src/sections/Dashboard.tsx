@@ -92,7 +92,6 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
         {kpis.map((k, i) => (
           <motion.div
             key={k.cls}
-            layout
             initial={reduced ? false : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: i * 0.06, ease: [0.2, 0.7, 0.2, 1] }}

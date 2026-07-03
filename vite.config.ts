@@ -10,7 +10,9 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
+      // autoUpdate: new deployments activate silently on next visit — the old
+      // confirm() prompt left users stuck on stale builds when dismissed
+      registerType: 'autoUpdate',
       includeAssets: ['icons/*.png'],
       manifest: {
         name: 'NT2 Planner — مخطط الاستعداد لامتحان NT2 (B1)',
