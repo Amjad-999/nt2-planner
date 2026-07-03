@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { ExamPdfViewer } from '@/components/ExamPdfViewer'
 import { RESOURCE_GROUPS } from '@/data/resources'
 import type { ResourceLink } from '@/data/resources'
 import { EXAMS, SKILL_ICON } from '@/data/examPdfs'
@@ -80,12 +81,11 @@ function PdfModal({ state, onClose }: { state: ModalState; onClose: () => void }
             </button>
           </div>
         </div>
-        {/* PDF iframe */}
-        <iframe
-          src={state.src}
-          title={state.title}
-          style={{ flex: 1, border: 'none', width: '100%' }}
-        />
+        {/* In-app viewer (react-pdf renders pages to canvas) — mobile
+            browsers can't display PDFs inside an <iframe> at all */}
+        <div style={{ flex: 1, overflow: 'auto', minHeight: 0, padding: 8 }}>
+          <ExamPdfViewer src={state.src} title={state.title} />
+        </div>
       </div>
     </div>
   )
