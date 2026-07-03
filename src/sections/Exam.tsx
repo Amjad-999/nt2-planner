@@ -2,11 +2,10 @@ import { useState } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import { EXAM_READING, EXAM_LISTENING, EXAM_WRITING, EXAM_SPEAKING } from '@/data/examContent'
 import { PASS_THRESHOLD, LEARNED_BOX } from '@/data/phases'
-import { streamElementsURL } from '@/features/tts/speakDutch'
+import { useSpeech } from '@/features/tts/useSpeech'
 import { FlashCard } from '@/components/FlashCard'
 import { WordCard } from '@/components/WordCard'
 import { SpeakAndCheck } from '@/components/SpeakAndCheck'
-import { WaveAudio } from '@/components/WaveAudio'
 import { useFuzzySearch, getMatchIndices } from '@/hooks/useFuzzySearch'
 import { useNow } from '@/hooks/useNow'
 import { wordCount } from '@/lib/utils'
@@ -148,7 +147,7 @@ function ListeningView({ s }: { s: S }) {
             <h3 dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', fontSize:'1.1rem', fontWeight:700, color:'var(--text)', margin:'0 0 6px' }}>
               🎙️ {it.title}
             </h3>
-            <WaveAudio src={streamElementsURL(it.transcript)} title={it.title} />
+            <TtsPlayer text={it.transcript} />
             <details>
               <summary style={{ cursor:'pointer', color:'var(--text2)', fontSize:'var(--text-sm)', margin:'8px 0' }}>📜 إظهار/إخفاء النصّ</summary>
               <Passage title="" text={it.transcript} pre />
@@ -266,7 +265,7 @@ function SpeakingView({ s }: { s: S }) {
                   <p><strong>Situatie:</strong> {sp.situatieNl}</p>
                   <p style={{ marginTop:8 }}><strong>Taak:</strong> {sp.taakNl}</p>
                 </div>
-                <WaveAudio src={streamElementsURL(sp.voorbeeldNl)} title="Voorbeeldantwoord" />
+                <TtsPlayer text={sp.voorbeeldNl} label="🔊 استمع للجواب النموذجي" />
                 <details style={{ marginTop:8 }}>
                   <summary style={{ cursor:'pointer', color:'var(--text2)', fontSize:'var(--text-sm)' }}>📜 إظهار النموذج</summary>
                   <div dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', marginTop:6, padding:10, background:'var(--surface2)', borderRadius:6, fontSize:'var(--text-base)', color:'var(--text)', lineHeight:1.6 }}>{sp.voorbeeldNl}</div>
@@ -350,6 +349,27 @@ function WordsView({ s }: { s: S }) {
 /* ── Shared helpers ── */
 function Card({ children }: { children: React.ReactNode }) {
   return <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:18, boxShadow:'var(--elev-1)', marginBottom:16 }}>{children}</div>
+}
+
+/* Chunked Dutch TTS play/stop button — long transcripts exceed the ~200-char
+   per-request limit of Google TTS, so playback goes through speakDutch */
+function TtsPlayer({ text, label = '🔊 استمع للنصّ' }: { text: string; label?: string }) {
+  const { speaking, speak, stop } = useSpeech()
+  return (
+    <button
+      onClick={() => (speaking ? stop() : speak(text))}
+      aria-label={speaking ? 'أوقف الاستماع' : 'استمع للنصّ الهولندي'}
+      style={{
+        display:'inline-flex', alignItems:'center', gap:8, padding:'9px 16px', margin:'4px 0',
+        borderRadius:12, border:'1px solid var(--glass-border)', cursor:'pointer',
+        background: speaking ? 'var(--orange-l)' : 'var(--glass-bg-strong)',
+        color: speaking ? 'var(--orange)' : 'var(--text2)',
+        fontFamily:'inherit', fontSize:'.88rem', fontWeight:600, boxShadow:'var(--elev-1)',
+      }}
+    >
+      {speaking ? '⏹ إيقاف' : label}
+    </button>
+  )
 }
 function InfoBox({ children, color }: { children: React.ReactNode; color: string }) {
   const c = `var(--${color})`; const bg = `var(--${color}-l)`

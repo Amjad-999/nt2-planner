@@ -1,12 +1,5 @@
 import { useAppStore } from '@/store/useAppStore'
 
-export const ONLINE_VOICES = [
-  { id: 'BrendaNeural',  name: 'Brenda (vrouw, warm)' },
-  { id: 'ColetteNeural', name: 'Colette (vrouw, helder)' },
-  { id: 'FennaNeural',   name: 'Fenna (vrouw, jong)' },
-  { id: 'MaartenNeural', name: 'Maarten (man, neutraal)' },
-]
-
 export let _voices: SpeechSynthesisVoice[] = []
 export let _bestNlVoice: SpeechSynthesisVoice | null = null
 export let _ttsUnlocked = false

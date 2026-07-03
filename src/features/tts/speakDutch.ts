@@ -1,26 +1,26 @@
 import { useAppStore } from '@/store/useAppStore'
-import { _bestNlVoice, loadVoices, pickVoice, unlockTTS, _voices } from './voices'
+import { loadVoices, pickVoice, unlockTTS, _voices } from './voices'
 import { chunkText, playOneClip, stopAudio, _audioQueue, setQueue } from './audioQueue'
 
-export function streamElementsURL(text: string, voice?: string): string {
-  const v = voice || useAppStore.getState().prefs.onlineVoice || 'FennaNeural'
-  return `https://api.streamelements.com/kappa/v2/speech?voice=${encodeURIComponent(v)}&text=${encodeURIComponent(text)}`
-}
-
+/* Online Dutch TTS = Google Translate (two hosts, second as backup).
+   StreamElements' public speech endpoint was shut down (401 since 2026)
+   and must not be used. ~200-char limit per request → always chunkText. */
 function googleTTSURL(text: string): string {
   return `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=nl&client=tw-ob`
 }
+function googleTTSBackupURL(text: string): string {
+  return `https://translate.googleapis.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=nl&client=gtx`
+}
 
-export async function speakOnline(text: string, voice?: string): Promise<string> {
-  const v = voice ?? useAppStore.getState().prefs.onlineVoice ?? 'FennaNeural'
+export async function speakOnline(text: string): Promise<string> {
   const chunks = chunkText(text)
   let firstLabel: string | null = null
   for (const chunk of chunks) {
     let label: string
     try {
-      label = await playOneClip(streamElementsURL(chunk, v), 'streamelements')
-    } catch {
       label = await playOneClip(googleTTSURL(chunk), 'google')
+    } catch {
+      label = await playOneClip(googleTTSBackupURL(chunk), 'google-backup')
     }
     if (!firstLabel) firstLabel = label
   }
@@ -34,6 +34,9 @@ export function speakBrowser(text: string): Promise<string> {
     try { window.speechSynthesis.cancel() } catch { /* synthesis in an odd state — nothing to cancel */ }
     const chunks = chunkText(text)
     const v = pickVoice()
+    // Never read Dutch with a non-Dutch voice — wrong phonetics are worse
+    // than no audio; rejecting lets the caller fall back to online TTS
+    if (!v || !/^nl/i.test(v.lang)) return reject(new Error('no Dutch voice installed'))
     let i = 0, spokeAny = false, settled = false
     const fin = (ok: boolean, err?: Error) => {
       if (settled) return
@@ -48,7 +51,7 @@ export function speakBrowser(text: string): Promise<string> {
       u.lang = 'nl-NL'
       u.rate = Math.max(0.7, Math.min(1.2, useAppStore.getState().prefs.rate ?? 0.95))
       u.pitch = 1.0
-      if (v) u.voice = v
+      u.voice = v
       u.onend = () => { spokeAny = true; speakNext() }
       u.onerror = (e) => { if (!spokeAny) return fin(false, new Error((e as SpeechSynthesisErrorEvent).error || 'speech err')); speakNext() }
       window.speechSynthesis.speak(u)
@@ -79,7 +82,6 @@ export function speakDutch(text: string, btnEl?: HTMLElement | null): Promise<vo
   const job = (async () => {
     const engine = useAppStore.getState().prefs.ttsEngine ?? 'auto'
     if (!_voices.length) { try { loadVoices() } catch { /* voice list unavailable — engine fallbacks below cover it */ } }
-    const hasNativeDutch = !!_bestNlVoice
 
     try {
       if (engine === 'browser') {
@@ -89,13 +91,14 @@ export function speakDutch(text: string, btnEl?: HTMLElement | null): Promise<vo
         try { await speakOnline(trimmed) }
         catch { await speakBrowser(trimmed) }
       } else {
-        // auto: prefer native Dutch; fall back to online if none installed
-        if (hasNativeDutch || !navigator.onLine) {
-          try { await speakBrowser(trimmed) }
-          catch { if (navigator.onLine) await speakOnline(trimmed); else throw new Error('offline') }
-        } else {
+        // auto: online Google Dutch first — pronunciation is guaranteed
+        // correct, while device voices vary wildly (and speakBrowser now
+        // rejects when no genuine Dutch voice is installed)
+        if (navigator.onLine) {
           try { await speakOnline(trimmed) }
           catch { await speakBrowser(trimmed) }
+        } else {
+          await speakBrowser(trimmed)
         }
       }
     } catch (e) {

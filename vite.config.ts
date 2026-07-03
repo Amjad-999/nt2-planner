@@ -30,8 +30,8 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,woff2,png,svg,ico}'],
         runtimeCaching: [
-          { urlPattern: /streamelements\.com/, handler: 'NetworkOnly' },
           { urlPattern: /translate\.google\.com/, handler: 'NetworkOnly' },
+          { urlPattern: /translate\.googleapis\.com/, handler: 'NetworkOnly' },
           {
             urlPattern: /mymemory\.translated\.net/,
             handler: 'CacheFirst',

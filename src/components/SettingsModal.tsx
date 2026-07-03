@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useAppStore } from '@/store/useAppStore'
-import { ONLINE_VOICES, _voices, loadVoices } from '@/features/tts/voices'
+import { _voices, loadVoices } from '@/features/tts/voices'
 import { testAudio } from '@/features/tts/speakDutch'
 import { CloudPanel } from './CloudPanel'
 
@@ -12,7 +12,6 @@ export function SettingsModal({ onClose }: Props) {
   const [examDate, setExamDate] = useState(() => { try { return new Date(s.examDate).toISOString().slice(0,10) } catch { return '' } })
   const [rate, setRate] = useState(String(s.prefs.rate))
   const [ttsEngine, setTtsEngine] = useState(s.prefs.ttsEngine)
-  const [onlineVoice, setOnlineVoice] = useState(s.prefs.onlineVoice)
   const [voiceURI, setVoiceURI] = useState(s.prefs.voiceURI)
   // FIX 3: study capacity prefs
   const [studyDayMinutes, setStudyDayMinutes] = useState(String(s.prefs.studyDayMinutes ?? 60))
@@ -28,7 +27,7 @@ export function SettingsModal({ onClose }: Props) {
       examDate: examDate ? new Date(examDate + 'T09:00:00').toISOString() : s.examDate,
       prefs: {
         rate: parseFloat(rate) || 0.9,
-        ttsEngine, onlineVoice, voiceURI,
+        ttsEngine, voiceURI,
         studyDayMinutes: Math.min(480, Math.max(15, parseInt(studyDayMinutes) || 60)),
         minutesPerTask:  Math.min(120, Math.max(5,   parseInt(minutesPerTask)  || 30)),
       },
@@ -101,14 +100,9 @@ export function SettingsModal({ onClose }: Props) {
       </Field>
       <Field label="محرّك النطق الصوتي">
         <select className="form-in" value={ttsEngine} onChange={(e)=>setTtsEngine(e.target.value as 'auto'|'online'|'browser')}>
-          <option value="auto">تلقائي — أفضل صوت هولندي محلّي، ثمّ الإنترنت (موصى به)</option>
-          <option value="online">عبر الإنترنت — صوت عصبي طبيعي (يتطلّب اتصالًا)</option>
-          <option value="browser">متصفّح فقط — يعمل بدون إنترنت</option>
-        </select>
-      </Field>
-      <Field label="الصوت الهولندي عبر الإنترنت">
-        <select className="form-in" value={onlineVoice} onChange={(e)=>setOnlineVoice(e.target.value)}>
-          {ONLINE_VOICES.map((v)=><option key={v.id} value={v.id}>{v.name}</option>)}
+          <option value="auto">تلقائي — صوت Google الهولندي، ثمّ صوت الجهاز (موصى به)</option>
+          <option value="online">عبر الإنترنت — صوت Google الهولندي (يتطلّب اتصالًا)</option>
+          <option value="browser">متصفّح فقط — يتطلّب صوتًا هولنديًّا مثبَّتًا على جهازك</option>
         </select>
       </Field>
       <div style={{ marginBottom:14 }}>
