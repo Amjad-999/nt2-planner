@@ -3,6 +3,7 @@ import { useAppStore } from '@/store/useAppStore'
 import { getDaysLeft } from '@/store/useAppStore'
 import { useTheme } from '@/hooks/useTheme'
 import { AppIcon } from './AppIcon'
+import { Magnetic } from './MotionFx'
 import { CalendarDots, Fire, DownloadSimple, Moon, Sun, GearSix } from '@phosphor-icons/react'
 
 interface Props {
@@ -95,15 +96,17 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
 
       {/* Install button */}
       {showInstall && (
-        <button
-          onClick={onInstall}
-          className="flex items-center gap-1.5 rounded-lg border-0 px-3.5 text-[.82rem] font-semibold text-white h-9 cursor-pointer"
-          style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }}
-          aria-label="تثبيت التطبيق"
-        >
-          <AppIcon icon={DownloadSimple} size={16} />
-          تثبيت
-        </button>
+        <Magnetic>
+          <button
+            onClick={onInstall}
+            className="flex items-center gap-1.5 rounded-lg border-0 px-3.5 text-[.82rem] font-semibold text-white h-9 cursor-pointer"
+            style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }}
+            aria-label="تثبيت التطبيق"
+          >
+            <AppIcon icon={DownloadSimple} size={16} />
+            تثبيت
+          </button>
+        </Magnetic>
       )}
 
       {/* Theme toggle */}
@@ -123,14 +126,16 @@ function IconBtn({ children, onClick, title, 'aria-label': ariaLabel }: {
   children: React.ReactNode; onClick: () => void; title?: string; 'aria-label'?: string
 }) {
   return (
-    <button
-      onClick={onClick}
-      title={title}
-      aria-label={ariaLabel}
-      className="w-9 h-9 rounded-lg flex items-center justify-center text-[1rem] text-[var(--muted)] cursor-pointer font-[inherit] transition-all hover:-translate-y-0.5"
-      style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', border: '1px solid var(--glass-border)', boxShadow: 'var(--elev-1)' }}
-    >
-      {children}
-    </button>
+    <Magnetic>
+      <button
+        onClick={onClick}
+        title={title}
+        aria-label={ariaLabel}
+        className="w-9 h-9 rounded-lg flex items-center justify-center text-[1rem] text-[var(--muted)] cursor-pointer font-[inherit] transition-all hover:-translate-y-0.5"
+        style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', border: '1px solid var(--glass-border)', boxShadow: 'var(--elev-1)' }}
+      >
+        {children}
+      </button>
+    </Magnetic>
   )
 }

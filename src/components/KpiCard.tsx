@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { Tilt } from './MotionFx'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 interface Props {
   cls: string   // k1..k6
@@ -20,9 +22,10 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
   const valRef = useRef<HTMLDivElement>(null)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
+  const reduced = useReducedMotion()
 
   useEffect(() => {
-    if (editing) return
+    if (editing || reduced) return
     const el = valRef.current
     if (!el) return
     const num = parseFloat(String(value))
@@ -37,7 +40,7 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
       else el.textContent = String(value)
     }
     requestAnimationFrame(step)
-  }, [value, editing])
+  }, [value, editing, reduced])
 
   const deltaColor = deltaClass === 'up' ? 'var(--green)' : deltaClass === 'down' ? 'var(--red)' : 'var(--muted)'
   const deltaIcon  = deltaClass === 'up' ? '↑ ' : deltaClass === 'down' ? '↓ ' : ''
@@ -60,7 +63,8 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
   const cancel = () => setEditing(false)
 
   return (
-    <div
+    <Tilt
+      disabled={editing}
       className="relative overflow-hidden rounded-card p-[14px_16px] glow-card"
       style={{
         background: 'var(--glass-bg-strong)',
@@ -128,6 +132,6 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
       {editing && (
         <div className="mt-2 text-[.7rem]" style={{ color: 'var(--muted)' }}>اضغط Enter للحفظ · Esc للإلغاء</div>
       )}
-    </div>
+    </Tilt>
   )
 }

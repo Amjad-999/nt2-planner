@@ -6,8 +6,11 @@ import { PlanHealth } from '@/components/PlanHealth'
 import { KpiCard } from '@/components/KpiCard'
 import { InsightCard } from '@/components/InsightCard'
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { todayKey, dayKeyOffset } from '@/lib/utils'
 import { useNow } from '@/hooks/useNow'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { Reveal, Magnetic } from '@/components/MotionFx'
 
 interface Props { onOpenStudyTime?: () => void }
 
@@ -25,6 +28,7 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
   const saveSettings = useAppStore((s) => s.saveSettings)
   const [weekEdit, setWeekEdit] = useState(false)
   const now = useNow()
+  const reduced = useReducedMotion()
 
   // FIX 3: read user-configured study capacity
   const minutesPerTask  = useAppStore((s) => s.prefs.minutesPerTask)
@@ -83,9 +87,19 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
       <Hero3D />
       <PlanHealth />
 
-      <h2 style={SH}><span style={{ color:'var(--orange)' }}>🎯</span> مؤشّرات اليوم</h2>
+      <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>🎯</span> مؤشّرات اليوم</h2></Reveal>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(165px,1fr))', gap:12, marginBottom:18 }}>
-        {kpis.map((k) => <KpiCard key={k.cls} cls={k.cls} icon={k.icon} label={k.label} value={k.value} delta={k.delta} deltaClass={k.dCls} editable={k.editable} editKind={k.editKind} editRaw={k.editRaw} min={k.min} max={k.max} onSave={k.onSave} onEditClick={k.onEditClick} />)}
+        {kpis.map((k, i) => (
+          <motion.div
+            key={k.cls}
+            layout
+            initial={reduced ? false : { opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: i * 0.06, ease: [0.2, 0.7, 0.2, 1] }}
+          >
+            <KpiCard cls={k.cls} icon={k.icon} label={k.label} value={k.value} delta={k.delta} deltaClass={k.dCls} editable={k.editable} editKind={k.editKind} editRaw={k.editRaw} min={k.min} max={k.max} onSave={k.onSave} onEditClick={k.onEditClick} />
+          </motion.div>
+        ))}
       </div>
 
       {weekEdit && (
@@ -113,12 +127,16 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
         </div>
       )}
 
-      <h2 style={SH}><span style={{ color:'var(--orange)' }}>💡</span> رؤى ذكية</h2>
+      <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>💡</span> رؤى ذكية</h2></Reveal>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:12, marginBottom:18 }}>
-        {insights.map((ins, i) => <InsightCard key={i} kind={ins.kind} icon={ins.icon} title={ins.title} desc={ins.desc} />)}
+        {insights.map((ins, i) => (
+          <Reveal key={i} delay={Math.min(i * 0.05, 0.3)}>
+            <InsightCard kind={ins.kind} icon={ins.icon} title={ins.title} desc={ins.desc} />
+          </Reveal>
+        ))}
       </div>
 
-      <h2 style={SH}><span style={{ color:'var(--orange)' }}>⚡</span> إجراءات سريعة</h2>
+      <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>⚡</span> إجراءات سريعة</h2></Reveal>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:12 }}>
         {[
           { label:'📝 ابدأ محاكاة الامتحان', action:()=>setActiveTab('exam'), primary:true },
@@ -126,15 +144,17 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
           { label:`✨ ولّد خطة اليوم (${gen.tasks.length} مهام)`, action:()=>setActiveTab('plan') },
           { label:'⏱️ أضف وقت الدراسة', action:()=>onOpenStudyTime?.() },
         ].map((b) => (
-          <button key={b.label} onClick={b.action}
-            className="py-2.5 px-4 rounded-xl font-semibold cursor-pointer font-[inherit] text-[.9rem] border transition-all hover:-translate-y-0.5"
-            style={b.primary ? { background:'var(--grad-primary)', color:'#fff', border:'none', boxShadow:'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }
-              : { background:'var(--glass-bg)', backdropFilter:'blur(8px)', WebkitBackdropFilter:'blur(8px)', color:'var(--text2)', borderColor:'var(--glass-border)', boxShadow:'var(--elev-1)' }}
-          >{b.label}</button>
+          <Magnetic key={b.label} strength={0.15} maxShift={4}>
+            <button onClick={b.action}
+              className="w-full py-2.5 px-4 rounded-xl font-semibold cursor-pointer font-[inherit] text-[.9rem] border transition-all hover:-translate-y-0.5"
+              style={b.primary ? { background:'var(--grad-primary)', color:'#fff', border:'none', boxShadow:'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }
+                : { background:'var(--glass-bg)', backdropFilter:'blur(8px)', WebkitBackdropFilter:'blur(8px)', color:'var(--text2)', borderColor:'var(--glass-border)', boxShadow:'var(--elev-1)' }}
+            >{b.label}</button>
+          </Magnetic>
         ))}
       </div>
 
-      <h2 style={SH}><span style={{ color:'var(--orange)' }}>🏅</span> إنجازاتي</h2>
+      <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>🏅</span> إنجازاتي</h2></Reveal>
       <AchievementsPanel />
     </div>
   )
