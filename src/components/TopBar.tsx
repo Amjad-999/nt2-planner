@@ -36,7 +36,7 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
 
   return (
     <header
-      className="sticky top-0 z-[200] flex items-center gap-3 px-7 h-[62px] border-b"
+      className="sticky top-0 z-[200] flex items-center gap-2 sm:gap-3 px-3 sm:px-7 h-[62px] border-b"
       style={{
         background: 'var(--topbar-bg)',
         backdropFilter: 'blur(22px) saturate(1.6)',
@@ -64,9 +64,9 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
 
       <div className="flex-1" />
 
-      {/* Countdown pill */}
+      {/* Countdown pill — hidden on phones (same info lives in the hero + KPIs) */}
       <div
-        className="flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[.8rem] text-[var(--muted)] whitespace-nowrap"
+        className="hidden sm:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[.8rem] text-[var(--muted)] whitespace-nowrap"
         style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
         title="الأيام المتبقية حتى الامتحان"
       >
@@ -77,9 +77,9 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
         <span>يومًا للامتحان</span>
       </div>
 
-      {/* Streak pill */}
+      {/* Streak pill — hidden on phones (shown in the hero + KPIs) */}
       <div
-        className="flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[.8rem] text-[var(--muted)] whitespace-nowrap"
+        className="hidden sm:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[.8rem] text-[var(--muted)] whitespace-nowrap"
         style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
         title="عدد أيام المواظبة المتتالية"
       >
@@ -104,7 +104,7 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
             aria-label="تثبيت التطبيق"
           >
             <AppIcon icon={DownloadSimple} size={16} />
-            تثبيت
+            <span className="hidden sm:inline">تثبيت</span>
           </button>
         </Magnetic>
       )}
