@@ -120,7 +120,14 @@ export function SettingsModal({ onClose }: Props) {
         </div>
       </details>
 
-      <div style={{ display:'flex', gap:10, justifyContent:'flex-end', marginTop:18, flexWrap:'wrap' }}>
+      <div style={{ marginTop:16, textAlign:'center' }}>
+        <a href="/privacy.html" target="_blank" rel="noopener noreferrer"
+          style={{ fontSize:'.8rem', color:'var(--muted)', textDecoration:'underline' }}>
+          سياسة الخصوصية
+        </a>
+      </div>
+
+      <div style={{ display:'flex', gap:10, justifyContent:'flex-end', marginTop:14, flexWrap:'wrap' }}>
         <button onClick={onClose} style={btnStyle('ghost')}>إلغاء</button>
         <button onClick={save} style={btnStyle('primary')}>حفظ</button>
       </div>
