@@ -92,8 +92,8 @@ body::before {
 
 /* ── Backdrop filter fallback ── */
 @supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
-  :root { --glass-bg: rgba(255,255,255,.92); --glass-bg-strong: rgba(255,255,255,.97); --topbar-bg: rgba(255,255,255,.96); --btn-bg: rgba(255,255,255,.92); }
-  :root[data-theme="dark"] { --glass-bg: rgba(44,44,41,.94); --glass-bg-strong: rgba(44,44,41,.98); --topbar-bg: rgba(30,30,28,.97); --btn-bg: rgba(58,58,54,.94); }
+  :root { --glass-bg: rgba(255,255,255,.92); --glass-bg-strong: rgba(255,255,255,.97); --topbar-bg: rgba(255,255,255,.96); --btn-bg: rgba(255,255,255,.92); --modal-bg: rgba(255,255,255,.97); }
+  :root[data-theme="dark"] { --glass-bg: rgba(44,44,41,.94); --glass-bg-strong: rgba(44,44,41,.98); --topbar-bg: rgba(30,30,28,.97); --btn-bg: rgba(58,58,54,.94); --modal-bg: rgba(38,38,35,.97); }
 }
 
 /* ── Glass form controls ─────────────────────────────────────────────────

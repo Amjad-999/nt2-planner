@@ -149,7 +149,7 @@ export function Overlay({ children, onClose }: { children: React.ReactNode; onCl
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
       role="dialog" aria-modal="true"
     >
-      <div style={{ background:'var(--glass-bg-strong)', backdropFilter:'blur(26px) saturate(1.4)', WebkitBackdropFilter:'blur(26px) saturate(1.4)', border:'1px solid var(--glass-border)', boxShadow:'var(--elev-3), inset 0 1px 0 var(--glass-hi)', borderRadius:'calc(var(--r) + 2px)', padding:24, maxWidth:520, width:'100%', maxHeight:'88vh', overflowY:'auto', animation:'popIn .28s cubic-bezier(.2,.8,.2,1) both' }}>
+      <div style={{ background:'var(--modal-bg)', backdropFilter:'blur(30px) saturate(2)', WebkitBackdropFilter:'blur(30px) saturate(2)', border:'1px solid var(--modal-border)', boxShadow:'var(--elev-3), inset 0 1px 0 var(--glass-hi)', borderRadius:'calc(var(--r) + 2px)', padding:24, maxWidth:520, width:'100%', maxHeight:'88vh', overflowY:'auto', animation:'popIn .28s cubic-bezier(.2,.8,.2,1) both' }}>
         {children}
       </div>
     </div>

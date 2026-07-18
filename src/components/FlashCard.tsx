@@ -157,9 +157,9 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
             dir="rtl"
             style={{
               position: 'absolute', top: 52, insetInlineEnd: 0, zIndex: 20,
-              background: 'var(--glass-bg-strong)',
-              backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
-              border: '1px solid var(--glass-border)',
+              background: 'var(--modal-bg)',
+              backdropFilter: 'blur(30px) saturate(2)', WebkitBackdropFilter: 'blur(30px) saturate(2)',
+              border: '1px solid var(--modal-border)',
               borderRadius: 'var(--r-sm)',
               padding: '14px 16px',
               boxShadow: 'var(--elev-2)',
