@@ -63,9 +63,8 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(1200px 760px at 8% -10%, var(--mesh1), transparent 60%),
-    radial-gradient(1000px 700px at 102% 2%, var(--mesh2), transparent 58%),
-    radial-gradient(900px 820px at 50% 118%, var(--mesh3), transparent 60%);
+    radial-gradient(at 20% 30%, var(--mesh1) 0%, transparent 50%),
+    radial-gradient(at 80% 20%, var(--mesh2) 0%, transparent 50%);
 }
 
 /* ── Focus ── */

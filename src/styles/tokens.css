@@ -22,7 +22,8 @@
      equivalent of the dark spec rgba(255,255,255,.08)) */
   --topbar-bg:rgba(255,255,255,.5);
   --overlay-bg:rgba(38,36,32,.45);
-  --mesh1:rgba(245,143,32,.14);--mesh2:rgba(70,116,52,.11);--mesh3:rgba(245,143,32,.10);
+  /* Page mesh per glass spec: warm orange at 20% 30%, soft purple at 80% 20% */
+  --mesh1:hsla(30,80%,70%,.3);--mesh2:hsla(260,60%,60%,.2);
   --glass-bg:rgba(255,255,255,.55);--glass-bg-strong:rgba(255,255,255,.78);
   --glass-border:rgba(255,255,255,.65);--glass-hi:rgba(255,255,255,.55);
   /* Glass buttons — light equivalents of the dark spec (bg .15 / border .3) */
@@ -76,7 +77,8 @@
      bg rgba(255,255,255,.08), border rgba(255,255,255,.2) */
   --topbar-bg:rgba(255,255,255,.08);
   --overlay-bg:rgba(8,8,7,.6);
-  --mesh1:rgba(245,143,32,.18);--mesh2:rgba(111,168,79,.12);--mesh3:rgba(249,162,63,.14);
+  /* Same spec hues, tuned down so they glow instead of wash out the dark bg */
+  --mesh1:hsla(30,80%,62%,.2);--mesh2:hsla(260,60%,58%,.16);
   --glass-bg:rgba(255,255,255,.1);--glass-bg-strong:rgba(255,255,255,.14);
   --glass-border:rgba(255,255,255,.18);--glass-hi:rgba(255,255,255,.12);
   /* Glass buttons per spec: bg rgba(255,255,255,.15), border rgba(255,255,255,.3) */
