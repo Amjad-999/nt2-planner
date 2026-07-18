@@ -1,7 +1,27 @@
 import { Suspense, useRef, useEffect, type ReactNode } from 'react'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useThree } from '@react-three/fiber'
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
+
+/* Touch devices have no hover pointer for the camera to follow, so a 60 fps
+   "always" loop with Bloom just burns battery. They get frameloop="demand":
+   a static, fully rendered hero. Desktop keeps the animated loop (hidden
+   tabs cost nothing — the browser freezes rAF, and the IntersectionObserver
+   below unmounts the canvas when scrolled out of view). */
+const IS_TOUCH = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+
+/* demand mode renders on invalidate() only; async assets (textures, fonts)
+   can land after the last automatic render. A short warm-up keeps
+   invalidating while the scene settles, then goes silent. */
+function DemandWarmup() {
+  const invalidate = useThree((s) => s.invalidate)
+  useEffect(() => {
+    const tick = setInterval(() => invalidate(), 250)
+    const stop = setTimeout(() => clearInterval(tick), 3000)
+    return () => { clearInterval(tick); clearTimeout(stop) }
+  }, [invalidate])
+  return null
+}
 
 interface Props {
   children: ReactNode
@@ -47,20 +67,21 @@ export function Scene({ children, onVisibilityChange }: Props) {
   return (
     <div ref={wrapperRef} style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
       <Canvas
-        dpr={[1, Math.min(window.devicePixelRatio, 2)]}
+        dpr={[1, Math.min(window.devicePixelRatio, IS_TOUCH ? 1.5 : 2)]}
         camera={{ position: [0, 0.2, 6], fov: 50, near: 0.1, far: 40 }}
         gl={{
           antialias: true,
           powerPreference: 'high-performance',
           alpha: false,
         }}
-        frameloop="always"
+        frameloop={IS_TOUCH ? 'demand' : 'always'}
         style={{ background: 'transparent' }}
         aria-hidden="true"
       >
         <Suspense fallback={null}>
           {children}
           <PostFX />
+          {IS_TOUCH && <DemandWarmup />}
         </Suspense>
       </Canvas>
     </div>
