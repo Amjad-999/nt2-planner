@@ -55,7 +55,7 @@ export function AiLookup() {
   const dotColor = status === 'ready' ? 'var(--green)' : status === 'error' ? 'var(--red)' : 'var(--amber)'
 
   return (
-    <div style={{ background: 'linear-gradient(135deg,var(--purple-l),var(--orange-l))', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r)', padding: 18, marginBottom: 16, boxShadow: 'var(--elev-2), inset 0 1px 0 var(--glass-hi)' }}>
+    <div style={{ background: 'linear-gradient(135deg,var(--purple-l),var(--orange-l))', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r)', padding: 18, marginBottom: 16, boxShadow: 'var(--elev-2), inset 0 1px 0 var(--glass-hi)' }}>
       <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>🤖 ابحث عن كلمة هولندية بذكاء اصطناعي مجاني</h3>
       <div className="flex items-center gap-1.5 text-[.78rem] text-[var(--muted)] mb-2.5">
         <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: dotColor, verticalAlign: 'middle' }} />

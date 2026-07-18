@@ -182,7 +182,7 @@ export default function Stats() {
           const col = colors[i]
           const C = 2*Math.PI*42; const offset = C-(C*v/100)
           return (
-            <div key={k} style={{ background:'var(--glass-bg)', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, textAlign:'center', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
+            <div key={k} style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, textAlign:'center', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
               <svg viewBox="0 0 100 100" style={{ width:96, height:96, display:'block', margin:'0 auto 8px' }} role="img" aria-label={`${SKILL_AR[k]}: ${v}%`}>
                 <circle cx="50" cy="50" r="42" fill="none" stroke="var(--surface3)" strokeWidth="8"/>
                 <circle cx="50" cy="50" r="42" fill="none" stroke={col} strokeWidth="8" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={offset} transform="rotate(-90 50 50)"/>
@@ -208,7 +208,7 @@ export default function Stats() {
           { id:'chWords',  title:'الكلمات المُكتسبة (تراكمي)' },
           { id:'chSkills', title:'المهارات مقابل عتبة النجاح' },
         ].map(({ id, title }) => (
-          <div key={id} style={{ background:'var(--glass-bg)', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
+          <div key={id} style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
             <div style={{ fontSize:'.95rem', fontWeight:600, color:'var(--text)', marginBottom:12 }}>{title}</div>
             <div style={{ position:'relative', height:230 }}><canvas id={id} /></div>
           </div>
@@ -225,7 +225,7 @@ export default function Stats() {
           {streakCount} يوم متتالٍ
         </span>
       </h3>
-      <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1)', marginBottom:18 }}>
+      <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1)', marginBottom:18 }}>
         <div style={{ fontSize:'.78rem', color:'var(--muted)', marginBottom:12 }}>آخر 56 يوم — مجموع {act56Sum} دقيقة</div>
         <div style={{ position:'relative', height:260 }}><canvas id="chActivity" /></div>
         <div style={{ marginTop:10, fontSize:'.78rem', color:'var(--muted)', display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:8 }}>
@@ -236,7 +236,7 @@ export default function Stats() {
 
       {/* Exam trend */}
       <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'18px 0 10px' }}>📈 تقدّم نتائج الامتحان</h3>
-      <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1)', marginBottom:18 }}>
+      <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1)', marginBottom:18 }}>
         <div style={{ fontSize:'.78rem', color:'var(--muted)', marginBottom:12 }}>آخر محاولات لكلّ مهارة — الخطّ الأخضر هو عتبة النجاح في NT2 (65%)</div>
         <div style={{ position:'relative', height:300 }}><canvas id="chExamTrend" /></div>
       </div>

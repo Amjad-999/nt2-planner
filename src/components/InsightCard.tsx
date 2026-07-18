@@ -15,8 +15,8 @@ export function InsightCard({ kind, icon, title, desc }: Props) {
       className="flex gap-3 items-start rounded-card p-[14px_16px] relative overflow-hidden glow-card"
       style={{
         background: 'var(--glass-bg)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         border: '1px solid var(--glass-border)',
         borderInlineStart: `3px solid ${BORDER[kind] ?? 'var(--blue)'}`,
         boxShadow: 'var(--elev-1)',
