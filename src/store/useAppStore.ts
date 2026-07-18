@@ -6,6 +6,7 @@ import { defaultState, applyState } from './migration'
 import type { State, VocabWord, ExamWord, SkillKey, TabId } from './types'
 import { TOTAL_PLAN_DAYS, LEARNED_BOX, PASS_THRESHOLD, planTaskId, scaledPhases, SKILL_AR } from '@/data/phases'
 import { scheduleCard, isFsrsLearned, type FsrsQuality } from '@/features/vocab/fsrs'
+import { completionPct } from '@/features/exam/scoring'
 import { celebrate } from '@/lib/celebrate'
 
 /* ── localStorage keys (match original) ── */
@@ -24,7 +25,9 @@ const customStorage = {
         if (parsed && parsed.state) {
           // Older save() builds persisted activeTab — tab choice is per-session
           delete parsed.state.activeTab
-          return parsed as StorageValue<State>
+          // Always sanitize on rehydrate: version-6 payloads skip migrate(),
+          // so without this a corrupted/inflated stored state loads verbatim
+          return { state: applyState(parsed.state), version: 6 }
         }
         // Original app stores raw S — migrate it
         return { state: applyState(parsed), version: 6 }
@@ -101,9 +104,9 @@ export interface AppStore extends State {
 
   // Exam
   recordExam: (skill: SkillKey, pct: number) => void
-  answerReading: (textId: string, qi: number, oi: number) => void
+  answerReading: (textId: string, qi: number, oi: number, questions?: readonly { correct: number }[]) => void
   resetReading: (textId: string) => void
-  answerListening: (itemId: string, qi: number, oi: number) => void
+  answerListening: (itemId: string, qi: number, oi: number, questions?: readonly { correct: number }[]) => void
   resetListening: (itemId: string) => void
   saveWriting: (id: string, text: string) => void
   scoreWriting: (id: string, score: number, feedback: string) => void
@@ -203,8 +206,11 @@ export const useAppStore = create<AppStore>()(
 
       recordStudyMinutes: (mins) => {
         if (!mins || mins <= 0) return
-        set((st) => ({ studySec: st.studySec + mins * 60 }))
-        get().bumpHist('mins', mins)
+        // Cap a single entry at 10 h — a typo like 99999 would poison the
+        // stats forever (cloud merge keeps the max, so it never self-heals)
+        const m = Math.min(600, Math.round(mins))
+        set((st) => ({ studySec: st.studySec + m * 60 }))
+        get().bumpHist('mins', m)
         get().bumpStreak()
         get().save()
       },
@@ -305,8 +311,13 @@ export const useAppStore = create<AppStore>()(
         get().save()
       },
 
-      answerReading: (textId, qi, oi) => {
+      answerReading: (textId, qi, oi, questions) => {
+        const prev = get().examReading[textId] ?? {}
         set((st) => ({ examReading: { ...st.examReading, [textId]: { ...(st.examReading[textId] ?? {}), [qi]: oi } } }))
+        if (questions) {
+          const pct = completionPct(prev, qi, oi, questions)
+          if (pct !== null) get().recordExam('reading', pct)
+        }
         get().save()
       },
       resetReading: (textId) => {
@@ -314,8 +325,13 @@ export const useAppStore = create<AppStore>()(
         get().save()
       },
 
-      answerListening: (itemId, qi, oi) => {
+      answerListening: (itemId, qi, oi, questions) => {
+        const prev = get().examListening[itemId] ?? {}
         set((st) => ({ examListening: { ...st.examListening, [itemId]: { ...(st.examListening[itemId] ?? {}), [qi]: oi } } }))
+        if (questions) {
+          const pct = completionPct(prev, qi, oi, questions)
+          if (pct !== null) get().recordExam('listening', pct)
+        }
         get().save()
       },
       resetListening: (itemId) => {

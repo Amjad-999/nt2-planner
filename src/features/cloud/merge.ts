@@ -26,6 +26,31 @@ function mergeWordArray<T extends { id: string; reps: number; fsrs_last_review?:
   return Array.from(map.values())
 }
 
+/** Multiset union: per (skill,score) pair keep the max count seen on either
+ *  side. Plain concatenation doubled shared history on every sync cycle
+ *  (local and remote are identical after a sync), growing exponentially. */
+function mergeExamTaken(a: DayRecord['examTaken'] = [], b: DayRecord['examTaken'] = []): DayRecord['examTaken'] {
+  const count = (list: DayRecord['examTaken']) => {
+    const m = new Map<string, { entry: DayRecord['examTaken'][number]; n: number }>()
+    for (const e of list ?? []) {
+      if (!e || typeof e !== 'object') continue
+      const k = `${e.skill}:${e.score}`
+      const cur = m.get(k)
+      if (cur) cur.n += 1
+      else m.set(k, { entry: e, n: 1 })
+    }
+    return m
+  }
+  const ca = count(a), cb = count(b)
+  const out: DayRecord['examTaken'] = []
+  for (const k of new Set([...ca.keys(), ...cb.keys()])) {
+    const n = Math.max(ca.get(k)?.n ?? 0, cb.get(k)?.n ?? 0)
+    const entry = (ca.get(k) ?? cb.get(k))!.entry
+    for (let i = 0; i < n; i++) out.push(entry)
+  }
+  return out
+}
+
 function mergeDay(x?: DayRecord, y?: DayRecord): DayRecord {
   const a = x ?? { mins: 0, tasks: 0, wordsAdded: 0, wordsLearned: 0, examTaken: [] }
   const b = y ?? { mins: 0, tasks: 0, wordsAdded: 0, wordsLearned: 0, examTaken: [] }
@@ -34,7 +59,7 @@ function mergeDay(x?: DayRecord, y?: DayRecord): DayRecord {
     tasks: Math.max(num(a.tasks), num(b.tasks)),
     wordsAdded: Math.max(num(a.wordsAdded), num(b.wordsAdded)),
     wordsLearned: Math.max(num(a.wordsLearned), num(b.wordsLearned)),
-    examTaken: [...(a.examTaken ?? []), ...(b.examTaken ?? [])],
+    examTaken: mergeExamTaken(a.examTaken, b.examTaken),
   }
 }
 

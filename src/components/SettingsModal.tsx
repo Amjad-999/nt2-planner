@@ -107,7 +107,8 @@ export function SettingsModal({ onClose }: Props) {
       </Field>
       <div style={{ marginBottom:14 }}>
         <button onClick={handleTest} style={btnStyle('primary')}>🔊 اختبر الصوت الآن</button>
-        {testResult && <div style={{ marginTop:8, fontSize:'.84rem', color:'var(--muted)' }} dangerouslySetInnerHTML={{ __html: testResult }} />}
+        {/* testAudio يعيد نصًّا عاديًّا — العرض كنصّ يمنع حقن أي HTML قادم من رسالة خطأ */}
+        {testResult && <div style={{ marginTop:8, fontSize:'.84rem', color:'var(--muted)' }}>{testResult}</div>}
       </div>
 
       <details style={{ marginBottom:14 }}>

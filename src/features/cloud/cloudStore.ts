@@ -27,8 +27,15 @@ function snapshot(): State {
   s._savedAt = Date.now()
   return s
 }
+
+/* hydrate() rewrites the app store, which fires the subscription below.
+   Without this flag every sync scheduled the next one 4 s later — an endless
+   self-sync loop that hammered Supabase even with the app idle. */
+let applyingRemote = false
 function hydrate(merged: State): void {
-  useAppStore.getState().importData(JSON.stringify(merged))
+  applyingRemote = true
+  try { useAppStore.getState().importData(JSON.stringify(merged)) }
+  finally { applyingRemote = false }
 }
 
 let inited = false
@@ -49,9 +56,9 @@ export const useCloud = create<CloudState>((set, get) => ({
       const { data } = await cloud.auth.getSession()
       if (data.session) { set({ user: data.session.user }); get().syncNow() }
       cloud.auth.onAuthStateChange((evt, session) => { void evt; set({ user: session ? session.user : null }) })
-      // مزامنة مؤجّلة عند أي تغيير محلّي
+      // مزامنة مؤجّلة عند أي تغيير محلّي (وليس التغييرات القادمة من السحابة نفسها)
       useAppStore.subscribe(() => {
-        if (!get().user) return
+        if (!get().user || applyingRemote) return
         if (debounceTimer) clearTimeout(debounceTimer)
         debounceTimer = setTimeout(() => { get().syncNow() }, 4000)
       })
@@ -94,9 +101,13 @@ export const useCloud = create<CloudState>((set, get) => ({
   },
 
   syncNow: async () => {
-    const cloud = await getCloud(); const user = get().user
-    if (!cloud || !user) return
+    // Re-entrancy guard: the 4 s debounce and the visibilitychange handler can
+    // both fire — overlapping read/merge/write cycles race each other. The
+    // claim must happen synchronously, before any await, or both pass it.
+    if (!get().user || get().status === 'syncing') return
     set({ status: 'syncing', message: '' })
+    const cloud = await getCloud(); const user = get().user
+    if (!cloud || !user) { set({ status: cloud ? 'idle' : 'offline' }); return }
     try {
       const local = snapshot()
       const res = await cloud.from(CLOUD_TABLE).select('data').eq('user_id', user.id).maybeSingle()

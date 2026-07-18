@@ -113,7 +113,7 @@ function ReadingView({ s }: { s: S }) {
                       if (sel!==undefined){if(oi===q.correct){bg='var(--green-l)';bc='var(--green)'}else if(oi===sel){bg='var(--red-l)';bc='var(--red)'}}
                       return (
                         <label key={oi} dir="ltr" lang="nl" style={{ display:'flex', alignItems:'flex-start', gap:8, padding:'9px 12px', border:`1px solid ${bc}`, borderRadius:12, background:bg, cursor:'pointer', fontFamily:'var(--font-latin)', fontSize:'.88rem', color:'var(--text)', transition:'.15s' }}>
-                          <input type="radio" name={`rq_${t.id}_${qi}`} checked={sel===oi} onChange={() => s.answerReading(t.id,qi,oi)} style={{ marginTop:3, accentColor:'var(--orange)', flexShrink:0 }} />
+                          <input type="radio" name={`rq_${t.id}_${qi}`} checked={sel===oi} onChange={() => s.answerReading(t.id,qi,oi,t.questions)} style={{ marginTop:3, accentColor:'var(--orange)', flexShrink:0 }} />
                           <span>{String.fromCharCode(65+oi)}. {o}</span>
                         </label>
                       )
@@ -165,7 +165,7 @@ function ListeningView({ s }: { s: S }) {
                       if(sel!==undefined){if(oi===q.correct){bg='var(--green-l)';bc='var(--green)'}else if(oi===sel){bg='var(--red-l)';bc='var(--red)'}}
                       return (
                         <label key={oi} dir="ltr" lang="nl" style={{ display:'flex', alignItems:'flex-start', gap:8, padding:'9px 12px', border:`1px solid ${bc}`, borderRadius:12, background:bg, cursor:'pointer', fontFamily:'var(--font-latin)', fontSize:'.88rem', color:'var(--text)', transition:'.15s' }}>
-                          <input type="radio" name={`lq_${it.id}_${qi}`} checked={sel===oi} onChange={() => s.answerListening(it.id,qi,oi)} style={{ marginTop:3, accentColor:'var(--orange)', flexShrink:0 }} />
+                          <input type="radio" name={`lq_${it.id}_${qi}`} checked={sel===oi} onChange={() => s.answerListening(it.id,qi,oi,it.questions)} style={{ marginTop:3, accentColor:'var(--orange)', flexShrink:0 }} />
                           <span>{String.fromCharCode(65+oi)}. {o}</span>
                         </label>
                       )

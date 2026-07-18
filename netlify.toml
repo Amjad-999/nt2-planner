@@ -7,3 +7,14 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# ترويسات أمن — تطابق ما في vercel.json
+# Referrer-Policy = no-referrer يطابق وسم <meta name="referrer"> الذي يحتاجه Google TTS
+# microphone=(self) مطلوب لميزة «تحدّث وتحقّق» (التعرّف على الكلام)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "no-referrer"
+    Permissions-Policy = "camera=(), geolocation=(), payment=(), usb=(), microphone=(self)"

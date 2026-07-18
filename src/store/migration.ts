@@ -113,8 +113,28 @@ export function applyState(parsed: any): State {
   S.examReading   = (parsed.examReading   && typeof parsed.examReading   === 'object') ? parsed.examReading   : {}
   S.examListening = (parsed.examListening && typeof parsed.examListening === 'object') ? parsed.examListening : {}
 
-  // Daily history
-  S.dailyHistory = (parsed.dailyHistory && typeof parsed.dailyHistory === 'object') ? parsed.dailyHistory : {}
+  // Daily history — sanitize each record: clamp counters and cap examTaken.
+  // The cap also self-heals states inflated by the old concat-merge bug
+  // (examTaken doubled on every cloud sync before mergeExamTaken existed).
+  S.dailyHistory = {}
+  if (parsed.dailyHistory && typeof parsed.dailyHistory === 'object') {
+    for (const [k, v] of Object.entries(parsed.dailyHistory as Record<string, unknown>)) {
+      if (!v || typeof v !== 'object') continue
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const d: any = v
+      S.dailyHistory[k] = {
+        mins:         clampNum(parseInt(String(d.mins))         || 0, 0, 1440),
+        tasks:        clampNum(parseInt(String(d.tasks))        || 0, 0, 500),
+        wordsAdded:   clampNum(parseInt(String(d.wordsAdded))   || 0, 0, 1000),
+        wordsLearned: clampNum(parseInt(String(d.wordsLearned)) || 0, 0, 1000),
+        examTaken: (Array.isArray(d.examTaken) ? d.examTaken : [])
+          .filter((e: unknown) => !!e && typeof e === 'object'
+            && typeof (e as { skill?: unknown }).skill === 'string'
+            && typeof (e as { score?: unknown }).score === 'number')
+          .slice(-50),
+      }
+    }
+  }
 
   // Prefs
   const p = parsed.prefs || {}

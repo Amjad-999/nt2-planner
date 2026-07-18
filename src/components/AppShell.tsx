@@ -8,6 +8,7 @@ import { OnboardModal } from './OnboardModal'
 import { StudyTimeModal } from './StudyTimeModal'
 import { TabErrorBoundary } from './TabErrorBoundary'
 import { useBadgeCheck } from '@/hooks/useBadgeCheck'
+import { useCloud } from '@/features/cloud/cloudStore'
 
 const Dashboard  = lazy(() => import('@/sections/Dashboard'))
 const Plan       = lazy(() => import('@/sections/Plan'))
@@ -44,6 +45,16 @@ export function AppShell() {
 
   // Show onboarding on first load
   useEffect(() => { if (!onboarded) setTimeout(() => setShowOnboard(true), 300) }, [onboarded])
+
+  // Signed-in users sync from app start — not only after opening Settings.
+  // The sb-*-auth-token key exists only after a login, so guests never pay
+  // for the supabase-js chunk.
+  useEffect(() => {
+    try {
+      if (Object.keys(localStorage).some((k) => k.startsWith('sb-') && k.endsWith('-auth-token')))
+        useCloud.getState().init()
+    } catch { /* storage blocked — CloudPanel still calls init() on open */ }
+  }, [])
 
   // PWA install prompt
   useEffect(() => {
