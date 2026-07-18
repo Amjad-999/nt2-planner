@@ -17,7 +17,9 @@
   --shadow-lg:0 24px 60px rgba(40,36,30,.20), 0 10px 24px rgba(40,36,30,.10);
   --r:18px;--r-sm:12px;
   --hero-bg:#2B2A26;
-  --topbar-bg:rgba(237,233,226,.7);
+  /* Glassmorphism navbar — white glass over the mesh gradient (light theme
+     equivalent of the dark spec rgba(255,255,255,.08)) */
+  --topbar-bg:rgba(255,255,255,.5);
   --overlay-bg:rgba(38,36,32,.45);
   --mesh1:rgba(245,143,32,.14);--mesh2:rgba(70,116,52,.11);--mesh3:rgba(245,143,32,.10);
   --glass-bg:rgba(255,255,255,.55);--glass-bg-strong:rgba(255,255,255,.78);
@@ -64,11 +66,13 @@
   --shadow:0 8px 24px rgba(0,0,0,.55), 0 3px 8px rgba(0,0,0,.4);
   --shadow-lg:0 28px 64px rgba(0,0,0,.65), 0 12px 28px rgba(0,0,0,.5);
   --hero-bg:#1F1F1C;
-  --topbar-bg:rgba(26,26,24,.66);
+  /* Glassmorphism (dark): white-tinted glass per spec —
+     bg rgba(255,255,255,.08), border rgba(255,255,255,.2) */
+  --topbar-bg:rgba(255,255,255,.08);
   --overlay-bg:rgba(8,8,7,.6);
   --mesh1:rgba(245,143,32,.18);--mesh2:rgba(111,168,79,.12);--mesh3:rgba(249,162,63,.14);
-  --glass-bg:rgba(54,54,54,.5);--glass-bg-strong:rgba(54,54,54,.72);
-  --glass-border:rgba(255,255,255,.10);--glass-hi:rgba(255,255,255,.08);
+  --glass-bg:rgba(255,255,255,.07);--glass-bg-strong:rgba(255,255,255,.12);
+  --glass-border:rgba(255,255,255,.18);--glass-hi:rgba(255,255,255,.12);
   --elev-1:0 1px 2px rgba(0,0,0,.5), 0 2px 8px rgba(0,0,0,.4);
   --elev-2:0 10px 28px rgba(0,0,0,.55), 0 4px 10px rgba(0,0,0,.4);
   --elev-3:0 30px 70px rgba(0,0,0,.7), 0 12px 30px rgba(0,0,0,.55);

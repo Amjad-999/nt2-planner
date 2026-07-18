@@ -68,8 +68,8 @@ export function NavTabs() {
       style={{
         top: '62px',
         background: 'var(--topbar-bg)',
-        backdropFilter: 'blur(18px) saturate(1.5)',
-        WebkitBackdropFilter: 'blur(18px) saturate(1.5)',
+        backdropFilter: 'blur(20px) saturate(1.8)',
+        WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
         borderColor: 'var(--glass-border)',
         position: 'relative',
       }}

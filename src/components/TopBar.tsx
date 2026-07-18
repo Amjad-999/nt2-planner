@@ -39,8 +39,8 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
       className="sticky top-0 z-[200] flex items-center gap-2 sm:gap-3 px-3 sm:px-7 h-[62px] border-b"
       style={{
         background: 'var(--topbar-bg)',
-        backdropFilter: 'blur(22px) saturate(1.6)',
-        WebkitBackdropFilter: 'blur(22px) saturate(1.6)',
+        backdropFilter: 'blur(20px) saturate(1.8)',
+        WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
         borderColor: 'var(--glass-border)',
         boxShadow: 'var(--elev-1), inset 0 1px 0 var(--glass-hi)',
       }}

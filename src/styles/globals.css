@@ -92,9 +92,34 @@ body::before {
 
 /* ── Backdrop filter fallback ── */
 @supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
-  :root { --glass-bg: rgba(255,255,255,.92); --glass-bg-strong: rgba(255,255,255,.97); }
-  :root[data-theme="dark"] { --glass-bg: rgba(44,44,41,.94); --glass-bg-strong: rgba(44,44,41,.98); }
+  :root { --glass-bg: rgba(255,255,255,.92); --glass-bg-strong: rgba(255,255,255,.97); --topbar-bg: rgba(255,255,255,.96); }
+  :root[data-theme="dark"] { --glass-bg: rgba(44,44,41,.94); --glass-bg-strong: rgba(44,44,41,.98); --topbar-bg: rgba(30,30,28,.97); }
 }
+
+/* ── Glass form controls ─────────────────────────────────────────────────
+   .form-in is referenced by the Settings + Onboarding modals; the shared
+   definition lives here so every input/select/date field gets the same
+   glassmorphism treatment (translucent surface + blur + focus ring). */
+.form-in {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  background: var(--glass-bg-strong);
+  /* standard property only — autoprefixer emits the -webkit- twin; writing
+     both by hand made the minifier keep only the prefixed one */
+  backdrop-filter: blur(8px);
+  color: var(--text);
+  font-family: inherit;
+  font-size: .92rem;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.form-in:focus {
+  outline: none;
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px var(--ring-primary);
+}
+.form-in option { background: var(--surface3); color: var(--text); }
 
 /* ── Glow card — cursor spotlight + hover accent ──────────────────────────
    Add class="glow-card" + position:relative + overflow:hidden to any card.
