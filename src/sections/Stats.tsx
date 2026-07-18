@@ -4,6 +4,15 @@ import { PASS_THRESHOLD, SKILL_AR } from '@/data/phases'
 import { dayKeyOffset, hexA } from '@/lib/utils'
 import { InsightCard } from '@/components/InsightCard'
 
+/* Chart.js generics make Chart<'bar'> unassignable to Chart[] — all the
+   leak fix needs is destroy(), so track instances by that shape alone */
+type DestroyableChart = { destroy(): void }
+
+function destroyCharts(charts: DestroyableChart[]) {
+  charts.forEach((ch) => { try { ch.destroy() } catch { /* already destroyed */ } })
+  charts.length = 0
+}
+
 export default function Stats() {
   const skill        = useAppStore((s) => s.skill)
   const vocab        = useAppStore((s) => s.vocab)
@@ -11,6 +20,9 @@ export default function Stats() {
   const dailyHistory = useAppStore((s) => s.dailyHistory)
   const theme        = useAppStore((s) => s.theme)
   const mountKey     = useRef(0)
+  // Live Chart instances — each holds a canvas ref + ResizeObserver, so they
+  // must be destroyed on unmount or every visit to this tab leaks all six
+  const chartsRef    = useRef<DestroyableChart[]>([])
 
   const weekM  = sumLastNDays(dailyHistory, 'mins',       7)
   const lastWM = sumPrevNDays(dailyHistory, 'mins',       7, 7)
@@ -34,6 +46,9 @@ export default function Stats() {
     mountKey.current += 1
     const key = mountKey.current
     let cancelled = false
+    // Stable array identity — captured once so the cleanup below sees the
+    // same list the render pass pushed into (and eslint's ref rule is happy)
+    const charts = chartsRef.current
 
     const render = async () => {
       const { Chart, registerables } = await import('chart.js')
@@ -55,7 +70,11 @@ export default function Stats() {
       Chart.defaults.borderColor = c.grid
       Chart.defaults.font.family = "'Cairo','Readex Pro',sans-serif"
 
-      const kill = (id: string) => { try { Chart.getChart(document.getElementById(id) as HTMLCanvasElement)?.destroy() } catch { /* chart already destroyed */ } }
+      // Destroy every chart this component created before building the new
+      // set — Chart.getChart(byId) can't find charts whose canvas was
+      // replaced by a remount, which is exactly how the old lookup leaked
+      destroyCharts(charts)
+      const track = (ch: DestroyableChart) => { charts.push(ch) }
 
       // 14-day data
       const days14: string[] = [], studyD: number[] = [], taskD: number[] = []
@@ -76,17 +95,14 @@ export default function Stats() {
         plugins: { legend:{display:false}, tooltip:{backgroundColor:c.txt,titleColor:'#fff',bodyColor:'#fff'} },
       })
 
-      kill('chStudy')
       const cs1 = document.getElementById('chStudy') as HTMLCanvasElement|null
-      if (cs1) new Chart(cs1, { type:'bar', data:{ labels:days14, datasets:[{ label:'دقائق', data:studyD, backgroundColor:hexA(c.orange,.8), borderRadius:6 }]}, options:base({beginAtZero:true,precision:0}) })
+      if (cs1) track(new Chart(cs1, { type:'bar', data:{ labels:days14, datasets:[{ label:'دقائق', data:studyD, backgroundColor:hexA(c.orange,.8), borderRadius:6 }]}, options:base({beginAtZero:true,precision:0}) }))
 
-      kill('chTasks')
       const ct = document.getElementById('chTasks') as HTMLCanvasElement|null
-      if (ct) new Chart(ct, { type:'bar', data:{ labels:days14, datasets:[{ label:'مهام', data:taskD, backgroundColor:hexA(c.green,.8), borderRadius:6 }]}, options:base({beginAtZero:true,precision:0}) })
+      if (ct) track(new Chart(ct, { type:'bar', data:{ labels:days14, datasets:[{ label:'مهام', data:taskD, backgroundColor:hexA(c.green,.8), borderRadius:6 }]}, options:base({beginAtZero:true,precision:0}) }))
 
-      kill('chWords')
       const cw = document.getElementById('chWords') as HTMLCanvasElement|null
-      if (cw) new Chart(cw, { type:'line', data:{ labels:days14, datasets:[{ label:'كلمات', data:wordsD, borderColor:c.purple, backgroundColor:hexA(c.purple,.2), tension:.35, fill:true, pointRadius:3 }]}, options:base({beginAtZero:true,precision:0}) })
+      if (cw) track(new Chart(cw, { type:'line', data:{ labels:days14, datasets:[{ label:'كلمات', data:wordsD, borderColor:c.purple, backgroundColor:hexA(c.purple,.2), tension:.35, fill:true, pointRadius:3 }]}, options:base({beginAtZero:true,precision:0}) }))
 
       // Skills horizontal bar
       const passPlugin = {
@@ -101,41 +117,42 @@ export default function Stats() {
           g.textAlign='center'; g.textBaseline='bottom'; g.fillText('عتبة 65%',px,area.top-3); g.restore()
         }
       }
-      kill('chSkills')
       const skL = [SKILL_AR.reading,SKILL_AR.listening,SKILL_AR.writing,SKILL_AR.speaking]
       const skS = [skill.reading.best,skill.listening.best,skill.writing.best,skill.speaking.best]
       const csk = document.getElementById('chSkills') as HTMLCanvasElement|null
-      if (csk) new Chart(csk, {
+      if (csk) track(new Chart(csk, {
         type:'bar',
         data:{ labels:skL, datasets:[{ label:'أفضل نتيجة', data:skS, backgroundColor:skS.map((v)=>hexA(v>=PASS_THRESHOLD?c.green:c.orange,.8)), borderColor:skS.map((v)=>v>=PASS_THRESHOLD?c.green:c.orange), borderWidth:1, borderRadius:6, borderSkipped:false }]},
         options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, layout:{padding:{top:16}}, scales:{ x:{min:0,max:100,grid:{color:c.grid},ticks:{color:c.txt,stepSize:25,callback:(v)=>v+'%'}}, y:{grid:{display:false},ticks:{color:c.txt,font:{size:13}}} }, plugins:{ legend:{display:false}, tooltip:{backgroundColor:c.txt,titleColor:'#fff',bodyColor:'#fff',callbacks:{label:(ctx)=>(ctx.parsed.x??0)+'%'+((ctx.parsed.x??0)>=PASS_THRESHOLD?' ✓ فوق العتبة':' — تحت العتبة')}} } },
         plugins:[passPlugin]
-      })
+      }))
 
       // 56-day sparkline
       const act56: string[] = [], actD: number[] = []
       for (let i = 55; i >= 0; i--) { const k = dayKeyOffset(-i); act56.push(k.slice(5)); actD.push(dailyHistory[k]?.mins??0) }
-      kill('chActivity')
       const ca = document.getElementById('chActivity') as HTMLCanvasElement|null
       if (ca) {
         const actCtx = ca.getContext('2d')!
         const grad = actCtx.createLinearGradient(0,0,0,ca.height||260)
         grad.addColorStop(0, hexA(c.orange,.55)); grad.addColorStop(1, hexA(c.orange,0))
-        new Chart(ca, { type:'line', data:{ labels:act56, datasets:[{ data:actD, borderColor:c.orange, borderWidth:2.2, backgroundColor:grad, fill:true, tension:.38, pointRadius:0, pointHoverRadius:5 }]}, options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, scales:{ x:{grid:{display:false},ticks:{color:c.txt+'aa',maxRotation:0,autoSkip:true,maxTicksLimit:8}}, y:{grid:{color:c.grid},ticks:{color:c.txt+'aa'},beginAtZero:true} }, plugins:{ legend:{display:false}, tooltip:{backgroundColor:'#1C1812',titleColor:'#fff',bodyColor:'#fff',borderColor:c.orange,borderWidth:1,displayColors:false,callbacks:{label:(ctx)=>ctx.parsed.y+' دقيقة'}} } } })
+        track(new Chart(ca, { type:'line', data:{ labels:act56, datasets:[{ data:actD, borderColor:c.orange, borderWidth:2.2, backgroundColor:grad, fill:true, tension:.38, pointRadius:0, pointHoverRadius:5 }]}, options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, scales:{ x:{grid:{display:false},ticks:{color:c.txt+'aa',maxRotation:0,autoSkip:true,maxTicksLimit:8}}, y:{grid:{color:c.grid},ticks:{color:c.txt+'aa'},beginAtZero:true} }, plugins:{ legend:{display:false}, tooltip:{backgroundColor:'#1C1812',titleColor:'#fff',bodyColor:'#fff',borderColor:c.orange,borderWidth:1,displayColors:false,callbacks:{label:(ctx)=>ctx.parsed.y+' دقيقة'}} } } }))
       }
 
       // Exam trend
       const sk = ['reading','listening','writing','speaking'] as const
       const cols = [c.blue,c.green,c.amber,c.purple]
-      kill('chExamTrend')
       const ce = document.getElementById('chExamTrend') as HTMLCanvasElement|null
-      if (ce) new Chart(ce, { type:'line', data:{ datasets: sk.map((k,i)=>({ label:SKILL_AR[k], data:(skill[k].history??[]).map((h)=>({x:h.date,y:h.score})), borderColor:cols[i], backgroundColor:hexA(cols[i],.1), tension:.3, pointRadius:4, fill:false })) }, options:{ responsive:true, maintainAspectRatio:false, scales:{ x:{type:'category',ticks:{color:c.txt+'aa'}}, y:{min:0,max:100,grid:{color:c.grid},ticks:{color:c.txt+'aa',callback:(v)=>v+'%'}} }, plugins:{ legend:{position:'bottom',labels:{color:c.txt}}, tooltip:{callbacks:{label:(ctx)=>ctx.dataset.label+': '+ctx.parsed.y+'%'}} } } })
+      if (ce) track(new Chart(ce, { type:'line', data:{ datasets: sk.map((k,i)=>({ label:SKILL_AR[k], data:(skill[k].history??[]).map((h)=>({x:h.date,y:h.score})), borderColor:cols[i], backgroundColor:hexA(cols[i],.1), tension:.3, pointRadius:4, fill:false })) }, options:{ responsive:true, maintainAspectRatio:false, scales:{ x:{type:'category',ticks:{color:c.txt+'aa'}}, y:{min:0,max:100,grid:{color:c.grid},ticks:{color:c.txt+'aa',callback:(v)=>v+'%'}} }, plugins:{ legend:{position:'bottom',labels:{color:c.txt}}, tooltip:{callbacks:{label:(ctx)=>ctx.dataset.label+': '+ctx.parsed.y+'%'}} } } }))
 
       void key
     }
 
     render().catch(console.error)
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+      // Unmount / theme switch: release the canvases and their ResizeObservers
+      destroyCharts(charts)
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme])
 
