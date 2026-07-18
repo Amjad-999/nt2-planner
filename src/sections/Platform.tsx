@@ -9,8 +9,8 @@ export default function Platform() {
           <p style={{ fontSize:'1rem', color:'#C8BFAA', marginBottom:18, lineHeight:1.65 }}>
             هنا أدرس <strong style={{ color:'#C7CCFF' }}>كل دروسي من الكتب</strong> وأحلّ <strong style={{ color:'#C7CCFF' }}>كل التمارين</strong> — 90% من وقت دراستي يمرّ عبر هذه المنصّة.
           </p>
-          <a href="https://leren.kleurrijker.nl/my/" target="_blank" rel="noopener noreferrer"
-            style={{ display:'inline-flex', alignItems:'center', gap:6, background:'var(--grad-primary)', color:'#fff', border:'none', borderRadius:14, padding:'13px 22px', fontWeight:600, fontSize:'.95rem', textDecoration:'none', boxShadow:'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }}>
+          <a href="https://leren.kleurrijker.nl/my/" target="_blank" rel="noopener noreferrer" className="btn-shine"
+            style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(255,255,255,.15)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid rgba(255,255,255,.3)', color:'#fff', borderRadius:14, padding:'13px 22px', fontWeight:700, fontSize:'.95rem', textDecoration:'none', boxShadow:'var(--elev-1), inset 0 1px 0 rgba(255,255,255,.2)' }}>
             🚀 افتح المنصّة الآن <span style={{ marginInlineStart:6 }}>↗</span>
           </a>
           <div style={{ marginTop:14, fontSize:'.84rem', color:'#A89F8C', display:'flex', alignItems:'center', gap:6 }}>

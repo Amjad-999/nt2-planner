@@ -22,16 +22,19 @@
      equivalent of the dark spec rgba(255,255,255,.08)) */
   --topbar-bg:rgba(255,255,255,.5);
   --overlay-bg:rgba(38,36,32,.45);
-  /* Page mesh per glass spec: warm orange at 20% 30%, soft purple at 80% 20% */
-  --mesh1:hsla(30,80%,70%,.3);--mesh2:hsla(260,60%,60%,.2);
-  --glass-bg:rgba(255,255,255,.55);--glass-bg-strong:rgba(255,255,255,.78);
-  --glass-border:rgba(255,255,255,.65);--glass-hi:rgba(255,255,255,.55);
-  /* Glass buttons — light equivalents of the dark spec (bg .15 / border .3) */
-  --btn-bg:rgba(255,255,255,.6);--btn-border:rgba(255,255,255,.8);
+  /* Page mesh per glass spec: orange 20% 30% · purple 80% 20% · teal 50% 80%.
+     Alphas boosted ~1.5x so the glass actually reads over the light base. */
+  --mesh1:hsla(30,80%,70%,.45);--mesh2:hsla(260,60%,60%,.3);--mesh3:hsla(190,70%,60%,.3);
+  /* Cards per spec literal: bg .1 white + border .2 white (both themes) */
+  --glass-bg:rgba(255,255,255,.1);--glass-bg-strong:rgba(255,255,255,.72);
+  --glass-border:rgba(255,255,255,.2);--glass-hi:rgba(255,255,255,.55);
+  /* Glass buttons — light glass slightly denser than the dark spec so they
+     stay discernible on blurred light surfaces */
+  --btn-bg:rgba(255,255,255,.45);--btn-border:rgba(255,255,255,.75);
   /* Glass modals — light equivalents of the dark spec (bg .05 / border .25) */
   --modal-bg:rgba(255,255,255,.65);--modal-border:rgba(255,255,255,.75);
-  /* Card shadow per glass spec: 0 8px 32px @ 10% (warm hue) + contact shadow */
-  --elev-1:0 8px 32px rgba(40,36,30,.10), 0 2px 8px rgba(40,36,30,.05);
+  /* Card shadow per glass spec literal: 0 8px 32px rgba(0,0,0,.1) + contact */
+  --elev-1:0 8px 32px rgba(0,0,0,.1), 0 2px 8px rgba(0,0,0,.05);
   --elev-2:0 8px 24px rgba(40,36,30,.12), 0 3px 8px rgba(40,36,30,.07);
   --elev-3:0 28px 64px rgba(40,36,30,.22), 0 12px 28px rgba(40,36,30,.12);
   --ring-primary:rgba(245,143,32,.26);
@@ -78,9 +81,9 @@
   --topbar-bg:rgba(255,255,255,.08);
   --overlay-bg:rgba(8,8,7,.6);
   /* Same spec hues, tuned down so they glow instead of wash out the dark bg */
-  --mesh1:hsla(30,80%,62%,.2);--mesh2:hsla(260,60%,58%,.16);
+  --mesh1:hsla(30,80%,62%,.22);--mesh2:hsla(260,60%,58%,.18);--mesh3:hsla(190,70%,55%,.14);
   --glass-bg:rgba(255,255,255,.1);--glass-bg-strong:rgba(255,255,255,.14);
-  --glass-border:rgba(255,255,255,.18);--glass-hi:rgba(255,255,255,.12);
+  --glass-border:rgba(255,255,255,.2);--glass-hi:rgba(255,255,255,.12);
   /* Glass buttons per spec: bg rgba(255,255,255,.15), border rgba(255,255,255,.3) */
   --btn-bg:rgba(255,255,255,.15);--btn-border:rgba(255,255,255,.3);
   /* Glass modals per spec: bg rgba(255,255,255,.05), border rgba(255,255,255,.25) */

@@ -14,10 +14,10 @@ const inp: React.CSSProperties = {
   background: 'var(--surface)', color: 'var(--text)', fontFamily: 'inherit', fontSize: '.92rem', marginBottom: 8, direction: 'ltr',
 }
 const btn = (primary = false): React.CSSProperties => ({
-  background: primary ? 'var(--grad-primary)' : 'var(--btn-bg)', color: primary ? '#fff' : 'var(--text2)',
-  border: primary ? 'none' : '1px solid var(--btn-border)', borderRadius: 8, padding: '9px 16px',
-  backdropFilter: primary ? undefined : 'blur(10px)', WebkitBackdropFilter: primary ? undefined : 'blur(10px)',
-  fontWeight: 600, fontSize: '.85rem', fontFamily: 'inherit', cursor: 'pointer',
+  background: 'var(--btn-bg)', color: primary ? 'var(--text)' : 'var(--text2)',
+  border: '1px solid var(--btn-border)', borderRadius: 8, padding: '9px 16px',
+  backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+  fontWeight: primary ? 700 : 600, fontSize: '.85rem', fontFamily: 'inherit', cursor: 'pointer',
 })
 
 export function CloudPanel() {

@@ -54,7 +54,7 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Mesh gradient background */
+/* Mesh gradient background — three drifting colour blobs per the glass spec */
 html { background: var(--bg); }
 body::before {
   content: '';
@@ -64,7 +64,19 @@ body::before {
   pointer-events: none;
   background:
     radial-gradient(at 20% 30%, var(--mesh1) 0%, transparent 50%),
-    radial-gradient(at 80% 20%, var(--mesh2) 0%, transparent 50%);
+    radial-gradient(at 80% 20%, var(--mesh2) 0%, transparent 50%),
+    radial-gradient(at 50% 80%, var(--mesh3) 0%, transparent 50%);
+  background-size: 200% 200%;
+  animation: mesh-move 15s ease infinite;
+}
+@keyframes mesh-move {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+/* Touch devices: keep the mesh but stop the drift — a full-screen
+   background-position animation repaints every frame and drains battery */
+@media (pointer: coarse) {
+  body::before { animation: none; }
 }
 
 /* ── Focus ── */

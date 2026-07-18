@@ -102,14 +102,14 @@ function ReadingView({ s }: { s: S }) {
             {t.questions.map((q, qi) => {
               const sel = ans[qi]
               return (
-                <div key={qi} style={{ margin:'14px 0', padding:14, background:'var(--glass-bg-strong)', border:'1px solid var(--glass-border)', borderRadius:14, boxShadow:'var(--elev-1)' }}>
+                <div key={qi} style={{ margin:'14px 0', padding:14, background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:14, boxShadow:'var(--elev-1)' }}>
                   {/* Dutch question → LTR, no Arabic translation */}
                   <div dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', fontWeight:500, color:'var(--text)', marginBottom:10, fontSize:'.93rem', lineHeight:1.55 }}>
                     {qi+1}. {q.q}
                   </div>
                   <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
                     {q.opts.map((o, oi) => {
-                      let bg='var(--glass-bg-strong)', bc='var(--border)'
+                      let bg='var(--btn-bg)', bc='var(--border)'
                       if (sel!==undefined){if(oi===q.correct){bg='var(--green-l)';bc='var(--green)'}else if(oi===sel){bg='var(--red-l)';bc='var(--red)'}}
                       return (
                         <label key={oi} dir="ltr" lang="nl" style={{ display:'flex', alignItems:'flex-start', gap:8, padding:'9px 12px', border:`1px solid ${bc}`, borderRadius:12, background:bg, cursor:'pointer', fontFamily:'var(--font-latin)', fontSize:'.88rem', color:'var(--text)', transition:'.15s' }}>
@@ -155,13 +155,13 @@ function ListeningView({ s }: { s: S }) {
             {it.questions.map((q,qi) => {
               const sel = ans[qi]
               return (
-                <div key={qi} style={{ margin:'14px 0', padding:14, background:'var(--glass-bg-strong)', border:'1px solid var(--glass-border)', borderRadius:14, boxShadow:'var(--elev-1)' }}>
+                <div key={qi} style={{ margin:'14px 0', padding:14, background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:14, boxShadow:'var(--elev-1)' }}>
                   <div dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', fontWeight:500, color:'var(--text)', marginBottom:10, fontSize:'.93rem', lineHeight:1.55 }}>
                     {qi+1}. {q.q}
                   </div>
                   <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
                     {q.opts.map((o,oi) => {
-                      let bg='var(--glass-bg-strong)',bc='var(--border)'
+                      let bg='var(--btn-bg)',bc='var(--border)'
                       if(sel!==undefined){if(oi===q.correct){bg='var(--green-l)';bc='var(--green)'}else if(oi===sel){bg='var(--red-l)';bc='var(--red)'}}
                       return (
                         <label key={oi} dir="ltr" lang="nl" style={{ display:'flex', alignItems:'flex-start', gap:8, padding:'9px 12px', border:`1px solid ${bc}`, borderRadius:12, background:bg, cursor:'pointer', fontFamily:'var(--font-latin)', fontSize:'.88rem', color:'var(--text)', transition:'.15s' }}>
@@ -413,5 +413,5 @@ function GhostBtn({ children, onClick }: { children: React.ReactNode; onClick: (
   return <button onClick={onClick} className="btn-glass" style={{ borderRadius:10, padding:'7px 12px', cursor:'pointer', fontSize:'var(--text-sm)', color:'var(--text2)', fontFamily:'inherit' }}>{children}</button>
 }
 function PrimaryBtn({ children, onClick }: { children: React.ReactNode; onClick: ()=>void }) {
-  return <button onClick={onClick} className="btn-shine" style={{ background:'var(--grad-primary)', color:'#fff', border:'none', borderRadius:10, padding:'7px 12px', cursor:'pointer', fontSize:'var(--text-sm)', fontWeight:600, fontFamily:'inherit' }}>{children}</button>
+  return <button onClick={onClick} className="btn-glass" style={{ borderRadius:10, padding:'7px 12px', cursor:'pointer', fontSize:'var(--text-sm)', fontWeight:700, color:'var(--text)', fontFamily:'inherit' }}>{children}</button>
 }

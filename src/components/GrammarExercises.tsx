@@ -103,7 +103,7 @@ export function GrammarExercises({ lessonId }: Props) {
                     placeholder="اكتب الإجابة…"
                     style={{ flex: 1, minWidth: 140, padding: '9px 12px', border: `1px solid ${done ? (st?.correct ? 'var(--green)' : 'var(--red)') : 'var(--border2)'}`, borderRadius: 8, background: 'var(--surface)', color: 'var(--text)', fontFamily: 'inherit', fontSize: '.95rem' }} />
                   <button disabled={done} onClick={() => answerGap(i, ex.answer, ex.accept ?? [])} className="btn-shine"
-                    style={{ background: done ? 'var(--surface3)' : 'var(--grad-primary)', color: done ? 'var(--muted)' : '#fff', border: 'none', borderRadius: 8, padding: '9px 18px', fontWeight: 600, fontSize: '.85rem', fontFamily: 'inherit', cursor: done ? 'default' : 'pointer' }}>تحقّق</button>
+                    style={{ background: done ? 'var(--surface3)' : 'var(--btn-bg)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', color: done ? 'var(--muted)' : 'var(--text)', border: '1px solid var(--btn-border)', borderRadius: 8, padding: '9px 18px', fontWeight: 700, fontSize: '.85rem', fontFamily: 'inherit', cursor: done ? 'default' : 'pointer' }}>تحقّق</button>
                 </div>
               )}
 

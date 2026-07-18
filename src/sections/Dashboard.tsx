@@ -145,9 +145,8 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
         ].map((b) => (
           <Magnetic key={b.label} strength={0.15} maxShift={4}>
             <button onClick={b.action}
-              className="btn-shine w-full py-2.5 px-4 rounded-xl font-semibold cursor-pointer font-[inherit] text-[.9rem] border transition-all hover:-translate-y-0.5"
-              style={b.primary ? { background:'var(--grad-primary)', color:'#fff', border:'none', boxShadow:'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }
-                : { background:'var(--btn-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', color:'var(--text2)', borderColor:'var(--btn-border)', boxShadow:'var(--elev-1)' }}
+              className="btn-shine w-full py-2.5 px-4 rounded-xl cursor-pointer font-[inherit] text-[.9rem] border transition-all hover:-translate-y-0.5"
+              style={{ background:'var(--btn-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', color: b.primary ? 'var(--text)' : 'var(--text2)', fontWeight: b.primary ? 700 : 600, borderColor:'var(--btn-border)', boxShadow: b.primary ? 'var(--elev-1), inset 0 1px 0 var(--glass-hi)' : 'var(--elev-1)' }}
             >{b.label}</button>
           </Magnetic>
         ))}

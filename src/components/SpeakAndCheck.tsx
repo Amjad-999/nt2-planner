@@ -176,7 +176,7 @@ export function SpeakAndCheck({ targetNl, label }: Props) {
           style={{
             marginTop: 8,
             padding: '7px 10px',
-            background: 'var(--glass-bg-strong)',
+            background: 'var(--glass-bg)',
             border: '1px solid var(--glass-border)',
             borderRadius: 8,
             fontSize: '.88rem',

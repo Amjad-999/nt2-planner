@@ -33,7 +33,7 @@ export function StudyTimeModal({ onClose }: Props) {
       </div>
       <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
         <button onClick={onClose} className="btn-shine" style={{ background:'var(--btn-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--btn-border)', borderRadius:14, padding:'10px 18px', cursor:'pointer', fontSize:'.9rem', color:'var(--text2)', fontFamily:'inherit' }}>إلغاء</button>
-        <button onClick={add} className="btn-shine" style={{ background:'var(--grad-primary)', color:'#fff', border:'none', borderRadius:14, padding:'10px 18px', fontWeight:600, cursor:'pointer', fontSize:'.9rem' }}>إضافة</button>
+        <button onClick={add} className="btn-glass" style={{ borderRadius:14, padding:'10px 18px', fontWeight:700, color:'var(--text)', cursor:'pointer', fontSize:'.9rem', fontFamily:'inherit' }}>إضافة</button>
       </div>
     </Overlay>
   )

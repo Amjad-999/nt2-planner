@@ -122,7 +122,7 @@ export default function Vocab() {
           )}
 
           {filteredBank.length === 0 ? (
-            <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--r-sm)', padding:'14px 18px', fontSize:'.9rem', color:'var(--text2)' }}>
+            <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r-sm)', padding:'14px 18px', fontSize:'.9rem', color:'var(--text2)' }}>
               {vocab.length === 0
                 ? '📚 بنك مفرداتك فارغ — استخدم خانة AI أعلاه لإضافة كلمات هولندية.'
                 : '🔍 لا توجد كلمات تطابق بحثك.'}
@@ -149,7 +149,7 @@ export default function Vocab() {
           ? <div style={{ background:'var(--green-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--green)', borderRadius:'var(--r-sm)', padding:'14px 18px', fontSize:'.9rem', color:'var(--text2)' }}>✅ لا توجد كلمات مستحقّة للمراجعة الآن — أحسنت! عُد لاحقًا.</div>
           : <div>
               <div style={{ background:'var(--orange-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--orange)', borderRadius:'var(--r-sm)', padding:'14px 18px', marginBottom:12, fontSize:'.9rem', color:'var(--text2)' }}>⏰ <strong style={{ color:'var(--text)' }}>{dueWords.length} كلمة</strong> مستحقّة للمراجعة الآن.</div>
-              <button onClick={() => setView('review')} className="btn-shine" style={{ background:'var(--grad-primary)', color:'#fff', border:'none', borderRadius:14, padding:'10px 20px', fontWeight:600, cursor:'pointer', fontSize:'.9rem', boxShadow:'var(--elev-2)' }}>🎴 ابدأ المراجعة</button>
+              <button onClick={() => setView('review')} className="btn-glass" style={{ borderRadius:14, padding:'10px 20px', fontWeight:700, color:'var(--text)', cursor:'pointer', fontSize:'.9rem', fontFamily:'inherit', boxShadow:'var(--elev-1)' }}>🎴 ابدأ المراجعة</button>
             </div>
       )}
 

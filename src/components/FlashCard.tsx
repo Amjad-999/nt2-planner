@@ -121,7 +121,7 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
   return (
     <div
       className="max-w-[420px] mx-auto text-center"
-      style={{ position: 'relative', background: 'var(--glass-bg-strong)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r)', padding: '32px 18px', boxShadow: 'var(--elev-2)' }}
+      style={{ position: 'relative', background: 'var(--glass-bg)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r)', padding: '32px 18px', boxShadow: 'var(--elev-2)' }}
     >
       {/* Progress + help button row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -237,8 +237,8 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
           <motion.div key="front" className="mt-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <button
               onClick={() => setFlipped(true)}
-              className="btn-shine font-semibold text-white px-6 py-2.5 rounded-[14px] cursor-pointer border-0"
-              style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }}
+              className="btn-glass font-bold text-[var(--text)] px-6 py-2.5 rounded-[14px] cursor-pointer"
+              style={{ boxShadow: 'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}
             >
               اقلب البطاقة <span aria-hidden="true" style={{ opacity: .65, fontSize: '.8rem', marginInlineStart: 6 }}>Space</span>
             </button>

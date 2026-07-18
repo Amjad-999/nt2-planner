@@ -215,7 +215,9 @@ export function WaveAudio({ src, audioBuffer, title }: Props) {
       dir="ltr"
       aria-label={title ?? 'مشغّل صوتي'}
       style={{
-        background: 'var(--glass-bg-strong)',
+        background: 'var(--glass-bg)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         border: '1px solid var(--glass-border)',
         borderRadius: 'var(--r-sm)',
         padding: '10px 12px',

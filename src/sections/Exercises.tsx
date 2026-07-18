@@ -51,7 +51,7 @@ const SORT_SENTENCES = EXAM_SPEAKING
 
 // ── Shared token styles ──────────────────────────────────────────────────────
 function chip(active = false, correct?: boolean, incorrect?: boolean): React.CSSProperties {
-  let bg = 'var(--glass-bg-strong)'
+  let bg = 'var(--btn-bg)'
   let bc = 'var(--border2)'
   let color = 'var(--text)'
   if (active)    { bg = 'var(--orange-l)'; bc = 'var(--orange)'; color = 'var(--orange)' }
@@ -86,9 +86,9 @@ function ScoreBadge({ correct, total }: { correct: number; total: number }) {
 
 function ResetBtn({ onClick }: { onClick: () => void }) {
   return (
-    <button onClick={onClick} className="btn-shine"
-      style={{ background: 'var(--grad-primary)', color: '#fff', border: 'none', borderRadius: 12,
-        padding: '9px 22px', fontWeight: 600, fontSize: '.88rem', cursor: 'pointer', fontFamily: 'inherit' }}>
+    <button onClick={onClick} className="btn-glass"
+      style={{ borderRadius: 12, color: 'var(--text)',
+        padding: '9px 22px', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer', fontFamily: 'inherit' }}>
       🔄 حاول مجدّدًا
     </button>
   )
@@ -307,10 +307,11 @@ function MatchingExercise() {
             className="btn-shine"
             aria-label={`تحقّق من ${placedCount} من ${s.pairs.length} إجابة`}
             style={{
-              background: placedCount < s.pairs.length ? 'var(--surface3)' : 'var(--grad-primary)',
-              color: placedCount < s.pairs.length ? 'var(--muted)' : '#fff',
-              border: 'none', borderRadius: 12, padding: '9px 22px',
-              fontWeight: 600, fontSize: '.88rem', cursor: placedCount < s.pairs.length ? 'not-allowed' : 'pointer',
+              background: placedCount < s.pairs.length ? 'var(--surface3)' : 'var(--btn-bg)',
+              backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+              color: placedCount < s.pairs.length ? 'var(--muted)' : 'var(--text)',
+              border: '1px solid var(--btn-border)', borderRadius: 12, padding: '9px 22px',
+              fontWeight: 700, fontSize: '.88rem', cursor: placedCount < s.pairs.length ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit',
             }}
           >
@@ -489,9 +490,9 @@ function SortingExercise() {
         {!checked && (
           <button
             onClick={() => setChecked(true)}
-            className="btn-shine"
-            style={{ background: 'var(--grad-primary)', color: '#fff', border: 'none', borderRadius: 12,
-              padding: '9px 22px', fontWeight: 600, fontSize: '.88rem', cursor: 'pointer', fontFamily: 'inherit' }}>
+            className="btn-glass"
+            style={{ color: 'var(--text)', borderRadius: 12,
+              padding: '9px 22px', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer', fontFamily: 'inherit' }}>
             ✅ تحقّق
           </button>
         )}
@@ -709,10 +710,11 @@ function FillGapExercise() {
             disabled={!placed}
             className="btn-shine"
             style={{
-              background: placed ? 'var(--grad-primary)' : 'var(--surface3)',
-              color: placed ? '#fff' : 'var(--muted)',
-              border: 'none', borderRadius: 12, padding: '9px 22px',
-              fontWeight: 600, fontSize: '.88rem',
+              background: placed ? 'var(--btn-bg)' : 'var(--surface3)',
+              backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+              color: placed ? 'var(--text)' : 'var(--muted)',
+              border: '1px solid var(--btn-border)', borderRadius: 12, padding: '9px 22px',
+              fontWeight: 700, fontSize: '.88rem',
               cursor: placed ? 'pointer' : 'not-allowed', fontFamily: 'inherit',
             }}
           >

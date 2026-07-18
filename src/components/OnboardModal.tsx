@@ -37,7 +37,7 @@ export function OnboardModal({ onClose }: Props) {
         <input type="number" value={planDay} onChange={(e)=>setPlanDay(e.target.value)} min={1} max={46} style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)' }} />
       </Field>
       <div style={{ display:'flex', justifyContent:'flex-end', marginTop:18 }}>
-        <button onClick={save} className="btn-shine" style={{ background:'var(--grad-primary)', color:'#fff', border:'none', borderRadius:14, padding:'10px 22px', fontWeight:600, cursor:'pointer', fontSize:'.9rem', boxShadow:'var(--elev-2)' }}>🚀 ابدأ الآن</button>
+        <button onClick={save} className="btn-glass" style={{ borderRadius:14, padding:'10px 22px', fontWeight:700, color:'var(--text)', cursor:'pointer', fontSize:'.9rem', fontFamily:'inherit', boxShadow:'var(--elev-1)' }}>🚀 ابدأ الآن</button>
       </div>
     </Overlay>
   )

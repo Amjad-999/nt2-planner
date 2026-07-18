@@ -163,7 +163,7 @@ export function Field({ label, children }: { label: string; children: React.Reac
 // eslint-disable-next-line react-refresh/only-export-components -- مساعد أنماط (ليس مكوّنًا)
 export function btnStyle(variant: 'primary'|'ghost'|'danger') {
   const base = { display:'inline-flex', alignItems:'center', justifyContent:'center', gap:6, padding:'10px 18px', borderRadius:14, fontFamily:'inherit', fontSize:'.9rem', fontWeight:600, cursor:'pointer', border:'1px solid transparent', transition:'.18s' } as const
-  if (variant==='primary') return { ...base, background:'var(--grad-primary)', color:'#fff', border:'none', boxShadow:'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }
+  if (variant==='primary') return { ...base, background:'var(--btn-bg)', backdropFilter:'blur(10px)' as const, WebkitBackdropFilter:'blur(10px)' as const, color:'var(--text)', fontWeight:700, borderColor:'var(--btn-border)', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }
   if (variant==='danger') return { ...base, background:'transparent', color:'var(--red)', borderColor:'var(--red)' }
   return { ...base, background:'var(--btn-bg)', backdropFilter:'blur(10px)' as const, WebkitBackdropFilter:'blur(10px)' as const, color:'var(--text2)', borderColor:'var(--btn-border)', boxShadow:'var(--elev-1)' }
 }

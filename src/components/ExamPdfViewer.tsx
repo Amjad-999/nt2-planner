@@ -111,7 +111,9 @@ export function ExamPdfViewer({ src, title }: Props) {
           alignItems: 'center',
           gap: 4,
           padding: '8px 10px',
-          background: 'var(--glass-bg-strong)',
+          background: 'var(--glass-bg)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
           borderBottom: '1px solid var(--glass-border)',
           flexWrap: 'wrap',
         }}
@@ -207,7 +209,9 @@ export function ExamPdfViewer({ src, title }: Props) {
             gap: 8,
             padding: '8px',
             borderTop: '1px solid var(--glass-border)',
-            background: 'var(--glass-bg-strong)',
+            background: 'var(--glass-bg)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
           }}
         >
           <TbBtn onClick={prev} disabled={page <= 1} aria-label="الصفحة السابقة"

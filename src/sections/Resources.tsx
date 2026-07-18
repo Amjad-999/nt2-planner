@@ -183,9 +183,9 @@ function ExamCard({
     <div
       className="relative overflow-hidden glow-card"
       style={{
-        background: 'var(--glass-bg-strong)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
+        background: 'var(--glass-bg)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         border: '1px solid var(--glass-border)',
         borderRadius: 'var(--r-sm)',
         padding: '14px 14px 12px',

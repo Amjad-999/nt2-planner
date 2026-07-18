@@ -76,14 +76,12 @@ export class TabErrorBoundary extends Component<Props, State> {
             )}
             <button
               onClick={this.reset}
-              className="btn-shine"
+              className="btn-glass"
               style={{
-                background: 'var(--grad-primary)',
-                color: '#fff',
-                border: 'none',
+                color: 'var(--text)',
                 borderRadius: 12,
                 padding: '9px 22px',
-                fontWeight: 600,
+                fontWeight: 700,
                 fontSize: '.9rem',
                 cursor: 'pointer',
                 fontFamily: 'inherit',

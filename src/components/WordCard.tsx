@@ -48,7 +48,9 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4, hlNl,
     <motion.div
       className="rounded-[10px] p-[12px_14px] mb-2"
       style={{
-        background: 'var(--glass-bg-strong)',
+        /* glass tint without backdrop blur — these cards render by the
+           hundreds in the vocab list; blurring each would kill scrolling */
+        background: 'var(--glass-bg)',
         border: '1px solid var(--glass-border)',
         boxShadow: 'var(--elev-1)',
       }}
@@ -98,7 +100,7 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4, hlNl,
           {showAdd && onAdd && (
             <button
               onClick={() => onAdd(word)}
-              className="btn-shine text-[.8rem] px-3 py-1.5 rounded-[8px] border border-[var(--orange)] bg-[var(--orange)] text-white cursor-pointer font-semibold hover:brightness-110"
+              className="btn-glass text-[.8rem] px-3 py-1.5 rounded-[8px] text-[var(--text)] cursor-pointer font-bold"
             >➕ بنك</button>
           )}
           {onDelete && (

@@ -72,8 +72,8 @@ export function AiLookup() {
         />
         <button
           onClick={lookup} disabled={loading || !input.trim()}
-          className="btn-shine font-semibold text-white px-5 py-2.5 rounded-xl border-0 cursor-pointer disabled:opacity-60"
-          style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }}
+          className="btn-glass font-bold text-[var(--text)] px-5 py-2.5 rounded-xl cursor-pointer disabled:opacity-60"
+          style={{ boxShadow: 'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}
         >
           {loading ? '⏳' : '🔍 ابحث'}
         </button>
@@ -115,7 +115,7 @@ export function AiLookup() {
           )}
           <div className="flex gap-1.5 justify-end flex-wrap mt-2">
             <button onClick={addWithEdit} className="btn-glass text-[.8rem] px-3 py-1.5 rounded-[10px] text-[var(--text2)] cursor-pointer hover:text-[var(--orange)]">✏️ تعديل قبل الإضافة</button>
-            <button onClick={addNow} className="btn-shine text-[.8rem] px-3 py-1.5 rounded-[10px] border-0 text-white cursor-pointer font-semibold" style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-1), inset 0 1px 0 rgba(255,255,255,.35)' }}>➕ أضف إلى بنك المفردات</button>
+            <button onClick={addNow} className="btn-glass text-[.8rem] px-3 py-1.5 rounded-[10px] text-[var(--text)] cursor-pointer font-bold" style={{ boxShadow: 'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>➕ أضف إلى بنك المفردات</button>
           </div>
         </div>
       )}

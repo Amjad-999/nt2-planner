@@ -99,8 +99,8 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
         <Magnetic>
           <button
             onClick={onInstall}
-            className="btn-shine flex items-center gap-1.5 rounded-lg border-0 px-3.5 text-[.82rem] font-semibold text-white h-9 cursor-pointer"
-            style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }}
+            className="btn-glass flex items-center gap-1.5 rounded-lg px-3.5 text-[.82rem] font-bold text-[var(--text)] h-9 cursor-pointer"
+            style={{ boxShadow: 'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}
             aria-label="تثبيت التطبيق"
           >
             <AppIcon icon={DownloadSimple} size={16} />
