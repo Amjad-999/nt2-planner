@@ -62,7 +62,7 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4, hlNl,
             <button
               ref={btnRef}
               onClick={() => speakDutch(nl, btnRef.current)}
-              className="text-[.78rem] px-1.5 py-0.5 rounded border border-[var(--border2)] bg-[var(--surface)] text-[var(--muted)] cursor-pointer hover:text-[var(--orange)] hover:border-[var(--orange)]"
+              className="text-[.78rem] px-1.5 py-0.5 rounded border border-[var(--btn-border)] bg-[var(--btn-bg)] text-[var(--muted)] cursor-pointer hover:text-[var(--orange)] hover:border-[var(--orange)]"
               title="استمع للنطق"
               aria-label={`استمع لنطق ${nl}`}
             >🔊</button>
@@ -98,7 +98,7 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4, hlNl,
           {showAdd && onAdd && (
             <button
               onClick={() => onAdd(word)}
-              className="text-[.8rem] px-3 py-1.5 rounded-[8px] border border-[var(--orange)] bg-[var(--orange)] text-white cursor-pointer font-semibold hover:brightness-110"
+              className="btn-shine text-[.8rem] px-3 py-1.5 rounded-[8px] border border-[var(--orange)] bg-[var(--orange)] text-white cursor-pointer font-semibold hover:brightness-110"
             >➕ بنك</button>
           )}
           {onDelete && (

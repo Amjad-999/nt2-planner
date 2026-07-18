@@ -25,6 +25,8 @@
   --mesh1:rgba(245,143,32,.14);--mesh2:rgba(70,116,52,.11);--mesh3:rgba(245,143,32,.10);
   --glass-bg:rgba(255,255,255,.55);--glass-bg-strong:rgba(255,255,255,.78);
   --glass-border:rgba(255,255,255,.65);--glass-hi:rgba(255,255,255,.55);
+  /* Glass buttons — light equivalents of the dark spec (bg .15 / border .3) */
+  --btn-bg:rgba(255,255,255,.6);--btn-border:rgba(255,255,255,.8);
   /* Card shadow per glass spec: 0 8px 32px @ 10% (warm hue) + contact shadow */
   --elev-1:0 8px 32px rgba(40,36,30,.10), 0 2px 8px rgba(40,36,30,.05);
   --elev-2:0 8px 24px rgba(40,36,30,.12), 0 3px 8px rgba(40,36,30,.07);
@@ -75,6 +77,8 @@
   --mesh1:rgba(245,143,32,.18);--mesh2:rgba(111,168,79,.12);--mesh3:rgba(249,162,63,.14);
   --glass-bg:rgba(255,255,255,.1);--glass-bg-strong:rgba(255,255,255,.14);
   --glass-border:rgba(255,255,255,.18);--glass-hi:rgba(255,255,255,.12);
+  /* Glass buttons per spec: bg rgba(255,255,255,.15), border rgba(255,255,255,.3) */
+  --btn-bg:rgba(255,255,255,.15);--btn-border:rgba(255,255,255,.3);
   /* Same 8/32 glass shadow — higher alpha so it reads on the dark bg */
   --elev-1:0 8px 32px rgba(0,0,0,.45), 0 2px 8px rgba(0,0,0,.3);
   --elev-2:0 10px 28px rgba(0,0,0,.55), 0 4px 10px rgba(0,0,0,.4);

@@ -106,7 +106,7 @@ export function SettingsModal({ onClose }: Props) {
         </select>
       </Field>
       <div style={{ marginBottom:14 }}>
-        <button onClick={handleTest} style={btnStyle('primary')}>🔊 اختبر الصوت الآن</button>
+        <button onClick={handleTest} className="btn-shine" style={btnStyle('primary')}>🔊 اختبر الصوت الآن</button>
         {/* testAudio يعيد نصًّا عاديًّا — العرض كنصّ يمنع حقن أي HTML قادم من رسالة خطأ */}
         {testResult && <div style={{ marginTop:8, fontSize:'.84rem', color:'var(--muted)' }}>{testResult}</div>}
       </div>
@@ -114,8 +114,8 @@ export function SettingsModal({ onClose }: Props) {
       <details style={{ marginBottom:14 }}>
         <summary style={{ cursor:'pointer', color:'var(--text2)', fontSize:'.88rem' }}>إجراءات متقدّمة</summary>
         <div style={{ marginTop:10, display:'flex', gap:8, flexWrap:'wrap' }}>
-          <button onClick={handleExport} style={btnStyle('ghost')}>📥 تصدير بياناتي (JSON)</button>
-          <button onClick={()=>fileRef.current?.click()} style={btnStyle('ghost')}>📤 استيراد</button>
+          <button onClick={handleExport} className="btn-shine" style={btnStyle('ghost')}>📥 تصدير بياناتي (JSON)</button>
+          <button onClick={()=>fileRef.current?.click()} className="btn-shine" style={btnStyle('ghost')}>📤 استيراد</button>
           <input ref={fileRef} type="file" accept=".json" style={{ display:'none' }} onChange={handleImport} />
           <button onClick={handleReset} style={btnStyle('danger')}>🗑️ إعادة تعيين كاملة</button>
         </div>
@@ -129,8 +129,8 @@ export function SettingsModal({ onClose }: Props) {
       </div>
 
       <div style={{ display:'flex', gap:10, justifyContent:'flex-end', marginTop:14, flexWrap:'wrap' }}>
-        <button onClick={onClose} style={btnStyle('ghost')}>إلغاء</button>
-        <button onClick={save} style={btnStyle('primary')}>حفظ</button>
+        <button onClick={onClose} className="btn-shine" style={btnStyle('ghost')}>إلغاء</button>
+        <button onClick={save} className="btn-shine" style={btnStyle('primary')}>حفظ</button>
       </div>
     </Overlay>
   )
@@ -165,5 +165,5 @@ export function btnStyle(variant: 'primary'|'ghost'|'danger') {
   const base = { display:'inline-flex', alignItems:'center', justifyContent:'center', gap:6, padding:'10px 18px', borderRadius:14, fontFamily:'inherit', fontSize:'.9rem', fontWeight:600, cursor:'pointer', border:'1px solid transparent', transition:'.18s' } as const
   if (variant==='primary') return { ...base, background:'var(--grad-primary)', color:'#fff', border:'none', boxShadow:'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }
   if (variant==='danger') return { ...base, background:'transparent', color:'var(--red)', borderColor:'var(--red)' }
-  return { ...base, background:'var(--glass-bg)', backdropFilter:'blur(8px)' as const, WebkitBackdropFilter:'blur(8px)' as const, color:'var(--text2)', borderColor:'var(--glass-border)', boxShadow:'var(--elev-1)' }
+  return { ...base, background:'var(--btn-bg)', backdropFilter:'blur(10px)' as const, WebkitBackdropFilter:'blur(10px)' as const, color:'var(--text2)', borderColor:'var(--btn-border)', boxShadow:'var(--elev-1)' }
 }

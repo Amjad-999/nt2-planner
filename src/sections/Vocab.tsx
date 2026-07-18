@@ -149,7 +149,7 @@ export default function Vocab() {
           ? <div style={{ background:'var(--green-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--green)', borderRadius:'var(--r-sm)', padding:'14px 18px', fontSize:'.9rem', color:'var(--text2)' }}>✅ لا توجد كلمات مستحقّة للمراجعة الآن — أحسنت! عُد لاحقًا.</div>
           : <div>
               <div style={{ background:'var(--orange-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--orange)', borderRadius:'var(--r-sm)', padding:'14px 18px', marginBottom:12, fontSize:'.9rem', color:'var(--text2)' }}>⏰ <strong style={{ color:'var(--text)' }}>{dueWords.length} كلمة</strong> مستحقّة للمراجعة الآن.</div>
-              <button onClick={() => setView('review')} style={{ background:'var(--grad-primary)', color:'#fff', border:'none', borderRadius:14, padding:'10px 20px', fontWeight:600, cursor:'pointer', fontSize:'.9rem', boxShadow:'var(--elev-2)' }}>🎴 ابدأ المراجعة</button>
+              <button onClick={() => setView('review')} className="btn-shine" style={{ background:'var(--grad-primary)', color:'#fff', border:'none', borderRadius:14, padding:'10px 20px', fontWeight:600, cursor:'pointer', fontSize:'.9rem', boxShadow:'var(--elev-2)' }}>🎴 ابدأ المراجعة</button>
             </div>
       )}
 
@@ -168,7 +168,7 @@ export default function Vocab() {
           <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:12 }}>
             {B1_THEMAS.map((t, i) => (
               <button key={i} onClick={() => setSelectedThema(i)}
-                style={{ background: i===selectedThema ? 'var(--grad-primary)' : 'var(--glass-bg)', color: i===selectedThema ? '#fff' : 'var(--text2)', border:'1px solid var(--glass-border)', borderRadius:10, padding:'7px 12px', fontSize:'.85rem', cursor:'pointer', fontFamily:'inherit', fontWeight: i===selectedThema ? 600 : 500 }}>
+                style={{ background: i===selectedThema ? 'var(--grad-primary)' : 'var(--btn-bg)', color: i===selectedThema ? '#fff' : 'var(--text2)', border:'1px solid var(--btn-border)', borderRadius:10, padding:'7px 12px', fontSize:'.85rem', cursor:'pointer', fontFamily:'inherit', fontWeight: i===selectedThema ? 600 : 500 }}>
                 {t.nl} <span style={{ opacity:.7 }}>({t.ar})</span>
               </button>
             ))}

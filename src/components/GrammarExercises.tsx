@@ -84,7 +84,7 @@ export function GrammarExercises({ lessonId }: Props) {
                   {ex.options.map((opt, oi) => {
                     const showCorrect = done && oi === ex.answer
                     const showWrong = done && st?.chosen === oi && oi !== ex.answer
-                    let bg = 'var(--glass-bg-strong)'; let bc = 'var(--border2)'; let col = 'var(--text)'
+                    let bg = 'var(--btn-bg)'; let bc = 'var(--btn-border)'; let col = 'var(--text)'
                     if (showCorrect) { bg = 'var(--green-l)'; bc = 'var(--green)'; col = 'var(--green)' }
                     if (showWrong) { bg = 'var(--red-l)'; bc = 'var(--red)'; col = 'var(--red)' }
                     return (
@@ -102,7 +102,7 @@ export function GrammarExercises({ lessonId }: Props) {
                     onKeyDown={e => { if (e.key === 'Enter') answerGap(i, ex.answer, ex.accept ?? []) }}
                     placeholder="اكتب الإجابة…"
                     style={{ flex: 1, minWidth: 140, padding: '9px 12px', border: `1px solid ${done ? (st?.correct ? 'var(--green)' : 'var(--red)') : 'var(--border2)'}`, borderRadius: 8, background: 'var(--surface)', color: 'var(--text)', fontFamily: 'inherit', fontSize: '.95rem' }} />
-                  <button disabled={done} onClick={() => answerGap(i, ex.answer, ex.accept ?? [])}
+                  <button disabled={done} onClick={() => answerGap(i, ex.answer, ex.accept ?? [])} className="btn-shine"
                     style={{ background: done ? 'var(--surface3)' : 'var(--grad-primary)', color: done ? 'var(--muted)' : '#fff', border: 'none', borderRadius: 8, padding: '9px 18px', fontWeight: 600, fontSize: '.85rem', fontFamily: 'inherit', cursor: done ? 'default' : 'pointer' }}>تحقّق</button>
                 </div>
               )}

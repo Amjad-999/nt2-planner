@@ -361,8 +361,9 @@ function TtsPlayer({ text, label = '🔊 استمع للنصّ' }: { text: strin
       aria-label={speaking ? 'أوقف الاستماع' : 'استمع للنصّ الهولندي'}
       style={{
         display:'inline-flex', alignItems:'center', gap:8, padding:'9px 16px', margin:'4px 0',
-        borderRadius:12, border:'1px solid var(--glass-border)', cursor:'pointer',
-        background: speaking ? 'var(--orange-l)' : 'var(--glass-bg-strong)',
+        borderRadius:12, border:'1px solid var(--btn-border)', cursor:'pointer',
+        backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)',
+        background: speaking ? 'var(--orange-l)' : 'var(--btn-bg)',
         color: speaking ? 'var(--orange)' : 'var(--text2)',
         fontFamily:'inherit', fontSize:'.88rem', fontWeight:600, boxShadow:'var(--elev-1)',
       }}
@@ -409,8 +410,8 @@ function Passage({ title, text, pre }: { title: string; text: string; pre?: bool
   )
 }
 function GhostBtn({ children, onClick }: { children: React.ReactNode; onClick: ()=>void }) {
-  return <button onClick={onClick} style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:10, padding:'7px 12px', cursor:'pointer', fontSize:'var(--text-sm)', color:'var(--text2)', fontFamily:'inherit' }}>{children}</button>
+  return <button onClick={onClick} className="btn-glass" style={{ borderRadius:10, padding:'7px 12px', cursor:'pointer', fontSize:'var(--text-sm)', color:'var(--text2)', fontFamily:'inherit' }}>{children}</button>
 }
 function PrimaryBtn({ children, onClick }: { children: React.ReactNode; onClick: ()=>void }) {
-  return <button onClick={onClick} style={{ background:'var(--grad-primary)', color:'#fff', border:'none', borderRadius:10, padding:'7px 12px', cursor:'pointer', fontSize:'var(--text-sm)', fontWeight:600, fontFamily:'inherit' }}>{children}</button>
+  return <button onClick={onClick} className="btn-shine" style={{ background:'var(--grad-primary)', color:'#fff', border:'none', borderRadius:10, padding:'7px 12px', cursor:'pointer', fontSize:'var(--text-sm)', fontWeight:600, fontFamily:'inherit' }}>{children}</button>
 }

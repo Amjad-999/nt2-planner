@@ -14,8 +14,9 @@ const inp: React.CSSProperties = {
   background: 'var(--surface)', color: 'var(--text)', fontFamily: 'inherit', fontSize: '.92rem', marginBottom: 8, direction: 'ltr',
 }
 const btn = (primary = false): React.CSSProperties => ({
-  background: primary ? 'var(--grad-primary)' : 'var(--surface)', color: primary ? '#fff' : 'var(--text2)',
-  border: primary ? 'none' : '1px solid var(--border2)', borderRadius: 8, padding: '9px 16px',
+  background: primary ? 'var(--grad-primary)' : 'var(--btn-bg)', color: primary ? '#fff' : 'var(--text2)',
+  border: primary ? 'none' : '1px solid var(--btn-border)', borderRadius: 8, padding: '9px 16px',
+  backdropFilter: primary ? undefined : 'blur(10px)', WebkitBackdropFilter: primary ? undefined : 'blur(10px)',
   fontWeight: 600, fontSize: '.85rem', fontFamily: 'inherit', cursor: 'pointer',
 })
 
@@ -46,9 +47,9 @@ export function CloudPanel() {
           <input style={inp} type="email" autoComplete="email" placeholder="البريد الإلكتروني" value={email} onChange={e => setEmail(e.target.value)} />
           <input style={inp} type="password" autoComplete="current-password" placeholder="كلمة المرور" value={password} onChange={e => setPassword(e.target.value)} />
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <button style={btn(true)} disabled={status === 'syncing'} onClick={() => signInEmail(email, password)}>تسجيل الدخول</button>
-            <button style={btn()} disabled={status === 'syncing'} onClick={() => signUpEmail(email, password)}>إنشاء حساب</button>
-            <button style={btn()} onClick={() => signInGoogle()}>المتابعة بحساب Google</button>
+            <button className="btn-shine" style={btn(true)} disabled={status === 'syncing'} onClick={() => signInEmail(email, password)}>تسجيل الدخول</button>
+            <button className="btn-shine" style={btn()} disabled={status === 'syncing'} onClick={() => signUpEmail(email, password)}>إنشاء حساب</button>
+            <button className="btn-shine" style={btn()} onClick={() => signInGoogle()}>المتابعة بحساب Google</button>
           </div>
         </div>
       ) : (
@@ -61,8 +62,8 @@ export function CloudPanel() {
             {lastSyncedAt ? ' · آخر مزامنة: ' + new Date(lastSyncedAt).toLocaleTimeString('ar-EG') : ''}
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <button style={btn(true)} disabled={status === 'syncing'} onClick={() => syncNow()}>مزامنة الآن</button>
-            <button style={btn()} onClick={() => signOut()}>تسجيل الخروج</button>
+            <button className="btn-shine" style={btn(true)} disabled={status === 'syncing'} onClick={() => syncNow()}>مزامنة الآن</button>
+            <button className="btn-shine" style={btn()} onClick={() => signOut()}>تسجيل الخروج</button>
           </div>
           {!confirmDel ? (
             <button style={{ ...btn(), color: 'var(--red)', borderColor: 'var(--red)', marginTop: 10 }} onClick={() => setConfirmDel(true)}>حذف بياناتي السحابية…</button>
@@ -71,7 +72,7 @@ export function CloudPanel() {
               <div style={{ fontSize: '.82rem', color: 'var(--text)', marginBottom: 8 }}>سيُحذف نسختك السحابية فقط — بياناتك المحلّية على هذا الجهاز تبقى. متابعة؟</div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button style={{ ...btn(), color: 'var(--red)', borderColor: 'var(--red)' }} onClick={() => { deleteCloud(); setConfirmDel(false) }}>نعم، احذف السحابي</button>
-                <button style={btn()} onClick={() => setConfirmDel(false)}>إلغاء</button>
+                <button className="btn-shine" style={btn()} onClick={() => setConfirmDel(false)}>إلغاء</button>
               </div>
             </div>
           )}

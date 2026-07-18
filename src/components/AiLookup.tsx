@@ -72,7 +72,7 @@ export function AiLookup() {
         />
         <button
           onClick={lookup} disabled={loading || !input.trim()}
-          className="font-semibold text-white px-5 py-2.5 rounded-xl border-0 cursor-pointer disabled:opacity-60"
+          className="btn-shine font-semibold text-white px-5 py-2.5 rounded-xl border-0 cursor-pointer disabled:opacity-60"
           style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }}
         >
           {loading ? '⏳' : '🔍 ابحث'}
@@ -84,7 +84,7 @@ export function AiLookup() {
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 14, marginTop: 10 }}>
           <div className="flex items-center gap-2 text-xl font-bold text-[var(--text)] mb-1">
             {result.nl}
-            <button ref={speakBtnRef} onClick={() => speakDutch(result.nl, speakBtnRef.current)} className="text-[.78rem] px-1.5 py-0.5 rounded border border-[var(--border2)] bg-[var(--surface)] text-[var(--muted)] cursor-pointer hover:text-[var(--orange)]">🔊</button>
+            <button ref={speakBtnRef} onClick={() => speakDutch(result.nl, speakBtnRef.current)} className="text-[.78rem] px-1.5 py-0.5 rounded border border-[var(--btn-border)] bg-[var(--btn-bg)] text-[var(--muted)] cursor-pointer hover:text-[var(--orange)]">🔊</button>
           </div>
           <div className="flex gap-1.5 flex-wrap mb-2">
             {result.article && <span style={{ background: 'var(--surface3)', color: 'var(--text2)', borderRadius: 99, padding: '2px 8px', fontSize: '.72rem', fontWeight: 600 }}>{result.article}</span>}
@@ -103,7 +103,7 @@ export function AiLookup() {
                     <button
                       onClick={(e) => speakDutch(ex.nl, e.currentTarget)}
                       aria-label="استمع لنطق الجملة"
-                      className="shrink-0 text-[.72rem] px-1.5 py-0.5 rounded border border-[var(--border2)] bg-[var(--surface)] text-[var(--muted)] cursor-pointer hover:text-[var(--orange)] hover:border-[var(--orange)]"
+                      className="shrink-0 text-[.72rem] px-1.5 py-0.5 rounded border border-[var(--btn-border)] bg-[var(--btn-bg)] text-[var(--muted)] cursor-pointer hover:text-[var(--orange)] hover:border-[var(--orange)]"
                     >🔊</button>
                   </div>
                   {ex.ar && <div className="text-[var(--muted)] text-[.82rem] mt-1">{ex.ar}</div>}
@@ -114,8 +114,8 @@ export function AiLookup() {
             result.exampleNL && <div className="text-[var(--text2)] text-[.88rem] py-2 px-2.5 rounded-md italic mb-1" style={{ background: 'var(--surface2)' }}>"{result.exampleNL}"</div>
           )}
           <div className="flex gap-1.5 justify-end flex-wrap mt-2">
-            <button onClick={addWithEdit} className="text-[.8rem] px-3 py-1.5 rounded-[10px] border border-[var(--border2)] bg-[var(--glass-bg)] text-[var(--text2)] cursor-pointer hover:text-[var(--orange)] hover:border-[var(--orange-m)]">✏️ تعديل قبل الإضافة</button>
-            <button onClick={addNow} className="text-[.8rem] px-3 py-1.5 rounded-[10px] border-0 text-white cursor-pointer font-semibold" style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-1), inset 0 1px 0 rgba(255,255,255,.35)' }}>➕ أضف إلى بنك المفردات</button>
+            <button onClick={addWithEdit} className="btn-glass text-[.8rem] px-3 py-1.5 rounded-[10px] text-[var(--text2)] cursor-pointer hover:text-[var(--orange)]">✏️ تعديل قبل الإضافة</button>
+            <button onClick={addNow} className="btn-shine text-[.8rem] px-3 py-1.5 rounded-[10px] border-0 text-white cursor-pointer font-semibold" style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-1), inset 0 1px 0 rgba(255,255,255,.35)' }}>➕ أضف إلى بنك المفردات</button>
           </div>
         </div>
       )}

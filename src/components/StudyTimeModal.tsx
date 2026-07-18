@@ -25,15 +25,15 @@ export function StudyTimeModal({ onClose }: Props) {
         style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)', marginBottom:10 }} />
       <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:18 }}>
         {[15,30,45,60].map((n)=>(
-          <button key={n} onClick={()=>setMins(String(n))}
-            style={{ background:'var(--glass-bg)', border:'1px solid var(--border2)', borderRadius:8, padding:'7px 12px', cursor:'pointer', fontSize:'.8rem', color:'var(--text2)', fontFamily:'inherit' }}>
+          <button key={n} onClick={()=>setMins(String(n))} className="btn-shine"
+            style={{ background:'var(--btn-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--btn-border)', borderRadius:8, padding:'7px 12px', cursor:'pointer', fontSize:'.8rem', color:'var(--text2)', fontFamily:'inherit' }}>
             + {n}
           </button>
         ))}
       </div>
       <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
-        <button onClick={onClose} style={{ background:'var(--glass-bg)', border:'1px solid var(--glass-border)', borderRadius:14, padding:'10px 18px', cursor:'pointer', fontSize:'.9rem', color:'var(--text2)', fontFamily:'inherit' }}>إلغاء</button>
-        <button onClick={add} style={{ background:'var(--grad-primary)', color:'#fff', border:'none', borderRadius:14, padding:'10px 18px', fontWeight:600, cursor:'pointer', fontSize:'.9rem' }}>إضافة</button>
+        <button onClick={onClose} className="btn-shine" style={{ background:'var(--btn-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--btn-border)', borderRadius:14, padding:'10px 18px', cursor:'pointer', fontSize:'.9rem', color:'var(--text2)', fontFamily:'inherit' }}>إلغاء</button>
+        <button onClick={add} className="btn-shine" style={{ background:'var(--grad-primary)', color:'#fff', border:'none', borderRadius:14, padding:'10px 18px', fontWeight:600, cursor:'pointer', fontSize:'.9rem' }}>إضافة</button>
       </div>
     </Overlay>
   )

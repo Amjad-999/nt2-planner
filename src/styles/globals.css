@@ -92,8 +92,8 @@ body::before {
 
 /* ── Backdrop filter fallback ── */
 @supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
-  :root { --glass-bg: rgba(255,255,255,.92); --glass-bg-strong: rgba(255,255,255,.97); --topbar-bg: rgba(255,255,255,.96); }
-  :root[data-theme="dark"] { --glass-bg: rgba(44,44,41,.94); --glass-bg-strong: rgba(44,44,41,.98); --topbar-bg: rgba(30,30,28,.97); }
+  :root { --glass-bg: rgba(255,255,255,.92); --glass-bg-strong: rgba(255,255,255,.97); --topbar-bg: rgba(255,255,255,.96); --btn-bg: rgba(255,255,255,.92); }
+  :root[data-theme="dark"] { --glass-bg: rgba(44,44,41,.94); --glass-bg-strong: rgba(44,44,41,.98); --topbar-bg: rgba(30,30,28,.97); --btn-bg: rgba(58,58,54,.94); }
 }
 
 /* ── Glass form controls ─────────────────────────────────────────────────
@@ -120,6 +120,37 @@ body::before {
   box-shadow: 0 0 0 3px var(--ring-primary);
 }
 .form-in option { background: var(--surface3); color: var(--text); }
+
+/* ── Glass buttons ────────────────────────────────────────────────────────
+   .btn-glass = translucent white chrome per the glass spec; values live in
+   --btn-bg / --btn-border so each theme supplies its own alpha.
+   .btn-shine = only the hover shine sweep — for primary gradient buttons
+   (and glass ones, which get it automatically). */
+.btn-glass {
+  background: var(--btn-bg);
+  /* standard property only — autoprefixer emits the -webkit- twin */
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--btn-border);
+}
+.btn-glass, .btn-shine { position: relative; overflow: hidden; }
+
+/* Shine: a skewed light strip parked off-canvas; hover sweeps it across.
+   The transition lives on the hover rule only, so it snaps back invisibly
+   on mouse-out instead of animating in reverse. */
+.btn-glass::after, .btn-shine::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: -70%;
+  width: 45%;
+  background: linear-gradient(105deg, transparent, rgba(255,255,255,.5), transparent);
+  transform: skewX(-18deg);
+  pointer-events: none;
+}
+.btn-glass:hover:not(:disabled)::after, .btn-shine:hover:not(:disabled)::after {
+  left: 130%;
+  transition: left .55s ease;
+}
 
 /* ── Glow card — cursor spotlight + hover accent ──────────────────────────
    Add class="glow-card" + position:relative + overflow:hidden to any card.

@@ -254,7 +254,7 @@ export function WaveAudio({ src, audioBuffer, title }: Props) {
               aria-label={`السرعة ${SPEED_LABELS[s]}`}
               style={{
                 ...ctrlBtn(false),
-                background: speed === s ? 'var(--orange)' : 'var(--glass-bg)',
+                background: speed === s ? 'var(--orange)' : 'var(--btn-bg)',
                 color:      speed === s ? '#fff' : 'var(--text2)',
                 fontSize: '.72rem',
                 padding: '4px 7px',
@@ -358,9 +358,11 @@ function ctrlBtn(disabled: boolean, fontSize = '.9rem'): React.CSSProperties {
     justifyContent: 'center',
     padding: '5px 9px',
     minWidth: 32,
-    border: '1px solid var(--border2)',
+    border: '1px solid var(--btn-border)',
     borderRadius: 8,
-    background: 'var(--glass-bg)',
+    background: 'var(--btn-bg)',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
     color: 'var(--text2)',
     cursor: disabled ? 'not-allowed' : 'pointer',
     opacity: disabled ? 0.45 : 1,

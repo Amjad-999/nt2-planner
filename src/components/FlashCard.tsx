@@ -133,8 +133,8 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
           aria-controls="flashcard-help"
           style={{
             width: 26, height: 26, borderRadius: '50%',
-            border: '1px solid var(--border2)',
-            background: helpOpen ? 'var(--orange-l)' : 'var(--glass-bg)',
+            border: '1px solid var(--btn-border)',
+            background: helpOpen ? 'var(--orange-l)' : 'var(--btn-bg)',
             color: helpOpen ? 'var(--orange)' : 'var(--muted)',
             cursor: 'pointer', fontSize: '.8rem', fontWeight: 700,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -198,7 +198,7 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>{nl}</div>
 
       <button ref={btnRef} onClick={() => speakDutch(nl, btnRef.current)}
-        className="text-[.8rem] px-3 py-1.5 rounded-[8px] border border-[var(--border2)] bg-[var(--surface)] text-[var(--muted)] cursor-pointer hover:text-[var(--orange)] hover:border-[var(--orange)]">
+        className="btn-glass text-[.8rem] px-3 py-1.5 rounded-[8px] text-[var(--muted)] cursor-pointer hover:text-[var(--orange)]">
         🔊 استمع
       </button>
 
@@ -237,7 +237,7 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
           <motion.div key="front" className="mt-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <button
               onClick={() => setFlipped(true)}
-              className="font-semibold text-white px-6 py-2.5 rounded-[14px] cursor-pointer border-0"
+              className="btn-shine font-semibold text-white px-6 py-2.5 rounded-[14px] cursor-pointer border-0"
               style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.4)' }}
             >
               اقلب البطاقة <span aria-hidden="true" style={{ opacity: .65, fontSize: '.8rem', marginInlineStart: 6 }}>Space</span>

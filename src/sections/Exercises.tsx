@@ -86,7 +86,7 @@ function ScoreBadge({ correct, total }: { correct: number; total: number }) {
 
 function ResetBtn({ onClick }: { onClick: () => void }) {
   return (
-    <button onClick={onClick}
+    <button onClick={onClick} className="btn-shine"
       style={{ background: 'var(--grad-primary)', color: '#fff', border: 'none', borderRadius: 12,
         padding: '9px 22px', fontWeight: 600, fontSize: '.88rem', cursor: 'pointer', fontFamily: 'inherit' }}>
       🔄 حاول مجدّدًا
@@ -304,6 +304,7 @@ function MatchingExercise() {
           <button
             onClick={check}
             disabled={placedCount < s.pairs.length}
+            className="btn-shine"
             aria-label={`تحقّق من ${placedCount} من ${s.pairs.length} إجابة`}
             style={{
               background: placedCount < s.pairs.length ? 'var(--surface3)' : 'var(--grad-primary)',
@@ -488,6 +489,7 @@ function SortingExercise() {
         {!checked && (
           <button
             onClick={() => setChecked(true)}
+            className="btn-shine"
             style={{ background: 'var(--grad-primary)', color: '#fff', border: 'none', borderRadius: 12,
               padding: '9px 22px', fontWeight: 600, fontSize: '.88rem', cursor: 'pointer', fontFamily: 'inherit' }}>
             ✅ تحقّق
@@ -705,6 +707,7 @@ function FillGapExercise() {
           <button
             onClick={check}
             disabled={!placed}
+            className="btn-shine"
             style={{
               background: placed ? 'var(--grad-primary)' : 'var(--surface3)',
               color: placed ? '#fff' : 'var(--muted)',

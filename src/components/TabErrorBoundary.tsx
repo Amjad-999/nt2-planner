@@ -76,6 +76,7 @@ export class TabErrorBoundary extends Component<Props, State> {
             )}
             <button
               onClick={this.reset}
+              className="btn-shine"
               style={{
                 background: 'var(--grad-primary)',
                 color: '#fff',

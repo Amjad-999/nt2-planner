@@ -124,7 +124,7 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
           onClick={startEdit}
           aria-label={`تعديل ${label}`}
           className="mt-2.5 inline-flex items-center gap-1 cursor-pointer text-[.72rem] font-semibold rounded-lg px-2.5 py-1"
-          style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', color: 'var(--orange)', boxShadow: 'var(--elev-1)' }}
+          style={{ background: 'var(--btn-bg)', border: '1px solid var(--btn-border)', color: 'var(--orange)', boxShadow: 'var(--elev-1)' }}
         >
           ✎ تعديل
         </button>
