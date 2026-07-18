@@ -6,7 +6,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function todayKey(d?: Date): string {
-  return (d ?? new Date()).toISOString().slice(0, 10)
+  // Local calendar date, NOT toISOString() (UTC): a user in Amsterdam
+  // studying at 00:30 local must land on today's key, not yesterday's.
+  // Same YYYY-MM-DD format as before, so stored keys stay compatible.
+  const x = d ?? new Date()
+  const m = String(x.getMonth() + 1).padStart(2, '0')
+  const day = String(x.getDate()).padStart(2, '0')
+  return `${x.getFullYear()}-${m}-${day}`
 }
 
 export function dayKeyOffset(off: number): string {
