@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, MotionConfig, motion } from 'framer-motion'
 import { useAppStore } from '@/store/useAppStore'
 import { TopBar } from './TopBar'
 import { NavTabs } from './NavTabs'
@@ -78,6 +78,7 @@ export function AppShell() {
   const ActiveSection = SECTION_MAP[activeTab] ?? Dashboard
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="min-h-dvh flex flex-col">
       <TopBar
         onOpenSettings={() => setShowSettings(true)}
@@ -96,10 +97,10 @@ export function AppShell() {
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.22, ease: [0.2, 0.7, 0.2, 1] }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3, ease: [0.2, 0.7, 0.2, 1] }}
           >
             <TabErrorBoundary tabKey={activeTab}>
               <Suspense fallback={<SectionLoader />}>
@@ -114,5 +115,6 @@ export function AppShell() {
       {showOnboard   && <OnboardModal onClose={() => setShowOnboard(false)} />}
       {showStudyTime && <StudyTimeModal onClose={() => setShowStudyTime(false)} />}
     </div>
+    </MotionConfig>
   )
 }
