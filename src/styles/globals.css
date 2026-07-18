@@ -143,7 +143,14 @@ body::before {
   backdrop-filter: blur(10px);
   border: 1px solid var(--btn-border);
 }
-.btn-glass, .btn-shine { position: relative; overflow: hidden; }
+.btn-glass, .btn-shine {
+  position: relative;
+  overflow: hidden;
+  /* Liquid feel: springy overshoot on scale (buttons hover spec: 1.05) */
+  transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), background .2s ease, border-color .2s ease;
+}
+.btn-glass:hover:not(:disabled), .btn-shine:hover:not(:disabled) { transform: scale(1.05); }
+.btn-glass:active:not(:disabled), .btn-shine:active:not(:disabled) { transform: scale(.96); transition-duration: .1s; }
 
 /* Shine: a skewed light strip parked off-canvas; hover sweeps it across.
    The transition lives on the hover rule only, so it snaps back invisibly
@@ -214,6 +221,8 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   .glow-card          { transition: none !important; }
   .glow-card:hover    { transform: none !important; }
+  .btn-glass:hover, .btn-shine:hover,
+  .btn-glass:active, .btn-shine:active { transform: none !important; }
   .glow-card::after   { transition: opacity 150ms ease !important; }
   .card-icon          { transition: color 150ms ease, background-color 150ms ease !important; }
   .glow-card:hover .card-icon { transform: none !important; }
