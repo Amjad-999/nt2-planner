@@ -212,11 +212,12 @@ export function SpeakAndCheck({ targetNl, label }: Props) {
             }}
           >
             <div
+              className="progress-wave"
               style={{
                 height: '100%',
                 width: `${score}%`,
                 background: lbl.color,
-                transition: reducedMotion ? 'none' : 'width .5s ease',
+                transition: reducedMotion ? 'none' : 'width .8s ease',
                 borderRadius: 4,
               }}
             />

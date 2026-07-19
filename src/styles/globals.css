@@ -251,6 +251,24 @@ body::before {
 .stagger > *:nth-child(15) { animation-delay: 700ms }
 .stagger > *:nth-child(n+16) { animation-delay: 750ms }
 
+/* ── Progress bars: gradual fill + wave-flowing sheen ────────────────────
+   Add class="progress-wave" to the FILL element (the one with inline
+   width:N%). progress-fill animates from width:0 to the inline width on
+   mount; the flowing white sheen rides on top of whatever base colour the
+   bar uses, so one class serves orange/green/per-book bars alike. */
+.progress-wave {
+  animation: progress-fill 1.2s cubic-bezier(.25,.8,.35,1) backwards,
+             progress-wave 2.4s linear infinite;
+  background-image: linear-gradient(105deg,
+    rgba(255,255,255,0) 30%, rgba(255,255,255,.35) 50%, rgba(255,255,255,0) 70%);
+  background-size: 220% 100%;
+}
+@keyframes progress-fill { from { width: 0 } }
+@keyframes progress-wave {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -100% 0; }
+}
+
 /* ── Common animation keyframes ── */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes secIn { from { opacity: 0; transform: translateY(10px) scale(.995); } to { opacity: 1; transform: none; } }

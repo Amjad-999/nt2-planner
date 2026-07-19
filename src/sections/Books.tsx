@@ -60,7 +60,7 @@ function BookCard({ book: b, doneUnits, onToggle }: { book: BookUnit; doneUnits:
         <div style={{ fontWeight:700, color:b.ic }}>{pct}% <span style={{ fontSize:'.78rem', color:'var(--muted)', fontWeight:400 }}>({doneUnits.length}/{b.units.length})</span></div>
       </div>
       <div style={{ background:'var(--surface3)', height:5, borderRadius:3, overflow:'hidden', marginBottom:10 }}>
-        <div style={{ height:'100%', background:b.ic, width:`${pct}%`, transition:'width .4s ease' }} />
+        <div className="progress-wave" style={{ height:'100%', background:b.ic, width:`${pct}%`, transition:'width .8s ease' }} />
       </div>
       <div className="stagger" style={{ display:'grid', gridTemplateColumns:'1fr', gap:5 }}>
         {b.units.map((u, i) => (

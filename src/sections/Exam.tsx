@@ -72,7 +72,7 @@ function PassBar({ pct }: { pct: number }) {
       <div style={{ fontFamily:'var(--font-latin)', fontSize:'var(--text-2xl)', fontWeight:600, color:pass?'var(--green)':'var(--orange)', lineHeight:1.1, fontFeatureSettings:"'tnum'" }}>{pct}%</div>
       <div style={{ fontSize:'var(--text-sm)', color:'var(--text2)', marginTop:4 }}>{pass?'✅ فوق عتبة النجاح (65%)':'❌ تحت العتبة — استمرّ!'}</div>
       <div style={{ height:8, background:'var(--surface3)', borderRadius:4, margin:'14px 0 4px', overflow:'hidden', position:'relative' }}>
-        <div style={{ height:'100%', background:pass?'var(--green)':'var(--orange)', width:`${pct}%`, transition:'width .6s ease' }} />
+        <div className="progress-wave" style={{ height:'100%', background:pass?'var(--green)':'var(--orange)', width:`${pct}%`, transition:'width .8s ease' }} />
         <div style={{ position:'absolute', top:-3, bottom:-3, width:2, background:'var(--green)', insetInlineStart:`${PASS_THRESHOLD}%` }}>
           <span style={{ position:'absolute', top:-18, insetInlineStart:'50%', transform:'translateX(-50%)', fontSize:'.65rem', color:'var(--green)', fontWeight:600, whiteSpace:'nowrap' }}>العتبة</span>
         </div>
