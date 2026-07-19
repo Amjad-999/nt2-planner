@@ -50,7 +50,7 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
         href="#"
         onClick={(e) => { e.preventDefault(); setActiveTab('dashboard') }}
         className="flex items-center gap-2 shrink-0 no-underline text-[var(--text)]"
-        aria-label="NT NT2·Planner — الصفحة الرئيسية"
+        title="الصفحة الرئيسية"
       >
         <div
           className="w-[34px] h-[34px] rounded-lg flex items-center justify-center text-[1rem] text-white font-bold shrink-0"
