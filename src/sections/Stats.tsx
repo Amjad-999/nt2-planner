@@ -200,6 +200,7 @@ export default function Stats() {
   }, [theme])
 
   const streakCount = streak.count
+  const avgAttempts = skill.reading.attempts + skill.listening.attempts + skill.writing.attempts + skill.speaking.attempts
   const act56Data = Array.from({length:56}, (_,i) => dailyHistory[dayKeyOffset(-(55-i))]?.mins ?? 0)
   const peakVal = Math.max(0, ...act56Data)
   const peakIdx = act56Data.lastIndexOf(peakVal)
@@ -215,6 +216,21 @@ export default function Stats() {
       <div style={{ background:'var(--purple-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--purple)', borderRadius:'var(--r-sm)', padding:'14px 18px', marginBottom:18, fontSize:'.9rem', color:'var(--text2)', lineHeight:1.65 }}>
         <strong style={{ color:'var(--text)' }}>تتبّع يومي وأسبوعي شامل:</strong> كلّ الرسوم البيانية تستخدم بياناتك الحقيقية من سجلّ التطبيق.
       </div>
+
+      {/* P6: حالة فارغة ودّية عندما لا توجد بيانات بعد */}
+      {Object.keys(dailyHistory).length === 0 && avgAttempts === 0 && (
+        <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:'32px 24px', marginBottom:18, textAlign:'center', boxShadow:'var(--elev-1)' }}>
+          <div style={{ fontSize:'2.6rem', marginBottom:8 }} aria-hidden="true">📊</div>
+          <div style={{ fontSize:'1.05rem', fontWeight:700, color:'var(--text)', marginBottom:6 }}>لا توجد بيانات بعد</div>
+          <div style={{ fontSize:'.88rem', color:'var(--muted)', marginBottom:14, lineHeight:1.7 }}>
+            أكمل أول مهمة دراسة أو سجّل دقائق اليوم وستمتلئ هذه اللوحة برسومك الحقيقية.
+          </div>
+          <button onClick={() => useAppStore.getState().setActiveTab('dashboard')} className="btn-glass"
+            style={{ borderRadius:12, padding:'10px 22px', fontWeight:700, color:'var(--text)', cursor:'pointer', fontSize:'.9rem', fontFamily:'inherit' }}>
+            🚀 ابدأ الآن
+          </button>
+        </div>
+      )}
 
       {/* Progress rings */}
       <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'0 0 10px' }}>🎯 مؤشّرات الأداء الرئيسية</h3>

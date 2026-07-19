@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import { Overlay } from './SettingsModal'
+import { toast } from './Toast'
 
 interface Props { onClose: () => void }
 
@@ -12,6 +13,7 @@ export function StudyTimeModal({ onClose }: Props) {
     const m = parseInt(mins)
     if (!m || m <= 0) return
     recordStudyMinutes(m)
+    toast(`سُجّلت ${m} دقيقة دراسة`)
     onClose()
   }
 

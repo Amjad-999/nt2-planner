@@ -3,6 +3,7 @@ import { useAppStore } from '@/store/useAppStore'
 import { _voices, loadVoices } from '@/features/tts/voices'
 import { testAudio } from '@/features/tts/speakDutch'
 import { CloudPanel } from './CloudPanel'
+import { toast } from './Toast'
 
 interface Props { onClose: () => void }
 
@@ -32,6 +33,7 @@ export function SettingsModal({ onClose }: Props) {
         minutesPerTask:  Math.min(120, Math.max(5,   parseInt(minutesPerTask)  || 30)),
       },
     })
+    toast('حُفظت الإعدادات')
     onClose()
   }
 
@@ -45,7 +47,7 @@ export function SettingsModal({ onClose }: Props) {
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return
     const r = new FileReader()
-    r.onload = () => { const ok = s.importData(r.result as string); alert(ok ? 'تمّ الاستيراد ✅' : 'ملفّ غير صالح ❌') }
+    r.onload = () => { const ok = s.importData(r.result as string); if (ok) toast('تمّ الاستيراد'); else toast('ملفّ غير صالح', 'error') }
     r.readAsText(f); e.target.value = ''
   }
 

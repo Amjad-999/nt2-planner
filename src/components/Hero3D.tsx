@@ -160,10 +160,12 @@ function HeroTextOverlay({ daysLeft, planDay, total, todayMins, streakCount }: T
           { icon: '📅', label: 'المتبقّي:',    value: daysLeft == null ? '—' : String(daysLeft), unit: 'يومًا' },
           { icon: '📍', label: 'اليوم:',        value: String(planDay),   unit: `/ ${total}` },
           { icon: '⏱️', label: 'درست اليوم:',  value: String(todayMins), unit: 'دقيقة'  },
-          { icon: '🔥', label: 'مواظبة:',       value: String(streakCount), unit: 'يوم'  },
+          // P6: نبض عند إنجاز اليوم — درس اليوم والمواظبة مستمرة
+          { icon: '🔥', label: 'مواظبة:',       value: String(streakCount), unit: 'يوم', pulse: todayMins > 0 && streakCount > 0 },
         ].map((ck) => (
           <div
             key={ck.label}
+            className={'pulse' in ck && ck.pulse ? 'pulse-ok' : undefined}
             style={{
               background: 'rgba(255,255,255,.09)',
               border: '1px solid rgba(255,255,255,.14)',

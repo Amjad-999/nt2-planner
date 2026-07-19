@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { aiLookup, type LookupResult } from '@/features/ai/lookup'
 import { useAppStore } from '@/store/useAppStore'
 import { speakDutch } from '@/features/tts/speakDutch'
+import { toast } from './Toast'
 
 type Result = LookupResult
 
@@ -38,8 +39,8 @@ export function AiLookup() {
   const addNow = () => {
     if (!result) return
     const ok = vocabAdd(result.nl, result.ar, result.exampleNL, result.level)
-    if (ok) { setInput(''); setResult(null); setStatus('idle') }
-    else alert('الكلمة موجودة في بنكك مسبقًا')
+    if (ok) { setInput(''); setResult(null); setStatus('idle'); toast('أُضيفت الكلمة إلى بنك المفردات') }
+    else toast('الكلمة موجودة في بنكك مسبقًا', 'warn')
   }
 
   const addWithEdit = () => {

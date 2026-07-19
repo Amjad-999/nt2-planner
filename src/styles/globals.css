@@ -238,6 +238,38 @@ body::before {
   .card-value         { transition: color 150ms ease !important; }
 }
 
+/* ── Skeleton loading — زجاج + لمعان shimmer (P6) ────────────────────────── */
+.skel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  position: relative;
+  overflow: hidden;
+}
+.skel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, var(--glass-hi) 50%, transparent 70%);
+  background-size: 220% 100%;
+  animation: skel-shimmer 1.4s linear infinite;
+}
+@keyframes skel-shimmer { 0% { background-position: 200% 0 } 100% { background-position: -100% 0 } }
+
+/* ── Error shake + daily-achievement pulse (P6) ─────────────────────────── */
+.shake { animation: shake .4s ease; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+.pulse-ok { animation: pulse-ok 1.8s ease infinite; }
+@keyframes pulse-ok {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(249,162,63,.45); }
+  50%      { box-shadow: 0 0 0 7px rgba(249,162,63,0); }
+}
+
 /* ── 3D heading (hero) — عمق + تدرج يتدفق على الحروف + توهج خفيف ─────────
    background-clip:text يجعل التدرج نصّ الحروف؛ الظلال عبر drop-shadow
    (وليس text-shadow الذي يظهر خلف الحروف الشفافة). */

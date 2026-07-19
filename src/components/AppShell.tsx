@@ -7,6 +7,7 @@ import { SettingsModal } from './SettingsModal'
 import { OnboardModal } from './OnboardModal'
 import { StudyTimeModal } from './StudyTimeModal'
 import { TabErrorBoundary } from './TabErrorBoundary'
+import { ToastHost } from './Toast'
 import { useBadgeCheck } from '@/hooks/useBadgeCheck'
 import { useCloud } from '@/features/cloud/cloudStore'
 
@@ -26,8 +27,15 @@ const SECTION_MAP = {
   exam: Exam, exercises: Exercises, grammar: Grammar, stats: Stats, resources: Resources, platform: Platform,
 } as const
 
+/* P6: هيكل عظمي زجاجي مع لمعان shimmer بدل نص التحميل الفارغ */
 const SectionLoader = () => (
-  <div className="flex items-center justify-center py-20 text-[var(--muted)]">جاري التحميل…</div>
+  <div style={{ padding: '24px 28px 60px', maxWidth: 1100, margin: '0 auto' }} aria-busy="true" aria-label="جاري التحميل">
+    <div className="skel" style={{ height: 130, borderRadius: 'var(--r)', marginBottom: 16 }} />
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(165px,1fr))', gap: 12, marginBottom: 16 }}>
+      {[0, 1, 2, 3].map((i) => <div key={i} className="skel" style={{ height: 96, borderRadius: 'var(--r)' }} />)}
+    </div>
+    <div className="skel" style={{ height: 220, borderRadius: 'var(--r)' }} />
+  </div>
 )
 
 export function AppShell() {
@@ -111,6 +119,7 @@ export function AppShell() {
         </AnimatePresence>
       </main>
 
+      <ToastHost />
       {showSettings  && <SettingsModal onClose={() => setShowSettings(false)} />}
       {showOnboard   && <OnboardModal onClose={() => setShowOnboard(false)} />}
       {showStudyTime && <StudyTimeModal onClose={() => setShowStudyTime(false)} />}

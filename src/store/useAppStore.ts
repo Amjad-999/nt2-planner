@@ -8,6 +8,7 @@ import { TOTAL_PLAN_DAYS, LEARNED_BOX, PASS_THRESHOLD, planTaskId, scaledPhases,
 import { scheduleCard, isFsrsLearned, type FsrsQuality } from '@/features/vocab/fsrs'
 import { completionPct } from '@/features/exam/scoring'
 import { celebrate } from '@/lib/celebrate'
+import { toast } from '@/components/Toast'
 
 /* ── localStorage keys (match original) ── */
 const SK6 = 'nt2planner_v6'
@@ -288,7 +289,8 @@ export const useAppStore = create<AppStore>()(
         if (!alreadyDone) {
           const st = get()
           const remaining = generateTodayPlan(st).tasks.filter(t => t.id !== 'srs')
-          if (remaining.length === 0) celebrate('tasks')
+          if (remaining.length === 0) { celebrate('tasks'); toast('🎉 أنجزت كل مهام اليوم!') }
+          else toast('أُنجزت المهمة')
         }
         get().save()
       },

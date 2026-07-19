@@ -89,6 +89,7 @@ export function GrammarExercises({ lessonId }: Props) {
                     if (showWrong) { bg = 'var(--red-l)'; bc = 'var(--red)'; col = 'var(--red)' }
                     return (
                       <button key={oi} dir="ltr" disabled={done} onClick={() => answerMcq(i, oi, ex.answer)}
+                        className={showWrong ? 'shake' : undefined}
                         style={{ background: bg, border: `1px solid ${bc}`, color: col, borderRadius: 8, padding: '8px 16px', fontFamily: 'inherit', fontSize: '.92rem', fontWeight: 500, cursor: done ? 'default' : 'pointer' }}>
                         {opt}
                       </button>
