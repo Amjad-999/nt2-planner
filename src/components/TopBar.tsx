@@ -50,7 +50,7 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
         href="#"
         onClick={(e) => { e.preventDefault(); setActiveTab('dashboard') }}
         className="flex items-center gap-2 shrink-0 no-underline text-[var(--text)]"
-        aria-label="الصفحة الرئيسية"
+        aria-label="NT NT2·Planner — الصفحة الرئيسية"
       >
         <div
           className="w-[34px] h-[34px] rounded-lg flex items-center justify-center text-[1rem] text-white font-bold shrink-0"
@@ -71,8 +71,8 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
         title="الأيام المتبقية حتى الامتحان"
       >
         <AppIcon icon={CalendarDots} size={15} style={{ color: 'var(--orange)' }} />
-        {/* orange-d: نفس الهوية بتباين ≥4.5:1 على الزجاج الفاتح */}
-        <strong style={{ color: 'var(--orange-d)', fontWeight: 600 }}>
+        {/* لون النص الأساسي يضمن ≥4.5:1 — الأيقونة البرتقالية تحمل الهوية */}
+        <strong style={{ color: 'var(--text)', fontWeight: 600 }}>
           {daysLeft == null ? '—' : daysLeft}
         </strong>
         <span>يومًا للامتحان</span>
@@ -85,14 +85,15 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
         title="عدد أيام المواظبة المتتالية"
       >
         <AppIcon icon={Fire} size={15} style={{ color: 'var(--orange)' }} />
-        <strong style={{ color: 'var(--orange-d)', fontWeight: 600 }}>{streak.count}</strong>
+        <strong style={{ color: 'var(--text)', fontWeight: 600 }}>{streak.count}</strong>
         <span>يوم</span>
       </div>
 
       {/* Font size */}
       <div className="flex items-center gap-1">
-        <IconBtn onClick={() => changeFontSize(-1)} title="تصغير الخطّ" aria-label="تصغير الخطّ"><span aria-hidden="true">A−</span></IconBtn>
-        <IconBtn onClick={() => changeFontSize(1)} title="تكبير الخطّ" aria-label="تكبير الخطّ"><span aria-hidden="true">A+</span></IconBtn>
+        {/* axe: الاسم المسموع يجب أن يضم النص المرئي (A−/A+) حرفيًا */}
+        <IconBtn onClick={() => changeFontSize(-1)} title="تصغير الخطّ" aria-label="A− تصغير الخطّ">A−</IconBtn>
+        <IconBtn onClick={() => changeFontSize(1)} title="تكبير الخطّ" aria-label="A+ تكبير الخطّ">A+</IconBtn>
       </div>
 
       {/* Install button */}
