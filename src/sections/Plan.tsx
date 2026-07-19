@@ -80,7 +80,7 @@ export default function Plan() {
               <div style={{ fontSize:'.85rem', color:'var(--orange)', fontWeight:600 }}>{pct}% — {pDone.length}/{pTotal}</div>
             </div>
             <div style={{ marginTop:8, background:'var(--surface3)', height:6, borderRadius:3, overflow:'hidden' }}>
-              <div className="progress-wave" style={{ height:'100%', background:'var(--orange)', width:`${pct}%`, transition:'width .8s ease' }} />
+              <div className="progress-wave" style={{ height:'100%', backgroundColor:'var(--orange)', width:`${pct}%`, transition:'width .8s ease' }} />
             </div>
             <details style={{ marginTop:10 }}>
               <summary style={{ cursor:'pointer', color:'var(--text2)', fontSize:'.86rem' }}>عرض مهام هذه المرحلة</summary>

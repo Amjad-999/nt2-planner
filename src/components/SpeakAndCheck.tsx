@@ -216,7 +216,7 @@ export function SpeakAndCheck({ targetNl, label }: Props) {
               style={{
                 height: '100%',
                 width: `${score}%`,
-                background: lbl.color,
+                backgroundColor: lbl.color,
                 transition: reducedMotion ? 'none' : 'width .8s ease',
                 borderRadius: 4,
               }}
