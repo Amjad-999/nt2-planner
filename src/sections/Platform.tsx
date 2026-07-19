@@ -19,7 +19,7 @@ export default function Platform() {
         </div>
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:12 }}>
+      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:12 }}>
         {[
           { icon:'📖', t:'دروس الكتب', d:'جميع دروس A2 وB1 (Deel 1 وDeel 2) متاحة بشكل تفاعلي على المنصّة.' },
           { icon:'✏️', t:'التمارين العملية', d:'حلّ التمارين هنا أوّلًا، ثمّ سجّل إتمام المهمّة في خطّة الدراسة ليُحتسب الوقت تلقائيًا.' },

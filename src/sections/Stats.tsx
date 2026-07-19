@@ -175,7 +175,7 @@ export default function Stats() {
 
       {/* Progress rings */}
       <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'0 0 10px' }}>🎯 مؤشّرات الأداء الرئيسية</h3>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:14, marginBottom:18 }}>
+      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:14, marginBottom:18 }}>
         {(['reading','listening','writing','speaking'] as const).map((k, i) => {
           const v = skill[k].best; const att = skill[k].attempts
           const colors = ['var(--c1)','var(--c4)','var(--c2)','var(--c5)']
@@ -201,7 +201,7 @@ export default function Stats() {
 
       {/* Charts 2×2 */}
       <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'18px 0 10px' }}>📊 الاتّجاهات الأسبوعية</h3>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))', gap:14, marginBottom:18 }}>
+      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))', gap:14, marginBottom:18 }}>
         {[
           { id:'chStudy',  title:'دقائق الدراسة اليومية (آخر 14 يوم)' },
           { id:'chTasks',  title:'المهام المنجزة يوميًا' },
@@ -243,7 +243,7 @@ export default function Stats() {
 
       {/* Week insights */}
       <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'18px 0 10px' }}>💡 رؤى مقارنة (هذا الأسبوع مقابل الأسبوع الماضي)</h3>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:12 }}>
+      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:12 }}>
         {weekInsights.map((ins, i) => <InsightCard key={i} kind={ins.kind} icon={ins.icon} title={ins.title} desc={ins.desc} />)}
       </div>
     </div>

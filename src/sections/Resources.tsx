@@ -132,7 +132,7 @@ export default function Resources() {
           📄 نماذج امتحانات DUO (PDF)
         </h3>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12, marginBottom: 24 }}>
+        <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12, marginBottom: 24 }}>
           {EXAMS.map((exam) => (
             <ExamCard
               key={exam.id}
@@ -151,7 +151,7 @@ export default function Resources() {
       {RESOURCE_GROUPS.map((group) => (
         <div key={group.title}>
           <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--text)', margin: '18px 0 10px' }}>{group.title}</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 12 }}>
+          <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 12 }}>
             {group.links.map((link) => (
               <ResourceLinkCard key={link.href} link={link} />
             ))}

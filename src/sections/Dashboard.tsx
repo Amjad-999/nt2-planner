@@ -88,7 +88,7 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
       <PlanHealth />
 
       <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>🎯</span> مؤشّرات اليوم</h2></Reveal>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(165px,1fr))', gap:12, marginBottom:18 }}>
+      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(165px,1fr))', gap:12, marginBottom:18 }}>
         {kpis.map((k, i) => (
           <motion.div
             key={k.cls}
@@ -127,7 +127,7 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
       )}
 
       <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>💡</span> رؤى ذكية</h2></Reveal>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:12, marginBottom:18 }}>
+      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:12, marginBottom:18 }}>
         {insights.map((ins, i) => (
           <Reveal key={i} delay={Math.min(i * 0.05, 0.3)}>
             <InsightCard kind={ins.kind} icon={ins.icon} title={ins.title} desc={ins.desc} />
@@ -136,7 +136,7 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
       </div>
 
       <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>⚡</span> إجراءات سريعة</h2></Reveal>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:12 }}>
+      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:12 }}>
         {[
           { label:'📝 ابدأ محاكاة الامتحان', action:()=>setActiveTab('exam'), primary:true },
           { label:'📚 راجع المفردات المستحقّة', action:()=>setActiveTab('vocab') },

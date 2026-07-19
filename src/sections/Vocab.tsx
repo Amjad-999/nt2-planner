@@ -127,7 +127,9 @@ export default function Vocab() {
                 ? '📚 بنك مفرداتك فارغ — استخدم خانة AI أعلاه لإضافة كلمات هولندية.'
                 : '🔍 لا توجد كلمات تطابق بحثك.'}
             </div>
-          ) : filteredBank.map((w) => {
+          ) : (
+          <div className="stagger">
+          {filteredBank.map((w) => {
             const r = resultMap.get(w.id)
             return (
               <WordCard
@@ -140,6 +142,8 @@ export default function Vocab() {
               />
             )
           })}
+          </div>
+          )}
         </>
       )}
 

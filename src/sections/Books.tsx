@@ -62,7 +62,7 @@ function BookCard({ book: b, doneUnits, onToggle }: { book: BookUnit; doneUnits:
       <div style={{ background:'var(--surface3)', height:5, borderRadius:3, overflow:'hidden', marginBottom:10 }}>
         <div style={{ height:'100%', background:b.ic, width:`${pct}%`, transition:'width .4s ease' }} />
       </div>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:5 }}>
+      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'1fr', gap:5 }}>
         {b.units.map((u, i) => (
           <label key={i} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 9px', background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:6, cursor:'pointer', fontSize:'.86rem', color:'var(--text)' }}>
             <input type="checkbox" checked={doneUnits.includes(i)} onChange={() => onToggle(i)} style={{ accentColor: b.ic }} aria-label={u} />
