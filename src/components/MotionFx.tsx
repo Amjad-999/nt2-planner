@@ -24,44 +24,9 @@ export function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: n
   )
 }
 
-/** Element springs a few pixels toward the cursor (icon buttons, CTAs). */
-export function Magnetic({ children, strength = 0.25, maxShift = 5, className }: {
-  children: ReactNode
-  strength?: number
-  maxShift?: number
-  className?: string
-}) {
-  const reduced = useReducedMotion()
-  const ref = useRef<HTMLDivElement>(null)
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-  const sx = useSpring(x, { stiffness: 320, damping: 22, mass: 0.5 })
-  const sy = useSpring(y, { stiffness: 320, damping: 22, mass: 0.5 })
-
-  const onMove = (e: React.MouseEvent) => {
-    const el = ref.current
-    if (!el) return
-    const r = el.getBoundingClientRect()
-    const dx = (e.clientX - (r.left + r.width / 2)) * strength
-    const dy = (e.clientY - (r.top + r.height / 2)) * strength
-    x.set(Math.max(-maxShift, Math.min(maxShift, dx)))
-    y.set(Math.max(-maxShift, Math.min(maxShift, dy)))
-  }
-  const onLeave = () => { x.set(0); y.set(0) }
-
-  if (reduced) return <div className={className}>{children}</div>
-  return (
-    <motion.div
-      ref={ref}
-      className={className}
-      style={{ x: sx, y: sy }}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-    >
-      {children}
-    </motion.div>
-  )
-}
+/* Magnetic انتقل إلى Magnetic.tsx (نسخة بلا framer) — يستهلكه TopBar في
+   مسار الإقلاع، وبقاؤه هنا كان يسحب framer إلى الحزمة الرئيسية */
+export { Magnetic } from './Magnetic'
 
 /** 3D pointer-tilt (max ±`max`°) with spring return — KPI cards. */
 export function Tilt({ children, max = 8, disabled = false, className, style }: {

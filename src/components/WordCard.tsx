@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useRef, useState } from 'react'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { speakDutch } from '@/features/tts/speakDutch'
 import { SpeakAndCheck } from '@/components/SpeakAndCheck'
 import { HighlightText } from '@/components/HighlightText'
@@ -36,6 +37,7 @@ const LEVEL_STYLE: Record<string, { bg: string; color: string }> = {
 
 export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4, hlNl, hlAr, hlEx }: Props) {
   const btnRef = useRef<HTMLButtonElement>(null)
+  const reduced = useReducedMotion()
   const [showPractice, setShowPractice] = useState(false)
   const now = useNow()
   const nl = getNl(word)
@@ -54,7 +56,7 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4, hlNl,
         border: '1px solid var(--glass-border)',
         boxShadow: 'var(--elev-1)',
       }}
-      whileHover={{ translateY: -2, boxShadow: 'var(--elev-2)', borderColor: 'var(--orange-m)' }}
+      whileHover={reduced ? undefined : { translateY: -2, boxShadow: 'var(--elev-2)', borderColor: 'var(--orange-m)' }}
       transition={{ duration: 0.18 }}
     >
       <div className="grid items-center gap-2" style={{ gridTemplateColumns: '1fr auto' }}>

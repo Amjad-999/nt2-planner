@@ -1,13 +1,15 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
-import { AnimatePresence, MotionConfig, motion } from 'framer-motion'
 import { useAppStore } from '@/store/useAppStore'
 import { TopBar } from './TopBar'
 import { NavTabs } from './NavTabs'
-import { SettingsModal } from './SettingsModal'
-import { OnboardModal } from './OnboardModal'
-import { StudyTimeModal } from './StudyTimeModal'
 import { TabErrorBoundary } from './TabErrorBoundary'
 import { ToastHost } from './Toast'
+
+/* النوافذ لا تُعرض قبل نقرة المستخدم — لا مبرر لوجودها (ومعها CloudPanel)
+   في حزمة الإقلاع */
+const SettingsModal  = lazy(() => import('./SettingsModal').then((m) => ({ default: m.SettingsModal })))
+const OnboardModal   = lazy(() => import('./OnboardModal').then((m) => ({ default: m.OnboardModal })))
+const StudyTimeModal = lazy(() => import('./StudyTimeModal').then((m) => ({ default: m.StudyTimeModal })))
 import { useBadgeCheck } from '@/hooks/useBadgeCheck'
 import { useCloud } from '@/features/cloud/cloudStore'
 
@@ -87,7 +89,6 @@ export function AppShell() {
   const ActiveSection = SECTION_MAP[activeTab] ?? Dashboard
 
   return (
-    <MotionConfig reducedMotion="user">
     <div className="min-h-dvh flex flex-col">
       <TopBar
         onOpenSettings={() => setShowSettings(true)}
@@ -103,28 +104,23 @@ export function AppShell() {
         tabIndex={-1}
         className="flex-1 focus:outline-none"
       >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.3, ease: [0.2, 0.7, 0.2, 1] }}
-          >
-            <TabErrorBoundary tabKey={activeTab}>
-              <Suspense fallback={<SectionLoader />}>
-                <ActiveSection onOpenStudyTime={() => setShowStudyTime(true)} />
-              </Suspense>
-            </TabErrorBoundary>
-          </motion.div>
-        </AnimatePresence>
+        {/* key يعيد التركيب عند تبديل التبويب فتعمل حركة الدخول CSS
+            (fade + انزلاق .3s) — بلا framer في مسار الإقلاع */}
+        <div key={activeTab} className="tab-in">
+          <TabErrorBoundary tabKey={activeTab}>
+            <Suspense fallback={<SectionLoader />}>
+              <ActiveSection onOpenStudyTime={() => setShowStudyTime(true)} />
+            </Suspense>
+          </TabErrorBoundary>
+        </div>
       </main>
 
       <ToastHost />
-      {showSettings  && <SettingsModal onClose={() => setShowSettings(false)} />}
-      {showOnboard   && <OnboardModal onClose={() => setShowOnboard(false)} />}
-      {showStudyTime && <StudyTimeModal onClose={() => setShowStudyTime(false)} />}
+      <Suspense fallback={null}>
+        {showSettings  && <SettingsModal onClose={() => setShowSettings(false)} />}
+        {showOnboard   && <OnboardModal onClose={() => setShowOnboard(false)} />}
+        {showStudyTime && <StudyTimeModal onClose={() => setShowStudyTime(false)} />}
+      </Suspense>
     </div>
-    </MotionConfig>
   )
 }

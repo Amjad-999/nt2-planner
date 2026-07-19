@@ -3,7 +3,7 @@ import { useAppStore } from '@/store/useAppStore'
 import { getDaysLeft } from '@/store/useAppStore'
 import { useTheme } from '@/hooks/useTheme'
 import { AppIcon } from './AppIcon'
-import { Magnetic } from './MotionFx'
+import { Magnetic } from './Magnetic'
 import { CalendarDots, Fire, DownloadSimple, Moon, Sun, GearSix } from '@phosphor-icons/react'
 
 interface Props {

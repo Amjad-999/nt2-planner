@@ -242,6 +242,22 @@ body::before {
   .card-value         { transition: color 150ms ease !important; }
 }
 
+/* ── Tab + toast enter/exit — CSS بدل framer في مسار الإقلاع ───────────── */
+.tab-in { animation: tab-in .3s cubic-bezier(.2,.7,.2,1); }
+@keyframes tab-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.toast-in  { animation: toast-in .25s cubic-bezier(.2,.7,.2,1); }
+.toast-out { animation: toast-out .22s ease forwards; }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(16px) scale(.95); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes toast-out {
+  to { opacity: 0; transform: translateY(8px) scale(.97); }
+}
+
 /* ── Skeleton loading — زجاج + لمعان shimmer (P6) ────────────────────────── */
 .skel {
   background: var(--glass-bg);
