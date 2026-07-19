@@ -16,12 +16,14 @@ function destroyCharts(charts: DestroyableChart[]) {
 
 /* حلقة مهارة: العدّاد وامتلاء الحلقة يقودهما useCountUp نفسه (ثانيتان) —
    مكوّن معزول حتى تبقى إعادة الرسم كل إطار محصورة فيه لا في الصفحة كلها */
-function SkillRing({ label, icon, v, att, col }: {
-  label: string; icon: string; v: number; att: number; col: string
+function SkillRing({ label, icon, v, att }: {
+  label: string; icon: string; v: number; att: number
 }) {
   const n = useCountUp(v, 2000)
   const C = 2 * Math.PI * 42
   const offset = C - (C * n) / 100
+  // P5: اللون حسب القيمة — أحمر < 50، كهرماني 50–75، أخضر > 75
+  const col = v < 50 ? 'var(--red)' : v <= 75 ? 'var(--amber)' : 'var(--green)'
   return (
     <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, textAlign:'center', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
       <svg viewBox="0 0 100 100" style={{ width:96, height:96, display:'block', margin:'0 auto 8px' }} role="img" aria-label={`${label}: ${v}%`}>
@@ -115,20 +117,35 @@ export default function Stats() {
         return Math.min(totW.learned, Math.max(0, cumW))
       })
 
+      // P5: ظهور تدريجي من اليسار (تأخير متدرج لكل نقطة) + ارتداد نقاط hover.
+      // تُعطَّل الحركة بالكامل مع prefers-reduced-motion.
+      const reducedAnim = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const staggerIn = reducedAnim ? (false as const) : {
+        delay: (ctx: { type: string; mode: string; dataIndex?: number }) =>
+          ctx.type === 'data' && ctx.mode === 'default' ? (ctx.dataIndex ?? 0) * 55 : 0,
+      }
+      const bouncePoints = reducedAnim ? {} : { radius: { duration: 420, easing: 'easeOutBounce' as const } }
       const base = (extra: Record<string, unknown>) => ({
         responsive: true, maintainAspectRatio: false,
+        animation: staggerIn,
+        animations: bouncePoints,
         scales: { x: { grid:{display:false}, ticks:{color:c.txt+'aa'} }, y: { grid:{color:c.grid}, ticks:{color:c.txt+'aa'}, ...extra } },
         plugins: { legend:{display:false}, tooltip:{backgroundColor:c.txt,titleColor:'#fff',bodyColor:'#fff'} },
       })
 
+      // مخطط الدقائق: مساحي (Area) بتدرج برتقالي يذوب نحو الأسفل
       const cs1 = document.getElementById('chStudy') as HTMLCanvasElement|null
-      if (cs1) track(new Chart(cs1, { type:'bar', data:{ labels:days14, datasets:[{ label:'دقائق', data:studyD, backgroundColor:hexA(c.orange,.8), borderRadius:6 }]}, options:base({beginAtZero:true,precision:0}) }))
+      if (cs1) {
+        const g1 = cs1.getContext('2d')!.createLinearGradient(0, 0, 0, cs1.height || 220)
+        g1.addColorStop(0, hexA(c.orange, .5)); g1.addColorStop(1, hexA(c.orange, 0))
+        track(new Chart(cs1, { type:'line', data:{ labels:days14, datasets:[{ label:'دقائق', data:studyD, borderColor:c.orange, borderWidth:2.2, backgroundColor:g1, fill:true, tension:.35, pointRadius:3, pointHoverRadius:7, pointBackgroundColor:c.orange }]}, options:base({beginAtZero:true,precision:0}) }))
+      }
 
       const ct = document.getElementById('chTasks') as HTMLCanvasElement|null
       if (ct) track(new Chart(ct, { type:'bar', data:{ labels:days14, datasets:[{ label:'مهام', data:taskD, backgroundColor:hexA(c.green,.8), borderRadius:6 }]}, options:base({beginAtZero:true,precision:0}) }))
 
       const cw = document.getElementById('chWords') as HTMLCanvasElement|null
-      if (cw) track(new Chart(cw, { type:'line', data:{ labels:days14, datasets:[{ label:'كلمات', data:wordsD, borderColor:c.purple, backgroundColor:hexA(c.purple,.2), tension:.35, fill:true, pointRadius:3 }]}, options:base({beginAtZero:true,precision:0}) }))
+      if (cw) track(new Chart(cw, { type:'line', data:{ labels:days14, datasets:[{ label:'كلمات', data:wordsD, borderColor:c.purple, backgroundColor:hexA(c.purple,.2), tension:.35, fill:true, pointRadius:3, pointHoverRadius:7 }]}, options:base({beginAtZero:true,precision:0}) }))
 
       // Skills horizontal bar
       const passPlugin = {
@@ -204,8 +221,7 @@ export default function Stats() {
       <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:14, marginBottom:18 }}>
         {(['reading','listening','writing','speaking'] as const).map((k, i) => (
           <SkillRing key={k} label={SKILL_AR[k]} icon={['📖','🎧','✍️','🗣️'][i]}
-            v={skill[k].best} att={skill[k].attempts}
-            col={['var(--c1)','var(--c4)','var(--c2)','var(--c5)'][i]} />
+            v={skill[k].best} att={skill[k].attempts} />
         ))}
       </div>
 
