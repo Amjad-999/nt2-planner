@@ -71,7 +71,8 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
         title="الأيام المتبقية حتى الامتحان"
       >
         <AppIcon icon={CalendarDots} size={15} style={{ color: 'var(--orange)' }} />
-        <strong style={{ color: 'var(--orange)', fontWeight: 600 }}>
+        {/* orange-d: نفس الهوية بتباين ≥4.5:1 على الزجاج الفاتح */}
+        <strong style={{ color: 'var(--orange-d)', fontWeight: 600 }}>
           {daysLeft == null ? '—' : daysLeft}
         </strong>
         <span>يومًا للامتحان</span>
@@ -84,7 +85,7 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
         title="عدد أيام المواظبة المتتالية"
       >
         <AppIcon icon={Fire} size={15} style={{ color: 'var(--orange)' }} />
-        <strong style={{ color: 'var(--orange)', fontWeight: 600 }}>{streak.count}</strong>
+        <strong style={{ color: 'var(--orange-d)', fontWeight: 600 }}>{streak.count}</strong>
         <span>يوم</span>
       </div>
 
