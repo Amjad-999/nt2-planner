@@ -3,6 +3,7 @@ import { useAppStore, totalLearnedWords, sumLastNDays, sumPrevNDays } from '@/st
 import { PASS_THRESHOLD, SKILL_AR } from '@/data/phases'
 import { dayKeyOffset, hexA } from '@/lib/utils'
 import { InsightCard } from '@/components/InsightCard'
+import { useCountUp } from '@/hooks/useCountUp'
 
 /* Chart.js generics make Chart<'bar'> unassignable to Chart[] — all the
    leak fix needs is destroy(), so track instances by that shape alone */
@@ -11,6 +12,31 @@ type DestroyableChart = { destroy(): void }
 function destroyCharts(charts: DestroyableChart[]) {
   charts.forEach((ch) => { try { ch.destroy() } catch { /* already destroyed */ } })
   charts.length = 0
+}
+
+/* حلقة مهارة: العدّاد وامتلاء الحلقة يقودهما useCountUp نفسه (ثانيتان) —
+   مكوّن معزول حتى تبقى إعادة الرسم كل إطار محصورة فيه لا في الصفحة كلها */
+function SkillRing({ label, icon, v, att, col }: {
+  label: string; icon: string; v: number; att: number; col: string
+}) {
+  const n = useCountUp(v, 2000)
+  const C = 2 * Math.PI * 42
+  const offset = C - (C * n) / 100
+  return (
+    <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, textAlign:'center', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
+      <svg viewBox="0 0 100 100" style={{ width:96, height:96, display:'block', margin:'0 auto 8px' }} role="img" aria-label={`${label}: ${v}%`}>
+        <circle cx="50" cy="50" r="42" fill="none" stroke="var(--surface3)" strokeWidth="8"/>
+        <circle cx="50" cy="50" r="42" fill="none" stroke={col} strokeWidth="8" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={offset} transform="rotate(-90 50 50)"/>
+        <text x="50" y="56" textAnchor="middle" style={{ fontFamily:'var(--font-display)', fontSize:'1.4rem', fontWeight:700, fill:'var(--text)' }}>{Math.round(n)}%</text>
+      </svg>
+      <div style={{ fontSize:'.85rem', color:'var(--text2)', fontWeight:600 }}>
+        {icon} {label}
+      </div>
+      <div style={{ fontSize:'.74rem', color:'var(--muted)', marginTop:2 }}>
+        {att} محاولة • {v>=PASS_THRESHOLD?'✓ ناجح':'لم تصل العتبة'}
+      </div>
+    </div>
+  )
 }
 
 export default function Stats() {
@@ -176,27 +202,11 @@ export default function Stats() {
       {/* Progress rings */}
       <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'0 0 10px' }}>🎯 مؤشّرات الأداء الرئيسية</h3>
       <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:14, marginBottom:18 }}>
-        {(['reading','listening','writing','speaking'] as const).map((k, i) => {
-          const v = skill[k].best; const att = skill[k].attempts
-          const colors = ['var(--c1)','var(--c4)','var(--c2)','var(--c5)']
-          const col = colors[i]
-          const C = 2*Math.PI*42; const offset = C-(C*v/100)
-          return (
-            <div key={k} style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, textAlign:'center', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
-              <svg viewBox="0 0 100 100" style={{ width:96, height:96, display:'block', margin:'0 auto 8px' }} role="img" aria-label={`${SKILL_AR[k]}: ${v}%`}>
-                <circle cx="50" cy="50" r="42" fill="none" stroke="var(--surface3)" strokeWidth="8"/>
-                <circle cx="50" cy="50" r="42" fill="none" stroke={col} strokeWidth="8" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={offset} transform="rotate(-90 50 50)"/>
-                <text x="50" y="56" textAnchor="middle" style={{ fontFamily:'var(--font-display)', fontSize:'1.4rem', fontWeight:700, fill:'var(--text)' }}>{v}%</text>
-              </svg>
-              <div style={{ fontSize:'.85rem', color:'var(--text2)', fontWeight:600 }}>
-                {['📖','🎧','✍️','🗣️'][i]} {SKILL_AR[k]}
-              </div>
-              <div style={{ fontSize:'.74rem', color:'var(--muted)', marginTop:2 }}>
-                {att} محاولة • {v>=PASS_THRESHOLD?'✓ ناجح':'لم تصل العتبة'}
-              </div>
-            </div>
-          )
-        })}
+        {(['reading','listening','writing','speaking'] as const).map((k, i) => (
+          <SkillRing key={k} label={SKILL_AR[k]} icon={['📖','🎧','✍️','🗣️'][i]}
+            v={skill[k].best} att={skill[k].attempts}
+            col={['var(--c1)','var(--c4)','var(--c2)','var(--c5)'][i]} />
+        ))}
       </div>
 
       {/* Charts 2×2 */}

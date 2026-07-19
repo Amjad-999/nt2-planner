@@ -31,7 +31,7 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
     const num = parseFloat(String(value))
     if (isNaN(num) || String(value).includes('/')) return
     let start: number | null = null
-    const duration = 600
+    const duration = 2000
     const step = (ts: number) => {
       if (start === null) start = ts
       const p = Math.min((ts - start) / duration, 1)
