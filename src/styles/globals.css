@@ -74,9 +74,13 @@ body::before {
   50% { background-position: 100% 50%; }
 }
 /* Touch devices: keep the mesh but stop the drift — a full-screen
-   background-position animation repaints every frame and drains battery */
+   background-position animation repaints every frame and drains battery.
+   Blurs are also lightened (P7): backdrop-filter cost scales with radius,
+   and phones pay it on every scroll frame. */
 @media (pointer: coarse) {
   body::before { animation: none; }
+  .btn-glass { backdrop-filter: blur(6px); }
+  .form-in   { backdrop-filter: blur(4px); }
 }
 
 /* ── Focus ── */
