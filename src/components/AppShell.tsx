@@ -30,7 +30,8 @@ const SECTION_MAP = {
 /* P6: هيكل عظمي زجاجي مع لمعان shimmer بدل نص التحميل الفارغ */
 const SectionLoader = () => (
   <div style={{ padding: '24px 28px 60px', maxWidth: 1100, margin: '0 auto' }} aria-busy="true" aria-label="جاري التحميل">
-    <div className="skel" style={{ height: 130, borderRadius: 'var(--r)', marginBottom: 16 }} />
+    {/* يطابق ارتفاع قسم البطل (minHeight 280) فلا ينزاح المحتوى عند التبديل */}
+    <div className="skel" style={{ height: 280, borderRadius: 'var(--r)', marginBottom: 16 }} />
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(165px,1fr))', gap: 12, marginBottom: 16 }}>
       {[0, 1, 2, 3].map((i) => <div key={i} className="skel" style={{ height: 96, borderRadius: 'var(--r)' }} />)}
     </div>

@@ -57,7 +57,7 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
           style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.5)', border: '1px solid rgba(255,255,255,.18)' }}
           aria-hidden="true"
         >NT</div>
-        <div className="font-display text-[1.25rem] font-bold text-[var(--text)] tracking-tight leading-none">
+        <div aria-hidden="true" className="font-display text-[1.25rem] font-bold text-[var(--text)] tracking-tight leading-none">
           NT2<span style={{ color: 'var(--orange)' }}>·</span>Planner
         </div>
       </a>
@@ -90,8 +90,8 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
 
       {/* Font size */}
       <div className="flex items-center gap-1">
-        <IconBtn onClick={() => changeFontSize(-1)} title="تصغير الخطّ" aria-label="تصغير الخطّ">A−</IconBtn>
-        <IconBtn onClick={() => changeFontSize(1)} title="تكبير الخطّ" aria-label="تكبير الخطّ">A+</IconBtn>
+        <IconBtn onClick={() => changeFontSize(-1)} title="تصغير الخطّ" aria-label="تصغير الخطّ"><span aria-hidden="true">A−</span></IconBtn>
+        <IconBtn onClick={() => changeFontSize(1)} title="تكبير الخطّ" aria-label="تكبير الخطّ"><span aria-hidden="true">A+</span></IconBtn>
       </div>
 
       {/* Install button */}

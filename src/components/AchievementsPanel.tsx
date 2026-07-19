@@ -39,8 +39,8 @@ export function AchievementsPanel() {
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <ProgressPips unlocked={count} total={total} />
-          <span style={{ fontSize: '.82rem', color: 'var(--muted)' }}>{count}/{total}</span>
-          <span style={{ fontSize: '.78rem', color: 'var(--muted)', transform: open ? 'rotate(180deg)' : undefined, display: 'inline-block', transition: 'transform .2s' }}>▼</span>
+          <span style={{ fontSize: '.82rem', color: 'var(--text2)' }}>{count}/{total}</span>
+          <span aria-hidden="true" style={{ fontSize: '.78rem', color: 'var(--muted)', transform: open ? 'rotate(180deg)' : undefined, display: 'inline-block', transition: 'transform .2s' }}>▼</span>
         </span>
       </button>
 

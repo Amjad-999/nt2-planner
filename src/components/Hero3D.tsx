@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useMemo, Component, type ReactNode, type ErrorInfo } from 'react'
+import { lazy, Suspense, useState, useMemo, useEffect, Component, type ReactNode, type ErrorInfo } from 'react'
 import { useAppStore, getDaysLeft, avgBestScore, getPlanTotal, getCurrentDay } from '@/store/useAppStore'
 import { todayKey } from '@/lib/utils'
 import { useReducedMotion3D } from '@/three/useReducedMotion3D'
@@ -40,6 +40,23 @@ const GREETINGS_3D = [
 export function Hero3D() {
   const reducedMotion = useReducedMotion3D()
   const [visible, setVisible] = useState(true)
+  // P8/Lighthouse: تهيئة WebGL (تحميل three + تجميع الـ shaders) تحجب الخيط
+  // الرئيسي ثوانيَ عند الإقلاع — نؤجّلها حتى يفرغ المعالج، والنص فوق التدرّج
+  // مقروء من اللحظة الأولى
+  const [engage, setEngage] = useState(false)
+  useEffect(() => {
+    type IdleWindow = Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number
+      cancelIdleCallback?: (id: number) => void
+    }
+    const w = window as IdleWindow
+    if (w.requestIdleCallback) {
+      const id = w.requestIdleCallback(() => setEngage(true), { timeout: 3000 })
+      return () => w.cancelIdleCallback?.(id)
+    }
+    const t = setTimeout(() => setEngage(true), 1500)
+    return () => clearTimeout(t)
+  }, [])
 
   const examDate     = useAppStore((s) => s.examDate)
   const planDay      = useAppStore((s) => s.planDay)
@@ -78,7 +95,7 @@ export function Hero3D() {
     >
       {/* 3D canvas — ErrorBoundary catches WebGL failures → shows 2D fallback */}
       <HeroErrorBoundary>
-        {visible && (
+        {visible && engage && (
           <Suspense fallback={null}>
             <Scene onVisibilityChange={setVisible}>
               <CanalScene

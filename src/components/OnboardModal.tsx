@@ -21,7 +21,7 @@ export function OnboardModal({ onClose }: Props) {
   }
 
   return (
-    <Overlay onClose={onClose}>
+    <Overlay onClose={onClose} label="الترحيب والإعداد الأوّلي">
       <div style={{ textAlign:'center', marginBottom:14 }}>
         <div style={{ fontSize:'2.4rem' }}>🇳🇱</div>
         <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.35rem', fontWeight:700, color:'var(--text)', margin:'6px 0 4px' }}>NT2 Planner</h3>

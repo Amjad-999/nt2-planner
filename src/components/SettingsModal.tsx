@@ -56,7 +56,7 @@ export function SettingsModal({ onClose }: Props) {
   const handleTest = async () => { setTestResult('يجرّب الآن…'); try { const r = await testAudio(); setTestResult(r) } catch (e) { setTestResult('❌ فشل: ' + String(e)) } }
 
   return (
-    <Overlay onClose={onClose}>
+    <Overlay onClose={onClose} label="الإعدادات">
       <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.35rem', fontWeight:700, color:'var(--text)', marginBottom:8 }}>⚙️ الإعدادات</h3>
       <p style={{ color:'var(--muted)', fontSize:'.88rem', marginBottom:14 }}>اضبط بياناتك واستهدافك للامتحان.</p>
 
@@ -139,7 +139,7 @@ export function SettingsModal({ onClose }: Props) {
 }
 
 /* ── Shared overlay helpers ── */
-export function Overlay({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+export function Overlay({ children, onClose, label }: { children: React.ReactNode; onClose: () => void; label: string }) {
   useEffect(() => {
     const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', esc)
@@ -149,7 +149,7 @@ export function Overlay({ children, onClose }: { children: React.ReactNode; onCl
     <div
       style={{ position:'fixed', inset:0, background:'var(--overlay-bg)', backdropFilter:'blur(10px) saturate(1.2)', WebkitBackdropFilter:'blur(10px) saturate(1.2)', zIndex:900, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
-      role="dialog" aria-modal="true"
+      role="dialog" aria-modal="true" aria-label={label}
     >
       <div style={{ background:'var(--modal-bg)', backdropFilter:'blur(30px) saturate(2)', WebkitBackdropFilter:'blur(30px) saturate(2)', border:'1px solid var(--modal-border)', boxShadow:'var(--elev-3), inset 0 1px 0 var(--glass-hi)', borderRadius:'calc(var(--r) + 2px)', padding:24, maxWidth:520, width:'100%', maxHeight:'88vh', overflowY:'auto', animation:'popIn .28s cubic-bezier(.2,.8,.2,1) both' }}>
         {children}
@@ -159,7 +159,13 @@ export function Overlay({ children, onClose }: { children: React.ReactNode; onCl
 }
 
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div style={{ marginBottom:10 }}><label style={{ display:'block', fontSize:'.85rem', fontWeight:500, color:'var(--text2)', marginBottom:6 }}>{label}</label>{children}</div>
+  // الحقل داخل <label> نفسها → ربط ضمني بلا حاجة إلى id/htmlFor (a11y: label)
+  return (
+    <label style={{ display:'block', marginBottom:10 }}>
+      <span style={{ display:'block', fontSize:'.85rem', fontWeight:500, color:'var(--text2)', marginBottom:6 }}>{label}</span>
+      {children}
+    </label>
+  )
 }
 
 // eslint-disable-next-line react-refresh/only-export-components -- مساعد أنماط (ليس مكوّنًا)
