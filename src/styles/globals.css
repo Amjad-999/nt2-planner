@@ -229,6 +229,25 @@ body::before {
   .card-value         { transition: color 150ms ease !important; }
 }
 
+/* ── 3D heading (hero) — عمق + تدرج يتدفق على الحروف + توهج خفيف ─────────
+   background-clip:text يجعل التدرج نصّ الحروف؛ الظلال عبر drop-shadow
+   (وليس text-shadow الذي يظهر خلف الحروف الشفافة). */
+.title-3d {
+  background: linear-gradient(100deg,
+    #FBC07A 0%, #F6F7FF 28%, #F9A23F 52%, #FBF6EE 76%, #FBC07A 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: title-flow 7s linear infinite;
+  filter:
+    drop-shadow(0 1px 0 rgba(16,13,6,.55))
+    drop-shadow(0 3px 1px rgba(16,13,6,.32))
+    drop-shadow(0 6px 20px rgba(249,162,63,.4));
+}
+@keyframes title-flow { to { background-position: -220% 0; } }
+
 /* ── Staggered list/grid reveal (lists spec: 50ms per item) ──────────────
    Add class="stagger" to a list/grid container; each child fades+slides in
    50ms after the previous. `backwards` (not `both`) so no keyframe style

@@ -1,8 +1,8 @@
-import { useRef, useEffect, useState, Suspense } from 'react'
+import { useRef, useEffect, useState, useMemo, Suspense } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { RoundedBox, Stars } from '@react-three/drei'
 import * as THREE from 'three'
-import { ReadinessOrb } from './ReadinessOrb'
+import { ReadinessOrb, type SkillKey } from './ReadinessOrb'
 import { FloatingCard } from './FloatingCard'
 
 interface Props {
@@ -12,6 +12,7 @@ interface Props {
   planDay: number
   todayMins: number
   streakCount: number
+  weakSkill: SkillKey
 }
 
 /* ── Floating glass panel (background decoration) ── */
@@ -105,40 +106,89 @@ function WaterPlane() {
   )
 }
 
-/* ── Particle field (glowing dots) ── */
+/* ── Particle field — جسيمات زجاجية تفاعلية (مواصفة P4) ──────────────────
+   أزرق فاتح + أبيض، تنجذب نحو الماوس داخل نصف قطر الجذب، وتخفت كلما
+   ابتعدت عنه (الخلفية داكنة، فتعتيم اللون = تلاشٍ بصري). كل جسيم يعود
+   بهدوء إلى موطنه عندما يبتعد المؤشر. */
 function ParticleField() {
   // Random field generated ONCE per mount inside the useState lazy
   // initializer, keeping render pure (react-hooks/purity)
-  const [[positions, sizes]] = useState(() => {
+  const [{ positions, colors, home, tint }] = useState(() => {
     const n = 180
-    const pos = new Float32Array(n * 3)
-    const sz  = new Float32Array(n)
+    const pos  = new Float32Array(n * 3)
+    const col  = new Float32Array(n * 3)
+    const base = new Float32Array(n * 3)
+    const mix  = new Float32Array(n)          // 0 = أبيض، 1 = أزرق فاتح
     for (let i = 0; i < n; i++) {
-      pos[i * 3]     = (Math.random() - 0.5) * 18
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 8
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 10 - 2
-      sz[i]           = Math.random() * 0.025 + 0.008
+      base[i * 3]     = pos[i * 3]     = (Math.random() - 0.5) * 18
+      base[i * 3 + 1] = pos[i * 3 + 1] = (Math.random() - 0.5) * 8
+      base[i * 3 + 2] = pos[i * 3 + 2] = (Math.random() - 0.5) * 10 - 2
+      mix[i] = Math.random()
     }
-    return [pos, sz] as const
+    return { positions: pos, colors: col, home: base, tint: mix }
   })
 
   const ref = useRef<THREE.Points>(null)
-  useFrame(({ clock }) => {
-    if (ref.current) ref.current.rotation.y = clock.getElapsedTime() * 0.006
+  const blue  = useMemo(() => new THREE.Color('#BFDBFE'), [])
+  const white = useMemo(() => new THREE.Color('#FFFFFF'), [])
+
+  useFrame(({ clock, pointer, viewport }) => {
+    const pts = ref.current
+    if (!pts) return
+    pts.rotation.y = clock.getElapsedTime() * 0.006
+
+    // موضع الماوس في إحداثيات المشهد (مستوى z≈0)
+    const mx = (pointer.x * viewport.width) / 2
+    const my = (pointer.y * viewport.height) / 2
+    const ATTRACT_R = 3.2
+
+    // التعديل يجري على مخازن الـ GPU عبر THREE (attribute.array)، لا على
+    // مراجع حالة React — home/tint تُقرأ فقط
+    const posAttr = pts.geometry.getAttribute('position') as THREE.BufferAttribute
+    const colAttr = pts.geometry.getAttribute('color') as THREE.BufferAttribute
+    const posArr = posAttr.array as Float32Array
+    const colArr = colAttr.array as Float32Array
+    const n = posAttr.count
+    for (let i = 0; i < n; i++) {
+      const ix = i * 3
+      const px = posArr[ix], py = posArr[ix + 1]
+      const dx = mx - px, dy = my - py
+      const dist = Math.hypot(dx, dy)
+
+      if (dist < ATTRACT_R) {
+        // انجذاب لطيف نحو المؤشر — أقوى كلما اقترب
+        const pull = (1 - dist / ATTRACT_R) * 0.02
+        posArr[ix]     += dx * pull
+        posArr[ix + 1] += dy * pull
+      } else {
+        // عودة هادئة إلى الموطن
+        posArr[ix]     += (home[ix]     - posArr[ix])     * 0.012
+        posArr[ix + 1] += (home[ix + 1] - posArr[ix + 1]) * 0.012
+      }
+
+      // تلاشٍ بالمسافة: قريب = ساطع، بعيد = خافت
+      const fade = 0.25 + Math.max(0, 1 - dist / (ATTRACT_R * 1.6)) * 0.75
+      const c = tint[i] < 0.5 ? white : blue
+      colArr[ix]     = c.r * fade
+      colArr[ix + 1] = c.g * fade
+      colArr[ix + 2] = c.b * fade
+    }
+    posAttr.needsUpdate = true
+    colAttr.needsUpdate = true
   })
 
   return (
     <points ref={ref}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-        <bufferAttribute attach="attributes-size"     args={[sizes, 1]}     />
+        <bufferAttribute attach="attributes-color"    args={[colors, 3]}    />
       </bufferGeometry>
       <pointsMaterial
-        color="#F6C283"
-        size={0.04}
+        vertexColors
+        size={0.05}
         sizeAttenuation
         transparent
-        opacity={0.55}
+        opacity={0.85}
         depthWrite={false}
       />
     </points>
@@ -172,7 +222,7 @@ function CameraRig() {
 }
 
 /* ── Main scene ── */
-export function CanalScene({ progress, streak, daysLeft, planDay, todayMins, streakCount }: Props) {
+export function CanalScene({ progress, streak, daysLeft, planDay, todayMins, streakCount, weakSkill }: Props) {
   return (
     <>
       {/* Environment */}
@@ -190,7 +240,7 @@ export function CanalScene({ progress, streak, daysLeft, planDay, todayMins, str
       <ParticleField />
 
       {/* The readiness orb — centre-stage */}
-      <ReadinessOrb progress={progress} streak={streak} />
+      <ReadinessOrb progress={progress} streak={streak} weakSkill={weakSkill} />
 
       {/* Background glass panels */}
       <GlassPanel position={[-3.8, 0.5, -2.5]}  rotation={[0, 0.25, 0.06]}  width={1.8} height={2.4} opacity={0.12} floatOffset={1.2} />

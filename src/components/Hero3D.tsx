@@ -51,6 +51,11 @@ export function Hero3D() {
   const daysLeft    = getDaysLeft(examDate)
   const todayMins   = useMemo(() => dailyHistory[todayKey()]?.mins ?? 0, [dailyHistory])
   const progress    = avgBestScore(skill)
+  // المهارة الأضعف تلوّن الكرة (P4): أزرق قراءة، أخضر استماع، برتقالي كتابة، أحمر تحدث
+  const weakSkill   = useMemo(() => {
+    const keys = ['reading', 'listening', 'writing', 'speaking'] as const
+    return keys.reduce<typeof keys[number]>((worst, k) => (skill[k].best < skill[worst].best ? k : worst), 'reading')
+  }, [skill])
   const streakCount = streak.count
   const planTotal   = getPlanTotal({ planStart, examDate })
   const planDayNow  = getCurrentDay({ planStart, planDay }, planTotal)
@@ -83,6 +88,7 @@ export function Hero3D() {
                 planDay={planDayNow}
                 todayMins={todayMins}
                 streakCount={streakCount}
+                weakSkill={weakSkill}
               />
             </Scene>
           </Suspense>
@@ -135,14 +141,13 @@ function HeroTextOverlay({ daysLeft, planDay, total, todayMins, streakCount }: T
   return (
     <>
       <h1
+        className="title-3d"
         style={{
           fontFamily: 'var(--font-display,"Plus Jakarta Sans",serif)',
           fontSize: 'clamp(1.4rem, 3vw, 1.8rem)',
           fontWeight: 700,
-          color: '#F6F7FF',
           marginBottom: 6,
           letterSpacing: '-.4px',
-          textShadow: '0 2px 12px rgba(13,15,30,.6)',
         }}
       >
         {greeting}
