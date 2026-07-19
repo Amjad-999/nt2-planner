@@ -28,6 +28,11 @@ class HeroErrorBoundary extends Component<{ children: ReactNode }, EBState> {
 // FIX 2 — proofreading pass (mirrors Hero2DFallback):
 //   'يومٌ مبارك' → 'يوم مبارك'   (tanwin dropped)
 //   'لنرَ'        → 'لنرى'         (standard spelling)
+/* P7/P8: لا 3D على أجهزة اللمس — محرك WebGL يحجب معالج الهاتف ثوانيَ عند
+   الإقلاع ويستنزف البطارية، والبديل 2D يعرض المعلومات نفسها فورًا.
+   (تُقرأ مرة عند التحميل — تغيير نوع المؤشر يتطلب إعادة تحميل، وهذا مقبول) */
+const IS_TOUCH = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+
 const GREETINGS_3D = [
   'أهلًا بك في NT2 Planner',
   'يوم مبارك — هيا نواصل التقدّم',
@@ -77,8 +82,9 @@ export function Hero3D() {
   const planTotal   = getPlanTotal({ planStart, examDate })
   const planDayNow  = getCurrentDay({ planStart, planDay }, planTotal)
 
-  // Render 2D fallback when the OS requests reduced motion
-  if (reducedMotion) return <Hero2DFallback />
+  // Render 2D fallback when the OS requests reduced motion — or on touch
+  // devices, where the WebGL init cost (TBT) and battery drain outweigh it
+  if (reducedMotion || IS_TOUCH) return <Hero2DFallback />
 
   return (
     <div
