@@ -1,6 +1,6 @@
 import type { State, VocabWord, ExamWord, SkillKey } from './types'
 import { clampNum } from '@/lib/utils'
-import { boxToFsrsFields } from '@/features/vocab/fsrs'
+import { boxToFsrsFields } from '@/features/vocab/fsrs-lite'
 
 const TOTAL_PLAN_DAYS = 46
 const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'] as const

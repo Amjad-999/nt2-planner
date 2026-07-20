@@ -5,7 +5,7 @@ import { idbGet, idbSet } from '@/lib/idb'
 import { defaultState, applyState } from './migration'
 import type { State, VocabWord, ExamWord, SkillKey, TabId } from './types'
 import { TOTAL_PLAN_DAYS, LEARNED_BOX, PASS_THRESHOLD, planTaskId, scaledPhases, SKILL_AR } from '@/data/phases'
-import { scheduleCard, isFsrsLearned, type FsrsQuality } from '@/features/vocab/fsrs'
+import { isFsrsLearned, type FsrsQuality } from '@/features/vocab/fsrs-lite'
 import { completionPct } from '@/features/exam/scoring'
 import { celebrate } from '@/lib/celebrate'
 import { toast } from '@/components/Toast'
@@ -98,7 +98,7 @@ export interface AppStore extends State {
   // Vocab
   vocabAdd: (dutch: string, arabic: string, example: string, level: string) => boolean
   removeVocab: (id: string) => void
-  gradeFlash: (wordId: string, quality: FsrsQuality, isExamWord?: boolean) => number
+  gradeFlash: (wordId: string, quality: FsrsQuality, isExamWord?: boolean) => Promise<number>
 
   // Plan
   toggleTaskDone: (id: string) => void
@@ -249,7 +249,10 @@ export const useAppStore = create<AppStore>()(
         get().save()
       },
 
-      gradeFlash: (wordId, quality, isExamWord = false) => {
+      gradeFlash: async (wordId, quality, isExamWord = false) => {
+        // محرك FSRS (~15KB مصغّرة) يُحمَّل عند أول تقييم لا عند الإقلاع —
+        // وFlashCard تسخّنه مسبقًا عند فتح المراجعة فلا يُحسّ بأي تأخير
+        const { scheduleCard } = await import('@/features/vocab/fsrs')
         let intervalDays = 1
         if (isExamWord) {
           set((st) => {

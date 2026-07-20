@@ -1,10 +1,10 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { speakDutch } from '@/features/tts/speakDutch'
 import type { VocabWord, ExamWord } from '@/store/types'
-import type { FsrsQuality } from '@/features/vocab/fsrs'
-import { formatIntervalAr } from '@/features/vocab/fsrs'
+import type { FsrsQuality } from '@/features/vocab/fsrs-lite'
+import { formatIntervalAr } from '@/features/vocab/fsrs-lite'
 
 type Word = VocabWord | ExamWord
 const getNl = (w: Word) => 'dutch' in w ? w.dutch : w.nl
@@ -13,7 +13,8 @@ const getEx = (w: Word) => 'example' in w ? w.example : w.ex
 
 interface Props {
   queue: Word[]
-  onGrade: (wordId: string, quality: FsrsQuality) => number
+  /** gradeFlash أصبح لا-متزامنًا (يحمّل محرك FSRS ديناميكيًا عند أول نداء) */
+  onGrade: (wordId: string, quality: FsrsQuality) => Promise<number> | number
   onDone: () => void
 }
 
@@ -57,10 +58,19 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
 
   const word: Word | undefined = queue[idx]
 
-  const grade = (q: FsrsQuality) => {
-    if (!word || nextInterval) return // no card / already grading — block double-fire
-    const days = onGrade(word.id, q)
-    setNextInterval(formatIntervalAr(days))
+  // تسخين محرك FSRS فور فتح المراجعة — قبل أول تقييم بثوانٍ
+  useEffect(() => { import('@/features/vocab/fsrs') }, [])
+
+  const gradingRef = useRef(false)
+  const grade = async (q: FsrsQuality) => {
+    if (!word || nextInterval || gradingRef.current) return // no card / already grading — block double-fire
+    gradingRef.current = true
+    try {
+      const days = await onGrade(word.id, q)
+      setNextInterval(formatIntervalAr(days))
+    } finally {
+      gradingRef.current = false
+    }
     setFlipped(false)
     advTimerRef.current = setTimeout(() => {
       advTimerRef.current = null

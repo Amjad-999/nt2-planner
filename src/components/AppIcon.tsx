@@ -1,7 +1,7 @@
-import type { Icon } from '@phosphor-icons/react'
+import type { LiteIcon } from './icons'
 
 interface AppIconProps {
-  icon: Icon
+  icon: LiteIcon
   size?: number
   /** When set, icon is announced; otherwise aria-hidden */
   label?: string

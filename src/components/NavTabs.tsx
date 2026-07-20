@@ -2,13 +2,13 @@ import { useRef, useEffect, useCallback } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import type { TabId } from '@/store/types'
 import { AppIcon } from './AppIcon'
-import type { Icon } from '@phosphor-icons/react'
+import type { LiteIcon } from './icons'
 import {
   SquaresFour, CalendarCheck, Translate, BookOpen,
   ClipboardText, GameController, TextAa, ChartLineUp, Globe, Star,
-} from '@phosphor-icons/react'
+} from './icons'
 
-const TABS: { id: TabId; Icon: Icon; label: string }[] = [
+const TABS: { id: TabId; Icon: LiteIcon; label: string }[] = [
   { id: 'dashboard', Icon: SquaresFour,   label: 'لوحة التحكم' },
   { id: 'plan',      Icon: CalendarCheck, label: 'الخطة' },
   { id: 'vocab',     Icon: Translate,     label: 'المفردات + AI' },
