@@ -1,8 +1,9 @@
-import { useAppStore, getDaysLeft, totalLearnedWords, avgBestScore, weakestSkill, sumLastNDays, sumPrevNDays, generateTodayPlan, planHealth } from '@/store/useAppStore'
+import { useAppStore, totalLearnedWords, avgBestScore, weakestSkill, sumLastNDays, sumPrevNDays, generateTodayPlan, planHealth } from '@/store/useAppStore'
 import { AchievementsPanel } from '@/components/AchievementsPanel'
 import { PASS_THRESHOLD, SKILL_AR, LEARNED_BOX } from '@/data/phases'
 import { Hero3D } from '@/components/Hero3D'
 import { PlanHealth } from '@/components/PlanHealth'
+import { ExamCountdowns } from '@/components/ExamCountdowns'
 import { KpiCard } from '@/components/KpiCard'
 import { InsightCard } from '@/components/InsightCard'
 import { useState } from 'react'
@@ -25,7 +26,6 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
   const dailyHistory = useAppStore((s) => s.dailyHistory)
   const setActiveTab = useAppStore((s) => s.setActiveTab)
   const setDayMinutes = useAppStore((s) => s.setDayMinutes)
-  const saveSettings = useAppStore((s) => s.saveSettings)
   const [weekEdit, setWeekEdit] = useState(false)
   const now = useNow()
   const reduced = useReducedMotion()
@@ -34,7 +34,6 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
   const minutesPerTask  = useAppStore((s) => s.prefs.minutesPerTask)
   const studyDayMinutes = useAppStore((s) => s.prefs.studyDayMinutes)
 
-  const daysLeft = getDaysLeft(examDate)
   const todayM   = dailyHistory[todayKey()]?.mins ?? 0
   const weekM    = sumLastNDays(dailyHistory, 'mins', 7)
   const lastWM   = sumPrevNDays(dailyHistory, 'mins', 7, 7)
@@ -51,9 +50,6 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
     onSave?: (v: string) => void; onEditClick?: () => void
   }
   const kpis: KpiItem[] = [
-    { cls:'k1', icon:'📅', label:'الأيام للامتحان', value: daysLeft == null ? '—' : daysLeft, delta: ph.status==='crit'?'حالة حرجة':ph.status==='tight'?'مشدودة':'على المسار', dCls: (ph.status==='crit'?'down':ph.status==='ok'?'up':'flat'),
-      editable:true, editKind:'number', editRaw: daysLeft==null?'':String(daysLeft), min:1, max:400,
-      onSave:(v)=>{ const n=parseInt(v); if(n>0){ const d=new Date(); d.setDate(d.getDate()+n); d.setHours(9,0,0,0); saveSettings({ examDate:d.toISOString() }) } } },
     { cls:'k2', icon:'⏱️', label:'دقائق اليوم', value: todayM, delta: todayM>=studyDayMinutes?'هدف اليوم محقّق':`تحتاج ${Math.max(0,studyDayMinutes-todayM)} د`, dCls: (todayM>=studyDayMinutes?'up':'flat'),
       editable:true, editKind:'number', editRaw:String(todayM), min:0, max:600,
       onSave:(v)=>{ setDayMinutes(todayKey(), parseInt(v)||0) } },
@@ -86,6 +82,8 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
     <div style={{ padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto' }}>
       <Hero3D />
       <PlanHealth />
+
+      <ExamCountdowns />
 
       <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>🎯</span> مؤشّرات اليوم</h2></Reveal>
       <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(165px,1fr))', gap:12, marginBottom:18 }}>
