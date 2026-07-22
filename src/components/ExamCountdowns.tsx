@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { useNow } from '@/hooks/useNow'
+import { getDaysLeft } from '@/store/useAppStore'
 
 /**
  * امتحانات الاندماج الهولندي (Inburgering) — 5 امتحانات مستقلّة.
@@ -23,7 +25,6 @@ const DEFAULT_EXAMS: Exam[] = [
 ]
 
 const STORAGE_KEY = 'nt2:inburgering-exams'
-const DAY = 86400000
 
 /* ── glassmorphism الحالة الناجحة (كما في المواصفات) ── */
 const PASS_BG     = 'rgba(34, 197, 94, 0.15)'
@@ -66,7 +67,7 @@ const SH = {
 export function ExamCountdowns() {
   const [exams, setExams] = useState<Exam[]>(loadExams)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [now] = useState(() => Date.now())
+  const now = useNow()
 
   useEffect(() => {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(exams)) } catch { /* التخزين غير متاح */ }
@@ -78,13 +79,11 @@ export function ExamCountdowns() {
   const setDate = (id: string, value: string) => {
     if (!value) { update(id, { examDate: null }); setEditingId(null); return }
     const chosen = new Date(`${value}T09:00:00`)
-    const days = Math.max(0, Math.ceil((chosen.getTime() - now) / DAY))
-    update(id, { examDate: chosen.toISOString(), daysLeft: days })
+    update(id, { examDate: chosen.toISOString(), daysLeft: getDaysLeft(chosen.toISOString()) ?? 0 })
     setEditingId(null)
   }
 
-  const displayDays = (e: Exam) =>
-    e.examDate ? Math.max(0, Math.ceil((new Date(e.examDate).getTime() - now) / DAY)) : e.daysLeft
+  const displayDays = (e: Exam) => (e.examDate ? getDaysLeft(e.examDate) ?? e.daysLeft : e.daysLeft)
 
   return (
     <section aria-labelledby="inburgering-heading">
@@ -173,7 +172,7 @@ export function ExamCountdowns() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => update(e.id, { passed: !passed })}
+                  onClick={() => { update(e.id, { passed: !passed }); if (!passed) setEditingId(null) }}
                   aria-pressed={passed}
                   aria-label={passed ? `إلغاء نجاح ${e.nameNL}` : `تحديد نجاح ${e.nameNL}`}
                   style={{
