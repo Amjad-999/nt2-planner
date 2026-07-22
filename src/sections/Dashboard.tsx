@@ -1,7 +1,7 @@
 import { useAppStore, totalLearnedWords, avgBestScore, weakestSkill, sumLastNDays, sumPrevNDays, generateTodayPlan, planHealth } from '@/store/useAppStore'
 import { AchievementsPanel } from '@/components/AchievementsPanel'
 import { PASS_THRESHOLD, SKILL_AR, LEARNED_BOX } from '@/data/phases'
-import { Hero3D } from '@/components/Hero3D'
+import { HeroSection } from '@/components/HeroSection'
 import { PlanHealth } from '@/components/PlanHealth'
 import { ExamCountdowns } from '@/components/ExamCountdowns'
 import { KpiCard } from '@/components/KpiCard'
@@ -80,7 +80,7 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
 
   return (
     <div style={{ padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto' }}>
-      <Hero3D />
+      <HeroSection />
       <PlanHealth />
 
       <ExamCountdowns />
