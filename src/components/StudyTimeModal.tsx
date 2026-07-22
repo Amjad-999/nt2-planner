@@ -21,8 +21,8 @@ export function StudyTimeModal({ onClose }: Props) {
     <Overlay onClose={onClose} label="إضافة وقت دراسة">
       <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.35rem', fontWeight:700, color:'var(--text)', marginBottom:8 }}>⏱️ أضف وقت دراسة اليوم</h3>
       <p style={{ color:'var(--muted)', fontSize:'.88rem', marginBottom:14 }}>سجّل الدقائق التي درستها اليوم. ستظهر في التحليلات وخريطة النشاط.</p>
-      <label style={{ display:'block', fontSize:'.85rem', fontWeight:500, color:'var(--text2)', marginBottom:6 }}>عدد الدقائق</label>
-      <input type="number" value={mins} onChange={(e)=>setMins(e.target.value)} min={1} max={600} placeholder="مثل: 30"
+      <label htmlFor="study-mins" style={{ display:'block', fontSize:'.85rem', fontWeight:500, color:'var(--text2)', marginBottom:6 }}>عدد الدقائق</label>
+      <input id="study-mins" type="number" value={mins} onChange={(e)=>setMins(e.target.value)} min={1} max={600} placeholder="مثل: 30"
         onKeyDown={(e)=>e.key==='Enter'&&add()}
         style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)', marginBottom:10 }} />
       <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:18 }}>

@@ -140,18 +140,55 @@ export function SettingsModal({ onClose }: Props) {
 
 /* ── Shared overlay helpers ── */
 export function Overlay({ children, onClose, label }: { children: React.ReactNode; onClose: () => void; label: string }) {
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  // A11y: focus management for the modal — move focus into the panel on open,
+  // trap Tab within it, close on Escape, and restore focus to the trigger on
+  // unmount. (aria-modal alone does not constrain DOM focus, so keyboard users
+  // could otherwise Tab out to the page behind the dialog.)
   useEffect(() => {
-    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    document.addEventListener('keydown', esc)
-    return () => document.removeEventListener('keydown', esc)
+    const trigger = document.activeElement as HTMLElement | null
+    const panel = panelRef.current
+    const focusables = () => {
+      if (!panel) return []
+      const all = Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),summary,[tabindex]:not([tabindex="-1"])',
+        ),
+      )
+      // Drop hidden nodes (e.g. the file input, collapsed <details> content).
+      // offsetParent has no layout in jsdom, so fall back to the full list there.
+      const visible = all.filter((el) => el.offsetParent !== null)
+      return visible.length ? visible : all
+    }
+
+    panel?.focus()
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { onClose(); return }
+      if (e.key !== 'Tab') return
+      const items = focusables()
+      if (items.length === 0) { e.preventDefault(); panel?.focus(); return }
+      const first = items[0], last = items[items.length - 1]
+      const active = document.activeElement
+      if (e.shiftKey && (active === first || active === panel)) { e.preventDefault(); last.focus() }
+      else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus() }
+      else if (active && panel && !panel.contains(active)) { e.preventDefault(); first.focus() }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      trigger?.focus?.()
+    }
   }, [onClose])
+
   return (
     <div
       style={{ position:'fixed', inset:0, background:'var(--overlay-bg)', backdropFilter:'blur(10px) saturate(1.2)', WebkitBackdropFilter:'blur(10px) saturate(1.2)', zIndex:900, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
       role="dialog" aria-modal="true" aria-label={label}
     >
-      <div style={{ background:'var(--modal-bg)', backdropFilter:'blur(30px) saturate(2)', WebkitBackdropFilter:'blur(30px) saturate(2)', border:'1px solid var(--modal-border)', boxShadow:'var(--elev-3), inset 0 1px 0 var(--glass-hi)', borderRadius:'calc(var(--r) + 2px)', padding:24, maxWidth:520, width:'100%', maxHeight:'88vh', overflowY:'auto', animation:'popIn .28s cubic-bezier(.2,.8,.2,1) both' }}>
+      <div ref={panelRef} tabIndex={-1} style={{ outline:'none', background:'var(--modal-bg)', backdropFilter:'blur(30px) saturate(2)', WebkitBackdropFilter:'blur(30px) saturate(2)', border:'1px solid var(--modal-border)', boxShadow:'var(--elev-3), inset 0 1px 0 var(--glass-hi)', borderRadius:'calc(var(--r) + 2px)', padding:24, maxWidth:520, width:'100%', maxHeight:'88vh', overflowY:'auto', animation:'popIn .28s cubic-bezier(.2,.8,.2,1) both' }}>
         {children}
       </div>
     </div>

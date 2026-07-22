@@ -3,7 +3,7 @@
 :root {
   --bg:#EDE9E2;--surface:rgba(255,255,255,.74);--surface2:rgba(255,255,255,.52);--surface3:#E6E0D5;
   --border:rgba(54,54,54,.13);--border2:rgba(54,54,54,.24);
-  --text:#262420;--text2:#4B4844;--muted:#7C766C;--muted2:#ADA89C;
+  --text:#262420;--text2:#4B4844;--muted:#6A6459;--muted2:#ADA89C;
   --orange:#F58F20;--orange-d:#CC7012;--orange-l:#FCEBD6;--orange-m:#F6C283;
   --blue:#2F77E0;--blue-l:#E7F0FD;
   --green:#467434;--green-l:#E4EEDC;
@@ -58,6 +58,10 @@
   --spot-color: rgba(245,143,32,.13);        /* tangerine glow, light — low opacity keeps WCAG AA */
   --card-fg-hover: #1F1D1A;                  /* slightly deeper than --text; ≥4.5:1 on hover bg */
   --card-accent-hover: var(--orange-d);      /* #CC7012 — same accent, darker shade */
+  /* ── Inburgering "passed" state (glass green) — dark-green text passes AA
+        (≈5.3:1) on the light green wash ── */
+  --pass-bg:rgba(34,197,94,.15);--pass-border:rgba(34,197,94,.3);--pass-text:#166534;
+  --pass-btn-bg:rgba(34,197,94,.25);--pass-btn-border:rgba(34,197,94,.5);
 }
 
 :root[data-theme="dark"] {
@@ -102,4 +106,8 @@
   --spot-color: rgba(249,162,63,.18);        /* brighter on dark bg */
   --card-fg-hover: #FBF8F2;                  /* slightly brighter than --text; ≥4.5:1 on hover bg */
   --card-accent-hover: var(--orange-d);      /* #FFB85C in dark theme */
+  /* ── Inburgering "passed" state (dark) — light-green text; #166534 on the
+        dark green wash was ~1.9:1, so use a bright green (≈9:1) instead ── */
+  --pass-bg:rgba(34,197,94,.18);--pass-border:rgba(34,197,94,.45);--pass-text:#86EFAC;
+  --pass-btn-bg:rgba(34,197,94,.28);--pass-btn-border:rgba(34,197,94,.55);
 }
