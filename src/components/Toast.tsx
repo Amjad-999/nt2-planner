@@ -45,16 +45,17 @@ export function ToastHost() {
       style={{ position: 'fixed', bottom: 18, insetInlineStart: '50%', transform: 'translateX(50%)',
         zIndex: 950, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center', pointerEvents: 'none' }}
     >
+      {/* الإعلان لقارئ الشاشة يأتي من aria-live على الحاوية أعلاه، فلا حاجة
+          إلى role="status" على كل عنصر (يسبّب إعلانًا مزدوجًا). الإغلاق عبر
+          زرّ حقيقي قابل للتركيز بلوحة المفاتيح بدل onClick على div. */}
       {list.map((t) => (
         <div
           key={t.id}
-          role="status"
           className={t.leaving ? 'toast-out' : 'toast-in'}
-          onClick={() => dismiss(t.id)}
           style={{
-            pointerEvents: 'auto', cursor: 'pointer',
+            pointerEvents: 'auto',
             display: 'flex', alignItems: 'center', gap: 8,
-            padding: '10px 16px', borderRadius: 14,
+            padding: '10px 10px 10px 16px', borderRadius: 14,
             background: 'var(--glass-bg-strong)',
             backdropFilter: 'blur(16px) saturate(1.5)', WebkitBackdropFilter: 'blur(16px) saturate(1.5)',
             border: '1px solid var(--glass-border)',
@@ -65,6 +66,18 @@ export function ToastHost() {
         >
           <span aria-hidden="true">{ICONS[t.kind]}</span>
           <span>{t.msg}</span>
+          <button
+            type="button"
+            onClick={() => dismiss(t.id)}
+            aria-label="إغلاق التنبيه"
+            style={{
+              marginInlineStart: 4, padding: '2px 6px', borderRadius: 8, flexShrink: 0,
+              background: 'transparent', border: 'none', cursor: 'pointer',
+              color: 'var(--muted)', fontSize: '.95rem', lineHeight: 1, fontFamily: 'inherit',
+            }}
+          >
+            ✕
+          </button>
         </div>
       ))}
     </div>

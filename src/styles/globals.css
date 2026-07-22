@@ -101,6 +101,25 @@ body::before {
   border: 0;
 }
 
+/* ── Skip link — off-screen until focused, then pinned to the top ── */
+.skip-link {
+  position: fixed;
+  inset-block-start: -60px;
+  inset-inline-start: 12px;
+  z-index: 1000;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--surface3);
+  color: var(--text);
+  border: 1px solid var(--border2);
+  box-shadow: var(--elev-2);
+  font-weight: 600;
+  font-size: .9rem;
+  text-decoration: none;
+  transition: inset-block-start .16s ease;
+}
+.skip-link:focus { inset-block-start: 12px; }
+
 /* ── Scrollbar hide ── */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { scrollbar-width: none; }

@@ -90,6 +90,9 @@ export function AppShell() {
 
   return (
     <div className="min-h-dvh flex flex-col">
+      {/* رابط تخطٍّ لأول عنصر قابل للتركيز — يقفز فوق الشريط والتبويبات
+          مباشرةً إلى المحتوى (مخفيّ حتى يُركَّز عليه بلوحة المفاتيح) */}
+      <a href="#main-content" className="skip-link">تخطَّ إلى المحتوى</a>
       <TopBar
         onOpenSettings={() => setShowSettings(true)}
         onInstall={handleInstall}
@@ -97,16 +100,18 @@ export function AppShell() {
       />
       <NavTabs />
 
-      <main
-        id={`tab-${activeTab}`}
-        role="tabpanel"
-        aria-labelledby={`ntab-${activeTab}`}
-        tabIndex={-1}
-        className="flex-1 focus:outline-none"
-      >
+      {/* <main> يحمل معلم landmark للصفحة؛ لوحة التبويب (role=tabpanel) بداخله
+          فيبقى الاثنان معًا (كان الدور tabpanel يلغي معلم main سابقًا) */}
+      <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
         {/* key يعيد التركيب عند تبديل التبويب فتعمل حركة الدخول CSS
             (fade + انزلاق .3s) — بلا framer في مسار الإقلاع */}
-        <div key={activeTab} className="tab-in">
+        <div
+          key={activeTab}
+          id={`tab-${activeTab}`}
+          role="tabpanel"
+          aria-labelledby={`ntab-${activeTab}`}
+          className="tab-in"
+        >
           <TabErrorBoundary tabKey={activeTab}>
             <Suspense fallback={<SectionLoader />}>
               <ActiveSection onOpenStudyTime={() => setShowStudyTime(true)} />
