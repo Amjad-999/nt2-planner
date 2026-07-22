@@ -121,6 +121,10 @@ export interface AppStore extends State {
   // Books
   toggleBookUnit: (bookId: string, unitIdx: number) => void
 
+  // Inburgering exams
+  setInburgeringExamPassed: (id: string, passed: boolean) => void
+  setInburgeringExamDate: (id: string, iso: string | null) => void
+
   // Settings
   saveSettings: (patch: Partial<Pick<State, 'name' | 'examDate' | 'planDay'> & { prefs: Partial<State['prefs']> }>) => void
   setCustomDur: (taskId: string, mins: number) => void
@@ -408,6 +412,18 @@ export const useAppStore = create<AppStore>()(
           get().bumpHist('tasks', 1)
           get().bumpStreak()
         }
+        get().save()
+      },
+
+      setInburgeringExamPassed: (id, passed) => {
+        set((st) => ({ inburgeringExams: st.inburgeringExams.map((e) => (e.id === id ? { ...e, passed } : e)) }))
+        get().save()
+      },
+
+      // Store only the exam date; `daysLeft` is derived from it at render (see
+      // ExamCountdowns), so there is no stale counter to keep in sync here.
+      setInburgeringExamDate: (id, iso) => {
+        set((st) => ({ inburgeringExams: st.inburgeringExams.map((e) => (e.id === id ? { ...e, examDate: iso } : e)) }))
         get().save()
       },
 

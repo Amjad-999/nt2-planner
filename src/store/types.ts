@@ -67,6 +67,20 @@ export interface Prefs {
   minutesPerTask: number   // FIX 3: average minutes assumed per task (default 30)
 }
 
+/* ── Inburgering exams (Lezen · Luisteren · Schrijven · Spreken · KNM) ──
+   The 5 civic-integration exams tracked on the dashboard. Names + the initial
+   day seed come from code (see @/data/inburgering); only `passed` and
+   `examDate` are user-owned and synced to the cloud. `daysLeft` is the seed
+   shown until a real `examDate` is picked (then it is derived from that date). */
+export interface InburgeringExam {
+  id: string
+  nameNL: string
+  nameAR: string
+  daysLeft: number
+  passed: boolean
+  examDate: string | null
+}
+
 export interface State {
   name: string
   examDate: string
@@ -90,6 +104,7 @@ export interface State {
   onboarded: boolean
   unlockedBadges: string[]
   grammarProgress: Record<string, number[]>   // topicId → indices of correctly-answered exercises
+  inburgeringExams: InburgeringExam[]
   _v: number
   _savedAt: number
 }

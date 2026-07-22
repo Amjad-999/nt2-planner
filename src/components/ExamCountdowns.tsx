@@ -1,30 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNow } from '@/hooks/useNow'
-import { getDaysLeft } from '@/store/useAppStore'
+import { useAppStore, getDaysLeft } from '@/store/useAppStore'
+import type { InburgeringExam } from '@/store/types'
 
 /**
  * امتحانات الاندماج الهولندي (Inburgering) — 5 امتحانات مستقلّة.
  * كل خانة: العدّاد + زر تعديل التاريخ + مفتاح «نجاح».
- * الحالة محفوظة مؤقّتًا في localStorage (تُربط بـ Supabase لاحقًا).
+ * الحالة تُقرأ من المتجر (useAppStore) وتُزامَن سحابيًّا عبر Supabase تلقائيًّا.
  */
-interface Exam {
-  id: string
-  nameNL: string
-  nameAR: string
-  daysLeft: number
-  passed: boolean
-  examDate: string | null
-}
-
-const DEFAULT_EXAMS: Exam[] = [
-  { id: 'lezen',     nameNL: 'Lezen',     nameAR: 'القراءة',  daysLeft: 57, passed: false, examDate: null },
-  { id: 'luisteren', nameNL: 'Luisteren', nameAR: 'الاستماع', daysLeft: 44, passed: false, examDate: null },
-  { id: 'schrijven', nameNL: 'Schrijven', nameAR: 'الكتابة',  daysLeft: 30, passed: false, examDate: null },
-  { id: 'spreken',   nameNL: 'Spreken',   nameAR: 'التحدث',   daysLeft: 60, passed: false, examDate: null },
-  { id: 'knm',       nameNL: 'KNM',       nameAR: 'المعرفة',  daysLeft: 25, passed: false, examDate: null },
-]
-
-const STORAGE_KEY = 'nt2:inburgering-exams'
 
 /* ── glassmorphism الحالة الناجحة (كما في المواصفات) ── */
 const PASS_BG     = 'rgba(34, 197, 94, 0.15)'
@@ -41,49 +24,24 @@ function isoToInputDate(iso: string | null): string {
   return `${y}-${m}-${day}`
 }
 
-/* دمج المحفوظ مع الافتراضي بحيث تبقى الأسماء مصدرها الكود، والحالة مصدرها التخزين */
-function loadExams(): Exam[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return DEFAULT_EXAMS
-    const saved = JSON.parse(raw) as Partial<Exam>[]
-    const byId = new Map(saved.map((e) => [e.id, e]))
-    return DEFAULT_EXAMS.map((d) => {
-      const s = byId.get(d.id)
-      return s
-        ? { ...d, daysLeft: s.daysLeft ?? d.daysLeft, passed: !!s.passed, examDate: s.examDate ?? null }
-        : d
-    })
-  } catch {
-    return DEFAULT_EXAMS
-  }
-}
-
 const SH = {
   fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 700,
   color: 'var(--text)', margin: '24px 0 12px', display: 'flex', alignItems: 'center', gap: 10,
 } as const
 
 export function ExamCountdowns() {
-  const [exams, setExams] = useState<Exam[]>(loadExams)
+  const exams       = useAppStore((s) => s.inburgeringExams)
+  const setPassed   = useAppStore((s) => s.setInburgeringExamPassed)
+  const setExamDate = useAppStore((s) => s.setInburgeringExamDate)
   const [editingId, setEditingId] = useState<string | null>(null)
   const now = useNow()
 
-  useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(exams)) } catch { /* التخزين غير متاح */ }
-  }, [exams])
-
-  const update = (id: string, patch: Partial<Exam>) =>
-    setExams((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)))
-
-  const setDate = (id: string, value: string) => {
-    if (!value) { update(id, { examDate: null }); setEditingId(null); return }
-    const chosen = new Date(`${value}T09:00:00`)
-    update(id, { examDate: chosen.toISOString(), daysLeft: getDaysLeft(chosen.toISOString()) ?? 0 })
+  const applyDate = (id: string, value: string) => {
+    setExamDate(id, value ? new Date(`${value}T09:00:00`).toISOString() : null)
     setEditingId(null)
   }
 
-  const displayDays = (e: Exam) => (e.examDate ? getDaysLeft(e.examDate) ?? e.daysLeft : e.daysLeft)
+  const displayDays = (e: InburgeringExam) => (e.examDate ? getDaysLeft(e.examDate) ?? e.daysLeft : e.daysLeft)
 
   return (
     <section aria-labelledby="inburgering-heading">
@@ -136,7 +94,7 @@ export function ExamCountdowns() {
                     type="date"
                     defaultValue={isoToInputDate(e.examDate)}
                     min={isoToInputDate(new Date(now).toISOString())}
-                    onChange={(ev) => setDate(e.id, ev.target.value)}
+                    onChange={(ev) => applyDate(e.id, ev.target.value)}
                     onBlur={() => setEditingId(null)}
                     aria-label={`تاريخ امتحان ${e.nameNL}`}
                     style={{
@@ -172,7 +130,7 @@ export function ExamCountdowns() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => { update(e.id, { passed: !passed }); if (!passed) setEditingId(null) }}
+                  onClick={() => { setPassed(e.id, !passed); if (!passed) setEditingId(null) }}
                   aria-pressed={passed}
                   aria-label={passed ? `إلغاء نجاح ${e.nameNL}` : `تحديد نجاح ${e.nameNL}`}
                   style={{

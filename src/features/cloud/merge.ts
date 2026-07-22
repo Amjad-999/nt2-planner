@@ -70,6 +70,19 @@ function mergeSkill(a?: SkillRecord, b?: SkillRecord): SkillRecord {
   return { best: Math.max(num(a?.best), num(b?.best)), attempts: Math.max(num(a?.attempts), num(b?.attempts)), history }
 }
 
+/** Inburgering exams: union by id, and for a shared id the newer state wins
+ *  (matching how settings — examDate/prefs/theme — resolve). Both sides always
+ *  hold the same canonical 5 after applyState, so this is effectively
+ *  newer-wins; the union only guards a future id present on one side only. */
+function mergeExams(a: State['inburgeringExams'] = [], b: State['inburgeringExams'] = [], bNewer: boolean): State['inburgeringExams'] {
+  const older = bNewer ? a : b
+  const newer = bNewer ? b : a
+  const map = new Map<string, State['inburgeringExams'][number]>()
+  for (const e of older ?? []) if (e && e.id) map.set(e.id, e)
+  for (const e of newer ?? []) if (e && e.id) map.set(e.id, e)
+  return Array.from(map.values())
+}
+
 function unionRecordNums(a: Record<string, number[]> = {}, b: Record<string, number[]> = {}): Record<string, number[]> {
   const out: Record<string, number[]> = {}
   for (const k of uniqStrs(Object.keys(a ?? {}), Object.keys(b ?? {}))) out[k] = uniqNums(a?.[k] ?? [], b?.[k] ?? [])
@@ -146,6 +159,7 @@ export function mergeStates(a: State, b: State): State {
     customDur: { ...older.customDur, ...newer.customDur },
     unlockedBadges: uniqStrs(a.unlockedBadges, b.unlockedBadges),
     grammarProgress: unionRecordNums(a.grammarProgress, b.grammarProgress),
+    inburgeringExams: mergeExams(a.inburgeringExams, b.inburgeringExams, bNewer),
     _v: 6,
     _savedAt: Math.max(num(a._savedAt), num(b._savedAt)),
   }

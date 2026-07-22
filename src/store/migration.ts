@@ -1,6 +1,7 @@
 import type { State, VocabWord, ExamWord, SkillKey } from './types'
 import { clampNum } from '@/lib/utils'
 import { boxToFsrsFields } from '@/features/vocab/fsrs-lite'
+import { reconcileInburgeringExams } from '@/data/inburgering'
 
 const TOTAL_PLAN_DAYS = 46
 const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'] as const
@@ -37,6 +38,7 @@ export function defaultState(): State {
     onboarded: false,
     unlockedBadges: [],
     grammarProgress: {},
+    inburgeringExams: reconcileInburgeringExams(null),
     _v: 6,
     _savedAt: 0,
   }
@@ -156,6 +158,7 @@ export function applyState(parsed: any): State {
   S.onboarded       = typeof parsed.onboarded === 'boolean' ? parsed.onboarded : !!(parsed.name || parsed.examDate)
   S.unlockedBadges  = Array.isArray(parsed.unlockedBadges) ? parsed.unlockedBadges.filter((x: unknown) => typeof x === 'string') : []
   S.grammarProgress = (parsed.grammarProgress && typeof parsed.grammarProgress === 'object' && !Array.isArray(parsed.grammarProgress)) ? parsed.grammarProgress : {}
+  S.inburgeringExams = reconcileInburgeringExams(parsed.inburgeringExams)
 
   // ExamWords
   S.examWords = (Array.isArray(parsed.examWords) ? parsed.examWords : [])
