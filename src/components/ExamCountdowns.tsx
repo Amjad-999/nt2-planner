@@ -9,10 +9,11 @@ import type { InburgeringExam } from '@/store/types'
  * الحالة تُقرأ من المتجر (useAppStore) وتُزامَن سحابيًّا عبر Supabase تلقائيًّا.
  */
 
-/* ── glassmorphism الحالة الناجحة (كما في المواصفات) ── */
-const PASS_BG     = 'rgba(34, 197, 94, 0.15)'
-const PASS_BORDER = '1px solid rgba(34, 197, 94, 0.3)'
-const PASS_TEXT   = '#166534'
+/* ── glassmorphism الحالة الناجحة — الألوان من tokens.css فتتكيّف مع الثيم
+   (النص الداكن #166534 غير مقروء على الأخضر في الوضع الداكن؛ التوكِن يبدّله) ── */
+const PASS_BG     = 'var(--pass-bg)'
+const PASS_BORDER = '1px solid var(--pass-border)'
+const PASS_TEXT   = 'var(--pass-text)'
 
 function isoToInputDate(iso: string | null): string {
   if (!iso) return ''
@@ -135,8 +136,8 @@ export function ExamCountdowns() {
                   aria-label={passed ? `إلغاء نجاح ${e.nameNL}` : `تحديد نجاح ${e.nameNL}`}
                   style={{
                     flex: 1, cursor: 'pointer', fontSize: '.72rem', fontWeight: 700, borderRadius: 8, padding: '5px 8px',
-                    background: passed ? 'rgba(34, 197, 94, 0.25)' : 'var(--btn-bg)',
-                    border: passed ? '1px solid rgba(34, 197, 94, 0.5)' : '1px solid var(--btn-border)',
+                    background: passed ? 'var(--pass-btn-bg)' : 'var(--btn-bg)',
+                    border: passed ? '1px solid var(--pass-btn-border)' : '1px solid var(--btn-border)',
                     color: passed ? PASS_TEXT : 'var(--green)', boxShadow: 'var(--elev-1)',
                   }}
                 >
