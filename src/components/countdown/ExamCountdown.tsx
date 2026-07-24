@@ -95,7 +95,20 @@ export function ExamCountdown() {
         </button>
       </div>
 
-      {isPast ? (
+      {examDate === null ? (
+        <div style={{ textAlign: 'center', padding: '10px 0' }}>
+          <p style={{ color: 'var(--muted)', fontSize: '.86rem', margin: '0 0 14px' }}>
+            لم تحدّد موعد امتحانك بعد — حدّده ليبدأ العدّ التنازلي الحقيقي.
+          </p>
+          <button
+            onClick={() => setShowModal(true)}
+            className="btn-shine"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 18px', borderRadius: 14, fontFamily: 'inherit', fontSize: '.88rem', fontWeight: 700, cursor: 'pointer', border: '1px solid var(--countdown-accent-border)', background: 'var(--countdown-accent-bg)', color: 'var(--text)' }}
+          >
+            🗓️ حدّد موعد الامتحان
+          </button>
+        </div>
+      ) : isPast ? (
         <div style={{ textAlign: 'center', padding: '10px 0' }}>
           <div style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>
             {reduced ? (

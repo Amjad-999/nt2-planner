@@ -20,16 +20,17 @@ beforeEach(() => {
 })
 
 describe('ExamCountdown', () => {
-  it('shows all-zero tiles and opens the date modal on first visit', async () => {
+  it('shows a "no date set" placeholder (not a fake 00:00:00:00 countdown) and opens the date modal on first visit', async () => {
     render(<ExamCountdown />)
-    expect(screen.getAllByText('00')).toHaveLength(4)
+    expect(screen.getByText('لم تحدّد موعد امتحانك بعد — حدّده ليبدأ العدّ التنازلي الحقيقي.')).toBeInTheDocument()
+    expect(screen.queryByText('00')).not.toBeInTheDocument()
     expect(await screen.findByRole('dialog', {}, { timeout: 9000 })).toBeInTheDocument()
   }, 10000)
 
   it('does not stack its modal on top of the app-level OnboardModal for a brand-new user', async () => {
     useAppStore.setState({ onboarded: false })
     render(<ExamCountdown />)
-    expect(screen.getAllByText('00')).toHaveLength(4)
+    expect(screen.getByText('لم تحدّد موعد امتحانك بعد — حدّده ليبدأ العدّ التنازلي الحقيقي.')).toBeInTheDocument()
     // Give the lazy modal every chance to appear before asserting its absence.
     await new Promise((r) => setTimeout(r, 300))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
