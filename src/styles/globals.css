@@ -361,3 +361,31 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
 @keyframes secIn { from { opacity: 0; transform: translateY(10px) scale(.995); } to { opacity: 1; transform: none; } }
 @keyframes popIn { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: none; } }
 @keyframes flame-flicker { 0%,100% { transform: scale(1) rotate(-1deg); } 50% { transform: scale(1.06) rotate(1deg); } }
+
+/* ── JourneyHero ambient scene ───────────────────────────────────────────
+   Every animated property below is transform or opacity — nothing here can
+   force layout or repaint beyond the compositor. The reduced-motion block
+   freezes all of it (the component additionally skips embers + pointer
+   listeners, so the static scene carries identical information). */
+.hero-phase { position: absolute; inset: 0; opacity: 0; transition: opacity 1.8s ease; pointer-events: none; }
+.hero-phase.on { opacity: 1; }
+.hero-sky { position: absolute; pointer-events: none; will-change: transform; }
+.ember {
+  position: absolute;
+  bottom: 10%;
+  width: var(--es, 6px);
+  height: var(--es, 6px);
+  border-radius: 50%;
+  background: var(--ember-cool);
+  opacity: 0;
+  pointer-events: none;
+  animation: ember-rise var(--ed, 9s) linear var(--edl, 0s) infinite;
+}
+@keyframes ember-rise { 0% { transform: translateY(0) translateX(0) scale(.6); opacity: 0; } 12% { opacity: .85; } 80% { opacity: .55; } 100% { transform: translateY(calc(-1 * var(--erise, 150px))) translateX(var(--edx, 14px)) scale(1); opacity: 0; } }
+@media (pointer: coarse) {
+  .hero-sky { will-change: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-phase { transition: none; }
+  .ember { display: none; }
+}

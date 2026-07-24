@@ -58,6 +58,16 @@
   --grad-primary:linear-gradient(135deg,#B9571E 0%,#8D4217 100%);
   --grad-hero:linear-gradient(140deg,#241E17 0%,#332A20 46%,#4A3220 100%);
   --blob-cool1:hsla(22,90%,58%,.5);--blob-cool2:hsla(30,55%,45%,.22);
+  /* ── JourneyHero time-of-day scene ── all four phase gradients keep every
+     stop at or below #5C3A2E lightness, so the hero's cream text (#FBF3EA)
+     measures ≥9:1 on the lightest stop — same AA discipline as --grad-hero. */
+  --hero-dawn:linear-gradient(160deg,#2E1F33 0%,#4A2B36 55%,#5C3A2E 100%);
+  --hero-day:linear-gradient(160deg,#1C2A3A 0%,#2A3B4E 55%,#3A4456 100%);
+  --hero-dusk:linear-gradient(160deg,#251626 0%,#48221A 55%,#68351C 100%);
+  --hero-night:linear-gradient(160deg,#0E1120 0%,#161B2C 55%,#20263C 100%);
+  --sky-back:rgba(20,16,24,.55);
+  --sky-front:rgba(12,10,16,.85);
+  --ember-cool:hsla(22,90%,58%,.9);
   --font-size-base: 16px;
   /* ── Typography — bilingual spec: Inter for Latin/Dutch, Tajawal for
         Arabic. --font-ar kept as an alias (still referenced by a couple of
@@ -143,6 +153,15 @@
   --grad-primary:linear-gradient(135deg,#B9571E 0%,#8D4217 100%);
   --grad-hero:linear-gradient(140deg,#141210 0%,#1E1A16 50%,#2E2013 100%);
   --blob-cool1:hsla(22,90%,58%,.5);--blob-cool2:hsla(30,55%,45%,.18);
+  /* JourneyHero phases, dark theme: same hues one step deeper — text
+     contrast only improves relative to the light-theme values above. */
+  --hero-dawn:linear-gradient(160deg,#261A2B 0%,#3E242E 55%,#4E3127 100%);
+  --hero-day:linear-gradient(160deg,#161F2C 0%,#22303F 55%,#2E3745 100%);
+  --hero-dusk:linear-gradient(160deg,#1E1220 0%,#3C1C16 55%,#552B18 100%);
+  --hero-night:linear-gradient(160deg,#0A0C18 0%,#111524 55%,#1A1F32 100%);
+  --sky-back:rgba(16,13,20,.6);
+  --sky-front:rgba(8,7,12,.9);
+  --ember-cool:hsla(22,92%,60%,.85);
   /* ── Spotlight / interactive-card ── */
   --spot-color: rgba(224,122,62,.18);        /* brighter on dark bg */
   --card-fg-hover: #FBF6F0;                  /* slightly brighter than --text; ≥4.5:1 on hover bg */
