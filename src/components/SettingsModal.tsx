@@ -70,10 +70,14 @@ export function SettingsModal({ onClose }: Props) {
 
       <CloudPanel />
 
-      <Field label="فوكسي 🦊">
+      <Field label="كاتيا 🐱">
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '.88rem', color: 'var(--text2)', cursor: 'pointer' }}>
           <input type="checkbox" checked={!s.mascotDismissed} onChange={() => s.toggleMascot()} />
-          إظهار فوكسي (المرشد التفاعلي) في زاوية الشاشة
+          إظهار كاتيا (المرشدة التفاعلية) في زاوية الشاشة
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '.88rem', color: 'var(--text2)', cursor: 'pointer', marginTop: 6 }}>
+          <input type="checkbox" checked={s.botWordReminders} onChange={() => s.toggleBotWordReminders()} />
+          تذكير بكلمات المهام المكتملة كل دقيقتين
         </label>
       </Field>
 

@@ -56,7 +56,7 @@ export function MascotBubble({ line, onClose, onDismissForever }: Props) {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
           <span style={{ fontFamily: 'var(--font-display)', fontSize: '.82rem', fontWeight: 'var(--fw-heading)', color: 'var(--orange-ink)' }}>
-            🦊 {MASCOT_NAME_AR}
+            🐱 {MASCOT_NAME_AR}
           </span>
           <button
             onClick={onClose} aria-label="إغلاق"

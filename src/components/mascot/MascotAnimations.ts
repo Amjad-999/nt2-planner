@@ -1,7 +1,7 @@
 import type { TargetAndTransition, Variants } from 'framer-motion'
 import { EASE_OUT, springFill } from '@/lib/animations'
 
-export type MascotMood = 'idle' | 'happy' | 'sad' | 'excited' | 'thinking'
+export type MascotMood = 'idle' | 'happy' | 'sad' | 'excited' | 'thinking' | 'dancing'
 
 /**
  * One animation target per mood, applied to the mascot's wrapping
@@ -36,6 +36,16 @@ export const MOOD_ANIMATION: Record<MascotMood, TargetAndTransition> = {
     rotate: [0, 6, 6, 0],
     transition: { duration: 2.2, repeat: Infinity, ease: EASE_OUT },
   },
+  // The victory dance: side-to-side sway + bounce, with a rotateY wobble
+  // (+ perspective) that reads as a 3D turn. Limb/tail motion is CSS-driven
+  // via the `mascot-dancing` class — see globals.css.
+  dancing: {
+    y: [0, -12, 0, -12, 0],
+    rotate: [0, -10, 0, 10, 0],
+    rotateY: [0, 28, 0, -28, 0],
+    transformPerspective: 400,
+    transition: { duration: 1.15, repeat: Infinity, ease: 'easeInOut' },
+  },
 }
 
 /** Static (no motion) pose per mood — used verbatim under prefers-reduced-motion. */
@@ -45,6 +55,7 @@ export const MOOD_STATIC: Record<MascotMood, TargetAndTransition> = {
   sad: { scale: 0.97, rotate: 0, y: 2 },
   excited: { scale: 1.05, rotate: 0, y: 0 },
   thinking: { scale: 1, rotate: 4, y: 0 },
+  dancing: { scale: 1.05, rotate: -3, y: 0 },
 }
 
 /** The character popping into view the first time it mounts. */

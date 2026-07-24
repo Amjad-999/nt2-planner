@@ -8,7 +8,8 @@ describe('Mascot', () => {
   beforeEach(() => {
     localStorage.clear()
     useAppStore.setState({
-      focusMode: false, mascotDismissed: false, name: '', streak: { count: 0, last: '' },
+      focusMode: false, mascotDismissed: false, botWordReminders: true, name: '',
+      streak: { count: 0, last: '' },
       dailyHistory: {}, unlockedBadges: [], inburgeringExams: [],
     })
   })
@@ -30,13 +31,33 @@ describe('Mascot', () => {
     expect(screen.queryByRole('button', { name: new RegExp(MASCOT_NAME_AR) })).not.toBeInTheDocument()
   })
 
-  it('opens a dialog bubble on click, with a working close button', () => {
+  it('opens the help panel on click, with a working close button', () => {
     render(<Mascot />)
     fireEvent.click(screen.getByRole('button', { name: new RegExp(MASCOT_NAME_AR) }))
-    expect(screen.getByRole('status')).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: new RegExp(MASCOT_NAME_AR) })).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'إغلاق' }))
-    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('shows the app guide inside the panel', () => {
+    render(<Mascot />)
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(MASCOT_NAME_AR) }))
+    fireEvent.click(screen.getByRole('button', { name: /دليل التطبيق/ }))
+    expect(screen.getByText('محاكاة الامتحان')).toBeInTheDocument()
+    // «رجوع» returns to the menu
+    fireEvent.click(screen.getByRole('button', { name: 'رجوع' }))
+    expect(screen.getByRole('button', { name: /نكتة هولندية/ })).toBeInTheDocument()
+  })
+
+  it('shows a Dutch joke with its Arabic translation', () => {
+    render(<Mascot />)
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(MASCOT_NAME_AR) }))
+    fireEvent.click(screen.getByRole('button', { name: /نكتة هولندية/ }))
+    // Both the Dutch original (lang=nl) and an Arabic line render
+    const panel = screen.getByRole('dialog', { name: new RegExp(MASCOT_NAME_AR) })
+    expect(panel.querySelector('[lang="nl"]')).not.toBeNull()
+    expect(screen.getByRole('button', { name: /نكتة أخرى/ })).toBeInTheDocument()
   })
 
   it('greets a named user by name on mount', async () => {
