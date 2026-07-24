@@ -51,7 +51,15 @@ export function SettingsModal({ onClose }: Props) {
     r.readAsText(f); e.target.value = ''
   }
 
-  const handleReset = () => { if (confirm('سيتم حذف كلّ بياناتك — هل أنت متأكّد؟')) { s.resetAll(); onClose() } }
+  // Full reload (not just onClose) after resetAll(): a couple of widgets
+  // (e.g. ExamCountdown) seed their own useState from localStorage once at
+  // mount rather than reading the store, so they'd keep showing stale
+  // values until the next full page load otherwise.
+  const handleReset = () => {
+    if (!confirm('سيتم حذف كلّ بياناتك — هل أنت متأكّد؟')) return
+    s.resetAll()
+    window.location.reload()
+  }
 
   const handleTest = async () => { setTestResult('يجرّب الآن…'); try { const r = await testAudio(); setTestResult(r) } catch (e) { setTestResult('❌ فشل: ' + String(e)) } }
 

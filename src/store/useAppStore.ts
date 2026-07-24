@@ -14,6 +14,10 @@ import { toast } from '@/components/Toast'
 const SK6 = 'nt2planner_v6'
 const SK5 = 'nt2planner_v5'
 const SK_BACKUP = 'nt2planner_v6_backup'
+/* Owned by src/components/countdown/ExamCountdown.tsx (kept as a literal
+   here, not an import, so the store doesn't reach into components) — must
+   stay in sync with that file's own STORAGE_KEY so resetAll() below clears it too. */
+const EXAM_COUNTDOWN_KEY = 'nt2_exam_date'
 
 /* ── Custom storage: reads Zustand-wrapped OR original raw JSON ── */
 const customStorage = {
@@ -478,6 +482,7 @@ export const useAppStore = create<AppStore>()(
           localStorage.removeItem(SK6)
           localStorage.removeItem(SK5)
           localStorage.removeItem(SK_BACKUP)
+          localStorage.removeItem(EXAM_COUNTDOWN_KEY)
         } catch {
           // storage blocked — still reset the in-memory state below
         }
