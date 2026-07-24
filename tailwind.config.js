@@ -5,14 +5,16 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        arabic: ['Cairo', 'Readex Pro', 'sans-serif'],
-        display: ['"Plus Jakarta Sans"', '"Cormorant Garamond"', 'serif'],
-        sans: ['Cairo', 'Readex Pro', 'sans-serif'],
+        arabic: ['Tajawal', 'sans-serif'],
+        latin: ['Inter', 'sans-serif'],
+        display: ['Tajawal', 'sans-serif'],
+        sans: ['Tajawal', 'sans-serif'],
       },
       colors: {
         accent: 'var(--orange)',
         'accent-dark': 'var(--orange-d)',
         'accent-light': 'var(--orange-l)',
+        'accent-ink': 'var(--orange-ink)',
         surface: 'var(--surface)',
         surface2: 'var(--surface2)',
         surface3: 'var(--surface3)',
@@ -22,6 +24,9 @@ export default {
         muted: 'var(--muted)',
         border: 'var(--border)',
         border2: 'var(--border2)',
+        success: 'var(--green)',
+        error: 'var(--red)',
+        info: 'var(--blue)',
       },
       borderRadius: {
         card: 'var(--r)',

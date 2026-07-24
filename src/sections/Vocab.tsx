@@ -63,8 +63,8 @@ export default function Vocab() {
 
   return (
     <div style={{ padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto' }}>
-      <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:700, color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
-        <span style={{ color:'var(--orange)' }}>📚</span> منصّة المفردات + AI
+      <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
+        <span style={{ color:'var(--orange)' }}>📚</span> منصّة المفردات + AI <span aria-hidden="true">🇳🇱</span>
       </h2>
 
       <AiLookup />

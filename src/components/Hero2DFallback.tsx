@@ -121,8 +121,8 @@ export function Hero2DFallback() {
       className="rounded-[calc(var(--r)+4px)] p-6 px-7 mb-5 relative overflow-hidden"
       style={{
         background: 'var(--grad-hero)',
-        border: '1px solid rgba(255,255,255,.12)',
-        boxShadow: 'var(--elev-3), inset 0 1px 0 rgba(255,255,255,.14)',
+        border: '1px solid rgba(255,244,235,.12)',
+        boxShadow: 'var(--elev-3), inset 0 1px 0 rgba(255,244,235,.12)',
         isolation: 'isolate',
       }}
     >
@@ -140,11 +140,11 @@ export function Hero2DFallback() {
 
       {/* Content */}
       <div style={{ position:'relative', zIndex:1 }}>
-        <h1 style={{ fontFamily:'var(--font-display,"Plus Jakarta Sans",serif)', fontSize:'1.8rem', fontWeight:700, color:'#F6F7FF', marginBottom:6, letterSpacing:'-.4px', position:'relative', display:'inline-block' }}>
+        <h1 style={{ fontFamily:'var(--font-display)', fontSize:'1.8rem', fontWeight:'var(--fw-heading)', color:'#FBF3EA', marginBottom:6, letterSpacing:'-.4px', position:'relative', display:'inline-block' }}>
           {greeting}
           <span aria-hidden="true" style={{ position:'absolute', insetInlineEnd:0, bottom:-6, width:'clamp(48px,40%,120px)', height:3, borderRadius:3, background:'linear-gradient(270deg,var(--hero-accent),transparent)', opacity:.9 }} />
         </h1>
-        <div style={{ fontSize:'.9rem', color:'rgba(233,236,250,.82)', lineHeight:1.5, marginTop:6 }}>
+        <div style={{ fontSize:'.9rem', color:'rgba(217,201,184,.82)', lineHeight:1.5, marginTop:6 }}>
           منصة متكاملة للوصول إلى مستوى B1 الفعلي المطلوب في امتحان NT2 — خطة تكيّفية، تحليلات يومية وأسبوعية، محاكاة امتحان رسمية، وذكاء اصطناعي مدمج.
         </div>
         <div style={{ display:'flex', gap:16, marginTop:14, flexWrap:'wrap' }}>
@@ -154,7 +154,7 @@ export function Hero2DFallback() {
             { icon:'⏱️', label:'درست اليوم:', value: String(todayMins), unit:'دقيقة' },
             { icon:'🔥', label:'مواظبة:', value: String(streak.count), unit:'يوم' },
           ].map((ck) => (
-            <div key={ck.label} style={{ background:'rgba(255,255,255,.1)', border:'1px solid rgba(255,255,255,.16)', backdropFilter:'blur(6px)', borderRadius:10, padding:'8px 14px', color:'#F2EEE2', display:'flex', alignItems:'center', gap:8, fontSize:'.85rem' }}>
+            <div key={ck.label} style={{ background:'rgba(255,244,235,.12)', border:'1px solid rgba(255,244,235,.16)', backdropFilter:'blur(6px)', borderRadius:10, padding:'8px 14px', color:'#EBDCC9', display:'flex', alignItems:'center', gap:8, fontSize:'.85rem' }}>
               {ck.icon} <span>{ck.label}</span>
               <b style={{ color:'var(--hero-accent)', fontSize:'1.05rem', fontWeight:700 }}>{ck.value}</b>
               <span>{ck.unit}</span>

@@ -31,7 +31,7 @@ export function CloudPanel() {
 
   return (
     <div dir="rtl" style={card}>
-      <h3 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 8 }}>
+      <h3 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 'var(--fw-heading)', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ color: 'var(--orange)' }}>☁️</span> الحفظ السحابي
       </h3>
 

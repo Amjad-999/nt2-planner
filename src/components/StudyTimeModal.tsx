@@ -19,7 +19,7 @@ export function StudyTimeModal({ onClose }: Props) {
 
   return (
     <Overlay onClose={onClose} label="إضافة وقت دراسة">
-      <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.35rem', fontWeight:700, color:'var(--text)', marginBottom:8 }}>⏱️ أضف وقت دراسة اليوم</h3>
+      <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.35rem', fontWeight:'var(--fw-heading)', color:'var(--text)', marginBottom:8 }}>⏱️ أضف وقت دراسة اليوم</h3>
       <p style={{ color:'var(--muted)', fontSize:'.88rem', marginBottom:14 }}>سجّل الدقائق التي درستها اليوم. ستظهر في التحليلات وخريطة النشاط.</p>
       <label htmlFor="study-mins" style={{ display:'block', fontSize:'.85rem', fontWeight:500, color:'var(--text2)', marginBottom:6 }}>عدد الدقائق</label>
       <input id="study-mins" type="number" value={mins} onChange={(e)=>setMins(e.target.value)} min={1} max={600} placeholder="مثل: 30"

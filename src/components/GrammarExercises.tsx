@@ -58,7 +58,7 @@ export function GrammarExercises({ lessonId }: Props) {
       boxShadow: 'var(--elev-1)',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ color: 'var(--orange)' }}>✏️</span> تمارين
         </h3>
         <span style={{ fontSize: '.82rem', color: 'var(--muted)', fontWeight: 600 }}>{correctCount} / {list.length}</span>

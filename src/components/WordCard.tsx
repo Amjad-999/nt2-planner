@@ -62,6 +62,7 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4, hlNl,
       <div className="grid items-center gap-2" style={{ gridTemplateColumns: '1fr auto' }}>
         <div>
           <div className="flex items-center gap-2 font-semibold text-[var(--text)] text-[.98rem]">
+            <span aria-hidden="true">🇳🇱</span>
             <HighlightText text={nl} indices={hlNl} />
             <button
               ref={btnRef}
@@ -71,7 +72,7 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4, hlNl,
               aria-label={`استمع لنطق ${nl}`}
             >🔊</button>
           </div>
-          <div className="text-[var(--text2)] text-[.88rem] mt-0.5"><HighlightText text={ar} indices={hlAr} /></div>
+          <div className="text-[var(--text2)] text-[.88rem] mt-0.5"><span aria-hidden="true">🇸🇾</span> <HighlightText text={ar} indices={hlAr} /></div>
           {ex && (
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="text-[var(--muted)] text-[.82rem] italic">"<HighlightText text={ex} indices={hlEx} />"</span>

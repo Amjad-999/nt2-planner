@@ -1,19 +1,28 @@
 import { useState, useEffect } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import { getDaysLeft } from '@/store/useAppStore'
-import { useTheme } from '@/hooks/useTheme'
 import { AppIcon } from './AppIcon'
 import { Magnetic } from './Magnetic'
-import { CalendarDots, Fire, DownloadSimple, Moon, Sun, GearSix } from './icons'
+import { ThemeToggle } from './themes/ThemeToggle'
+import { CalendarDots, Fire, DownloadSimple, GearSix } from './icons'
 
 interface Props {
   onOpenSettings: () => void
+  onOpenProfile: () => void
   onInstall: () => void
   showInstall: boolean
+  showProfile: boolean
+  userEmail?: string
 }
 
-export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
-  const { toggleTheme, isDark } = useTheme()
+function initials(label: string): string {
+  const parts = label.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return '؟'
+  return (parts[0][0] + (parts[1]?.[0] ?? '')).toUpperCase()
+}
+
+export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, showProfile, userEmail }: Props) {
+  const name = useAppStore((s) => s.name)
   const examDate = useAppStore((s) => s.examDate)
   const streak = useAppStore((s) => s.streak)
   const prefs = useAppStore((s) => s.prefs)
@@ -64,9 +73,10 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
 
       <div className="flex-1" />
 
-      {/* Countdown pill — hidden on phones (same info lives in the hero + KPIs) */}
+      {/* Countdown pill — hidden on phones (same info lives in the hero + KPIs);
+          also hidden in Focus Mode (decor-flourish) — motivational chrome, not core nav */}
       <div
-        className="hidden sm:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[.8rem] text-[var(--muted)] whitespace-nowrap"
+        className="decor-flourish hidden sm:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[.8rem] text-[var(--muted)] whitespace-nowrap"
         style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
         title="الأيام المتبقية حتى الامتحان"
       >
@@ -78,9 +88,9 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
         <span>يومًا للامتحان</span>
       </div>
 
-      {/* Streak pill — hidden on phones (shown in the hero + KPIs) */}
+      {/* Streak pill — hidden on phones (shown in the hero + KPIs); Focus Mode hides it too */}
       <div
-        className="hidden sm:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[.8rem] text-[var(--muted)] whitespace-nowrap"
+        className="decor-flourish hidden sm:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[.8rem] text-[var(--muted)] whitespace-nowrap"
         style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
         title="عدد أيام المواظبة المتتالية"
       >
@@ -111,10 +121,22 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
         </Magnetic>
       )}
 
-      {/* Theme toggle */}
-      <IconBtn onClick={toggleTheme} aria-label="تبديل المظهر" title={isDark ? 'الوضع الفاتح' : 'الوضع الداكن'}>
-        <AppIcon icon={isDark ? Sun : Moon} size={18} />
-      </IconBtn>
+      {/* Theme + Focus Mode */}
+      <ThemeToggle />
+
+      {/* Profile — only once the auth gate has been resolved (signed in or guest) */}
+      {showProfile && (
+        <Magnetic>
+          <button
+            onClick={onOpenProfile}
+            aria-label="الملف الشخصي" title={userEmail ?? (name || 'الملف الشخصي')}
+            className="btn-shine w-9 h-9 rounded-lg flex items-center justify-center text-[.78rem] font-bold cursor-pointer font-[inherit]"
+            style={{ background: 'var(--grad-primary)', color: '#fff', border: '1px solid var(--btn-border)', boxShadow: 'var(--elev-1)' }}
+          >
+            {initials(name || userEmail || 'ضيف')}
+          </button>
+        </Magnetic>
+      )}
 
       {/* Settings */}
       <IconBtn onClick={onOpenSettings} aria-label="الإعدادات" title="الإعدادات">
@@ -124,7 +146,7 @@ export function TopBar({ onOpenSettings, onInstall, showInstall }: Props) {
   )
 }
 
-function IconBtn({ children, onClick, title, 'aria-label': ariaLabel }: {
+export function IconBtn({ children, onClick, title, 'aria-label': ariaLabel }: {
   children: React.ReactNode; onClick: () => void; title?: string; 'aria-label'?: string
 }) {
   return (

@@ -1,7 +1,11 @@
 /* عميل Supabase — يُحمَّل ديناميكيًّا، ولا يعمل إلّا عند ضبط متغيّرات البيئة.
    إن لم تُضبَط أو لم تُثبَّت الحزمة، يبقى التطبيق يعمل عاديًّا (السحابة معطّلة فقط). */
 
-export interface CloudUser { id: string; email?: string }
+export interface CloudUser {
+  id: string
+  email?: string
+  user_metadata?: { full_name?: string; name?: string; avatar_url?: string; picture?: string }
+}
 export interface CloudSession { user: CloudUser }
 export interface CloudErr { message: string }
 
@@ -10,6 +14,7 @@ interface AuthApi {
   signInWithPassword(c: { email: string; password: string }): Promise<{ error: CloudErr | null }>
   signUp(c: { email: string; password: string }): Promise<{ error: CloudErr | null }>
   signInWithOAuth(c: { provider: string; options?: { redirectTo?: string } }): Promise<{ error: CloudErr | null }>
+  signInWithOtp(c: { email: string; options?: { emailRedirectTo?: string } }): Promise<{ error: CloudErr | null }>
   signOut(): Promise<{ error: CloudErr | null }>
   onAuthStateChange(cb: (event: string, session: CloudSession | null) => void): { data: { subscription: { unsubscribe(): void } } }
 }

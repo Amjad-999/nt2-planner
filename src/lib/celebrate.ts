@@ -15,9 +15,9 @@ export async function celebrate(type: CelebType = 'badge'): Promise<void> {
 
   const { default: confetti } = await import('canvas-confetti')
 
-  // Shared brand palette from app tokens — tangerine · leaf green · gold
-  const teal   = ['#F58F20', '#F9A23F', '#FBC07A', '#467434']
-  const bright = ['#F58F20', '#467434', '#D98A2B', '#6FA84F', '#F9A23F']
+  // Shared brand palette from app tokens — one burnt-orange hue, varied by shade
+  const teal   = ['#E07A3E', '#E7986A', '#EFBC9E', '#9E4B19']
+  const bright = ['#E07A3E', '#CA5F20', '#EFBC9E', '#E7986A', '#9E4B19']
 
   switch (type) {
     case 'word':

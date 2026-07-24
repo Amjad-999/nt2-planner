@@ -1,53 +1,89 @@
-/* ═══════════════════════════════════════════ ROOT (tangerine · leaf green · sea grey — light) ═══════════════════════════════════════════ */
-/* Brand palette (kept exact):  Tangerine #F58F20 · Leaf Green #467434 · Sea Grey #363636 */
+/* ═══════════════════════════════════════════ ROOT (muted burnt-orange glassmorphism — light) ═══════════════════════════════════════════ */
+/* Brand palette: primary #E07A3E (burnt orange, NOT the old #F58F20 tangerine) ·
+   hover/accent #C96A32. Semantic colors (success/error/info/tertiary, chart
+   categories, achievement tiers) are folded into this same orange/brown
+   family by design — differentiated by lightness/saturation, not hue — so
+   every one of them still reads as "on brand." Because that removes the
+   old red/green hue cue, every state pairs its color with an icon (✅/❌/⚠️/
+   🚨/🎯 etc., already this app's convention throughout) so meaning never
+   depends on color alone (WCAG 1.4.1). */
 :root {
-  --bg:#EDE9E2;--surface:rgba(255,255,255,.74);--surface2:rgba(255,255,255,.52);--surface3:#E6E0D5;
-  --border:rgba(54,54,54,.13);--border2:rgba(54,54,54,.24);
-  --text:#262420;--text2:#4B4844;--muted:#6A6459;--muted2:#ADA89C;
-  --orange:#F58F20;--orange-d:#CC7012;--orange-l:#FCEBD6;--orange-m:#F6C283;
-  --blue:#2F77E0;--blue-l:#E7F0FD;
-  --green:#467434;--green-l:#E4EEDC;
-  --amber:#D98A2B;--amber-l:#FAEBD6;
-  --purple:#8B5CF6;--purple-l:#F0EBFE;
-  --red:#E5484D;--red-l:#FCE7E7;
-  --teal:#467434;--teal-l:#E4EEDC;
-  --c1:#2F77E0;--c2:#D98A2B;--c3:#F58F20;--c4:#467434;--c5:#8B5CF6;--c6:#5B5B5B;
-  --shadow-sm:0 1px 2px rgba(40,36,30,.06), 0 2px 8px rgba(40,36,30,.05);
-  --shadow:0 6px 20px rgba(40,36,30,.10), 0 2px 6px rgba(40,36,30,.06);
-  --shadow-lg:0 24px 60px rgba(40,36,30,.20), 0 10px 24px rgba(40,36,30,.10);
-  /* Card radius per glass spec (24px); small radius unchanged for chips/inputs */
-  --r:24px;--r-sm:12px;
-  --hero-bg:#2B2A26;
-  /* Glassmorphism navbar — white glass over the mesh gradient (light theme
-     equivalent of the dark spec rgba(255,255,255,.08)) */
-  --topbar-bg:rgba(255,255,255,.5);
-  --overlay-bg:rgba(38,36,32,.45);
-  /* Page mesh per glass spec: orange 20% 30% · purple 80% 20% · teal 50% 80%.
-     Alphas boosted ~1.5x so the glass actually reads over the light base. */
-  --mesh1:hsla(30,80%,70%,.45);--mesh2:hsla(260,60%,60%,.3);--mesh3:hsla(190,70%,60%,.3);
-  /* Cards per spec literal: bg .1 white + border .2 white (both themes) */
-  --glass-bg:rgba(255,255,255,.1);--glass-bg-strong:rgba(255,255,255,.72);
-  --glass-border:rgba(255,255,255,.2);--glass-hi:rgba(255,255,255,.55);
-  /* Glass buttons — light glass slightly denser than the dark spec so they
-     stay discernible on blurred light surfaces */
-  --btn-bg:rgba(255,255,255,.45);--btn-border:rgba(255,255,255,.75);
-  /* Glass modals — light equivalents of the dark spec (bg .05 / border .25) */
-  --modal-bg:rgba(255,255,255,.65);--modal-border:rgba(255,255,255,.75);
-  /* Card shadow per glass spec literal: 0 8px 32px rgba(0,0,0,.1) + contact */
-  --elev-1:0 8px 32px rgba(0,0,0,.1), 0 2px 8px rgba(0,0,0,.05);
-  --elev-2:0 8px 24px rgba(40,36,30,.12), 0 3px 8px rgba(40,36,30,.07);
-  --elev-3:0 28px 64px rgba(40,36,30,.22), 0 12px 28px rgba(40,36,30,.12);
-  --ring-primary:rgba(245,143,32,.26);
-  --grad-primary:linear-gradient(135deg,#F9A23F 0%,#F58F20 52%,#D2740C 100%);
-  --grad-hero:linear-gradient(140deg,#242220 0%,#34322C 46%,#3A4A2C 100%);
-  --hero-accent:#F9B870;
-  --blob-cool1:hsla(32,90%,54%,.5);--blob-cool2:hsla(96,42%,40%,.20);--blob-cool3:hsla(28,86%,55%,.4);
-  --ember-cool:hsla(32,90%,58%,.9);
+  --bg:#FAF7F2;--surface:rgba(255,250,244,.74);--surface2:rgba(255,250,244,.52);--surface3:#F0E6DA;
+  --border:rgba(45,42,38,.13);--border2:rgba(45,42,38,.24);
+  --text:#2D2A26;--text2:#47433E;--muted:#6B6560;--muted2:#BAB5B0;
+  /* --orange = brand hue for fills/borders/icons (not held to text-contrast,
+     WCAG 1.4.11 non-text 3:1 only). --orange-ink = same hue darkened to
+     4.62:1 on --bg — use this instead of --orange wherever the color is the
+     TEXT itself (links, emphasized numbers, icon-as-content). */
+  --orange:#E07A3E;--orange-d:#C96A32;--orange-ink:#B4551D;--orange-l:#F7E4D9;--orange-m:#EAB18F;
+  /* Semantic states, folded into the orange/brown family (see header note).
+     Each *-text is contrast-verified ≥4.5:1 on both --bg and the glass card
+     wash; each *-l is a low-alpha background suitable for badges/pills. */
+  --blue:#7B675C;--blue-l:rgba(123,103,92,.14);                 /* info */
+  --green:#965D3B;--green-l:rgba(150,93,59,.14);                /* success / pass */
+  --amber:#B4551D;--amber-l:rgba(180,85,29,.14);
+  --purple:#A05845;--purple-l:rgba(160,88,69,.14);              /* tertiary / stats accent */
+  --red:#B14C10;--red-l:rgba(177,76,16,.14);                    /* error */
+  --teal:var(--green);--teal-l:var(--green-l);
+  /* Chart categorical ramp — one hue, six lightness steps (distinguish by
+     shade, not color-by-category; pair with a legend label, not color alone) */
+  --c1:#EFBC9E;--c2:#E7986A;--c3:#E07A3E;--c4:#CA5F20;--c5:#9E4B19;--c6:#723612;
+  --shadow-sm:0 1px 2px rgba(40,34,26,.06), 0 2px 8px rgba(40,34,26,.05);
+  --shadow:0 6px 20px rgba(40,34,26,.10), 0 2px 6px rgba(40,34,26,.06);
+  --shadow-lg:0 24px 60px rgba(40,34,26,.20), 0 10px 24px rgba(40,34,26,.10);
+  /* Glass card radius per spec (16px) — this is the app's one card radius,
+     used everywhere var(--r) appears; --r-sm unchanged for chips/inputs */
+  --r:16px;--r-sm:12px;
+  --hero-bg:#2B241D;
+  --topbar-bg:rgba(224,122,62,.08);
+  --overlay-bg:rgba(38,32,26,.45);
+  /* Page mesh — three lightness/alpha steps of the one brand hue (was a
+     multi-hue orange/purple/teal mesh; now a "subtle orange tint" wash) */
+  --mesh1:hsla(22,70%,65%,.40);--mesh2:hsla(22,60%,50%,.22);--mesh3:hsla(30,75%,72%,.28);
+  /* Glassmorphism card — spec literal: bg rgba(224,122,62,.08),
+     border rgba(224,122,62,.15), blur 12px (applied via .btn-glass/card
+     styles), radius 16px (--r above) */
+  --glass-bg:rgba(224,122,62,.08);--glass-bg-strong:rgba(250,240,230,.72);
+  --glass-border:rgba(224,122,62,.15);--glass-hi:rgba(255,244,235,.55);
+  --btn-bg:rgba(224,122,62,.14);--btn-border:rgba(224,122,62,.35);
+  --modal-bg:rgba(250,242,234,.72);--modal-border:rgba(224,122,62,.3);
+  --elev-1:0 8px 32px rgba(40,30,20,.1), 0 2px 8px rgba(40,30,20,.05);
+  --elev-2:0 8px 24px rgba(40,30,20,.12), 0 3px 8px rgba(40,30,20,.07);
+  --elev-3:0 28px 64px rgba(40,30,20,.22), 0 12px 28px rgba(40,30,20,.12);
+  --ring-primary:rgba(224,122,62,.30);
+  /* Kept within L=32–42% (both stops) so white text laid over ANY point of
+     the gradient still clears 4.5:1 (measured 4.72:1 / 7.18:1) — a wider,
+     brighter span looked better but silently failed AA wherever text sat
+     near its lighter end (TopBar logo badge, active nav/tab pills). */
+  --grad-primary:linear-gradient(135deg,#B9571E 0%,#8D4217 100%);
+  --grad-hero:linear-gradient(140deg,#241E17 0%,#332A20 46%,#4A3220 100%);
+  --hero-accent:#EBBDA2;
+  --blob-cool1:hsla(22,90%,58%,.5);--blob-cool2:hsla(30,55%,45%,.22);--blob-cool3:hsla(14,80%,55%,.4);
+  --ember-cool:hsla(22,90%,58%,.9);
   --font-size-base: 16px;
-  /* ── Typography ── */
-  --font-ar: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  /* ── Typography — bilingual spec: Inter for Latin/Dutch, Tajawal for
+        Arabic. --font-ar kept as an alias (still referenced by a couple of
+        call sites) so nothing dangles. --font-display = --font-arabic since
+        headings in this app are Arabic UI chrome, not a separate face. ── */
   --font-latin: 'Inter', system-ui, sans-serif;
-  --font-display: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  --font-arabic: 'Tajawal', system-ui, sans-serif;
+  --font-ar: var(--font-arabic);
+  --font-display: var(--font-arabic);
+  /* Weight scale: body 400 · headings 600 · CTAs/buttons 700.
+     Tajawal's static (non-variable) build only ships 400/700 — there is no
+     600 face. A font-weight:600 request therefore resolves, per the CSS
+     Fonts matching algorithm, to the nearest *heavier* loaded face (700).
+     Headings still read var(--fw-heading) everywhere (single source of
+     truth, and correct the moment a 600 face is ever added) even though
+     today they render visually identical to CTA weight. */
+  --fw-body: 400;
+  --fw-heading: 600;
+  --fw-cta: 700;
+  /* Arabic body copy: taller line-height for comfortable reading + zero
+     letter-spacing (tracking distorts joined Arabic letterforms). Latin/nl
+     content overrides both back to Western defaults via :lang(nl). */
+  --lh-arabic: 1.8;
+  --ls-arabic: 0;
   --text-xs: 0.8125rem;   /* 13px */
   --text-sm: 0.875rem;    /* 14px */
   --text-base: 1rem;      /* 16px */
@@ -55,59 +91,72 @@
   --text-xl: clamp(1.25rem, 2.2vw, 1.625rem);  /* 20–26px section titles */
   --text-2xl: clamp(1.75rem, 3vw, 2.25rem);    /* 28–36px card numbers */
   /* ── Spotlight / interactive-card ── */
-  --spot-color: rgba(245,143,32,.13);        /* tangerine glow, light — low opacity keeps WCAG AA */
-  --card-fg-hover: #1F1D1A;                  /* slightly deeper than --text; ≥4.5:1 on hover bg */
-  --card-accent-hover: var(--orange-d);      /* #CC7012 — same accent, darker shade */
-  /* ── Inburgering "passed" state (glass green) — dark-green text passes AA
-        (≈5.3:1) on the light green wash ── */
-  --pass-bg:rgba(34,197,94,.15);--pass-border:rgba(34,197,94,.3);--pass-text:#166534;
-  --pass-btn-bg:rgba(34,197,94,.25);--pass-btn-border:rgba(34,197,94,.5);
+  --spot-color: rgba(224,122,62,.13);        /* brand glow, light — low opacity keeps WCAG AA */
+  --card-fg-hover: #211D17;                  /* slightly deeper than --text; ≥4.5:1 on hover bg */
+  --card-accent-hover: var(--orange-d);      /* #C96A32 — same accent, darker shade */
+  /* ── Inburgering "passed" state — folded into --green (success), which is
+        itself the orange/brown family darkened to ≥4.5:1 (measured 5.0:1 on
+        --bg, 4.64:1 on the glass card wash) ── */
+  --pass-bg:var(--green-l);--pass-border:rgba(150,93,59,.3);--pass-text:var(--green);
+  --pass-btn-bg:rgba(150,93,59,.22);--pass-btn-border:rgba(150,93,59,.45);
+  /* ── Exam countdown card — now just the standard glass card recipe above,
+        with --orange-ink for AA-safe text (4.62:1 on the card wash) ── */
+  --countdown-bg:var(--glass-bg);--countdown-border:var(--glass-border);--countdown-text:var(--orange-ink);
+  --countdown-accent-bg:rgba(224,122,62,.15);--countdown-accent-border:rgba(224,122,62,.3);
 }
 
 :root[data-theme="dark"] {
-  --bg:#1A1A18;--surface:rgba(54,54,54,.55);--surface2:rgba(54,54,54,.4);--surface3:#2C2C29;
-  --border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18);
-  --text:#F2EFEA;--text2:#CFC9BF;--muted:#9A948A;--muted2:#6C675E;
-  --orange:#F9A23F;--orange-d:#FFB85C;--orange-l:#3A2A14;--orange-m:#7A5A2E;
-  --blue:#5C9CE8;--blue-l:#1A2540;
-  --green:#6FA84F;--green-l:#1E2C16;
-  --amber:#E0A24E;--amber-l:#33260F;
-  --purple:#A78BFA;--purple-l:#272148;
-  --red:#F2685F;--red-l:#3A1E1C;
-  --teal:#6FA84F;--teal-l:#1E2C16;
-  --c1:#5C9CE8;--c2:#E0A24E;--c3:#F9A23F;--c4:#6FA84F;--c5:#A78BFA;--c6:#9A948A;
+  --bg:#1A1A1A;--surface:rgba(44,38,32,.55);--surface2:rgba(44,38,32,.4);--surface3:#2C2620;
+  --border:rgba(255,244,235,.10);--border2:rgba(255,244,235,.18);
+  --text:#F5F0EB;--text2:#B8B4B0;--muted:#92908D;--muted2:#575655;
+  --orange:#E07A3E;--orange-d:#E89E72;--orange-l:#422210;--orange-m:#914E27;
+  /* Dark theme: --orange already clears AA as TEXT on --bg (5.82:1), so no
+     darkening is needed for that use. --orange-ink is still needed here —
+     same theme-constant value as light — for the OTHER failure mode: white
+     text on a solid orange chip/badge fails (2.99:1) regardless of theme,
+     since neither "white" nor plain --orange moves with the page theme. */
+  --orange-ink:#B4551D;
+  --blue:#9B8C83;--blue-l:rgba(155,140,131,.18);
+  --green:#B78466;--green-l:rgba(183,132,102,.18);
+  --amber:#E66B23;--amber-l:rgba(230,107,35,.18);
+  --purple:#B88274;--purple-l:rgba(184,130,116,.18);
+  --red:#E66B23;--red-l:rgba(230,107,35,.18);
+  --teal:var(--green);--teal-l:var(--green-l);
+  --c1:#843E15;--c2:#B0531C;--c3:#DC6823;--c4:#E3864F;--c5:#EAA47B;--c6:#F1C2A7;
   --shadow-sm:0 1px 2px rgba(0,0,0,.5), 0 2px 10px rgba(0,0,0,.4);
   --shadow:0 8px 24px rgba(0,0,0,.55), 0 3px 8px rgba(0,0,0,.4);
   --shadow-lg:0 28px 64px rgba(0,0,0,.65), 0 12px 28px rgba(0,0,0,.5);
-  --hero-bg:#1F1F1C;
-  /* Glassmorphism (dark): white-tinted glass per spec —
-     bg rgba(255,255,255,.08), border rgba(255,255,255,.2) */
-  --topbar-bg:rgba(255,255,255,.08);
-  --overlay-bg:rgba(8,8,7,.6);
-  /* Same spec hues, tuned down so they glow instead of wash out the dark bg */
-  --mesh1:hsla(30,80%,62%,.22);--mesh2:hsla(260,60%,58%,.18);--mesh3:hsla(190,70%,55%,.14);
-  --glass-bg:rgba(255,255,255,.1);--glass-bg-strong:rgba(255,255,255,.14);
-  --glass-border:rgba(255,255,255,.2);--glass-hi:rgba(255,255,255,.12);
-  /* Glass buttons per spec: bg rgba(255,255,255,.15), border rgba(255,255,255,.3) */
-  --btn-bg:rgba(255,255,255,.15);--btn-border:rgba(255,255,255,.3);
-  /* Glass modals per spec: bg rgba(255,255,255,.05), border rgba(255,255,255,.25) */
-  --modal-bg:rgba(255,255,255,.05);--modal-border:rgba(255,255,255,.25);
-  /* Same 8/32 glass shadow — higher alpha so it reads on the dark bg */
+  --hero-bg:#1E1A16;
+  --topbar-bg:rgba(224,122,62,.10);
+  --overlay-bg:rgba(6,5,4,.6);
+  --mesh1:hsla(22,70%,58%,.22);--mesh2:hsla(22,55%,48%,.16);--mesh3:hsla(30,70%,55%,.14);
+  /* Glassmorphism card (dark) — spec literal: bg rgba(224,122,62,.12) */
+  --glass-bg:rgba(224,122,62,.12);--glass-bg-strong:rgba(224,122,62,.16);
+  --glass-border:rgba(224,122,62,.22);--glass-hi:rgba(224,122,62,.14);
+  --btn-bg:rgba(224,122,62,.18);--btn-border:rgba(224,122,62,.35);
+  --modal-bg:rgba(224,122,62,.08);--modal-border:rgba(224,122,62,.28);
   --elev-1:0 8px 32px rgba(0,0,0,.45), 0 2px 8px rgba(0,0,0,.3);
   --elev-2:0 10px 28px rgba(0,0,0,.55), 0 4px 10px rgba(0,0,0,.4);
   --elev-3:0 30px 70px rgba(0,0,0,.7), 0 12px 30px rgba(0,0,0,.55);
-  --ring-primary:rgba(249,162,63,.32);
-  --grad-primary:linear-gradient(135deg,#FFB85C 0%,#F9A23F 50%,#E07D12 100%);
-  --grad-hero:linear-gradient(140deg,#161614 0%,#22221E 50%,#2A331C 100%);
-  --hero-accent:#FBC07A;
-  --blob-cool1:hsla(32,90%,55%,.5);--blob-cool2:hsla(96,45%,45%,.18);--blob-cool3:hsla(28,88%,58%,.4);
-  --ember-cool:hsla(32,92%,60%,.85);
+  --ring-primary:rgba(224,122,62,.35);
+  /* Same safe range as light theme — button-local contrast (white text on a
+     filled orange chip/badge) doesn't depend on page theme, so this is
+     intentionally identical rather than brightened for dark mode. */
+  --grad-primary:linear-gradient(135deg,#B9571E 0%,#8D4217 100%);
+  --grad-hero:linear-gradient(140deg,#141210 0%,#1E1A16 50%,#2E2013 100%);
+  --hero-accent:#EBBDA2;
+  --blob-cool1:hsla(22,90%,58%,.5);--blob-cool2:hsla(30,55%,45%,.18);--blob-cool3:hsla(14,85%,58%,.4);
+  --ember-cool:hsla(22,92%,60%,.85);
   /* ── Spotlight / interactive-card ── */
-  --spot-color: rgba(249,162,63,.18);        /* brighter on dark bg */
-  --card-fg-hover: #FBF8F2;                  /* slightly brighter than --text; ≥4.5:1 on hover bg */
-  --card-accent-hover: var(--orange-d);      /* #FFB85C in dark theme */
-  /* ── Inburgering "passed" state (dark) — light-green text; #166534 on the
-        dark green wash was ~1.9:1, so use a bright green (≈9:1) instead ── */
-  --pass-bg:rgba(34,197,94,.18);--pass-border:rgba(34,197,94,.45);--pass-text:#86EFAC;
-  --pass-btn-bg:rgba(34,197,94,.28);--pass-btn-border:rgba(34,197,94,.55);
+  --spot-color: rgba(224,122,62,.18);        /* brighter on dark bg */
+  --card-fg-hover: #FBF6F0;                  /* slightly brighter than --text; ≥4.5:1 on hover bg */
+  --card-accent-hover: var(--orange-d);      /* #E89E72 in dark theme */
+  /* ── Inburgering "passed" state (dark) — folded into --green (5.39:1 on
+        --bg, 4.54:1 on the glass card wash) ── */
+  --pass-bg:var(--green-l);--pass-border:rgba(183,132,102,.4);--pass-text:var(--green);
+  --pass-btn-bg:rgba(183,132,102,.24);--pass-btn-border:rgba(183,132,102,.5);
+  /* ── Exam countdown card (dark) — standard glass card recipe; the base
+        orange already clears AA here so --countdown-text just reuses it ── */
+  --countdown-bg:var(--glass-bg);--countdown-border:var(--glass-border);--countdown-text:var(--orange);
+  --countdown-accent-bg:rgba(224,122,62,.15);--countdown-accent-border:rgba(224,122,62,.3);
 }

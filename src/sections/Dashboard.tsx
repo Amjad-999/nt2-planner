@@ -2,6 +2,7 @@ import { useAppStore, totalLearnedWords, avgBestScore, weakestSkill, sumLastNDay
 import { AchievementsPanel } from '@/components/AchievementsPanel'
 import { PASS_THRESHOLD, SKILL_AR, LEARNED_BOX } from '@/data/phases'
 import { HeroSection } from '@/components/HeroSection'
+import { ExamCountdown } from '@/components/countdown/ExamCountdown'
 import { PlanHealth } from '@/components/PlanHealth'
 import { ExamCountdowns } from '@/components/ExamCountdowns'
 import { KpiCard } from '@/components/KpiCard'
@@ -76,11 +77,12 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
   else insights.push({ kind:'good', icon:'✅', title:'لا توجد كلمات مستحقّة الآن', desc:'استثمر هذا الوقت في إضافة كلمات جديدة من خانة AI.' })
   if (remDays>0) insights.push({ kind:projected>=PASS_THRESHOLD?'good':'warn', icon:'🔮', title:'توقّع جاهزيتك يوم الامتحان', desc:`بمعدّلك الحالي (${bestNT2}%) وبواقع ${remDays} يوم، أنت في طريقك إلى ~${projected}%. ${projected>=PASS_THRESHOLD?'مرشّح للنجاح إن حافظت على الإيقاع.':'تحتاج رفع الكثافة لتجاوز عتبة 65%.'}` })
 
-  const SH = { fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:700, color:'var(--text)', margin:'24px 0 12px', display:'flex', alignItems:'center', gap:10 } as const
+  const SH = { fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'24px 0 12px', display:'flex', alignItems:'center', gap:10 } as const
 
   return (
     <div style={{ padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto' }}>
       <HeroSection />
+      <ExamCountdown />
       <PlanHealth />
 
       <ExamCountdowns />

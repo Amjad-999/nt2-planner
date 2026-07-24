@@ -42,8 +42,8 @@ export default function Exam() {
 
   return (
     <div style={{ padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto' }}>
-      <h2 style={{ fontFamily:'var(--font-ar)', fontSize:'var(--text-xl)', fontWeight:700, color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
-        <span style={{ color:'var(--orange)' }}>📝</span> محاكاة امتحان NT2 — مستوى B1 حقيقي
+      <h2 style={{ fontFamily:'var(--font-ar)', fontSize:'var(--text-xl)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
+        <span style={{ color:'var(--orange)' }}>📝</span> محاكاة امتحان NT2 — مستوى B1 حقيقي <span aria-hidden="true">🎯</span>
       </h2>
       <div style={{ background:'var(--orange-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--orange)', borderRadius:'var(--r-sm)', padding:'14px 18px', marginBottom:16, fontSize:'var(--text-sm)', color:'var(--text2)', lineHeight:1.65 }}>
         <strong style={{ color:'var(--text)' }}>مُعايَر على امتحانات DUO الرسمية.</strong> المحتوى أصليّ لكنّه مكتوب لتطابق المستوى B1 الفعلي.
@@ -95,7 +95,7 @@ function ReadingView({ s }: { s: S }) {
         return (
           <Card key={t.id}>
             {/* Dutch title → LTR */}
-            <h3 dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', fontSize:'1.1rem', fontWeight:700, color:'var(--text)', margin:'0 0 6px' }}>
+            <h3 dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', fontSize:'1.1rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 6px' }}>
               📄 {t.title}
             </h3>
             <Passage title={t.title} text={t.text} />
@@ -144,7 +144,7 @@ function ListeningView({ s }: { s: S }) {
         const pct = answered===it.questions.length ? Math.round((correct/it.questions.length)*100) : -1
         return (
           <Card key={it.id}>
-            <h3 dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', fontSize:'1.1rem', fontWeight:700, color:'var(--text)', margin:'0 0 6px' }}>
+            <h3 dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', fontSize:'1.1rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 6px' }}>
               🎙️ {it.title}
             </h3>
             <TtsPlayer text={it.transcript} />
@@ -214,7 +214,7 @@ function WritingView({ s }: { s: S }) {
         return (
           <Card key={w.id}>
             {/* Dutch task title → LTR */}
-            <h3 dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', fontSize:'1.1rem', fontWeight:700, color:'var(--text)', margin:'0 0 6px' }}>
+            <h3 dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', fontSize:'1.1rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 6px' }}>
               📝 {w.titleNl}
             </h3>
             <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:'18px 20px', margin:'12px 0 10px', boxShadow:'var(--elev-1)' }}>
@@ -401,7 +401,7 @@ function Passage({ title, text, pre }: { title: string; text: string; pre?: bool
       }}
     >
       {title && (
-        <h4 style={{ fontFamily:'var(--font-latin)', fontSize:'1.2rem', fontWeight:700, color:'var(--text)', marginBottom:6 }}>
+        <h4 style={{ fontFamily:'var(--font-latin)', fontSize:'1.2rem', fontWeight:'var(--fw-heading)', color:'var(--text)', marginBottom:6 }}>
           {title}
         </h4>
       )}

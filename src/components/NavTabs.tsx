@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react'
 import { useAppStore } from '@/store/useAppStore'
+import { useFocusMode } from '@/hooks/useFocusMode'
 import type { TabId } from '@/store/types'
 import { AppIcon } from './AppIcon'
 import type { LiteIcon } from './icons'
@@ -8,22 +9,25 @@ import {
   ClipboardText, GameController, TextAa, ChartLineUp, Globe, Star,
 } from './icons'
 
-const TABS: { id: TabId; Icon: LiteIcon; label: string }[] = [
-  { id: 'dashboard', Icon: SquaresFour,   label: 'لوحة التحكم' },
-  { id: 'plan',      Icon: CalendarCheck, label: 'الخطة' },
-  { id: 'vocab',     Icon: Translate,     label: 'المفردات + AI' },
-  { id: 'books',     Icon: BookOpen,      label: 'الكتب' },
-  { id: 'exam',      Icon: ClipboardText, label: 'محاكاة الامتحان' },
-  { id: 'exercises', Icon: GameController,label: 'تمارين' },
-  { id: 'grammar',   Icon: TextAa,        label: 'قواعد' },
-  { id: 'stats',     Icon: ChartLineUp,   label: 'التحليلات' },
-  { id: 'resources', Icon: Globe,         label: 'مصادر DUO' },
-  { id: 'platform',  Icon: Star,          label: 'منصّتي' },
+/* رموز جغرافية توضيحية: 🇳🇱 محتوى هولندي · 🎯 متعلّق بالامتحان ·
+   📍 موقعك/تقدّمك الحالي · 🌍 عام/شامل (مصادر خارجية أو نظرة عامة) */
+const TABS: { id: TabId; Icon: LiteIcon; label: string; geo: string }[] = [
+  { id: 'dashboard', Icon: SquaresFour,   label: 'لوحة التحكم',     geo: '🌍' },
+  { id: 'plan',      Icon: CalendarCheck, label: 'الخطة',            geo: '📍' },
+  { id: 'vocab',     Icon: Translate,     label: 'المفردات + AI',   geo: '🇳🇱' },
+  { id: 'books',     Icon: BookOpen,      label: 'الكتب',            geo: '🇳🇱' },
+  { id: 'exam',      Icon: ClipboardText, label: 'محاكاة الامتحان', geo: '🎯' },
+  { id: 'exercises', Icon: GameController,label: 'تمارين',           geo: '🇳🇱' },
+  { id: 'grammar',   Icon: TextAa,        label: 'قواعد',            geo: '🇳🇱' },
+  { id: 'stats',     Icon: ChartLineUp,   label: 'التحليلات',        geo: '📍' },
+  { id: 'resources', Icon: Globe,         label: 'مصادر DUO',       geo: '🌍' },
+  { id: 'platform',  Icon: Star,          label: 'منصّتي',           geo: '🌍' },
 ]
 
 export function NavTabs() {
   const activeTab = useAppStore((s) => s.activeTab)
   const setActiveTab = useAppStore((s) => s.setActiveTab)
+  const { focusMode } = useFocusMode()
   const navRef = useRef<HTMLElement>(null)
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
   const indicatorRef = useRef<HTMLSpanElement>(null)
@@ -104,6 +108,7 @@ export function NavTabs() {
             role="tab"
             aria-selected={isActive}
             aria-controls={`tab-${tab.id}`}
+            aria-label={tab.label}
             onClick={() => setActiveTab(tab.id)}
             onKeyDown={(e) => handleKeyDown(e, idx)}
             onMouseEnter={() => moveIndicatorTo(tabRefs.current[tab.id])}
@@ -116,7 +121,11 @@ export function NavTabs() {
             }}
           >
             <AppIcon icon={tab.Icon} size={20} />
-            {tab.label}
+            {!focusMode && (
+              <>
+                {tab.label} <span aria-hidden="true">{tab.geo}</span>
+              </>
+            )}
           </button>
         )
       })}

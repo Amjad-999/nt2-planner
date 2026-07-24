@@ -38,20 +38,24 @@ html {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-ar);
-  font-weight: 400;
-  line-height: 1.6;
-  letter-spacing: 0;  /* Arabic requires zero tracking */
+  font-family: var(--font-arabic);
+  font-weight: var(--fw-body);
+  line-height: var(--lh-arabic);
+  letter-spacing: var(--ls-arabic);
   min-height: 100dvh;
   transition: background .25s ease, color .25s ease;
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }
 
-/* Dutch / Latin content: Inter, left-to-right */
+/* Dutch / Latin content: Inter, left-to-right — resets the Arabic body
+   defaults (line-height/tracking) back to Western norms, and turns on
+   ligatures + contextual alternates for cleaner Latin rendering. */
 :lang(nl) {
   font-family: var(--font-latin);
+  line-height: 1.5;
   letter-spacing: -0.01em;
+  font-feature-settings: 'liga' 1, 'calt' 1;
 }
 
 /* Mesh gradient background — three drifting colour blobs per the glass spec */
@@ -90,6 +94,14 @@ body::before {
   border-radius: 6px;
 }
 
+/* ── Focus Mode — minimal UI, no distractions ─────────────────────────────
+   Toggled via TopBar's ThemeToggle → useAppStore().toggleFocusMode(), which
+   sets data-focus on <html> (see useAppStore.ts, mirrors data-theme). Any
+   purely decorative/motivational element (not core content or navigation)
+   can opt in by adding class="decor-flourish". */
+html[data-focus="on"] body::before { display: none; }
+html[data-focus="on"] .decor-flourish { display: none !important; }
+
 /* ── Screen-reader only ── */
 .sr-only {
   position: absolute;
@@ -126,8 +138,8 @@ body::before {
 
 /* ── Backdrop filter fallback ── */
 @supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
-  :root { --glass-bg: rgba(255,255,255,.92); --glass-bg-strong: rgba(255,255,255,.97); --topbar-bg: rgba(255,255,255,.96); --btn-bg: rgba(255,255,255,.92); --modal-bg: rgba(255,255,255,.97); }
-  :root[data-theme="dark"] { --glass-bg: rgba(44,44,41,.94); --glass-bg-strong: rgba(44,44,41,.98); --topbar-bg: rgba(30,30,28,.97); --btn-bg: rgba(58,58,54,.94); --modal-bg: rgba(38,38,35,.97); }
+  :root { --glass-bg: rgba(250,244,237,.92); --glass-bg-strong: rgba(250,244,237,.97); --topbar-bg: rgba(250,244,237,.96); --btn-bg: rgba(250,244,237,.92); --modal-bg: rgba(250,244,237,.97); }
+  :root[data-theme="dark"] { --glass-bg: rgba(42,34,27,.94); --glass-bg-strong: rgba(42,34,27,.98); --topbar-bg: rgba(26,22,18,.97); --btn-bg: rgba(50,40,32,.94); --modal-bg: rgba(34,28,22,.97); }
 }
 
 /* ── Glass form controls ─────────────────────────────────────────────────
@@ -172,8 +184,8 @@ body::before {
   /* Liquid feel: springy overshoot on scale (buttons hover spec: 1.05) */
   transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), background .2s ease, border-color .2s ease;
 }
-.btn-glass:hover:not(:disabled), .btn-shine:hover:not(:disabled) { transform: scale(1.05); }
-.btn-glass:active:not(:disabled), .btn-shine:active:not(:disabled) { transform: scale(.96); transition-duration: .1s; }
+.btn-glass:hover:not(:disabled), .btn-shine:hover:not(:disabled) { transform: scale(1.05) translateY(-2px); }
+.btn-glass:active:not(:disabled), .btn-shine:active:not(:disabled) { transform: scale(.95); transition-duration: .1s; }
 
 /* Shine: a skewed light strip parked off-canvas; hover sweeps it across.
    The transition lives on the hover rule only, so it snaps back invisibly
@@ -314,7 +326,7 @@ body::before {
    (وليس text-shadow الذي يظهر خلف الحروف الشفافة). */
 .title-3d {
   background: linear-gradient(100deg,
-    #FBC07A 0%, #F6F7FF 28%, #F9A23F 52%, #FBF6EE 76%, #FBC07A 100%);
+    #EBBDA2 0%, #FCF3EA 28%, #E07A3E 52%, #F7E4D9 76%, #EBBDA2 100%);
   background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;

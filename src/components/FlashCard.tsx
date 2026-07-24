@@ -205,7 +205,9 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
         )}
       </AnimatePresence>
 
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>{nl}</div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>
+        <span aria-hidden="true" style={{ fontSize: '1.4rem', verticalAlign: 'middle' }}>🇳🇱</span> {nl}
+      </div>
 
       <button ref={btnRef} onClick={() => speakDutch(nl, btnRef.current)}
         className="btn-glass text-[.8rem] px-3 py-1.5 rounded-[8px] text-[var(--muted)] cursor-pointer hover:text-[var(--orange)]">
@@ -231,7 +233,7 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
       <AnimatePresence>
         {!nextInterval && flipped ? (
           <motion.div key="back" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-            <div className="mt-5 text-[1.15rem] text-[var(--text)] font-medium">{ar}</div>
+            <div className="mt-5 text-[1.15rem] text-[var(--text)] font-medium"><span aria-hidden="true">🇸🇾</span> {ar}</div>
             {ex && <div className="mt-2.5 text-[.92rem] text-[var(--text2)] italic">"{ex}"</div>}
             <div className="flex gap-2 mt-[18px] justify-center flex-wrap">
               {GRADE_BUTTONS.map(({ quality, label, icon, color, bg, key }) => (

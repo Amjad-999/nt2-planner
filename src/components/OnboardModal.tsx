@@ -24,7 +24,7 @@ export function OnboardModal({ onClose }: Props) {
     <Overlay onClose={onClose} label="الترحيب والإعداد الأوّلي">
       <div style={{ textAlign:'center', marginBottom:14 }}>
         <div style={{ fontSize:'2.4rem' }}>🇳🇱</div>
-        <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.35rem', fontWeight:700, color:'var(--text)', margin:'6px 0 4px' }}>NT2 Planner</h3>
+        <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.35rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'6px 0 4px' }}>NT2 Planner</h3>
         <p style={{ color:'var(--muted)', fontSize:'.88rem', margin:0 }}>مخطّط ذكي للاستعداد لامتحان NT2 (B1)</p>
       </div>
       <Field label="اسمك (كيف تريد أن يناديك التطبيق؟)">

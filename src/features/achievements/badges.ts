@@ -114,6 +114,9 @@ export const TIER_ORDER: BadgeDef['tier'][] = ['bronze', 'silver', 'gold', 'plat
 export const TIER_LABEL: Record<BadgeDef['tier'], string> = {
   bronze: 'برونزي', silver: 'فضّي', gold: 'ذهبي', platinum: 'بلاتيني',
 }
+/* Folded into the app's one orange/brown hue — tiers read by lightness +
+   saturation (bronze darkest/muted → platinum lightest) rather than by a
+   distinct color per tier, alongside the tier label text (TIER_LABEL). */
 export const TIER_COLOR: Record<BadgeDef['tier'], string> = {
-  bronze: '#cd7f32', silver: '#9E9E9E', gold: '#D98A2B', platinum: '#467434',
+  bronze: '#995229', silver: '#998980', gold: '#E26D28', platinum: '#C7B4A8',
 }

@@ -81,6 +81,9 @@ export interface AppStore extends State {
   // UI actions
   setActiveTab: (tab: TabId) => void
   toggleTheme: () => void
+  toggleFocusMode: () => void
+  setGuestMode: () => void
+  toggleMascot: () => void
 
   // Persistence
   save: () => void
@@ -163,6 +166,29 @@ export const useAppStore = create<AppStore>()(
         const theme = get().theme === 'dark' ? 'light' : 'dark'
         set({ theme })
         document.documentElement.setAttribute('data-theme', theme)
+        get().save()
+      },
+
+      toggleFocusMode: () => {
+        const focusMode = !get().focusMode
+        set({ focusMode })
+        document.documentElement.setAttribute('data-focus', focusMode ? 'on' : 'off')
+        get().save()
+      },
+
+      // "Continue without account" — one-way flag; a later sign-in still
+      // works fine (the auth gate just checks `!user && !guestMode`), and
+      // signing out again afterwards should not re-trigger the gate.
+      setGuestMode: () => {
+        set({ guestMode: true })
+        get().save()
+      },
+
+      // "Turn off the mascot" preference — reversible from Settings, unlike
+      // guestMode. Closing a single bubble is separate, session-only UI
+      // state that lives in useMascot, not here.
+      toggleMascot: () => {
+        set({ mascotDismissed: !get().mascotDismissed })
         get().save()
       },
 
@@ -458,6 +484,7 @@ export const useAppStore = create<AppStore>()(
         const fresh = defaultState()
         set({ ...fresh, activeTab: 'dashboard' })
         document.documentElement.setAttribute('data-theme', 'light')
+        document.documentElement.setAttribute('data-focus', 'off')
         get().save()
       },
 
@@ -467,6 +494,7 @@ export const useAppStore = create<AppStore>()(
           const state = parsed?.state ? applyState(parsed.state) : applyState(parsed)
           set({ ...state })
           document.documentElement.setAttribute('data-theme', state.theme)
+          document.documentElement.setAttribute('data-focus', state.focusMode ? 'on' : 'off')
           get().save()
           return true
         } catch {
@@ -647,6 +675,7 @@ export function generateTodayPlan(state: Pick<State, 'planDay' | 'done' | 'vocab
 export function initStore() {
   const state = useAppStore.getState()
   document.documentElement.setAttribute('data-theme', state.theme)
+  document.documentElement.setAttribute('data-focus', state.focusMode ? 'on' : 'off')
   const fs = state.prefs.fontSize ?? 15
   document.documentElement.style.setProperty('--font-size-base', `${fs}px`)
 

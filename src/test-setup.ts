@@ -41,3 +41,17 @@ Object.defineProperty(window, 'ResizeObserver', {
     disconnect() {}
   },
 })
+
+// Mock IntersectionObserver (required by framer-motion's whileInView, used by Reveal in MotionFx.tsx)
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  value: class IntersectionObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() { return [] }
+  },
+})
+
+// jsdom doesn't implement scrollIntoView (used by NavTabs to keep the active tab visible)
+Element.prototype.scrollIntoView = function () {}

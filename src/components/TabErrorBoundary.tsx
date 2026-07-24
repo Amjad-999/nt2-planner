@@ -36,8 +36,8 @@ export class TabErrorBoundary extends Component<Props, State> {
           style={{ padding: '32px 28px', maxWidth: 560, margin: '0 auto', textAlign: 'center' }}
         >
           <div style={{
-            background: 'var(--red-l, #FFF0F0)',
-            border: '1px solid var(--red, #E53E3E)',
+            background: 'var(--red-l, rgba(177,76,16,.14))',
+            border: '1px solid var(--red, #B14C10)',
             borderRadius: 'var(--r, 16px)',
             padding: '28px 24px',
             boxShadow: 'var(--elev-1)',

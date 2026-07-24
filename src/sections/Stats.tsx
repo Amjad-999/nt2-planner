@@ -86,13 +86,13 @@ export default function Stats() {
       const cs = getComputedStyle(document.documentElement)
       const color = (v: string, fb: string) => cs.getPropertyValue(v).trim() || fb
       const c = {
-        txt:    color('--text2',   '#444A66'),
-        grid:   color('--border',  '#E4DECE'),
-        orange: color('--orange',  '#F58F20'),
-        blue:   color('--blue',    '#2F77E0'),
-        green:  color('--green',   '#467434'),
-        purple: color('--purple',  '#8B5CF6'),
-        amber:  color('--amber',   '#D98A2B'),
+        txt:    color('--text2',   '#47433E'),
+        grid:   color('--border',  'rgba(45,42,38,.13)'),
+        orange: color('--orange',  '#E07A3E'),
+        blue:   color('--blue',    '#7B675C'),
+        green:  color('--green',   '#965D3B'),
+        purple: color('--purple',  '#A05845'),
+        amber:  color('--amber',   '#B4551D'),
       }
       Chart.defaults.color = c.txt
       Chart.defaults.borderColor = c.grid
@@ -210,8 +210,8 @@ export default function Stats() {
 
   return (
     <div style={{ padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto' }}>
-      <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:700, color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
-        <span style={{ color:'var(--orange)' }}>📈</span> لوحة التحليلات الاستراتيجية
+      <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
+        <span style={{ color:'var(--orange)' }}>📈</span> لوحة التحليلات الاستراتيجية <span aria-hidden="true">📍</span>
       </h2>
       <div style={{ background:'var(--purple-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--purple)', borderRadius:'var(--r-sm)', padding:'14px 18px', marginBottom:18, fontSize:'.9rem', color:'var(--text2)', lineHeight:1.65 }}>
         <strong style={{ color:'var(--text)' }}>تتبّع يومي وأسبوعي شامل:</strong> كلّ الرسوم البيانية تستخدم بياناتك الحقيقية من سجلّ التطبيق.

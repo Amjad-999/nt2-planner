@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import type WaveSurfer from 'wavesurfer.js'
 
 interface Props {
   /** Audio URL to load */
@@ -53,8 +54,7 @@ function audioBufferToBlob(buf: AudioBuffer): Blob {
 
 export function WaveAudio({ src, audioBuffer, title }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const wsRef = useRef<any>(null)
+  const wsRef = useRef<WaveSurfer | null>(null)
   const blobUrlRef = useRef<string | null>(null)
 
   const [playing, setPlaying] = useState(false)
@@ -85,9 +85,9 @@ export function WaveAudio({ src, audioBuffer, title }: Props) {
 
   // Build wavesurfer colors from CSS vars
   const waveColors = () => ({
-    waveColor:     cssVar('--orange-m') || '#F6C283',
-    progressColor: cssVar('--orange')   || '#F58F20',
-    cursorColor:   cssVar('--orange-d') || '#CC7012',
+    waveColor:     cssVar('--orange-m') || '#EAB18F',
+    progressColor: cssVar('--orange')   || '#E07A3E',
+    cursorColor:   cssVar('--orange-d') || '#C96A32',
   })
 
   // ── Init wavesurfer on mount / src change ──
@@ -96,15 +96,14 @@ export function WaveAudio({ src, audioBuffer, title }: Props) {
     if (!src && !audioBuffer) return
 
     let destroyed = false
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let ws: any = null
+    let ws: WaveSurfer | null = null
 
     const init = async () => {
       const { default: WaveSurfer } = await import('wavesurfer.js')
       if (destroyed || !containerRef.current) return
 
       const colors = waveColors()
-      ws = WaveSurfer.create({
+      const inst = WaveSurfer.create({
         container: containerRef.current,
         height: 56,
         barWidth: 2,
@@ -117,15 +116,16 @@ export function WaveAudio({ src, audioBuffer, title }: Props) {
         audioRate: speed,
         ...colors,
       })
-      wsRef.current = ws
+      ws = inst
+      wsRef.current = inst
 
-      ws.on('ready', (dur: number) => {
+      inst.on('ready', (dur: number) => {
         if (destroyed) return
         setDuration(dur)
         setReady(true)
         setLoadError(false)
       })
-      ws.on('timeupdate', (ct: number) => {
+      inst.on('timeupdate', (ct: number) => {
         if (destroyed) return
         setCurrentTime(ct)
         // A–B loop
@@ -136,30 +136,30 @@ export function WaveAudio({ src, audioBuffer, title }: Props) {
           abBRef.current > abARef.current &&
           ct >= abBRef.current
         ) {
-          ws.setTime(abARef.current)
+          inst.setTime(abARef.current)
         }
       })
-      ws.on('play',   () => { if (!destroyed) setPlaying(true) })
-      ws.on('pause',  () => { if (!destroyed) setPlaying(false) })
-      ws.on('finish', () => {
+      inst.on('play',   () => { if (!destroyed) setPlaying(true) })
+      inst.on('pause',  () => { if (!destroyed) setPlaying(false) })
+      inst.on('finish', () => {
         if (destroyed) return
         if (abOnRef.current && abARef.current !== null) {
-          ws.setTime(abARef.current)
-          ws.play().catch(() => {})
+          inst.setTime(abARef.current)
+          inst.play().catch(() => {})
         } else {
           setPlaying(false)
         }
       })
-      ws.on('error', () => { if (!destroyed) setLoadError(true) })
+      inst.on('error', () => { if (!destroyed) setLoadError(true) })
 
       // Load source
       if (src) {
-        await ws.load(src)
+        await inst.load(src)
       } else if (audioBuffer) {
         const blob = audioBufferToBlob(audioBuffer)
         const blobUrl = URL.createObjectURL(blob)
         blobUrlRef.current = blobUrl
-        await ws.load(blobUrl)
+        await inst.load(blobUrl)
       }
     }
 
@@ -256,7 +256,7 @@ export function WaveAudio({ src, audioBuffer, title }: Props) {
               aria-label={`السرعة ${SPEED_LABELS[s]}`}
               style={{
                 ...ctrlBtn(false),
-                background: speed === s ? 'var(--orange)' : 'var(--btn-bg)',
+                background: speed === s ? 'var(--orange-ink)' : 'var(--btn-bg)',
                 color:      speed === s ? '#fff' : 'var(--text2)',
                 fontSize: '.72rem',
                 padding: '4px 7px',
@@ -310,8 +310,8 @@ export function WaveAudio({ src, audioBuffer, title }: Props) {
               bottom: 0,
               insetInlineStart: `${abAFrac * 100}%`,
               width: `${(abBFrac - abAFrac) * 100}%`,
-              background: 'rgba(16,155,142,.18)',
-              border: '1px solid rgba(16,155,142,.5)',
+              background: 'rgba(160,88,69,.18)',
+              border: '1px solid rgba(160,88,69,.5)',
               borderRadius: 3,
               pointerEvents: 'none',
             }}

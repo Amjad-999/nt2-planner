@@ -13,7 +13,7 @@ const components: Components = {
     <h1 style={{
       fontFamily: 'var(--font-display)',
       fontSize: '1.45rem',
-      fontWeight: 700,
+      fontWeight: 'var(--fw-heading)',
       color: 'var(--text)',
       borderBottom: '2px solid var(--orange-m)',
       paddingBottom: '0.4em',
@@ -26,7 +26,7 @@ const components: Components = {
     <h2 style={{
       fontFamily: 'var(--font-display)',
       fontSize: '1.1rem',
-      fontWeight: 700,
+      fontWeight: 'var(--fw-heading)',
       color: 'var(--text)',
       margin: '1.6em 0 0.6em',
       display: 'flex',

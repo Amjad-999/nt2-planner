@@ -52,7 +52,7 @@ export function FloatingCard({
       {/* Glass border line */}
       <RoundedBox args={[width + 0.02, height + 0.02, 0.01]} radius={0.055} smoothness={4}>
         <meshBasicMaterial
-          color="#F6C283"
+          color="#EAB18F"
           transparent
           opacity={0.18}
           side={THREE.BackSide}

@@ -69,7 +69,7 @@ function PdfModal({ state, onClose }: { state: ModalState; onClose: () => void }
             <a
               href={state.src}
               download
-              style={{ fontSize: '.8rem', padding: '5px 12px', borderRadius: 8, border: '1px solid var(--green, #4caf50)', color: 'var(--green, #4caf50)', background: 'transparent', textDecoration: 'none', fontFamily: 'inherit', cursor: 'pointer' }}
+              style={{ fontSize: '.8rem', padding: '5px 12px', borderRadius: 8, border: '1px solid var(--green, #965D3B)', color: 'var(--green, #965D3B)', background: 'transparent', textDecoration: 'none', fontFamily: 'inherit', cursor: 'pointer' }}
             >
               ⬇ تنزيل
             </a>
@@ -118,8 +118,8 @@ export default function Resources() {
 
   return (
     <div style={{ padding: '24px 28px 60px', maxWidth: 1100, margin: '0 auto' }}>
-      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 700, color: 'var(--text)', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ color: 'var(--orange)' }}>🔗</span> مصادر رسمية وعلى الإنترنت
+      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{ color: 'var(--orange)' }}>🔗</span> مصادر رسمية وعلى الإنترنت <span aria-hidden="true">🌍</span>
       </h2>
 
       <div style={{ background: 'var(--blue-l)', border: '1px solid var(--glass-border)', borderInlineStart: '3px solid var(--blue)', borderRadius: 'var(--r-sm)', padding: '14px 18px', marginBottom: 18, fontSize: '.9rem', color: 'var(--text2)', lineHeight: 1.65 }}>
@@ -396,7 +396,7 @@ function ExamActionButton({
         download
         title="تنزيل"
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, borderRadius: 6, border: '1px solid var(--glass-border)', color: 'var(--text2)', textDecoration: 'none', fontSize: '.85rem', flexShrink: 0, transition: 'border-color .12s' }}
-        onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--green, #4caf50)' }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--green, #965D3B)' }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--glass-border)' }}
       >
         ⬇

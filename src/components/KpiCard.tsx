@@ -108,7 +108,7 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
         <div
           ref={valRef}
           className="text-[1.65rem] font-bold leading-[1.1] text-[var(--text)] pe-10 card-value"
-          style={{ fontFamily: 'var(--font-display,"Plus Jakarta Sans",serif)' }}
+          style={{ fontFamily: 'var(--font-display)' }}
         >
           {value}
         </div>

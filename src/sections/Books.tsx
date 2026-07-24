@@ -7,8 +7,8 @@ export default function Books() {
 
   return (
     <div style={{ padding: '24px 28px 60px', maxWidth: 1100, margin: '0 auto' }}>
-      <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:700, color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
-        <span style={{ color:'var(--orange)' }}>📖</span> الكتب والوحدات
+      <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
+        <span style={{ color:'var(--orange)' }}>📖</span> الكتب والوحدات <span aria-hidden="true">🇳🇱</span>
       </h2>
       <div style={{ background:'var(--amber-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--amber)', borderRadius:'var(--r-sm)', padding:'14px 18px', marginBottom:18, fontSize:'.9rem', color:'var(--text2)', lineHeight:1.65 }}>
         📚 <strong style={{ color:'var(--text)' }}>تتبّع تقدّمك في الكتب الرسمية</strong> — حدّد الوحدات التي أتممت مراجعتها. يُضاف إنجازك تلقائيًا إلى لوحة التحليلات.

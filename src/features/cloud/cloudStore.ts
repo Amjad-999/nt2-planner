@@ -13,10 +13,15 @@ interface CloudState {
   status: CloudStatus
   message: string
   lastSyncedAt: number | null
+  // False until the initial getSession() call resolves — lets callers (the
+  // first-run auth gate) avoid flashing a login screen at a returning,
+  // already-signed-in user before we've had a chance to check.
+  sessionChecked: boolean
   init: () => void
   signInEmail: (email: string, password: string) => Promise<void>
   signUpEmail: (email: string, password: string) => Promise<void>
   signInGoogle: () => Promise<void>
+  signInMagicLink: (email: string) => Promise<void>
   signOut: () => Promise<void>
   syncNow: () => Promise<void>
   deleteCloud: () => Promise<void>
@@ -47,14 +52,17 @@ export const useCloud = create<CloudState>((set, get) => ({
   status: cloudConfigured() ? 'idle' : 'offline',
   message: '',
   lastSyncedAt: null,
+  // Nothing to check when cloud isn't configured at all — resolved immediately.
+  sessionChecked: !cloudConfigured(),
 
   init: () => {
     if (inited || !cloudConfigured()) return
     inited = true
     getCloud().then(async (cloud) => {
-      if (!cloud) return
+      if (!cloud) { set({ sessionChecked: true }); return }
       const { data } = await cloud.auth.getSession()
       if (data.session) { set({ user: data.session.user }); get().syncNow() }
+      set({ sessionChecked: true })
       cloud.auth.onAuthStateChange((evt, session) => { void evt; set({ user: session ? session.user : null }) })
       // مزامنة مؤجّلة عند أي تغيير محلّي (وليس التغييرات القادمة من السحابة نفسها)
       useAppStore.subscribe(() => {
@@ -92,6 +100,14 @@ export const useCloud = create<CloudState>((set, get) => ({
   signInGoogle: async () => {
     const cloud = await getCloud(); if (!cloud) return
     await cloud.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })
+  },
+
+  signInMagicLink: async (email) => {
+    set({ status: 'syncing', message: '' })
+    const cloud = await getCloud(); if (!cloud) return
+    const { error } = await cloud.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin } })
+    if (error) { set({ status: 'error', message: error.message }); return }
+    set({ status: 'idle', message: 'أُرسل رابط الدخول — افتحه من بريدك الإلكتروني على هذا الجهاز.' })
   },
 
   signOut: async () => {

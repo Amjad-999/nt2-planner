@@ -56,11 +56,11 @@ export default function Grammar() {
     <div dir="rtl" style={{ padding: '24px 28px 80px', maxWidth: 820, margin: '0 auto' }}>
       {/* Header */}
       <h2 style={{
-        fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 700,
+        fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 'var(--fw-heading)',
         color: 'var(--text)', margin: '0 0 4px',
         display: 'flex', alignItems: 'center', gap: 10,
       }}>
-        <span style={{ color: 'var(--orange)' }}>📖</span> قواعد ونصائح
+        <span style={{ color: 'var(--orange)' }}>📖</span> قواعد ونصائح <span aria-hidden="true">🇳🇱</span>
       </h2>
       <p style={{ fontSize: '.88rem', color: 'var(--text2)', marginBottom: 18, lineHeight: 1.6 }}>
         كل المستويات A1 · A2 · B1 · B2 — اختر مستوًى ثمّ درسًا، وبعد كل درس تمارين تفاعلية.
@@ -80,7 +80,7 @@ export default function Grammar() {
                 padding: '8px 16px', minWidth: 92,
                 border: `1px solid ${on ? 'var(--orange)' : 'var(--glass-border)'}`,
                 borderRadius: 12,
-                background: on ? 'var(--orange)' : 'var(--glass-bg)',
+                background: on ? 'var(--orange-ink)' : 'var(--glass-bg)',
                 color: on ? '#fff' : 'var(--text2)',
                 fontFamily: 'inherit', cursor: 'pointer',
                 fontWeight: on ? 700 : 600,

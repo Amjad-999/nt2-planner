@@ -745,8 +745,8 @@ export default function Exercises() {
 
   return (
     <div dir="rtl" style={{ padding: '24px 28px 80px', maxWidth: 760, margin: '0 auto' }}>
-      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 700, color: 'var(--text)', margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ color: 'var(--orange)' }}>🎮</span> تمارين تفاعلية
+      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{ color: 'var(--orange)' }}>🎮</span> تمارين تفاعلية <span aria-hidden="true">🇳🇱</span>
       </h2>
       <p style={{ fontSize: '.88rem', color: 'var(--text2)', marginBottom: 18, lineHeight: 1.6 }}>
         تمارين مُولَّدة من مفرداتك. تدعم السحب والإفلات ولوحة المفاتيح واللمس.

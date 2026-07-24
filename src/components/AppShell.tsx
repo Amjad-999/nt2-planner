@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import { useAppStore } from '@/store/useAppStore'
+import { useAuth } from '@/hooks/useAuth'
 import { TopBar } from './TopBar'
 import { NavTabs } from './NavTabs'
 import { TabErrorBoundary } from './TabErrorBoundary'
@@ -10,8 +11,12 @@ import { ToastHost } from './Toast'
 const SettingsModal  = lazy(() => import('./SettingsModal').then((m) => ({ default: m.SettingsModal })))
 const OnboardModal   = lazy(() => import('./OnboardModal').then((m) => ({ default: m.OnboardModal })))
 const StudyTimeModal = lazy(() => import('./StudyTimeModal').then((m) => ({ default: m.StudyTimeModal })))
+const AuthModal      = lazy(() => import('./auth/AuthModal').then((m) => ({ default: m.AuthModal })))
+const UserProfile    = lazy(() => import('./auth/UserProfile').then((m) => ({ default: m.UserProfile })))
+const Mascot         = lazy(() => import('./mascot/Mascot').then((m) => ({ default: m.Mascot })))
 import { useBadgeCheck } from '@/hooks/useBadgeCheck'
 import { useCloud } from '@/features/cloud/cloudStore'
+import { cloudConfigured } from '@/lib/supabase'
 
 const Dashboard  = lazy(() => import('@/sections/Dashboard'))
 const Plan       = lazy(() => import('@/sections/Plan'))
@@ -23,6 +28,11 @@ const Grammar    = lazy(() => import('@/sections/Grammar'))
 const Stats      = lazy(() => import('@/sections/Stats'))
 const Resources  = lazy(() => import('@/sections/Resources'))
 const Platform   = lazy(() => import('@/sections/Platform'))
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
+}
 
 const SECTION_MAP = {
   dashboard: Dashboard, plan: Plan, vocab: Vocab, books: Books,
@@ -44,32 +54,45 @@ const SectionLoader = () => (
 export function AppShell() {
   const activeTab = useAppStore((s) => s.activeTab)
   const onboarded = useAppStore((s) => s.onboarded)
+  const { isAuthenticated, guestMode, resolved, user } = useAuth()
 
   const [showSettings, setShowSettings] = useState(false)
   const [showOnboard, setShowOnboard] = useState(false)
   const [showStudyTime, setShowStudyTime] = useState(false)
+  const [showProfile, setShowProfile] = useState(false)
   const [showInstall, setShowInstall] = useState(false)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [deferredInstall, setDeferredInstall] = useState<any>(null)
+  const [deferredInstall, setDeferredInstall] = useState<BeforeInstallPromptEvent | null>(null)
 
   useBadgeCheck()
 
-  // Show onboarding on first load
-  useEffect(() => { if (!onboarded) setTimeout(() => setShowOnboard(true), 300) }, [onboarded])
+  // First-run auth gate: must resolve (signed in, or explicit "continue as
+  // guest") before onboarding. `resolved` is false only for the brief window
+  // where a configured backend's session check hasn't returned yet — during
+  // that window we show neither the gate nor onboarding, to avoid a flash of
+  // one before the other.
+  const needsAuthGate = cloudConfigured() && resolved && !isAuthenticated && !guestMode
 
-  // Signed-in users sync from app start — not only after opening Settings.
-  // The sb-*-auth-token key exists only after a login, so guests never pay
-  // for the supabase-js chunk.
+  // Show onboarding on first load — deferred behind the auth gate above.
   useEffect(() => {
-    try {
-      if (Object.keys(localStorage).some((k) => k.startsWith('sb-') && k.endsWith('-auth-token')))
-        useCloud.getState().init()
-    } catch { /* storage blocked — CloudPanel still calls init() on open */ }
+    if (needsAuthGate || !resolved) return
+    if (!onboarded) setTimeout(() => setShowOnboard(true), 300)
+  }, [onboarded, needsAuthGate, resolved])
+
+  // Previously this only ran for *returning* signed-in users (detected via a
+  // leftover sb-*-auth-token key), so brand-new guests never paid for the
+  // supabase-js chunk. Task 5's mandatory first-run auth gate needs to know
+  // the session state for EVERY visitor before deciding what to show them —
+  // there's no way to offer a working "sign in with Google" screen without
+  // the auth client loaded, so that optimization no longer applies once
+  // cloud is configured. It's still skipped entirely when cloud isn't
+  // configured (local dev without .env, or a deploy that opts out).
+  useEffect(() => {
+    if (cloudConfigured()) useCloud.getState().init()
   }, [])
 
   // PWA install prompt
   useEffect(() => {
-    const handler = (e: Event) => { e.preventDefault(); setDeferredInstall(e); setShowInstall(true) }
+    const handler = (e: Event) => { e.preventDefault(); setDeferredInstall(e as BeforeInstallPromptEvent); setShowInstall(true) }
     window.addEventListener('beforeinstallprompt', handler)
     window.addEventListener('appinstalled', () => setShowInstall(false))
     return () => window.removeEventListener('beforeinstallprompt', handler)
@@ -78,7 +101,7 @@ export function AppShell() {
   const handleInstall = () => {
     if (deferredInstall) {
       deferredInstall.prompt()
-      deferredInstall.userChoice.then((ch: { outcome: string }) => {
+      deferredInstall.userChoice.then((ch) => {
         if (ch.outcome === 'accepted') setShowInstall(false)
       })
     } else {
@@ -95,8 +118,11 @@ export function AppShell() {
       <a href="#main-content" className="skip-link">تخطَّ إلى المحتوى</a>
       <TopBar
         onOpenSettings={() => setShowSettings(true)}
+        onOpenProfile={() => setShowProfile(true)}
         onInstall={handleInstall}
         showInstall={showInstall}
+        showProfile={isAuthenticated || guestMode}
+        userEmail={user?.email}
       />
       <NavTabs />
 
@@ -121,10 +147,19 @@ export function AppShell() {
       </main>
 
       <ToastHost />
+      {/* Not shown during the first-run auth gate / onboarding — it would just
+          be clutter competing with a modal the user must resolve first. */}
+      {!needsAuthGate && onboarded && (
+        <Suspense fallback={null}>
+          <Mascot />
+        </Suspense>
+      )}
       <Suspense fallback={null}>
+        {needsAuthGate && <AuthModal />}
         {showSettings  && <SettingsModal onClose={() => setShowSettings(false)} />}
         {showOnboard   && <OnboardModal onClose={() => setShowOnboard(false)} />}
         {showStudyTime && <StudyTimeModal onClose={() => setShowStudyTime(false)} />}
+        {showProfile   && <UserProfile onClose={() => setShowProfile(false)} />}
       </Suspense>
     </div>
   )

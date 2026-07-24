@@ -10,7 +10,8 @@ import type { InburgeringExam } from '@/store/types'
  */
 
 /* ── glassmorphism الحالة الناجحة — الألوان من tokens.css فتتكيّف مع الثيم
-   (النص الداكن #166534 غير مقروء على الأخضر في الوضع الداكن؛ التوكِن يبدّله) ── */
+   (--pass-text/--pass-bg تُطابق --green، وهو الآن جزءًا من عائلة البرتقالي
+   المطفأ الموحّدة للتطبيق، وليس أخضر منفصل — كل قيمة محقّقة الوضوح ≥4.5:1) ── */
 const PASS_BG     = 'var(--pass-bg)'
 const PASS_BORDER = '1px solid var(--pass-border)'
 const PASS_TEXT   = 'var(--pass-text)'
@@ -26,7 +27,7 @@ function isoToInputDate(iso: string | null): string {
 }
 
 const SH = {
-  fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 700,
+  fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 'var(--fw-heading)',
   color: 'var(--text)', margin: '24px 0 12px', display: 'flex', alignItems: 'center', gap: 10,
 } as const
 

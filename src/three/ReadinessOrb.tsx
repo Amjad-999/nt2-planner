@@ -16,8 +16,8 @@ interface Props {
 const SKILL_COLORS: Record<SkillKey, string> = {
   reading:   '#3B82F6',
   listening: '#22C55E',
-  writing:   '#F58F20',
-  speaking:  '#EF4444',
+  writing:   '#E07A3E',
+  speaking:  '#B14C10',
 }
 
 export function ReadinessOrb({ progress, streak, weakSkill }: Props) {
@@ -151,7 +151,7 @@ export function ReadinessOrb({ progress, streak, weakSkill }: Props) {
       />
 
       {/* Very soft fill light */}
-      <pointLight color="#F6C68A" intensity={0.3} distance={5} decay={2} />
+      <pointLight color="#EAB18F" intensity={0.3} distance={5} decay={2} />
     </group>
   )
 }

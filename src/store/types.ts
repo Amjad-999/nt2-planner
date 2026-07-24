@@ -89,6 +89,9 @@ export interface State {
   done: Record<string, true>
   studySec: number
   theme: ThemeKey
+  focusMode: boolean
+  guestMode: boolean
+  mascotDismissed: boolean
   vocab: VocabWord[]
   streak: { count: number; last: string }
   skill: Record<SkillKey, SkillRecord>

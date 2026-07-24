@@ -95,8 +95,8 @@ export function Hero3D() {
         marginBottom: 20,
         minHeight: 280,
         background: 'var(--grad-hero)',
-        border: '1px solid rgba(255,255,255,.10)',
-        boxShadow: 'var(--elev-3), inset 0 1px 0 rgba(255,255,255,.10)',
+        border: '1px solid rgba(255,244,235,.12)',
+        boxShadow: 'var(--elev-3), inset 0 1px 0 rgba(255,244,235,.12)',
       }}
     >
       {/* 3D canvas — ErrorBoundary catches WebGL failures → shows 2D fallback */}
@@ -166,16 +166,16 @@ function HeroTextOverlay({ daysLeft, planDay, total, todayMins, streakCount }: T
       <h1
         className="title-3d"
         style={{
-          fontFamily: 'var(--font-display,"Plus Jakarta Sans",serif)',
+          fontFamily: 'var(--font-display)',
           fontSize: 'clamp(1.4rem, 3vw, 1.8rem)',
-          fontWeight: 700,
+          fontWeight: 'var(--fw-heading)',
           marginBottom: 6,
           letterSpacing: '-.4px',
         }}
       >
         {greeting}
       </h1>
-      <div style={{ fontSize: '.9rem', color: 'rgba(233,236,250,.82)', lineHeight: 1.5, marginBottom: 14, textShadow: '0 1px 6px rgba(13,15,30,.5)' }}>
+      <div style={{ fontSize: '.9rem', color: 'rgba(217,201,184,.82)', lineHeight: 1.5, marginBottom: 14, textShadow: '0 1px 6px rgba(13,15,30,.5)' }}>
         منصة متكاملة للوصول إلى مستوى B1 الفعلي المطلوب في امتحان NT2 — خطة تكيّفية، وذكاء اصطناعي مدمج.
       </div>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -190,13 +190,13 @@ function HeroTextOverlay({ daysLeft, planDay, total, todayMins, streakCount }: T
             key={ck.label}
             className={'pulse' in ck && ck.pulse ? 'pulse-ok' : undefined}
             style={{
-              background: 'rgba(255,255,255,.09)',
-              border: '1px solid rgba(255,255,255,.14)',
+              background: 'rgba(255,244,235,.09)',
+              border: '1px solid rgba(255,244,235,.12)',
               backdropFilter: 'blur(6px)',
               WebkitBackdropFilter: 'blur(6px)',
               borderRadius: 10,
               padding: '7px 13px',
-              color: '#F2EEE2',
+              color: '#EBDCC9',
               display: 'flex',
               alignItems: 'center',
               gap: 7,

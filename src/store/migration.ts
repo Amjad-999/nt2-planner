@@ -18,6 +18,9 @@ export function defaultState(): State {
     done: {},
     studySec: 0,
     theme: 'light',
+    focusMode: false,
+    guestMode: false,
+    mascotDismissed: false,
     vocab: [],
     streak: { count: 0, last: '' },
     skill: {
@@ -63,6 +66,9 @@ export function applyState(parsed: any): State {
     const ps = new Date(); ps.setDate(ps.getDate() - (S.planDay - 1)); S.planStart = ps.toISOString()
   }
   S.theme = parsed.theme === 'dark' ? 'dark' : 'light'
+  S.focusMode = typeof parsed.focusMode === 'boolean' ? parsed.focusMode : false
+  S.guestMode = typeof parsed.guestMode === 'boolean' ? parsed.guestMode : false
+  S.mascotDismissed = typeof parsed.mascotDismissed === 'boolean' ? parsed.mascotDismissed : false
 
   // Vocab
   S.vocab = (Array.isArray(parsed.vocab) ? parsed.vocab : [])

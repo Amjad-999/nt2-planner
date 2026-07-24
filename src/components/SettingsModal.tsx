@@ -57,10 +57,17 @@ export function SettingsModal({ onClose }: Props) {
 
   return (
     <Overlay onClose={onClose} label="الإعدادات">
-      <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.35rem', fontWeight:700, color:'var(--text)', marginBottom:8 }}>⚙️ الإعدادات</h3>
+      <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.35rem', fontWeight:'var(--fw-heading)', color:'var(--text)', marginBottom:8 }}>⚙️ الإعدادات</h3>
       <p style={{ color:'var(--muted)', fontSize:'.88rem', marginBottom:14 }}>اضبط بياناتك واستهدافك للامتحان.</p>
 
       <CloudPanel />
+
+      <Field label="فوكسي 🦊">
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '.88rem', color: 'var(--text2)', cursor: 'pointer' }}>
+          <input type="checkbox" checked={!s.mascotDismissed} onChange={() => s.toggleMascot()} />
+          إظهار فوكسي (المرشد التفاعلي) في زاوية الشاشة
+        </label>
+      </Field>
 
       <Field label="اسمك (اختياري)"><input className="form-in" value={name} onChange={(e)=>setName(e.target.value)} placeholder="اسمك" /></Field>
       <Field label="تاريخ الامتحان"><input className="form-in" type="date" value={examDate} onChange={(e)=>setExamDate(e.target.value)} /></Field>

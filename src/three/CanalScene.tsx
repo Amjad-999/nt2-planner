@@ -46,7 +46,7 @@ function GlassPanel({
       </RoundedBox>
       {/* thin border highlight */}
       <RoundedBox args={[width + 0.015, height + 0.015, 0.005]} radius={0.065} smoothness={3}>
-        <meshBasicMaterial color="#F6C283" transparent opacity={0.12} side={THREE.BackSide} />
+        <meshBasicMaterial color="#EAB18F" transparent opacity={0.12} side={THREE.BackSide} />
       </RoundedBox>
     </group>
   )
@@ -231,7 +231,7 @@ export function CanalScene({ progress, streak, daysLeft, planDay, todayMins, str
 
       {/* Ambient light — kept dim so the orb glow stands out */}
       <ambientLight color="#4A3C28" intensity={0.6} />
-      <directionalLight position={[4, 6, 4]} color="#F9C079" intensity={0.4} />
+      <directionalLight position={[4, 6, 4]} color="#E7986A" intensity={0.4} />
 
       {/* Stars background */}
       <Stars radius={30} depth={20} count={600} factor={2.5} fade speed={0.4} />
@@ -266,7 +266,7 @@ export function CanalScene({ progress, streak, daysLeft, planDay, todayMins, str
           floatAmplitude={0.07}
         >
           <div style={{ color: '#FBF6EE', fontSize: 13, lineHeight: 1.5 }}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: '#FBC07A', lineHeight: 1 }}>
+            <div style={{ fontSize: 22, fontWeight: 800, color: '#EBBDA2', lineHeight: 1 }}>
               {daysLeft == null ? '—' : daysLeft}
             </div>
             <div style={{ fontSize: 11, opacity: 0.75, marginTop: 2 }}>يومًا للامتحان</div>
