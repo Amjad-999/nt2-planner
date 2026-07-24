@@ -50,9 +50,9 @@ export default defineConfig({
     }),
   ],
   // No manualChunks: every heavy library here has a single lazy consumer
-  // (three→3D hero, dnd-kit→Exercises, markdown→Grammar, chart→Stats,
-  // pdf/wavesurfer→Exam), so default chunking already keeps them out of the
-  // eager critical path. Hand-grouping them pulled shared modules (react-dom,
-  // jsx-runtime, zustand) into those chunks and forced the entry to
-  // modulepreload 1.4 MB of lazy vendor code at startup.
+  // (dnd-kit→Exercises, markdown→Grammar, chart→Stats, pdf/wavesurfer→Exam),
+  // so default chunking already keeps them out of the eager critical path.
+  // Hand-grouping them pulled shared modules (react-dom, jsx-runtime,
+  // zustand) into those chunks and forced the entry to modulepreload 1.4 MB
+  // of lazy vendor code at startup.
 })
