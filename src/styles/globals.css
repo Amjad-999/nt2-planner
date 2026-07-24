@@ -385,7 +385,30 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
 @media (pointer: coarse) {
   .hero-sky { will-change: auto; }
 }
+.ring-pulse { animation: ring-pulse .7s ease-out 3; }
+@keyframes ring-pulse { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.07); } }
 @media (prefers-reduced-motion: reduce) {
   .hero-phase { transition: none; }
   .ember { display: none; }
+  .ring-pulse { animation: none; }
+}
+
+/* ── كاتيا 🐱: رقصة الأطراف والذيل — تأرجح الجسم الكامل يعيش في
+   MascotAnimations.ts (framer-motion). class «mascot-dancing» تُضاف فقط
+   عندما mood==='dancing' وبدون prefers-reduced-motion (انظر Mascot.tsx)؛
+   الـ media query أدناه شبكة أمان إضافية بنفس عادة بقية الملف. ── */
+.cat-arm-l, .cat-arm-r, .cat-tail { transform-box: fill-box; }
+.cat-arm-l { transform-origin: 50% 12%; }
+.cat-arm-r { transform-origin: 50% 12%; }
+.cat-tail  { transform-origin: 15% 85%; }
+.mascot-dancing .cat-arm-l { animation: cat-arm-swing-l .58s ease-in-out infinite; }
+.mascot-dancing .cat-arm-r { animation: cat-arm-swing-r .58s ease-in-out infinite; }
+.mascot-dancing .cat-tail  { animation: cat-tail-wag .58s ease-in-out infinite; }
+@keyframes cat-arm-swing-l { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-38deg); } }
+@keyframes cat-arm-swing-r { 0%, 100% { transform: rotate(38deg); } 50% { transform: rotate(0deg); } }
+@keyframes cat-tail-wag    { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(16deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .mascot-dancing .cat-arm-l,
+  .mascot-dancing .cat-arm-r,
+  .mascot-dancing .cat-tail { animation: none; }
 }

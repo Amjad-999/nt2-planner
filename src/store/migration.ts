@@ -21,6 +21,7 @@ export function defaultState(): State {
     focusMode: false,
     guestMode: false,
     mascotDismissed: false,
+    botWordReminders: true,
     vocab: [],
     streak: { count: 0, last: '' },
     skill: {
@@ -42,6 +43,7 @@ export function defaultState(): State {
     unlockedBadges: [],
     grammarProgress: {},
     inburgeringExams: reconcileInburgeringExams(null),
+    goalCelebratedOn: '',
     _v: 6,
     _savedAt: 0,
   }
@@ -69,6 +71,11 @@ export function applyState(parsed: any): State {
   S.focusMode = typeof parsed.focusMode === 'boolean' ? parsed.focusMode : false
   S.guestMode = typeof parsed.guestMode === 'boolean' ? parsed.guestMode : false
   S.mascotDismissed = typeof parsed.mascotDismissed === 'boolean' ? parsed.mascotDismissed : false
+  S.botWordReminders = typeof parsed.botWordReminders === 'boolean' ? parsed.botWordReminders : true
+  // Daily-goal flag: must be a real dayKey or '' — junk that sorts after every
+  // date (e.g. 'zzz') would win the cloud-merge max and mute celebrations forever.
+  S.goalCelebratedOn = typeof parsed.goalCelebratedOn === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(parsed.goalCelebratedOn)
+    ? parsed.goalCelebratedOn : ''
 
   // Vocab
   S.vocab = (Array.isArray(parsed.vocab) ? parsed.vocab : [])

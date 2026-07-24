@@ -92,6 +92,7 @@ export interface State {
   focusMode: boolean
   guestMode: boolean
   mascotDismissed: boolean
+  botWordReminders: boolean
   vocab: VocabWord[]
   streak: { count: number; last: string }
   skill: Record<SkillKey, SkillRecord>
@@ -108,6 +109,7 @@ export interface State {
   unlockedBadges: string[]
   grammarProgress: Record<string, number[]>   // topicId → indices of correctly-answered exercises
   inburgeringExams: InburgeringExam[]
+  goalCelebratedOn: string   // dayKey ('YYYY-MM-DD') of the last daily-goal celebration; '' = never
   _v: number
   _savedAt: number
 }

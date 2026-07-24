@@ -145,6 +145,7 @@ export function mergeStates(a: State, b: State): State {
     focusMode: newer.focusMode,
     guestMode: newer.guestMode,
     mascotDismissed: newer.mascotDismissed,
+    botWordReminders: newer.botWordReminders,
     prefs: newer.prefs,
     onboarded: !!(a.onboarded || b.onboarded),
     done: { ...older.done, ...newer.done },
@@ -163,6 +164,10 @@ export function mergeStates(a: State, b: State): State {
     unlockedBadges: uniqStrs(a.unlockedBadges, b.unlockedBadges),
     grammarProgress: unionRecordNums(a.grammarProgress, b.grammarProgress),
     inburgeringExams: mergeExams(a.inburgeringExams, b.inburgeringExams, bNewer),
+    // Daily-goal flag: lexicographic max — 'YYYY-MM-DD' keys sort correctly as
+    // strings, and "either device already celebrated today" must keep winning
+    // so the celebration can never re-fire after a sync.
+    goalCelebratedOn: (a.goalCelebratedOn ?? '') > (b.goalCelebratedOn ?? '') ? (a.goalCelebratedOn ?? '') : (b.goalCelebratedOn ?? ''),
     _v: 6,
     _savedAt: Math.max(num(a._savedAt), num(b._savedAt)),
   }

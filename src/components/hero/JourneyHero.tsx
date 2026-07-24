@@ -1,12 +1,23 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { motion } from 'framer-motion'
 import { useAppStore, getDaysLeft, getPlanTotal, getCurrentDay, avgBestScore } from '@/store/useAppStore'
 import { todayKey } from '@/lib/utils'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useNow } from '@/hooks/useNow'
 import { springFill } from '@/lib/animations'
+import { celebrate } from '@/lib/celebrate'
 import { SmartGreeting } from '@/components/SmartGreeting'
 import { phaseOfHour, msToNextBoundary, type DayPhase } from './journeyPhase'
+import { deriveHeroProgress } from './heroProgress'
+
+/* Lazy for the same reason ExamCountdown lazy-loads it: the modal statically
+   imports Overlay/Field from SettingsModal, which drags CloudPanel + TTS
+   code — none of that belongs in the always-visible Dashboard chunk. */
+const ExamDateModal = lazy(() => import('@/components/countdown/ExamDateModal').then((m) => ({ default: m.ExamDateModal })))
+
+/* ExamCountdown's separate storage for the same date — written on save so the
+   countdown pill doesn't keep nagging for a date the user just set here. */
+const COUNTDOWN_DATE_KEY = 'nt2_exam_date'
 
 /* Same touch heuristic the old 3D hero used: read once at module load —
    pointer type changing mid-session (dock/undock) is rare enough that a
@@ -73,6 +84,10 @@ export function JourneyHero() {
   const dailyHistory = useAppStore((s) => s.dailyHistory)
   const prefs = useAppStore((s) => s.prefs)
   const skill = useAppStore((s) => s.skill)
+  const goalCelebratedOn = useAppStore((s) => s.goalCelebratedOn)
+  const markGoalCelebrated = useAppStore((s) => s.markGoalCelebrated)
+  const saveSettings = useAppStore((s) => s.saveSettings)
+  const setActiveTab = useAppStore((s) => s.setActiveTab)
 
   const daysLeft = getDaysLeft(examDate)
   const todayMins = dailyHistory[todayKey()]?.mins ?? 0
@@ -83,6 +98,63 @@ export function JourneyHero() {
   // نسبة التقدم اليومي
   const targetMins = prefs?.studyDayMinutes ?? 60
   const progress = Math.min(100, Math.round((todayMins / targetMins) * 100))
+
+  const [showDateModal, setShowDateModal] = useState(false)
+
+  /* ── Daily-goal celebration — at most once per calendar day, persisted.
+     The flag (goalCelebratedOn, a dayKey) is consumed in EVERY goal-met path;
+     confetti + pulse fire only on a live below→met crossing witnessed while
+     mounted. First paint with the goal already met (logged earlier today, or
+     on another device) consumes the flag silently — celebrating stale news on
+     mount is exactly the bug the task forbids. */
+  const prevMinsRef = useRef<number | null>(null)
+  const pulseTimer = useRef(0)
+  const ringWrapRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const prev = prevMinsRef.current
+    prevMinsRef.current = todayMins
+    if (deriveHeroProgress(todayMins, targetMins) !== 'goal-met') return
+    const today = todayKey()
+    if (goalCelebratedOn === today) return
+    markGoalCelebrated(today)
+    if (prev === null || prev >= targetMins) return
+    celebrate('tasks') // celebrate() no-ops under prefers-reduced-motion itself
+    // Pulse is decorative — written straight to the DOM (same idiom as the
+    // parallax layer transforms) so no render cascades from this effect.
+    const el = ringWrapRef.current
+    if (!reduced && el) {
+      el.classList.add('ring-pulse')
+      window.clearTimeout(pulseTimer.current)
+      pulseTimer.current = window.setTimeout(() => el.classList.remove('ring-pulse'), 2400)
+    }
+  }, [todayMins, targetMins, goalCelebratedOn, markGoalCelebrated, reduced])
+  useEffect(() => () => window.clearTimeout(pulseTimer.current), [])
+
+  const handleSaveDate = (iso: string) => {
+    saveSettings({ examDate: iso })
+    try { localStorage.setItem(COUNTDOWN_DATE_KEY, iso) } catch { /* private mode — the store copy still saved */ }
+  }
+
+  /* ── Smart empty states: the ring never shows a hollow zero or a dash.
+     No usable exam date → CTA into ExamDateModal; date set but nothing
+     measured yet (brand-new user, no sims) → CTA into the first simulation. */
+  const ringCta =
+    daysLeft == null
+      ? {
+          icon: '📅',
+          label: 'حدّد موعدك',
+          ariaLabel: 'حدّد موعد امتحانك ليبدأ حساب الجاهزية',
+          onClick: () => setShowDateModal(true),
+          hasPopup: true,
+        }
+      : readiness === 0
+        ? {
+            icon: '🎯',
+            label: 'أول محاكاة',
+            ariaLabel: 'ابدأ أول محاكاة امتحان لقياس جاهزيتك',
+            onClick: () => setActiveTab('exam'),
+          }
+        : undefined
 
   /* ── Time-of-day phase — seeded from useNow(), then one chained timer per
      boundary crossing (at most 4/day) flips the state; the visible change is
@@ -213,7 +285,9 @@ export function JourneyHero() {
             <div style={{ flex: '1 1 240px', minWidth: 0 }}>
               <SmartGreeting />
             </div>
-            <ReadinessRing pct={readiness} reduced={reduced} />
+            <div ref={ringWrapRef} style={{ flexShrink: 0 }}>
+              <ReadinessRing pct={readiness} reduced={reduced} cta={ringCta} />
+            </div>
           </div>
 
           {/* الخانات في صف واحد */}
@@ -301,43 +375,84 @@ export function JourneyHero() {
             </div>
           </div>
         </div>
+
+        {showDateModal && (
+          <Suspense fallback={null}>
+            <ExamDateModal
+              currentDate={daysLeft == null ? null : examDate}
+              onClose={() => setShowDateModal(false)}
+              onSave={handleSaveDate}
+            />
+          </Suspense>
+        )}
       </div>
     </div>
   )
 }
 
-/* ── حلقة الجاهزية — نفس مقياس "معدّل امتحاناتك" (avgBestScore) بلمحة واحدة ── */
-function ReadinessRing({ pct, reduced }: { pct: number; reduced: boolean }) {
+/* ── حلقة الجاهزية — نفس مقياس "معدّل امتحاناتك" (avgBestScore) بلمحة واحدة.
+   في الحالات الفارغة تعرض زرًّا حقيقيًّا (قابلًا للتركيز، باسم واضح لقارئ
+   الشاشة) بدل صفرٍ أجوف — انظر ringCta أعلاه. ── */
+interface RingCta {
+  icon: string
+  label: string
+  ariaLabel: string
+  onClick: () => void
+  hasPopup?: boolean
+}
+
+function ReadinessRing({ pct, reduced, cta }: { pct: number; reduced: boolean; cta?: RingCta }) {
   const R = 30
   const C = 2 * Math.PI * R
   const filled = (Math.min(100, Math.max(0, pct)) / 100) * C
 
   return (
     <div
-      role="img"
-      aria-label={`جاهزية ${pct}%`}
+      role={cta ? undefined : 'img'}
+      aria-label={cta ? undefined : `جاهزية ${pct}%`}
       style={{ position: 'relative', width: 84, height: 84, flexShrink: 0 }}
     >
       <svg width="84" height="84" viewBox="0 0 84 84" aria-hidden="true">
         <circle cx="42" cy="42" r={R} fill="none" stroke="rgba(255,244,235,.14)" strokeWidth="7" />
-        <motion.circle
-          cx="42" cy="42" r={R} fill="none"
-          stroke="var(--orange)" strokeWidth="7" strokeLinecap="round"
-          transform="rotate(-90 42 42)"
-          initial={reduced ? false : { strokeDasharray: `0 ${C}` }}
-          animate={{ strokeDasharray: `${filled} ${C}` }}
-          transition={reduced ? { duration: 0 } : springFill}
-        />
+        {!cta && (
+          <motion.circle
+            cx="42" cy="42" r={R} fill="none"
+            stroke="var(--orange)" strokeWidth="7" strokeLinecap="round"
+            transform="rotate(-90 42 42)"
+            initial={reduced ? false : { strokeDasharray: `0 ${C}` }}
+            animate={{ strokeDasharray: `${filled} ${C}` }}
+            transition={reduced ? { duration: 0 } : springFill}
+          />
+        )}
       </svg>
-      <div
-        style={{
-          position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center', pointerEvents: 'none',
-        }}
-      >
-        <b style={{ fontSize: '1.05rem', color: '#FBF3EA', fontFamily: 'var(--font-display)' }}>{pct}%</b>
-        <span style={{ fontSize: '.62rem', color: 'rgba(217,201,184,0.75)' }}>جاهزية</span>
-      </div>
+      {cta ? (
+        <button
+          type="button"
+          onClick={cta.onClick}
+          aria-label={cta.ariaLabel}
+          aria-haspopup={cta.hasPopup ? 'dialog' : undefined}
+          style={{
+            position: 'absolute', inset: 8, borderRadius: '50%',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
+            background: 'rgba(255,244,235,0.10)', border: '1px dashed rgba(255,244,235,0.4)',
+            color: '#FBF3EA', cursor: 'pointer', fontFamily: 'inherit',
+            fontSize: '.6rem', fontWeight: 700, lineHeight: 1.4, textAlign: 'center', padding: 4,
+          }}
+        >
+          <span aria-hidden="true" style={{ fontSize: '1.05rem' }}>{cta.icon}</span>
+          {cta.label}
+        </button>
+      ) : (
+        <div
+          style={{
+            position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center', pointerEvents: 'none',
+          }}
+        >
+          <b style={{ fontSize: '1.05rem', color: '#FBF3EA', fontFamily: 'var(--font-display)' }}>{pct}%</b>
+          <span style={{ fontSize: '.62rem', color: 'rgba(217,201,184,0.75)' }}>جاهزية</span>
+        </div>
+      )}
     </div>
   )
 }

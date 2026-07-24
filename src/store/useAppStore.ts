@@ -88,6 +88,7 @@ export interface AppStore extends State {
   toggleFocusMode: () => void
   setGuestMode: () => void
   toggleMascot: () => void
+  toggleBotWordReminders: () => void
 
   // Persistence
   save: () => void
@@ -98,6 +99,7 @@ export interface AppStore extends State {
   bumpStreak: () => void
   recordStudyMinutes: (mins: number) => void
   setDayMinutes: (dayKey: string, mins: number) => void
+  markGoalCelebrated: (day: string) => void
 
   // Gamification
   unlockBadge: (id: string) => void
@@ -196,6 +198,13 @@ export const useAppStore = create<AppStore>()(
         get().save()
       },
 
+      // "Remind me of completed-task words every 2 min" — the mascot's word
+      // reminder loop (useMascot). Synced like any other setting.
+      toggleBotWordReminders: () => {
+        set({ botWordReminders: !get().botWordReminders })
+        get().save()
+      },
+
       save: () => {
         // Exclude activeTab — parity with the persist partialize below
         const { activeTab, ...state } = get()
@@ -258,6 +267,16 @@ export const useAppStore = create<AppStore>()(
           return { dailyHistory: { ...st.dailyHistory, [dayKey]: { ...prev, mins: m } } }
         })
         if (dayKey === todayKey() && m > 0) get().bumpStreak()
+        get().save()
+      },
+
+      // Record that today's daily-goal celebration was consumed (hero ring
+      // pulse + confetti) — keyed by dayKey so it fires at most once per
+      // calendar day across reloads and, via the cloud-merge max, across
+      // devices.
+      markGoalCelebrated: (day) => {
+        if (get().goalCelebratedOn === day) return
+        set({ goalCelebratedOn: day })
         get().save()
       },
 
