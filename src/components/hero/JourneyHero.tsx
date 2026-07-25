@@ -8,7 +8,7 @@ import { springFill } from '@/lib/animations'
 import { celebrate } from '@/lib/celebrate'
 import { SmartGreeting } from '@/components/SmartGreeting'
 import { phaseOfHour, msToNextBoundary, type DayPhase } from './journeyPhase'
-import { deriveHeroProgress } from './heroProgress'
+import { shouldCelebrateGoal } from './heroProgress'
 
 /* Lazy for the same reason ExamCountdown lazy-loads it: the modal statically
    imports Overlay/Field from SettingsModal, which drags CloudPanel + TTS
@@ -113,11 +113,14 @@ export function JourneyHero() {
   useEffect(() => {
     const prev = prevMinsRef.current
     prevMinsRef.current = todayMins
-    if (deriveHeroProgress(todayMins, targetMins) !== 'goal-met') return
     const today = todayKey()
-    if (goalCelebratedOn === today) return
+    const decision = shouldCelebrateGoal({
+      prevMins: prev, todayMins, targetMins,
+      celebratedOn: goalCelebratedOn, today,
+    })
+    if (decision === 'skip') return
     markGoalCelebrated(today)
-    if (prev === null || prev >= targetMins) return
+    if (decision === 'consume') return
     celebrate('tasks') // celebrate() no-ops under prefers-reduced-motion itself
     // Pulse is decorative — written straight to the DOM (same idiom as the
     // parallax layer transforms) so no render cascades from this effect.
@@ -325,7 +328,7 @@ export function JourneyHero() {
                 <div
                   style={{
                     fontSize: '.72rem',
-                    color: 'rgba(217,201,184,0.75)',
+                    color: 'rgba(217,201,184,0.9)',
                     marginTop: 2,
                   }}
                 >
@@ -346,7 +349,7 @@ export function JourneyHero() {
                 marginBottom: 6,
               }}
             >
-              <span style={{ fontSize: '.8rem', color: 'rgba(217,201,184,0.82)', fontWeight: 500 }}>
+              <span style={{ fontSize: '.8rem', color: 'rgba(217,201,184,0.92)', fontWeight: 500 }}>
                 تقدمك اليومي
               </span>
               <span style={{ fontSize: '.85rem', color: '#FBF3EA', fontWeight: 700 }}>
@@ -450,7 +453,7 @@ function ReadinessRing({ pct, reduced, cta }: { pct: number; reduced: boolean; c
           }}
         >
           <b style={{ fontSize: '1.05rem', color: '#FBF3EA', fontFamily: 'var(--font-display)' }}>{pct}%</b>
-          <span style={{ fontSize: '.62rem', color: 'rgba(217,201,184,0.75)' }}>جاهزية</span>
+          <span style={{ fontSize: '.62rem', color: 'rgba(217,201,184,0.9)' }}>جاهزية</span>
         </div>
       )}
     </div>

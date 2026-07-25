@@ -165,3 +165,57 @@ describe('JourneyHero — smart empty states', () => {
     expect(useAppStore.getState().activeTab).toBe('exam')
   })
 })
+
+describe('JourneyHero — three store states', () => {
+  it('(a) empty store: CTA button renders and the ring shows no zero-value number', () => {
+    useAppStore.setState({
+      examDate: '', dailyHistory: {}, skill: skillAt(0), streak: { count: 0, last: '' },
+    })
+    render(<JourneyHero />)
+
+    const btn = screen.getByRole('button', { name: /حدّد موعد امتحانك/ })
+    expect(btn).toBeInTheDocument()
+    // value-mode ring absent, and the CTA carries no digits — no hollow "0%"
+    expect(screen.queryByRole('img', { name: /جاهزية/ })).not.toBeInTheDocument()
+    expect(btn.textContent).not.toMatch(/[0-9]/)
+  })
+
+  it('(b) mid-journey: days-left, streak, minutes and plan position render with exact values', () => {
+    const now = Date.now()
+    useAppStore.setState({
+      examDate: new Date(now + 10 * 86400000).toISOString(),   // ceil → 10 days left
+      planStart: new Date(now - 2 * 86400000).toISOString(),   // round → day 3 of 12
+      streak: { count: 7, last: todayKey() },
+      dailyHistory: { [todayKey()]: day(25) },                 // 25/60 → bar 42%
+      skill: skillAt(60),                                      // ring 60%
+    })
+    render(<JourneyHero />)
+
+    expect(screen.getAllByText('10').length).toBeGreaterThan(0)    // المتبقّي
+    expect(screen.getAllByText('7').length).toBeGreaterThan(0)     // مواظبة
+    expect(screen.getAllByText('25د').length).toBeGreaterThan(0)   // درست اليوم
+    expect(screen.getAllByText('3/12').length).toBeGreaterThan(0)  // اليوم / الخطة
+    expect(screen.getByRole('img', { name: 'جاهزية 60%' })).toBeInTheDocument()
+    expect(screen.getAllByText('42%').length).toBeGreaterThan(0)   // تقدم اليوم
+  })
+
+  it('(c) goal met: bar saturates at 100% and the day is consumed without a first-paint celebration', () => {
+    useAppStore.setState({ dailyHistory: { [todayKey()]: day(75) } })  // 75 ≥ 60
+    render(<JourneyHero />)
+
+    expect(screen.getAllByText('100%').length).toBeGreaterThan(0)
+    expect(celebrate).not.toHaveBeenCalled()
+    expect(useAppStore.getState().goalCelebratedOn).toBe(todayKey())
+  })
+
+  it('remount after a fired celebration does not re-fire (flag persisted in the store)', () => {
+    useAppStore.setState({ dailyHistory: { [todayKey()]: day(30) } })
+    const first = render(<JourneyHero />)
+    act(() => { useAppStore.getState().setDayMinutes(todayKey(), 60) })
+    expect(celebrate).toHaveBeenCalledTimes(1)
+
+    first.unmount()
+    render(<JourneyHero />)
+    expect(celebrate).toHaveBeenCalledTimes(1)
+  })
+})

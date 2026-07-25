@@ -58,12 +58,14 @@
   --grad-primary:linear-gradient(135deg,#B9571E 0%,#8D4217 100%);
   --grad-hero:linear-gradient(140deg,#241E17 0%,#332A20 46%,#4A3220 100%);
   --blob-cool1:hsla(22,90%,58%,.5);--blob-cool2:hsla(30,55%,45%,.22);
-  /* ── JourneyHero time-of-day scene ── all four phase gradients keep every
-     stop at or below #5C3A2E lightness, so the hero's cream text (#FBF3EA)
-     measures ≥9:1 on the lightest stop — same AA discipline as --grad-hero. */
-  --hero-dawn:linear-gradient(160deg,#2E1F33 0%,#4A2B36 55%,#5C3A2E 100%);
-  --hero-day:linear-gradient(160deg,#1C2A3A 0%,#2A3B4E 55%,#3A4456 100%);
-  --hero-dusk:linear-gradient(160deg,#251626 0%,#48221A 55%,#68351C 100%);
+  /* ── JourneyHero time-of-day scene ── stops tuned against the measured
+     worst case (sand labels rgba(217,201,184,.9) on a .10 translucent chip
+     over the lightest stop): 4.62:1 there, ≥7.7:1 for the cream #FBF3EA
+     primary text — same AA discipline as --grad-hero. Don't brighten the
+     100% stops without re-running the contrast matrix. */
+  --hero-dawn:linear-gradient(160deg,#2E1F33 0%,#4A2B36 55%,#4E3126 100%);
+  --hero-day:linear-gradient(160deg,#1C2A3A 0%,#2A3B4E 55%,#323A48 100%);
+  --hero-dusk:linear-gradient(160deg,#251626 0%,#48221A 55%,#5A2E18 100%);
   --hero-night:linear-gradient(160deg,#0E1120 0%,#161B2C 55%,#20263C 100%);
   --sky-back:rgba(20,16,24,.55);
   --sky-front:rgba(12,10,16,.85);

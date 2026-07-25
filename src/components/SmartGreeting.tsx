@@ -114,7 +114,7 @@ export function SmartGreeting() {
         <div
           style={{
             fontSize: '.82rem',
-            color: 'rgba(217,201,184,0.78)',
+            color: 'rgba(217,201,184,0.92)',
             marginTop: 4,
           }}
         >
