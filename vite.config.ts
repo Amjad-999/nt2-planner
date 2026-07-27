@@ -34,7 +34,10 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,woff2,png,svg,ico}'],
+        // jpg is here for the mascot portrait (public/images/cartoon-cat.jpg) — without
+        // it the file is never precached, so the icon silently drops to its drawn
+        // SVG fallback the moment the app runs offline
+        globPatterns: ['**/*.{js,css,html,woff2,png,jpg,svg,ico}'],
         runtimeCaching: [
           { urlPattern: /translate\.google\.com/, handler: 'NetworkOnly' },
           { urlPattern: /translate\.googleapis\.com/, handler: 'NetworkOnly' },

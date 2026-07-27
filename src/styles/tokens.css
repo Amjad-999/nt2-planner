@@ -113,6 +113,9 @@
         with --orange-ink for AA-safe text (4.62:1 on the card wash) ── */
   --countdown-bg:var(--glass-bg);--countdown-border:var(--glass-border);--countdown-text:var(--orange-ink);
   --countdown-accent-bg:rgba(224,122,62,.15);--countdown-accent-border:rgba(224,122,62,.3);
+  /* ── Katja's 3D contact shadow — decorative only (never behind text), so it
+        is tuned for depth, not contrast ── */
+  --mascot-shadow:rgba(40,30,20,.32);
 }
 
 :root[data-theme="dark"] {
@@ -176,4 +179,6 @@
         orange already clears AA here so --countdown-text just reuses it ── */
   --countdown-bg:var(--glass-bg);--countdown-border:var(--glass-border);--countdown-text:var(--orange);
   --countdown-accent-bg:rgba(224,122,62,.15);--countdown-accent-border:rgba(224,122,62,.3);
+  /* Deeper on the dark page so the icon still reads as lifted off the surface */
+  --mascot-shadow:rgba(0,0,0,.55);
 }

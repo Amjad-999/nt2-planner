@@ -1,10 +1,19 @@
-import { motion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useMascot } from '@/hooks/useMascot'
-import { MOOD_ANIMATION, MOOD_STATIC, mascotEntrance, type MascotMood } from './MascotAnimations'
+import {
+  MOOD_ANIMATION, MOOD_STATIC, TILT_SPRING, MAX_TILT_DEG, POINTER_RANGE_PX,
+  type MascotMood,
+} from './MascotAnimations'
 import { MascotBubble } from './MascotBubble'
 import { MascotPanel } from './MascotPanel'
 import { MASCOT_NAME_AR } from '@/data/mascotDialogs'
+
+/** The rendered portrait, served from public/. If it is missing the component
+ *  falls back to the drawn CatSvg below — the icon must never be able to
+ *  render as nothing (see the invisibility bug documented on Mascot). */
+const KATYA_PHOTO = '/images/cartoon-cat.jpg'
 
 /* ── وجه كاتيا — عيون برموش/فم مختلفة لكل حالة مزاجية ── */
 function CatFace({ mood }: { mood: MascotMood }) {
@@ -85,7 +94,7 @@ function CatFace({ mood }: { mood: MascotMood }) {
 function CatSvg({ mood, dancing }: { mood: MascotMood; dancing: boolean }) {
   return (
     <svg
-      width="76" height="76" viewBox="0 0 200 200" role="img"
+      width="66" height="66" viewBox="0 0 200 200" role="img"
       aria-label={`${MASCOT_NAME_AR} — الوضع: ${mood}`}
       className={dancing ? 'mascot-dancing' : undefined}
     >
@@ -154,14 +163,79 @@ function CatSvg({ mood, dancing }: { mood: MascotMood; dancing: boolean }) {
   )
 }
 
-/** The bottom-right corner widget: character + speech bubble + help panel.
- *  Hidden entirely in Focus Mode or once permanently dismissed (see useMascot). */
+/** The corner widget: a launcher icon + its speech bubble + the help panel.
+ *  Hidden entirely in Focus Mode or once permanently dismissed (see useMascot).
+ *
+ *  Entrance lives on the WRAPPER, mood animation on the button. Keeping them on
+ *  one element is what made the mascot invisible: `variants` + `initial="initial"`
+ *  applied {opacity:0, scale:0}, but `animate` was a mood *object* (no opacity
+ *  key), so nothing ever animated opacity back to 1 — it stayed 0 forever while
+ *  the mood's own scale keyframes hid the symptom. */
 export function Mascot() {
   const {
     visible, mood, dialog, bubbleOpen, closeBubble,
-    panelOpen, togglePanel, closePanel, batches, dance, dismissForever,
+    panelOpen, openPanel, closePanel,
+    batches, reminderCount, dance, doDuty, dismissForever,
   } = useMascot()
   const reduced = useReducedMotion()
+
+  const stageRef = useRef<HTMLDivElement>(null)
+  // The real photo is the intended face; the hand-drawn SVG is the fallback so
+  // a missing/failed asset degrades to a drawn cat rather than a broken icon.
+  const [photoFailed, setPhotoFailed] = useState(false)
+
+  // Pointer offset, normalised to -1..1 — written from a listener, never from
+  // render, so tracking the cursor costs zero React re-renders.
+  const pointerX = useMotionValue(0)
+  const pointerY = useMotionValue(0)
+  // Continuous idle drift, driven by requestAnimationFrame below.
+  const idleRotY = useMotionValue(0)
+  const idleRotX = useMotionValue(0)
+  const idleLift = useMotionValue(0)
+
+  const tiltX = useSpring(pointerX, TILT_SPRING)
+  const tiltY = useSpring(pointerY, TILT_SPRING)
+
+  // Pointer tilt and idle drift sum into one rotation per axis, so the icon
+  // keeps breathing while it follows the cursor instead of freezing.
+  const rotateY = useTransform([tiltX, idleRotY], ([p, i]: number[]) => p * MAX_TILT_DEG + i)
+  const rotateX = useTransform([tiltY, idleRotX], ([p, i]: number[]) => -p * MAX_TILT_DEG + i)
+  // Leans toward the cursor in depth, which is what sells the 3D over a tilt.
+  const translateZ = useTransform([tiltX, tiltY], ([a, b]: number[]) => (Math.abs(a) + Math.abs(b)) * 16)
+  // Contact shadow: narrows as the body turns away, fades as it floats up.
+  const shadowScaleX = useTransform(rotateY, (r: number) => 1 - Math.min(0.55, Math.abs(r) / 90))
+  const shadowOpacity = useTransform(idleLift, (l: number) => 0.85 - Math.abs(l) * 0.05)
+
+  useEffect(() => {
+    if (!visible || reduced) return
+    const onMove = (e: PointerEvent) => {
+      const el = stageRef.current
+      if (!el) return
+      const r = el.getBoundingClientRect()
+      const dx = (e.clientX - (r.left + r.width / 2)) / POINTER_RANGE_PX
+      const dy = (e.clientY - (r.top + r.height / 2)) / POINTER_RANGE_PX
+      pointerX.set(Math.max(-1, Math.min(1, dx)))
+      pointerY.set(Math.max(-1, Math.min(1, dy)))
+    }
+    window.addEventListener('pointermove', onMove, { passive: true })
+    return () => window.removeEventListener('pointermove', onMove)
+  }, [visible, reduced, pointerX, pointerY])
+
+  useEffect(() => {
+    if (!visible || reduced) return
+    let raf = 0
+    const t0 = performance.now()
+    const tick = (t: number) => {
+      const s = (t - t0) / 1000
+      // Three different periods so the drift never looks like a loop.
+      idleRotY.set(Math.sin(s * 0.62) * 8)
+      idleRotX.set(Math.cos(s * 0.44) * 4.5)
+      idleLift.set(Math.sin(s * 0.9) * 4)
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [visible, reduced, idleRotY, idleRotX, idleLift])
 
   if (!visible) return null
 
@@ -179,23 +253,68 @@ export function Mascot() {
       {!panelOpen && bubbleOpen && dialog && (
         // Keyed by content so a new dialog remounts the bubble fresh —
         // that's what resets its typed-text reveal, see MascotBubble.tsx.
-        <MascotBubble key={dialog.ar} line={dialog} onClose={closeBubble} onDismissForever={dismissForever} />
+        <MascotBubble
+          key={dialog.ar} line={dialog}
+          onClose={closeBubble} onOpenPanel={openPanel} onDismissForever={dismissForever}
+        />
       )}
 
-      <motion.button
-        type="button"
-        onClick={togglePanel}
-        aria-label={panelOpen ? `إغلاق لوحة ${MASCOT_NAME_AR}` : `${MASCOT_NAME_AR} — اضغط للمساعدة`}
-        variants={reduced ? undefined : mascotEntrance}
-        initial={reduced ? undefined : 'initial'}
-        animate={reduced ? MOOD_STATIC[mood] : MOOD_ANIMATION[mood]}
-        style={{
-          background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-          filter: 'drop-shadow(var(--elev-2))', lineHeight: 0,
-        }}
+      {/* The 3D stage. `perspective` is inline (not CSS-only) so the depth is
+          part of the component's contract and is assertable in tests. */}
+      <div
+        ref={stageRef}
+        className="mascot-stage mascot-enter"
+        data-testid="mascot-stage"
+        style={{ perspective: '1000px', lineHeight: 0 }}
       >
-        <CatSvg mood={mood} dancing={mood === 'dancing' && !reduced} />
-      </motion.button>
+        <motion.div
+          className="mascot-3d"
+          style={{
+            transformStyle: 'preserve-3d',
+            ...(reduced ? {} : { rotateX, rotateY, translateZ, y: idleLift }),
+          }}
+        >
+          <motion.button
+            type="button"
+            onClick={doDuty}
+            className="mascot-launcher"
+            data-mood={mood}
+            aria-label={`${MASCOT_NAME_AR} — اضغط لمهمة سريعة`}
+            title={`${MASCOT_NAME_AR} — اضغط لمهمة سريعة`}
+            animate={reduced ? MOOD_STATIC[mood] : MOOD_ANIMATION[mood]}
+            style={{
+              background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+              lineHeight: 0, position: 'relative', transformStyle: 'preserve-3d',
+            }}
+          >
+            <span className="mascot-orb">
+              {photoFailed ? (
+                <CatSvg mood={mood} dancing={mood === 'dancing' && !reduced} />
+              ) : (
+                <img
+                  className="mascot-photo"
+                  src={KATYA_PHOTO}
+                  alt=""
+                  draggable={false}
+                  onError={() => setPhotoFailed(true)}
+                />
+              )}
+            </span>
+            {reminderCount > 0 && (
+              <span className="mascot-badge" aria-hidden="true">{reminderCount}</span>
+            )}
+            <span className="sr-only">
+              {reminderCount > 0 ? `${reminderCount} كلمة من مهام اليوم جاهزة للتذكير` : ''}
+            </span>
+          </motion.button>
+        </motion.div>
+
+        <motion.span
+          className="mascot-shadow"
+          aria-hidden="true"
+          style={reduced ? undefined : { scaleX: shadowScaleX, opacity: shadowOpacity }}
+        />
+      </div>
     </div>
   )
 }

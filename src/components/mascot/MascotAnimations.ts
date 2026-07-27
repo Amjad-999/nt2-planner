@@ -1,5 +1,5 @@
 import type { TargetAndTransition, Variants } from 'framer-motion'
-import { EASE_OUT, springFill } from '@/lib/animations'
+import { EASE_OUT } from '@/lib/animations'
 
 export type MascotMood = 'idle' | 'happy' | 'sad' | 'excited' | 'thinking' | 'dancing'
 
@@ -36,17 +36,30 @@ export const MOOD_ANIMATION: Record<MascotMood, TargetAndTransition> = {
     rotate: [0, 6, 6, 0],
     transition: { duration: 2.2, repeat: Infinity, ease: EASE_OUT },
   },
-  // The victory dance: side-to-side sway + bounce, with a rotateY wobble
-  // (+ perspective) that reads as a 3D turn. Limb/tail motion is CSS-driven
-  // via the `mascot-dancing` class — see globals.css.
+  // The victory dance: a genuine 3D turn, not a flat slide — the character
+  // swings around its own Y axis while nodding on X, with its own
+  // `transformPerspective` so the rotation has real depth even though the
+  // stage's perspective already applies. Limb/tail motion (SVG fallback) is
+  // CSS-driven via the `mascot-dancing` class — see globals.css.
   dancing: {
-    y: [0, -12, 0, -12, 0],
-    rotate: [0, -10, 0, 10, 0],
-    rotateY: [0, 28, 0, -28, 0],
-    transformPerspective: 400,
+    y: [0, -14, 0, -14, 0],
+    rotate: [0, -8, 0, 8, 0],
+    rotateY: [0, 36, 0, -36, 0],
+    rotateX: [0, -14, 0, -14, 0],
+    scale: [1, 1.06, 1, 1.06, 1],
+    transformPerspective: 500,
     transition: { duration: 1.15, repeat: Infinity, ease: 'easeInOut' },
   },
 }
+
+/** Spring used for the pointer-driven 3D tilt (Mascot.tsx). Softer than
+ *  springFill: the icon should trail the cursor, not snap to it. */
+export const TILT_SPRING = { stiffness: 140, damping: 18, mass: 0.6 } as const
+
+/** Degrees of rotation at full pointer offset, and the distance (px) from the
+ *  icon's centre at which that full offset is reached. */
+export const MAX_TILT_DEG = 16
+export const POINTER_RANGE_PX = 420
 
 /** Static (no motion) pose per mood — used verbatim under prefers-reduced-motion. */
 export const MOOD_STATIC: Record<MascotMood, TargetAndTransition> = {
@@ -58,11 +71,12 @@ export const MOOD_STATIC: Record<MascotMood, TargetAndTransition> = {
   dancing: { scale: 1.05, rotate: -3, y: 0 },
 }
 
-/** The character popping into view the first time it mounts. */
-export const mascotEntrance: Variants = {
-  initial: { scale: 0, opacity: 0 },
-  animate: { scale: 1, opacity: 1, transition: springFill },
-}
+/* The mount "pop-in" is deliberately CSS, not a framer variant (see
+   .mascot-enter in globals.css). A variant that starts at {opacity:0} leaves
+   the launcher invisible for good if the animation never runs — which is
+   exactly the bug that hid the mascot: `initial="initial"` applied opacity 0
+   while `animate` was a mood object with no opacity key. CSS keyframes give
+   the same pop while the element's resting style stays visible. */
 
 /** Speech bubble in/out — fade + slide, reusing the Task 4 page-transition feel. */
 export const bubbleTransition: Variants = {

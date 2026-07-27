@@ -393,6 +393,117 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
   .ring-pulse { animation: none; }
 }
 
+/* ── كاتيا 🐱: أيقونة الإطلاق — قرص زجاجي بحلقة برتقالية وهالة نابضة، كي
+   تُقرأ كزرّ حيّ في الزاوية لا كرسمة عابرة. القرص زجاجي (لا برتقالي) عمدًا:
+   القطة نفسها برتقالية، فلو كان القرص برتقاليًّا لذابت فيه في كلا المظهرين. ── */
+/* opacity مثبّتة صراحةً على كل حلقة في سلسلة الأيقونة — شبكة أمان ضد أي
+   حركة أو متغيّر مستقبلي يحاول تمرير شفافية صفرية (انظر mascot-pop أدناه). */
+.mascot-stage { position: relative; display: inline-block; opacity: 1; }
+.mascot-3d { transform-style: preserve-3d; opacity: 1; }
+.mascot-launcher, .mascot-orb { opacity: 1; }
+
+.mascot-orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 96px;
+  block-size: 96px;
+  border-radius: 50%;
+  overflow: hidden;               /* clips the portrait to the disc */
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(12px) saturate(1.6);
+  border: 2px solid var(--orange);
+  box-shadow: var(--elev-3), inset 0 1px 0 var(--glass-hi);
+}
+
+/* الصورة الحقيقية داخل القرص — تأطير على الوجه.
+   لماذا تموضع مطلق بدل object-fit: الصورة عرضية (1500×1072) و`cover` داخل
+   مربّع يملأ الارتفاع تمامًا فلا يبقى فائض رأسي، ما يجعل object-position
+   الرأسي بلا أثر وأي تكبير يتمركز على صدر القطة لا وجهها.
+   الأرقام مشتقّة من قياس بكسلات الصورة: الرأس يمتدّ 23%→72% أفقيًّا
+   و15%→58% رأسيًّا، ومركزه (47.5%, 36.5%).
+   left/top فيزيائيان عمدًا لا inset-inline-*: التطبيق RTL، والمنطقي منها
+   ينقلب إلى اليمين فيعكس القصّ ويؤطّر الجهة الخطأ.
+   القيم الحالية تضع مركز الرأس عند (50.8%, 45.9%) من القرص وتقصّ شريحة
+   رفيعة من طرف الأذن والخدّ — مقايضة مقصودة: الرأس أعرض من ارتفاعه
+   (735×461 بكسل) فإظهاره كاملًا يملأ 61% من ارتفاع القرص ويترك خلفية فارغة.
+   للضبط: --katya-zoom: 200% مع --katya-x: -45% و--katya-y: -5% يُظهر الأذنين
+   كاملتين بوجه أصغر. كبّر الـ zoom للاقتراب أكثر. */
+.mascot-photo {
+  position: absolute;
+  inline-size: var(--katya-zoom, 230%);
+  block-size: auto;
+  max-inline-size: none;
+  left: var(--katya-x, -59%);
+  top: var(--katya-y, -14%);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* الظلّ الأرضي — يضيق كلّما استدارت الأيقونة (scaleX من rotateY في Mascot.tsx) */
+.mascot-shadow {
+  position: absolute;
+  inset-block-end: -12px;
+  inset-inline-start: 50%;
+  inline-size: 76px;
+  block-size: 14px;
+  margin-inline-start: -38px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, var(--mascot-shadow), transparent 72%);
+  pointer-events: none;
+}
+/* الهالة النابضة — على الزرّ لا على القرص: القرص يقصّ ما يتجاوزه
+   (overflow:hidden لتدوير الصورة)، فهالة داخله كانت ستُقصّ وتختفي.
+   الإيقاف عند تقليل الحركة يأتي من القاعدة العامة أعلى الملف. */
+.mascot-launcher::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 2px solid var(--orange);
+  opacity: 0;
+  pointer-events: none;
+  animation: mascot-halo 2.8s ease-out infinite;
+}
+@keyframes mascot-halo {
+  0%   { transform: scale(1);    opacity: .55; }
+  70%  { transform: scale(1.24); opacity: 0; }
+  100% { transform: scale(1.24); opacity: 0; }
+}
+/* ظهور الأيقونة عند أول تركيب.
+   قاعدة صارمة: هذه الحركة لا تملك opacity أبدًا، وتبدأ من تكبير طفيف لا من
+   الصفر. السبب: لو تجمّدت الإطارات (تبويب خلفي، جهاز مخنوق، معاينة لا تُركِّب
+   إطارات) تبقى الحركة عالقة عند إطارها الأول — فلو كان ذلك الإطار opacity:0
+   لعادت الأيقونة للاختفاء تمامًا، وهو العطل نفسه الذي أخفى كاتيا أصلًا.
+   أسوأ حالة الآن: أيقونة ظاهرة بالكامل بحجم 88% بدل 100%. */
+.mascot-enter { animation: mascot-pop .42s cubic-bezier(.34, 1.56, .64, 1) both; }
+@keyframes mascot-pop {
+  from { transform: scale(.88); }
+  to   { transform: scale(1); }
+}
+.mascot-launcher { transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); }
+.mascot-launcher:hover .mascot-orb { border-color: var(--orange-d); box-shadow: var(--elev-3), 0 0 0 6px var(--orange-l); }
+.mascot-launcher:active .mascot-orb { transform: scale(.94); }
+/* شارة عدد كلمات اليوم — أبيض على --orange-ink = 4.96:1 (AA) في المظهرين */
+.mascot-badge {
+  position: absolute;
+  inset-block-start: -2px;
+  inset-inline-end: -2px;
+  min-inline-size: 22px;
+  block-size: 22px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--orange-ink);
+  color: #fff;
+  font-family: var(--font-latin);
+  font-size: .72rem;
+  font-weight: 700;
+  line-height: 1;
+  border: 2px solid var(--bg);
+}
+
 /* ── كاتيا 🐱: رقصة الأطراف والذيل — تأرجح الجسم الكامل يعيش في
    MascotAnimations.ts (framer-motion). class «mascot-dancing» تُضاف فقط
    عندما mood==='dancing' وبدون prefers-reduced-motion (انظر Mascot.tsx)؛

@@ -12,6 +12,7 @@ import {
   type MascotLine,
 } from '@/data/mascotDialogs'
 import { CULTURE_FACTS } from '@/data/dutchCulture'
+import { DUTCH_JOKES } from '@/data/dutchJokes'
 import { heroProgressFromState } from '@/components/hero/heroProgress'
 
 const STREAK_MILESTONES = [3, 7, 14, 30, 50, 100]
@@ -93,6 +94,7 @@ export function useMascot() {
   const pendingWords = useRef<Map<string, ReminderWord>>(new Map())
   const pendingSeeded = useRef(false)
   const reminderIdx = useRef(0)
+  const dutyIdx = useRef(0)
   const danceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // One-time greeting-or-nudge, computed as initial state (not in an effect —
@@ -301,17 +303,56 @@ export function useMascot() {
   const closeBubble = useCallback(() => { setBubbleOpen(false) }, [])
   const closePanel = useCallback(() => { setPanelOpen(false) }, [])
 
-  /** Tapping the character toggles the help panel (bubble yields to it). */
-  const togglePanel = useCallback(() => {
-    if (panelOpen) { setPanelOpen(false); return }
+  const openPanel = useCallback(() => {
     setBubbleOpen(false)
     setPanelOpen(true)
-  }, [panelOpen])
+  }, [])
+
+  /** Tapping the icon performs ONE of Katja's routine duties, rotating through
+   *  them so consecutive taps never repeat: today's word reminder → next task
+   *  → Dutch tip → culture fact → joke → encouragement → victory dance. The
+   *  full menu stays one tap further in (the bubble's «كل ما أستطيع فعله»). */
+  const doDuty = useCallback(() => {
+    const st = useAppStore.getState()
+    const duties: (() => void)[] = []
+
+    // Only offered once the user actually has words from a completed task.
+    if (reminderWords.length > 0) {
+      duties.push(() => {
+        const w = reminderWords[reminderIdx.current % reminderWords.length]
+        reminderIdx.current++
+        say(
+          { ar: `تذكير سريع 📖 «${w.nl}» تعني «${w.ar}» — من مهمة «${w.task}» التي أنجزتها اليوم.`, nl: w.nl },
+          'happy', { settleTo: 'idle' },
+        )
+      })
+    }
+
+    duties.push(() => {
+      const tasks = generateTodayPlan(st).tasks
+      if (tasks.length === 0) { dance(pick(ALL_DONE_DANCE)); return }
+      const t = tasks[0]
+      say({ ar: `خطوتك التالية 👉 «${t.name}» — حوالي ${t.mins} دقيقة. ابدأ بها وسأكون هنا حين تنتهي 💪` }, 'excited', { settleTo: 'idle' })
+    })
+
+    duties.push(() => say(pick(DUTCH_TIPS), 'thinking', { settleTo: 'idle' }))
+    duties.push(() => say(pick(CULTURE_FACTS), 'idle'))
+    duties.push(() => {
+      const j = pick(DUTCH_JOKES)
+      say({ ar: `😹 ${j.ar}`, nl: j.nl }, 'happy', { settleTo: 'idle' })
+    })
+    duties.push(() => say(pick(ENCOURAGEMENT), 'happy', { settleTo: 'idle' }))
+    duties.push(() => dance())
+
+    duties[dutyIdx.current % duties.length]()
+    dutyIdx.current++
+  }, [reminderWords, say, dance])
 
   return {
     visible, mood, dialog, bubbleOpen, closeBubble,
-    panelOpen, togglePanel, closePanel,
-    batches, dance,
+    panelOpen, openPanel, closePanel,
+    batches, reminderCount: reminderWords.length,
+    dance, doDuty,
     dismissForever: toggleMascot,
   }
 }
