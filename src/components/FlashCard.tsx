@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { speakDutch } from '@/features/tts/speakDutch'
+import { useWordDetail } from '@/hooks/useWordDetail'
 import type { VocabWord, ExamWord } from '@/store/types'
 import type { FsrsQuality } from '@/features/vocab/fsrs-lite'
 import { formatIntervalAr } from '@/features/vocab/fsrs-lite'
@@ -57,6 +58,10 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
   }, [idx, queue.length, onDone])
 
   const word: Word | undefined = queue[idx]
+
+  // تفاصيل النطق من ويكاموس — تُطلَب عند قلب البطاقة فقط، لا عند عرضها:
+  // البطاقات التي يتخطّاها المستخدم بلا قلب لا تستهلك طلبًا.
+  const detail = useWordDetail(word ? getNl(word) : null, flipped)
 
   // تسخين محرك FSRS فور فتح المراجعة — قبل أول تقييم بثوانٍ
   useEffect(() => { import('@/features/vocab/fsrs') }, [])
@@ -234,7 +239,44 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
         {!nextInterval && flipped ? (
           <motion.div key="back" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
             <div className="mt-5 text-[1.15rem] text-[var(--text)] font-medium"><span aria-hidden="true">🇸🇾</span> {ar}</div>
-            {ex && <div className="mt-2.5 text-[.92rem] text-[var(--text2)] italic">"{ex}"</div>}
+
+            {/* سطر النطق من ويكاموس. يظهر حين يصل ويختفي بلا أثر حين لا
+                تتوفّر الكلمة أو ينقطع الاتصال — لا رسالة خطأ أثناء المراجعة. */}
+            {detail && (detail.ipa || detail.syllables || detail.typeAR) && (
+              <div
+                dir="rtl"
+                style={{
+                  marginTop: 10, display: 'flex', gap: 10, flexWrap: 'wrap',
+                  justifyContent: 'center', alignItems: 'center',
+                  fontSize: '.78rem', color: 'var(--muted)',
+                }}
+              >
+                {detail.ipa && (
+                  <span dir="ltr" style={{ fontFamily: 'var(--font-latin)' }} title="النطق بالأبجدية الصوتية">
+                    /{detail.ipa}/
+                  </span>
+                )}
+                {detail.syllables && (
+                  <span dir="ltr" style={{ fontFamily: 'var(--font-latin)' }} title="تقطيع المقاطع">
+                    {detail.syllables}
+                  </span>
+                )}
+                {detail.typeAR && <span>{detail.typeAR}</span>}
+              </div>
+            )}
+
+            {ex
+              ? <div className="mt-2.5 text-[.92rem] text-[var(--text2)] italic">"{ex}"</div>
+              /* لا مثال محفوظ مع الكلمة — ويكاموس يسدّ الفراغ بمثال حقيقي */
+              : detail?.examples[0] && (
+                <div
+                  dir="ltr" lang="nl"
+                  className="mt-2.5 text-[.88rem] text-[var(--text2)] italic"
+                  style={{ fontFamily: 'var(--font-latin)' }}
+                >
+                  "{detail.examples[0]}"
+                </div>
+              )}
             <div className="flex gap-2 mt-[18px] justify-center flex-wrap">
               {GRADE_BUTTONS.map(({ quality, label, icon, color, bg, key }) => (
                 <button key={quality} onClick={() => grade(quality)}

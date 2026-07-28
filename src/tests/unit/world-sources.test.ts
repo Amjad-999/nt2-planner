@@ -79,6 +79,32 @@ describe('wiktionaryLookup', () => {
     const { wiktionaryLookup } = await import('@/features/world/wiktionary')
     expect(await wiktionaryLookup('fiets')).toBeNull()
   })
+
+  it('caches a real answer but never caches a network failure', async () => {
+    vi.resetModules()
+    const { wiktionaryLookup } = await import('@/features/world/wiktionary')
+
+    // 1) الشبكة ساقطة — يجب ألّا تُخزَّن النتيجة
+    const failing = vi.fn(async () => { throw new Error('offline') })
+    vi.stubGlobal('fetch', failing)
+    expect(await wiktionaryLookup('lopen')).toBeNull()
+    expect(failing).toHaveBeenCalledTimes(1)
+
+    // 2) عاد الاتصال — لا بدّ أن يُعاد الطلب لا أن تُعاد نتيجة الفشل المخزّنة
+    const ok = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ query: { pages: { '1': { extract: LOPEN_EXTRACT } } } }),
+    }))
+    vi.stubGlobal('fetch', ok)
+    const first = await wiktionaryLookup('lopen')
+    expect(first).not.toBeNull()
+    expect(ok).toHaveBeenCalledTimes(1)
+
+    // 3) الطلب نفسه ثانيةً — يأتي من الذاكرة بلا طلب شبكة جديد
+    const second = await wiktionaryLookup('lopen')
+    expect(second).toEqual(first)
+    expect(ok).toHaveBeenCalledTimes(1)
+  })
 })
 
 describe('appInsight', () => {

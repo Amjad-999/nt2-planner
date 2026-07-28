@@ -58,13 +58,31 @@ function heading(section: string, name: string): string {
   return re.exec(section)?.[1]?.trim() ?? ''
 }
 
+/* ذاكرة الجلسة. FSRS يعيد عرض الكلمة نفسها مرارًا داخل الجلسة الواحدة،
+   وبطاقات المراجعة تستدعي هذه الدالّة عند كل قلب — بلا هذه الذاكرة يتكرّر
+   الطلب على نفس الكلمة عشرات المرّات. تخزين الـ PWA يغطّي الجلسات اللاحقة،
+   وهذه تغطّي الجلسة الجارية. تُخزَّن النتائج الفارغة أيضًا كي لا تُعاد
+   محاولة كلمة لا مدخل لها. */
+const memo = new Map<string, WordDetail | null>()
+
 export async function wiktionaryLookup(word: string): Promise<WordDetail | null> {
   const w = word.trim().toLowerCase()
   if (!w) return null
+  if (memo.has(w)) return memo.get(w) ?? null
 
+  const result = await fetchDetail(w)
+  // undefined = تعذّر الوصول (شبكة/مهلة) — لا يُخزَّن، وإلّا عطّل انقطاعٌ
+  // عابر هذه الكلمة لبقيّة الجلسة. null = وصلنا وتأكّدنا أن لا مدخل لها،
+  // وهذه جدير بالتخزين كي لا تُعاد المحاولة عبثًا.
+  if (result !== undefined) memo.set(w, result)
+  return result ?? null
+}
+
+async function fetchDetail(w: string): Promise<WordDetail | null | undefined> {
   const u = `https://nl.wiktionary.org/w/api.php?action=query&format=json&origin=*`
     + `&prop=extracts&explaintext=1&redirects=1&titles=${encodeURIComponent(w)}`
   const j = await getJson<PagesResponse>(u)
+  if (j === null) return undefined
   const page = Object.values(j?.query?.pages ?? {})[0]
   if (!page || page.missing !== undefined) return null
 
