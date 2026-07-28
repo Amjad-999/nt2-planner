@@ -48,6 +48,31 @@ export default defineConfig({
           },
           { urlPattern: /fonts\.googleapis\.com/, handler: 'StaleWhileRevalidate' },
           { urlPattern: /fonts\.gstatic\.com/, handler: 'CacheFirst' },
+          /* مصادر كاتيا الحيّة (src/features/world). محتوى موسوعي وقاموسي
+             شبه ثابت → CacheFirst لأسبوع، فتُقرأ الاستعلامات المتكرّرة فورًا
+             وتظلّ متاحة دون اتصال. */
+          {
+            urlPattern: /(nl|ar)\.wikipedia\.org/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'wiki-cache', expiration: { maxEntries: 120, maxAgeSeconds: 604800 } },
+          },
+          {
+            urlPattern: /nl\.wiktionary\.org/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'wiktionary-cache', expiration: { maxEntries: 200, maxAgeSeconds: 604800 } },
+          },
+          /* الطقس والأخبار يفقدان قيمتهما إن قدُما: الشبكة أوّلًا، والنسخة
+             المخزّنة شبكة أمان قصيرة العمر حين ينقطع الاتصال. */
+          {
+            urlPattern: /api\.open-meteo\.com/,
+            handler: 'NetworkFirst',
+            options: { cacheName: 'weather-cache', networkTimeoutSeconds: 5, expiration: { maxEntries: 12, maxAgeSeconds: 3600 } },
+          },
+          {
+            urlPattern: /corsproxy\.io/,
+            handler: 'NetworkFirst',
+            options: { cacheName: 'news-cache', networkTimeoutSeconds: 6, expiration: { maxEntries: 8, maxAgeSeconds: 1800 } },
+          },
         ],
       },
     }),
