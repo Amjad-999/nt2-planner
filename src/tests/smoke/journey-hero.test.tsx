@@ -45,6 +45,8 @@ beforeEach(() => {
     dailyHistory: {},
     goalCelebratedOn: '',
     streak: { count: 0, last: '' },
+    // Pinned so no earlier case can leak it and auto-open the date picker.
+    onboarded: false,
     // A future date + measured skills → the ring renders its value mode by
     // default; empty-state tests override these per case.
     examDate: new Date(Date.now() + 30 * 86400000).toISOString(),
@@ -64,13 +66,14 @@ describe('JourneyHero', () => {
     expect(container.querySelectorAll('.ember')).toHaveLength(10)
   })
 
-  it('shows the readiness ring and every stat the old hero carried', () => {
+  it('shows the exam countdown ring and every stat the hero carries', () => {
     render(<JourneyHero />)
 
-    // Ring exposes its value to AT; visible label sits in the ring center
-    expect(screen.getByRole('img', { name: /جاهزية/ })).toBeInTheDocument()
+    // The ring is a real button (it opens the date picker) and names both the
+    // days remaining and the share of the study timeline already spent.
+    expect(screen.getByRole('button', { name: /متبقٍ 30 يوم على امتحان NT2/ })).toBeInTheDocument()
 
-    for (const label of ['مواظبة', 'درست', 'اليوم', 'يوم', 'تقدمك اليومي']) {
+    for (const label of ['مواظبة', 'درست', 'اليوم', 'جاهزية', 'يوم', 'تقدمك اليومي']) {
       expect(screen.getAllByText(label).length).toBeGreaterThan(0)
     }
   })
@@ -84,8 +87,8 @@ describe('JourneyHero', () => {
 
     // …while every informational element is still there, just static
     expect(container.querySelectorAll('.hero-phase.on')).toHaveLength(1)
-    expect(screen.getByRole('img', { name: /جاهزية/ })).toBeInTheDocument()
-    for (const label of ['مواظبة', 'درست', 'اليوم', 'يوم', 'تقدمك اليومي']) {
+    expect(screen.getByRole('button', { name: /متبقٍ 30 يوم على امتحان NT2/ })).toBeInTheDocument()
+    for (const label of ['مواظبة', 'درست', 'اليوم', 'جاهزية', 'يوم', 'تقدمك اليومي']) {
       expect(screen.getAllByText(label).length).toBeGreaterThan(0)
     }
   })
@@ -138,16 +141,17 @@ describe('JourneyHero — daily-goal celebration', () => {
 })
 
 describe('JourneyHero — smart empty states', () => {
-  it('no exam date → a real focusable CTA button (no hollow number), which opens the date modal', async () => {
-    useAppStore.setState({ examDate: '' })
+  it('no exam date → a real focusable CTA button (no invented countdown), which opens the date modal', async () => {
+    // `onboarded: false` keeps the ring's own first-visit auto-open out of the
+    // way so this asserts the CLICK path, not the automatic one.
+    useAppStore.setState({ examDate: '', onboarded: false })
     render(<JourneyHero />)
 
-    // No value-mode ring at all…
-    expect(screen.queryByRole('img', { name: /جاهزية/ })).not.toBeInTheDocument()
-
-    // …but a genuine <button> with an accessible name, keyboard-reachable
+    // Nothing counts down, and the button carries no digits at all — the app
+    // never shows a number the user did not choose.
     const btn = screen.getByRole('button', { name: /حدّد موعد امتحانك/ })
     expect(btn.tagName).toBe('BUTTON')
+    expect(btn.textContent).not.toMatch(/[0-9]/)
     btn.focus()
     expect(btn).toHaveFocus()
 
@@ -155,28 +159,27 @@ describe('JourneyHero — smart empty states', () => {
     expect(await screen.findByRole('dialog')).toBeInTheDocument()
   })
 
-  it('brand-new user (date set, nothing measured yet) → CTA into the first exam simulation', () => {
+  it('brand-new user (nothing measured yet) → the readiness stat shows a dash, never a hollow zero', () => {
     useAppStore.setState({ skill: skillAt(0) })
     render(<JourneyHero />)
 
-    expect(screen.queryByRole('img', { name: /جاهزية/ })).not.toBeInTheDocument()
-    const btn = screen.getByRole('button', { name: /أول محاكاة امتحان/ })
-    fireEvent.click(btn)
-    expect(useAppStore.getState().activeTab).toBe('exam')
+    expect(screen.getByText('جاهزية')).toBeInTheDocument()
+    // A dash, not "0%" — nothing was measured, so there is nothing to score.
+    expect(screen.getAllByText('—').length).toBeGreaterThan(0)
   })
 })
 
 describe('JourneyHero — three store states', () => {
-  it('(a) empty store: CTA button renders and the ring shows no zero-value number', () => {
+  it('(a) empty store: CTA button renders and no countdown number is invented', () => {
     useAppStore.setState({
-      examDate: '', dailyHistory: {}, skill: skillAt(0), streak: { count: 0, last: '' },
+      examDate: '', onboarded: false, dailyHistory: {}, skill: skillAt(0), streak: { count: 0, last: '' },
     })
     render(<JourneyHero />)
 
     const btn = screen.getByRole('button', { name: /حدّد موعد امتحانك/ })
     expect(btn).toBeInTheDocument()
-    // value-mode ring absent, and the CTA carries no digits — no hollow "0%"
-    expect(screen.queryByRole('img', { name: /جاهزية/ })).not.toBeInTheDocument()
+    // No days-left figure anywhere, and the CTA itself carries no digits
+    expect(screen.queryByText('حتى الامتحان')).not.toBeInTheDocument()
     expect(btn.textContent).not.toMatch(/[0-9]/)
   })
 
@@ -191,11 +194,11 @@ describe('JourneyHero — three store states', () => {
     })
     render(<JourneyHero />)
 
-    expect(screen.getAllByText('10').length).toBeGreaterThan(0)    // المتبقّي
+    expect(screen.getAllByText('10').length).toBeGreaterThan(0)    // المتبقّي (حلقة العدّ)
     expect(screen.getAllByText('7').length).toBeGreaterThan(0)     // مواظبة
     expect(screen.getAllByText('25د').length).toBeGreaterThan(0)   // درست اليوم
     expect(screen.getAllByText('3/12').length).toBeGreaterThan(0)  // اليوم / الخطة
-    expect(screen.getByRole('img', { name: 'جاهزية 60%' })).toBeInTheDocument()
+    expect(screen.getAllByText('60%').length).toBeGreaterThan(0)   // جاهزية
     expect(screen.getAllByText('42%').length).toBeGreaterThan(0)   // تقدم اليوم
   })
 

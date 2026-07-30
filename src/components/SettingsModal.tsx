@@ -51,10 +51,9 @@ export function SettingsModal({ onClose }: Props) {
     r.readAsText(f); e.target.value = ''
   }
 
-  // Full reload (not just onClose) after resetAll(): a couple of widgets
-  // (e.g. ExamCountdown) seed their own useState from localStorage once at
-  // mount rather than reading the store, so they'd keep showing stale
-  // values until the next full page load otherwise.
+  // Full reload (not just onClose) after resetAll(): theme/focus attributes are
+  // written straight to <html> and several widgets seed useState once at mount,
+  // so a reload is the cheapest way to guarantee nothing stale survives.
   const handleReset = () => {
     if (!confirm('سيتم حذف كلّ بياناتك — هل أنت متأكّد؟')) return
     s.resetAll()

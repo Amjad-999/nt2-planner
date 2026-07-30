@@ -14,9 +14,11 @@ import { toast } from '@/components/Toast'
 const SK6 = 'nt2planner_v6'
 const SK5 = 'nt2planner_v5'
 const SK_BACKUP = 'nt2planner_v6_backup'
-/* Owned by src/components/countdown/ExamCountdown.tsx (kept as a literal
-   here, not an import, so the store doesn't reach into components) — must
-   stay in sync with that file's own STORAGE_KEY so resetAll() below clears it too. */
+/* Legacy key from the old standalone countdown card, which kept a SECOND copy
+   of the exam date outside the store. The date is now a plain store field
+   (State.examDate, persisted + cloud-merged like everything else); this key is
+   only still cleared by resetAll() so an upgrading device doesn't leave the
+   stale value behind in localStorage. */
 const EXAM_COUNTDOWN_KEY = 'nt2_exam_date'
 
 /* ── Custom storage: reads Zustand-wrapped OR original raw JSON ── */

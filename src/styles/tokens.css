@@ -70,6 +70,19 @@
   --sky-back:rgba(20,16,24,.55);
   --sky-front:rgba(12,10,16,.85);
   --ember-cool:hsla(22,90%,58%,.9);
+  /* ── Ink ON the hero gradient. --grad-hero and the four --hero-* phases are
+        dark in BOTH themes, so this foreground set is intentionally identical
+        in light and dark — it tracks the gradient, not the page. Values are
+        the ones the contrast matrix above was run against: cream ≥7.7:1,
+        sand ≥4.62:1 on the lightest stop. Never substitute --text here. ── */
+  --hero-ink:#FBF3EA;                    /* primary text on the hero */
+  --hero-ink2:rgba(217,201,184,.92);     /* secondary labels on the hero */
+  --hero-veil:rgba(255,244,235,.08);     /* chip / tile wash */
+  --hero-veil2:rgba(255,244,235,.12);    /* pressed / emphasised wash */
+  --hero-line:rgba(255,244,235,.14);     /* hairline + empty ring track */
+  --hero-hi:rgba(255,244,235,.08);       /* inset top highlight */
+  /* Ink on --grad-primary (deep burnt orange in both themes): 8.9:1 */
+  --on-primary:#FFF9F4;
   --font-size-base: 16px;
   /* ── Typography — bilingual spec: Inter for Latin/Dutch, Tajawal for
         Arabic. --font-ar kept as an alias (still referenced by a couple of

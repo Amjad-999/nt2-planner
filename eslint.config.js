@@ -6,7 +6,10 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  /* supabase/functions runs on Deno, not in the browser bundle: different globals,
+     different type roots. It is deployed with the Supabase CLI and is deliberately
+     outside both `tsc -b` (tsconfig.app.json includes only `src`) and this lint pass. */
+  globalIgnores(['dist', 'supabase/functions']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

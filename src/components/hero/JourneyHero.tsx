@@ -1,23 +1,15 @@
-import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { motion } from 'framer-motion'
-import { useAppStore, getDaysLeft, getPlanTotal, getCurrentDay, avgBestScore } from '@/store/useAppStore'
+import { useAppStore, getPlanTotal, getCurrentDay, avgBestScore } from '@/store/useAppStore'
 import { todayKey } from '@/lib/utils'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useNow } from '@/hooks/useNow'
 import { springFill } from '@/lib/animations'
 import { celebrate } from '@/lib/celebrate'
 import { SmartGreeting } from '@/components/SmartGreeting'
+import { ExamCountdownRing } from '@/components/countdown/ExamCountdownRing'
 import { phaseOfHour, msToNextBoundary, type DayPhase } from './journeyPhase'
 import { shouldCelebrateGoal } from './heroProgress'
-
-/* Lazy for the same reason ExamCountdown lazy-loads it: the modal statically
-   imports Overlay/Field from SettingsModal, which drags CloudPanel + TTS
-   code — none of that belongs in the always-visible Dashboard chunk. */
-const ExamDateModal = lazy(() => import('@/components/countdown/ExamDateModal').then((m) => ({ default: m.ExamDateModal })))
-
-/* ExamCountdown's separate storage for the same date — written on save so the
-   countdown pill doesn't keep nagging for a date the user just set here. */
-const COUNTDOWN_DATE_KEY = 'nt2_exam_date'
 
 /* Same touch heuristic the old 3D hero used: read once at module load —
    pointer type changing mid-session (dock/undock) is rare enough that a
@@ -86,10 +78,7 @@ export function JourneyHero() {
   const skill = useAppStore((s) => s.skill)
   const goalCelebratedOn = useAppStore((s) => s.goalCelebratedOn)
   const markGoalCelebrated = useAppStore((s) => s.markGoalCelebrated)
-  const saveSettings = useAppStore((s) => s.saveSettings)
-  const setActiveTab = useAppStore((s) => s.setActiveTab)
 
-  const daysLeft = getDaysLeft(examDate)
   const todayMins = dailyHistory[todayKey()]?.mins ?? 0
   const planTotal = getPlanTotal({ planStart, examDate })
   const planDayNow = getCurrentDay({ planDay, planStart }, planTotal)
@@ -98,8 +87,6 @@ export function JourneyHero() {
   // نسبة التقدم اليومي
   const targetMins = prefs?.studyDayMinutes ?? 60
   const progress = Math.min(100, Math.round((todayMins / targetMins) * 100))
-
-  const [showDateModal, setShowDateModal] = useState(false)
 
   /* ── Daily-goal celebration — at most once per calendar day, persisted.
      The flag (goalCelebratedOn, a dayKey) is consumed in EVERY goal-met path;
@@ -132,32 +119,6 @@ export function JourneyHero() {
     }
   }, [todayMins, targetMins, goalCelebratedOn, markGoalCelebrated, reduced])
   useEffect(() => () => window.clearTimeout(pulseTimer.current), [])
-
-  const handleSaveDate = (iso: string) => {
-    saveSettings({ examDate: iso })
-    try { localStorage.setItem(COUNTDOWN_DATE_KEY, iso) } catch { /* private mode — the store copy still saved */ }
-  }
-
-  /* ── Smart empty states: the ring never shows a hollow zero or a dash.
-     No usable exam date → CTA into ExamDateModal; date set but nothing
-     measured yet (brand-new user, no sims) → CTA into the first simulation. */
-  const ringCta =
-    daysLeft == null
-      ? {
-          icon: '📅',
-          label: 'حدّد موعدك',
-          ariaLabel: 'حدّد موعد امتحانك ليبدأ حساب الجاهزية',
-          onClick: () => setShowDateModal(true),
-          hasPopup: true,
-        }
-      : readiness === 0
-        ? {
-            icon: '🎯',
-            label: 'أول محاكاة',
-            ariaLabel: 'ابدأ أول محاكاة امتحان لقياس جاهزيتك',
-            onClick: () => setActiveTab('exam'),
-          }
-        : undefined
 
   /* ── Time-of-day phase — seeded from useNow(), then one chained timer per
      boundary crossing (at most 4/day) flips the state; the visible change is
@@ -222,19 +183,24 @@ export function JourneyHero() {
     { icon: '🔥', value: String(streak.count), label: 'مواظبة' },
     { icon: '⏱️', value: `${todayMins}د`, label: 'درست' },
     { icon: '📍', value: `${planDayNow}/${planTotal}`, label: 'اليوم' },
-    { icon: '📅', value: `${daysLeft ?? 0}`, label: 'يوم' },
+    { icon: '🎯', value: readiness ? `${readiness}%` : '—', label: 'جاهزية' },
   ]
 
+  /* No wrapper margin and no bottom radius/border: the hero is the TOP half of
+     one continuous slab whose bottom half is TodayFocus (see Dashboard).
+     The old layout ended the hero with a rounded edge and a 20px gap, which
+     read as a divider line with dead space under it. */
   return (
-    <div style={{ marginBottom: 20 }}>
+    <div>
       <div
         ref={rootRef}
         style={{
           background: 'var(--grad-hero)',
-          borderRadius: 'calc(var(--r) + 4px)',
+          borderRadius: 'calc(var(--r) + 4px) calc(var(--r) + 4px) 0 0',
           border: '1px solid var(--glass-border)',
+          borderBottom: 'none',
           borderTop: '3px solid var(--orange)',
-          boxShadow: 'var(--elev-2), inset 0 1px 0 rgba(255,244,235,.08)',
+          boxShadow: 'var(--elev-2), inset 0 1px 0 var(--hero-hi)',
           padding: '24px 28px',
           position: 'relative',
           overflow: 'hidden',
@@ -284,12 +250,58 @@ export function JourneyHero() {
 
         {/* المحتوى */}
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+          {/* The greeting column carries the daily progress bar so it matches
+              the 108px ring's height. Before, the bar sat in its own row below
+              the stats and the greeting alone was ~66px tall — the 40px
+              difference piled up as dead space beside the ring. Filling it with
+              information the hero already owned beats padding it out, and it
+              drops a whole row from the card. */}
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
             <div style={{ flex: '1 1 240px', minWidth: 0 }}>
               <SmartGreeting />
+
+              {/* شريط التقدم — scaleX بدل width: التحويل لا يفرض إعادة تخطيط،
+                  والأصل من اليمين ليطابق اتجاه التعبئة في RTL */}
+              <div style={{ marginTop: 14 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: 6,
+                  }}
+                >
+                  <span style={{ fontSize: '.8rem', color: 'var(--hero-ink2)', fontWeight: 500 }}>
+                    تقدمك اليومي
+                  </span>
+                  <span style={{ fontSize: '.85rem', color: 'var(--hero-ink)', fontWeight: 700 }}>
+                    {progress}%
+                  </span>
+                </div>
+                <div
+                  style={{
+                    height: 6,
+                    background: 'var(--hero-line)',
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <motion.div
+                    initial={reduced ? false : { scaleX: 0 }}
+                    animate={{ scaleX: progress / 100 }}
+                    transition={reduced ? { duration: 0 } : springFill}
+                    style={{
+                      height: '100%',
+                      borderRadius: 3,
+                      transformOrigin: '100% 50%',
+                      background: 'linear-gradient(90deg, var(--orange), var(--orange-m))',
+                    }}
+                  />
+                </div>
+              </div>
             </div>
             <div ref={ringWrapRef} style={{ flexShrink: 0 }}>
-              <ReadinessRing pct={readiness} reduced={reduced} cta={ringCta} />
+              <ExamCountdownRing />
             </div>
           </div>
 
@@ -306,20 +318,20 @@ export function JourneyHero() {
               <div
                 key={s.label}
                 style={{
-                  background: 'rgba(255,244,235,0.08)',
+                  background: 'var(--hero-veil)',
                   backdropFilter: 'blur(12px)',
                   borderRadius: 'var(--r-sm)',
                   padding: '12px 8px',
                   textAlign: 'center',
-                  border: '1px solid rgba(255,244,235,0.1)',
+                  border: '1px solid var(--hero-line)',
                 }}
               >
-                <div style={{ fontSize: '1.3rem', marginBottom: 4 }}>{s.icon}</div>
+                <div aria-hidden="true" style={{ fontSize: '1.3rem', marginBottom: 4 }}>{s.icon}</div>
                 <div
                   style={{
                     fontSize: '1.1rem',
                     fontWeight: 700,
-                    color: '#FBF3EA',
+                    color: 'var(--hero-ink)',
                     fontFamily: 'var(--font-display)',
                   }}
                 >
@@ -328,7 +340,7 @@ export function JourneyHero() {
                 <div
                   style={{
                     fontSize: '.72rem',
-                    color: 'rgba(217,201,184,0.9)',
+                    color: 'var(--hero-ink2)',
                     marginTop: 2,
                   }}
                 >
@@ -337,125 +349,8 @@ export function JourneyHero() {
               </div>
             ))}
           </div>
-
-          {/* شريط التقدم — scaleX بدل width: التحويل لا يفرض إعادة تخطيط،
-              والأصل من اليمين ليطابق اتجاه التعبئة في RTL */}
-          <div style={{ marginTop: 16 }}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 6,
-              }}
-            >
-              <span style={{ fontSize: '.8rem', color: 'rgba(217,201,184,0.92)', fontWeight: 500 }}>
-                تقدمك اليومي
-              </span>
-              <span style={{ fontSize: '.85rem', color: '#FBF3EA', fontWeight: 700 }}>
-                {progress}%
-              </span>
-            </div>
-            <div
-              style={{
-                height: 6,
-                background: 'rgba(255,244,235,0.1)',
-                borderRadius: 3,
-                overflow: 'hidden',
-              }}
-            >
-              <motion.div
-                initial={reduced ? false : { scaleX: 0 }}
-                animate={{ scaleX: progress / 100 }}
-                transition={reduced ? { duration: 0 } : springFill}
-                style={{
-                  height: '100%',
-                  borderRadius: 3,
-                  transformOrigin: '100% 50%',
-                  background: 'linear-gradient(90deg, var(--orange), #EBBDA2)',
-                }}
-              />
-            </div>
-          </div>
         </div>
-
-        {showDateModal && (
-          <Suspense fallback={null}>
-            <ExamDateModal
-              currentDate={daysLeft == null ? null : examDate}
-              onClose={() => setShowDateModal(false)}
-              onSave={handleSaveDate}
-            />
-          </Suspense>
-        )}
       </div>
-    </div>
-  )
-}
-
-/* ── حلقة الجاهزية — نفس مقياس "معدّل امتحاناتك" (avgBestScore) بلمحة واحدة.
-   في الحالات الفارغة تعرض زرًّا حقيقيًّا (قابلًا للتركيز، باسم واضح لقارئ
-   الشاشة) بدل صفرٍ أجوف — انظر ringCta أعلاه. ── */
-interface RingCta {
-  icon: string
-  label: string
-  ariaLabel: string
-  onClick: () => void
-  hasPopup?: boolean
-}
-
-function ReadinessRing({ pct, reduced, cta }: { pct: number; reduced: boolean; cta?: RingCta }) {
-  const R = 30
-  const C = 2 * Math.PI * R
-  const filled = (Math.min(100, Math.max(0, pct)) / 100) * C
-
-  return (
-    <div
-      role={cta ? undefined : 'img'}
-      aria-label={cta ? undefined : `جاهزية ${pct}%`}
-      style={{ position: 'relative', width: 84, height: 84, flexShrink: 0 }}
-    >
-      <svg width="84" height="84" viewBox="0 0 84 84" aria-hidden="true">
-        <circle cx="42" cy="42" r={R} fill="none" stroke="rgba(255,244,235,.14)" strokeWidth="7" />
-        {!cta && (
-          <motion.circle
-            cx="42" cy="42" r={R} fill="none"
-            stroke="var(--orange)" strokeWidth="7" strokeLinecap="round"
-            transform="rotate(-90 42 42)"
-            initial={reduced ? false : { strokeDasharray: `0 ${C}` }}
-            animate={{ strokeDasharray: `${filled} ${C}` }}
-            transition={reduced ? { duration: 0 } : springFill}
-          />
-        )}
-      </svg>
-      {cta ? (
-        <button
-          type="button"
-          onClick={cta.onClick}
-          aria-label={cta.ariaLabel}
-          aria-haspopup={cta.hasPopup ? 'dialog' : undefined}
-          style={{
-            position: 'absolute', inset: 8, borderRadius: '50%',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
-            background: 'rgba(255,244,235,0.10)', border: '1px dashed rgba(255,244,235,0.4)',
-            color: '#FBF3EA', cursor: 'pointer', fontFamily: 'inherit',
-            fontSize: '.6rem', fontWeight: 700, lineHeight: 1.4, textAlign: 'center', padding: 4,
-          }}
-        >
-          <span aria-hidden="true" style={{ fontSize: '1.05rem' }}>{cta.icon}</span>
-          {cta.label}
-        </button>
-      ) : (
-        <div
-          style={{
-            position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center', pointerEvents: 'none',
-          }}
-        >
-          <b style={{ fontSize: '1.05rem', color: '#FBF3EA', fontFamily: 'var(--font-display)' }}>{pct}%</b>
-          <span style={{ fontSize: '.62rem', color: 'rgba(217,201,184,0.9)' }}>جاهزية</span>
-        </div>
-      )}
     </div>
   )
 }

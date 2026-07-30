@@ -2,7 +2,9 @@ import { useAppStore, totalLearnedWords, avgBestScore, weakestSkill, sumLastNDay
 import { AchievementsPanel } from '@/components/AchievementsPanel'
 import { PASS_THRESHOLD, SKILL_AR, LEARNED_BOX } from '@/data/phases'
 import { JourneyHero } from '@/components/hero/JourneyHero'
-import { ExamCountdown } from '@/components/countdown/ExamCountdown'
+import { TodayFocus } from '@/components/dashboard/TodayFocus'
+import { QuoteTicker } from '@/components/dashboard/QuoteTicker'
+import { AuthBar } from '@/components/auth/AuthBar'
 import { PlanHealth } from '@/components/PlanHealth'
 import { ExamCountdowns } from '@/components/ExamCountdowns'
 import { KpiCard } from '@/components/KpiCard'
@@ -12,7 +14,8 @@ import { motion } from 'framer-motion'
 import { todayKey, dayKeyOffset } from '@/lib/utils'
 import { useNow } from '@/hooks/useNow'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { Reveal, Magnetic } from '@/components/MotionFx'
+import { Reveal } from '@/components/MotionFx'
+import { pressSpring, pressTransition, springCardAt } from '@/lib/animations'
 
 interface Props { onOpenStudyTime?: () => void }
 
@@ -81,20 +84,28 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
 
   return (
     <div style={{ padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto' }}>
+      {/* نقطة الدخول إلى الحساب — أعلى الصفحة، لا داخل الإعدادات */}
+      <AuthBar />
+
+      {/* البطل + تركيز اليوم يشكّلان لوحًا واحدًا متّصلًا: لا خطّ فاصل ولا
+          فراغ ميت بينهما — الحوافّ الداخلية مستقيمة والحدّ السفلي للبطل محذوف */}
       <JourneyHero />
-      <ExamCountdown />
+      <TodayFocus onStartSession={() => setActiveTab('plan')} />
+
+      <QuoteTicker />
       <PlanHealth />
 
       <ExamCountdowns />
 
       <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>🎯</span> مؤشّرات اليوم</h2></Reveal>
-      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(165px,1fr))', gap:12, marginBottom:18 }}>
+      {/* دخول فيزيائي متدرّج (نابض) بدل منحنى زمني — البطاقات تستقرّ كأجسام */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(165px,1fr))', gap:12, marginBottom:18 }}>
         {kpis.map((k, i) => (
           <motion.div
             key={k.cls}
-            initial={reduced ? false : { opacity: 0, y: 14 }}
+            initial={reduced ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: i * 0.06, ease: [0.2, 0.7, 0.2, 1] }}
+            transition={springCardAt(i)}
           >
             <KpiCard cls={k.cls} icon={k.icon} label={k.label} value={k.value} delta={k.delta} deltaClass={k.dCls} editable={k.editable} editKind={k.editKind} editRaw={k.editRaw} min={k.min} max={k.max} onSave={k.onSave} onEditClick={k.onEditClick} />
           </motion.div>
@@ -136,19 +147,29 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
       </div>
 
       <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>⚡</span> إجراءات سريعة</h2></Reveal>
-      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:12 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:12 }}>
         {[
           { label:'📝 ابدأ محاكاة الامتحان', action:()=>setActiveTab('exam'), primary:true },
           { label:'📚 راجع المفردات المستحقّة', action:()=>setActiveTab('vocab') },
           { label:`✨ ولّد خطة اليوم (${gen.tasks.length} مهام)`, action:()=>setActiveTab('plan') },
           { label:'⏱️ أضف وقت الدراسة', action:()=>onOpenStudyTime?.() },
-        ].map((b) => (
-          <Magnetic key={b.label} strength={0.15} maxShift={4}>
-            <button onClick={b.action}
-              className="btn-shine w-full py-2.5 px-4 rounded-xl cursor-pointer font-[inherit] text-[.9rem] border transition-all hover:-translate-y-0.5"
-              style={{ background:'var(--btn-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', color: b.primary ? 'var(--text)' : 'var(--text2)', fontWeight: b.primary ? 700 : 600, borderColor:'var(--btn-border)', boxShadow: b.primary ? 'var(--elev-1), inset 0 1px 0 var(--glass-hi)' : 'var(--elev-1)' }}
-            >{b.label}</button>
-          </Magnetic>
+        ].map((b, i) => (
+          /* الدخول النابض على الغلاف، واستجابة الضغط على الزرّ نفسه — فصلهما
+             يمنع تأخير الـ stagger من إبطاء ردّ فعل اللمسة */
+          <motion.div
+            key={b.label}
+            initial={reduced ? false : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={springCardAt(i)}
+          >
+            <motion.button
+              onClick={b.action}
+              whileTap={reduced ? undefined : pressSpring}
+              transition={pressTransition}
+              className="btn-shine w-full px-4 rounded-xl cursor-pointer font-[inherit] text-[.9rem] border"
+              style={{ minHeight:44, background:'var(--btn-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', color: b.primary ? 'var(--text)' : 'var(--text2)', fontWeight: b.primary ? 700 : 600, borderColor:'var(--btn-border)', boxShadow: b.primary ? 'var(--elev-1), inset 0 1px 0 var(--glass-hi)' : 'var(--elev-1)' }}
+            >{b.label}</motion.button>
+          </motion.div>
         ))}
       </div>
 

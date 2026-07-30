@@ -7,12 +7,13 @@ const TOTAL_PLAN_DAYS = 46
 const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'] as const
 
 export function defaultState(): State {
-  const d = new Date()
-  d.setDate(d.getDate() + TOTAL_PLAN_DAYS)
-  d.setHours(9, 0, 0, 0)
   return {
     name: '',
-    examDate: d.toISOString(),
+    /* No seeded date. Seeding "today + 46" made every brand-new user stare at
+       a 46-day countdown they never chose — a number the app invented. The
+       exam date is user-owned: '' means "not set yet", and every consumer
+       (getDaysLeft, the hero countdown ring, planHealth) already handles it. */
+    examDate: '',
     planDay: 1,
     planStart: new Date().toISOString(),
     done: {},
@@ -202,7 +203,9 @@ export function applyState(parsed: any): State {
     })
 
   S._v = 6
-  if (!S.examDate || isNaN(new Date(S.examDate).getTime())) S.examDate = fresh.examDate
+  // '' stays '' (never set); anything unparseable is downgraded to "not set"
+  // rather than to an invented date — see defaultState above.
+  if (typeof S.examDate !== 'string' || isNaN(new Date(S.examDate).getTime())) S.examDate = ''
 
   // Prune daily history older than 180 days
   const cutoff = Date.now() - 1000 * 60 * 60 * 24 * 180

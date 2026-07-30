@@ -74,19 +74,22 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
       <div className="flex-1" />
 
       {/* Countdown pill — hidden on phones (same info lives in the hero + KPIs);
-          also hidden in Focus Mode (decor-flourish) — motivational chrome, not core nav */}
-      <div
-        className="decor-flourish hidden sm:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[.8rem] text-[var(--muted)] whitespace-nowrap"
-        style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
-        title="الأيام المتبقية حتى الامتحان"
-      >
-        <AppIcon icon={CalendarDots} size={15} style={{ color: 'var(--orange)' }} />
-        {/* لون النص الأساسي يضمن ≥4.5:1 — الأيقونة البرتقالية تحمل الهوية */}
-        <strong style={{ color: 'var(--text)', fontWeight: 600 }}>
-          {daysLeft == null ? '—' : daysLeft}
-        </strong>
-        <span>يومًا للامتحان</span>
-      </div>
+          also hidden in Focus Mode (decor-flourish) — motivational chrome, not core nav.
+          Hidden entirely until the user has picked a date: the hero's countdown
+          ring owns the "when is your exam?" question, and an em-dash pill here
+          would just be chrome that asks nothing and answers nothing. */}
+      {daysLeft != null && (
+        <div
+          className="decor-flourish hidden sm:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[.8rem] text-[var(--muted)] whitespace-nowrap"
+          style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
+          title="الأيام المتبقية حتى الامتحان"
+        >
+          <AppIcon icon={CalendarDots} size={15} style={{ color: 'var(--orange)' }} />
+          {/* لون النص الأساسي يضمن ≥4.5:1 — الأيقونة البرتقالية تحمل الهوية */}
+          <strong style={{ color: 'var(--text)', fontWeight: 600 }}>{daysLeft}</strong>
+          <span>يومًا للامتحان</span>
+        </div>
+      )}
 
       {/* Streak pill — hidden on phones (shown in the hero + KPIs); Focus Mode hides it too */}
       <div

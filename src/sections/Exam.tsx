@@ -6,6 +6,7 @@ import { useSpeech } from '@/features/tts/useSpeech'
 import { FlashCard } from '@/components/FlashCard'
 import { WordCard } from '@/components/WordCard'
 import { SpeakAndCheck } from '@/components/SpeakAndCheck'
+import { WritingFeedbackPanel } from '@/components/exam/WritingFeedbackPanel'
 import { useFuzzySearch, getMatchIndices } from '@/hooks/useFuzzySearch'
 import { useNow } from '@/hooks/useNow'
 import { wordCount } from '@/lib/utils'
@@ -86,7 +87,7 @@ type S = AppStore
 function ReadingView({ s }: { s: S }) {
   return (
     <div>
-      <InfoBox color="blue">📖 <strong>Lezen — أسلوب DUO:</strong> 3 نصوص أصلية معايرة على B1.</InfoBox>
+      <InfoBox color="blue">📖 <strong>Lezen — أسلوب DUO:</strong> {EXAM_READING.length} نصوص أصلية معايرة على B1.</InfoBox>
       {EXAM_READING.map((t) => {
         const ans = s.examReading[t.id] ?? {}
         const answered = Object.keys(ans).length
@@ -136,7 +137,7 @@ function ReadingView({ s }: { s: S }) {
 function ListeningView({ s }: { s: S }) {
   return (
     <div>
-      <InfoBox color="blue">🎧 <strong>Luisteren — أسلوب DUO:</strong> 2 حوارات/نشرات أصلية.</InfoBox>
+      <InfoBox color="blue">🎧 <strong>Luisteren — أسلوب DUO:</strong> {EXAM_LISTENING.length} حوارات ونشرات أصلية.</InfoBox>
       {EXAM_LISTENING.map((it) => {
         const ans = s.examListening[it.id] ?? {}
         const answered = Object.keys(ans).length
@@ -185,32 +186,11 @@ function ListeningView({ s }: { s: S }) {
 function WritingView({ s }: { s: S }) {
   return (
     <div>
-      <InfoBox color="blue">✍️ <strong>Schrijven — أسلوب DUO:</strong> 4 مهام كتابة معايرة على B1.</InfoBox>
+      <InfoBox color="blue">✍️ <strong>Schrijven — أسلوب DUO:</strong> {EXAM_WRITING.length} مهام كتابة معايرة على B1.</InfoBox>
       {EXAM_WRITING.map((w) => {
         const cur = s.examWriting[w.id] ?? { text:'', score:0 }
         const wc = wordCount(cur.text ?? '')
         const inRange = wc>=w.minWords && wc<=w.maxWords
-        const scoreIt = () => {
-          const text = cur.text ?? ''; if (!text.trim()) return
-          const sents = text.split(/[.!?؟]/).filter((x)=>x.trim().length>0).length
-          const uniq = new Set((text.toLowerCase().match(/[a-zà-üœ]+/gi)??[])).size
-          const avgSL = sents ? Math.round(wc/sents) : 0
-          const lexD = wc ? Math.round((uniq/wc)*100) : 0
-          let score = 0
-          if(wc>=w.minWords&&wc<=w.maxWords)score+=40;else if(wc>=w.minWords*.85&&wc<=w.maxWords*1.15)score+=25;else score+=10
-          if(avgSL>=8&&avgSL<=18)score+=20;else if(avgSL>=6&&avgSL<=22)score+=12;else score+=5
-          if(lexD>=55)score+=20;else if(lexD>=40)score+=14;else if(lexD>=25)score+=8
-          const hG=/\b(beste|geachte|hallo|hoi|hey)\b/i.test(text)
-          const hC=/\b(met vriendelijke groet|mvg|hartelijke groet|alvast bedankt|vriendelijke groeten|groet(en)?)\b/i.test(text)
-          if(hG&&hC)score+=20;else if(hG||hC)score+=10
-          score=Math.max(0,Math.min(100,Math.round(score)))
-          const fb=[`عدد الكلمات: ${wc} (المستهدف ${w.minWords}–${w.maxWords})`,`عدد الجمل: ${sents} • متوسّط طول الجملة: ${avgSL} كلمة`,`تنوّع المفردات: ${lexD}%`]
-          if(!hG)fb.push('💡 ابدأ بتحيّة (Beste / Geachte)')
-          if(!hC)fb.push('💡 اختم بصيغة وداع (Met vriendelijke groet)')
-          if(wc<w.minWords)fb.push('💡 النصّ قصير — أضف تفاصيل')
-          if(avgSL>22)fb.push('💡 جملك طويلة — قسّمها')
-          s.scoreWriting(w.id, score, fb.join(' • '))
-        }
         return (
           <Card key={w.id}>
             {/* Dutch task title → LTR */}
@@ -228,11 +208,15 @@ function WritingView({ s }: { s: S }) {
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:8, flexWrap:'wrap', gap:8 }}>
               <div style={{ fontSize:'var(--text-sm)', color:inRange?'var(--green)':'var(--muted)' }}><strong>{wc}</strong> كلمة / {w.minWords}–{w.maxWords}</div>
               <div style={{ display:'flex', gap:6 }}>
-                <GhostBtn onClick={scoreIt}>📊 احسب التقييم</GhostBtn>
                 <GhostBtn onClick={()=>s.resetWriting(w.id)}>🔄 مسح</GhostBtn>
               </div>
             </div>
-            {cur.score>0&&(<>{cur.feedback&&<div style={{ marginTop:10, padding:'10px 12px', borderRadius:8, background:'var(--blue-l)', fontSize:'var(--text-sm)', color:'var(--text2)' }}>{cur.feedback}</div>}<PassBar pct={cur.score}/></>)}
+            <WritingFeedbackPanel
+              task={w}
+              text={cur.text ?? ''}
+              onRecord={(total, summary) => { s.scoreWriting(w.id, total, summary); s.save() }}
+            />
+            {cur.score>0&&(<><div style={{ marginTop:10, fontSize:'var(--text-sm)', color:'var(--muted)' }}>آخر درجة مسجّلة</div><PassBar pct={cur.score}/></>)}
           </Card>
         )
       })}
