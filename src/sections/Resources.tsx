@@ -1,5 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
-import { ExamPdfViewer } from '@/components/ExamPdfViewer'
+import { useEffect, useRef, useState, lazy, Suspense } from 'react'
+/* react-pdf and the pdf.js worker are the heaviest dependency in the app. Imported
+   statically they landed inside this section's chunk, so opening the Resources tab
+   downloaded the whole PDF engine even for someone who only wanted a link.
+   Loaded on demand it becomes its own chunk, fetched the moment a PDF is opened. */
+const ExamPdfViewer = lazy(() => import('@/components/ExamPdfViewer').then((m) => ({ default: m.ExamPdfViewer })))
 import { RESOURCE_GROUPS } from '@/data/resources'
 import type { ResourceLink } from '@/data/resources'
 import { EXAMS, SKILL_ICON } from '@/data/examPdfs'
@@ -84,7 +88,9 @@ function PdfModal({ state, onClose }: { state: ModalState; onClose: () => void }
         {/* In-app viewer (react-pdf renders pages to canvas) — mobile
             browsers can't display PDFs inside an <iframe> at all */}
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0, padding: 8 }}>
-          <ExamPdfViewer src={state.src} title={state.title} />
+          <Suspense fallback={<div style={{ padding: 24, textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--text-sm)' }}>جارٍ تحميل عارض الملفات…</div>}>
+            <ExamPdfViewer src={state.src} title={state.title} />
+          </Suspense>
         </div>
       </div>
     </div>
@@ -119,7 +125,7 @@ export default function Resources() {
   return (
     <div style={{ padding: '24px 28px 60px', maxWidth: 1100, margin: '0 auto' }}>
       <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ color: 'var(--orange)' }}>🔗</span> مصادر رسمية وعلى الإنترنت <span aria-hidden="true">🌍</span>
+        <span style={{ color: 'var(--orange-text)' }}>🔗</span> مصادر رسمية وعلى الإنترنت <span aria-hidden="true">🌍</span>
       </h2>
 
       <div style={{ background: 'var(--blue-l)', border: '1px solid var(--glass-border)', borderInlineStart: '3px solid var(--blue)', borderRadius: 'var(--r-sm)', padding: '14px 18px', marginBottom: 18, fontSize: '.9rem', color: 'var(--text2)', lineHeight: 1.65 }}>
@@ -254,7 +260,7 @@ function ResourceLinkCard({ link }: { link: ResourceLink }) {
         opacity: link.warn ? 0.65 : 1,
       }}
     >
-      <div className="card-value" style={{ fontWeight: 600, color: link.highlight ? 'var(--orange)' : 'var(--text)', marginBottom: 4 }}>{link.title}</div>
+      <div className="card-value" style={{ fontWeight: 600, color: link.highlight ? 'var(--orange-text)' : 'var(--text)', marginBottom: 4 }}>{link.title}</div>
       <div style={{ fontSize: '.8rem', color: 'var(--text2)', lineHeight: 1.5 }}>{link.desc}</div>
     </a>
   )
@@ -370,7 +376,7 @@ function ExamActionButton({
         style={{
           flex: 1, fontSize: '.8rem', fontWeight: 500,
           padding: '7px 10px', borderRadius: 6,
-          border: '1px solid var(--orange)', color: 'var(--orange)',
+          border: '1px solid var(--orange)', color: 'var(--orange-text)',
           background: 'transparent', cursor: 'pointer', fontFamily: 'inherit',
           textAlign: 'start', transition: 'background .12s',
         }}
