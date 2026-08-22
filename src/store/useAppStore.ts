@@ -3,10 +3,15 @@ import { persist, type StorageValue } from 'zustand/middleware'
 import { todayKey, dayKeyOffset, daysBetween } from '@/lib/utils'
 import { idbGet, idbSet } from '@/lib/idb'
 import { defaultState, applyState } from './migration'
-import type { State, VocabWord, ExamWord, SkillKey, TabId } from './types'
+import type {
+  State, VocabWord, ExamWord, SkillKey, TabId, LessonStatusKey, StudyBlockSnapshot, StudyOrderKey,
+} from './types'
+import { isKnownLesson, sectionOf } from '@/data/curriculum'
+import { skipToNext as skipToNextBlock, restartBlock as restartCurrentBlock } from '@/features/plan/timer'
 import { TOTAL_PLAN_DAYS, LEARNED_BOX, PASS_THRESHOLD, planTaskId, scaledPhases, SKILL_AR } from '@/data/phases'
 import { isFsrsLearned, type FsrsQuality } from '@/features/vocab/fsrs-lite'
 import { completionPct } from '@/features/exam/scoring'
+import { createSession, advance, isFinished } from '@/features/exam/mock'
 import { celebrate } from '@/lib/celebrate'
 import { toast } from '@/components/Toast'
 
@@ -136,6 +141,21 @@ export interface AppStore extends State {
 
   // Books
   toggleBookUnit: (bookId: string, unitIdx: number) => void
+
+  // برنامج الدراسة (منهج الكتب الثلاثة)
+  activateStudyProgram: (startKey: string, deadlineKey: string) => void
+  setStudyProgramWindow: (patch: Partial<Pick<State['studyProgram'], 'startKey' | 'deadlineKey' | 'maxLessonsPerDay'>>) => void
+  setLessonStatus: (lessonId: string, status: LessonStatusKey) => void
+  setLessonsStatus: (lessonIds: string[], status: LessonStatusKey) => void
+  setSectionStatus: (sectionId: string, status: LessonStatusKey) => void
+  setBookLessonMinutes: (bookId: string, minutes: number | null) => void
+  setStudyOrder: (order: StudyOrderKey) => void
+  startStudyDay: (dayKey: string, blocks: StudyBlockSnapshot[], now: number) => void
+  pauseStudyDay: (now: number) => void
+  resumeStudyDay: (now: number) => void
+  skipStudyBlock: (now: number) => void
+  restartStudyBlock: (now: number) => void
+  endStudyDay: () => void
 
   // Inburgering exams
   setInburgeringExamPassed: (id: string, passed: boolean) => void
@@ -483,6 +503,117 @@ export const useAppStore = create<AppStore>()(
 
       removeExamWord: (id) => {
         set((st) => ({ examWords: st.examWords.filter((w) => w.id !== id) }))
+        get().save()
+      },
+
+      /* ── برنامج الدراسة ──
+         The timer actions never write a countdown value: they only move
+         `startedAt`, `pausedAt` and `pausedMs`. Every displayed number is
+         recomputed from those three against the wall clock, which is what makes
+         a refresh, a closed tab or a sleeping phone harmless. */
+
+      activateStudyProgram: (startKey, deadlineKey) => {
+        set((st) => ({ studyProgram: { ...st.studyProgram, startKey, deadlineKey, session: null } }))
+        get().save()
+      },
+
+      setStudyProgramWindow: (patch) => {
+        set((st) => ({ studyProgram: { ...st.studyProgram, ...patch } }))
+        get().save()
+      },
+
+      setLessonStatus: (lessonId, status) => {
+        get().setLessonsStatus([lessonId], status)
+      },
+
+      setLessonsStatus: (lessonIds, status) => {
+        if (lessonIds.length === 0) return
+        const at = Date.now()
+        set((st) => {
+          const lessons = { ...st.studyProgram.lessons }
+          for (const id of lessonIds) {
+            /* لا تُسجَّل حالة لدرس خارج المنهج: سجلّ يتيم يُفسد نسبة التقدّم. */
+            if (!isKnownLesson(id)) continue
+            /* العودة إلى "لم يبدأ" تحذف السجلّ ولا تخزّنه: غياب السجلّ هو
+               نفسه معنى "لم يبدأ"، وتخزينه يضخّم الحمولة المزامَنة بلا فائدة. */
+            if (status === 'new') { delete lessons[id]; continue }
+            const prev = lessons[id]
+            lessons[id] = { s: status, at, reps: (prev?.reps ?? 0) + 1 }
+          }
+          return { studyProgram: { ...st.studyProgram, lessons } }
+        })
+        get().save()
+      },
+
+      /* تعليم قسم كامل بنقرة — الطريقة الوحيدة العملية لتسجيل ما أُنجز
+         قبل تفعيل البرنامج دون النقر على عشرات الدروس واحدًا واحدًا. */
+      setSectionStatus: (sectionId, status) => {
+        const section = sectionOf(sectionId)
+        if (!section) return
+        get().setLessonsStatus(section.lessonIds, status)
+      },
+
+      setBookLessonMinutes: (bookId, minutes) => {
+        set((st) => {
+          const lessonMinutes = { ...st.studyProgram.lessonMinutes }
+          /* null يعني العودة إلى المدّة الافتراضية للكتاب، لا تصفيرها. */
+          if (minutes === null || !isFinite(minutes) || minutes <= 0) delete lessonMinutes[bookId]
+          else lessonMinutes[bookId] = Math.min(120, Math.max(5, Math.round(minutes)))
+          return { studyProgram: { ...st.studyProgram, lessonMinutes } }
+        })
+        get().save()
+      },
+
+      setStudyOrder: (order) => {
+        set((st) => ({ studyProgram: { ...st.studyProgram, order } }))
+        get().save()
+      },
+
+      startStudyDay: (dayKey, blocks, now) => {
+        if (blocks.length === 0) return
+        set((st) => ({
+          studyProgram: { ...st.studyProgram, session: { dayKey, startedAt: now, blocks, pausedMs: 0, pausedAt: 0 } },
+        }))
+        get().save()
+      },
+
+      pauseStudyDay: (now) => {
+        const s = get().studyProgram.session
+        if (!s || s.pausedAt > 0) return
+        set((st) => ({ studyProgram: { ...st.studyProgram, session: { ...s, pausedAt: now } } }))
+        get().save()
+      },
+
+      resumeStudyDay: (now) => {
+        const s = get().studyProgram.session
+        if (!s || s.pausedAt <= 0) return
+        const delta = Math.max(0, now - s.pausedAt)
+        set((st) => ({
+          studyProgram: { ...st.studyProgram, session: { ...s, pausedAt: 0, pausedMs: s.pausedMs + delta } },
+        }))
+        get().save()
+      },
+
+      skipStudyBlock: (now) => {
+        const s = get().studyProgram.session
+        if (!s) return
+        const next = skipToNextBlock(s, now)
+        if (next === s) return
+        set((st) => ({ studyProgram: { ...st.studyProgram, session: next } }))
+        get().save()
+      },
+
+      restartStudyBlock: (now) => {
+        const s = get().studyProgram.session
+        if (!s) return
+        const next = restartCurrentBlock(s, now)
+        if (next === s) return
+        set((st) => ({ studyProgram: { ...st.studyProgram, session: next } }))
+        get().save()
+      },
+
+      endStudyDay: () => {
+        set((st) => ({ studyProgram: { ...st.studyProgram, session: null } }))
         get().save()
       },
 

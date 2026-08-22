@@ -51,6 +51,51 @@ function mergeExamTaken(a: DayRecord['examTaken'] = [], b: DayRecord['examTaken'
   return out
 }
 
+/** ترتيب حالات الدرس من الأدنى إلى الأعلى — التقدّم لا يتراجع بسبب مزامنة. */
+const LESSON_RANK: Record<string, number> = { new: 0, learning: 1, weak: 2, review: 3, done: 4, mastered: 5 }
+
+/**
+ * برنامج الدراسة: التواريخ والسقف للأحدث، وحالة كل درس بالأحدث زمنًا.
+ *
+ * Per-lesson, the record with the later `at` wins — that is the device that
+ * actually graded it last. When both sides carry the same timestamp (the usual
+ * case right after a sync) the higher status wins, so a merge can never quietly
+ * demote a mastered lesson back to weak. A live session belongs to the device
+ * running it, exactly like mockSession.
+ */
+function mergeStudyProgram(
+  x: State['studyProgram'] | undefined,
+  y: State['studyProgram'] | undefined,
+  bNewer: boolean,
+): State['studyProgram'] {
+  const empty: State['studyProgram'] = { startKey: '', deadlineKey: '', lessons: {}, session: null, maxLessonsPerDay: 12, lessonMinutes: {}, order: 'sequential' }
+  const a = x ?? empty
+  const b = y ?? empty
+  const newer = bNewer ? b : a
+  const older = bNewer ? a : b
+
+  const lessons: State['studyProgram']['lessons'] = { ...(a.lessons ?? {}) }
+  for (const [id, rec] of Object.entries(b.lessons ?? {})) {
+    const cur = lessons[id]
+    if (!cur) { lessons[id] = rec; continue }
+    const curAt = num(cur.at), recAt = num(rec.at)
+    if (recAt > curAt) lessons[id] = rec
+    else if (recAt === curAt && (LESSON_RANK[rec.s] ?? 0) > (LESSON_RANK[cur.s] ?? 0)) lessons[id] = rec
+  }
+
+  return {
+    startKey: newer.startKey || older.startKey,
+    deadlineKey: newer.deadlineKey || older.deadlineKey,
+    lessons,
+    session: newer.session ?? null,
+    maxLessonsPerDay: num(newer.maxLessonsPerDay, num(older.maxLessonsPerDay, 12)),
+    /* الأحدث يفوز على الإعدادات، لكن تجاوزات المدّة تُدمج مفتاحًا مفتاحًا حتى
+       لا يمحو جهازٌ ضبطَ كتابٍ لم يضبطه هو أصلًا. */
+    lessonMinutes: { ...(older.lessonMinutes ?? {}), ...(newer.lessonMinutes ?? {}) },
+    order: newer.order ?? older.order ?? 'sequential',
+  }
+}
+
 function mergeDay(x?: DayRecord, y?: DayRecord): DayRecord {
   const a = x ?? { mins: 0, tasks: 0, wordsAdded: 0, wordsLearned: 0, examTaken: [] }
   const b = y ?? { mins: 0, tasks: 0, wordsAdded: 0, wordsLearned: 0, examTaken: [] }
@@ -176,10 +221,16 @@ export function mergeStates(a: State, b: State): State {
     unlockedBadges: uniqStrs(a.unlockedBadges, b.unlockedBadges),
     grammarProgress: unionRecordNums(a.grammarProgress, b.grammarProgress),
     inburgeringExams: mergeExams(a.inburgeringExams, b.inburgeringExams, bNewer),
+    /* A timed run belongs to the device it is being taken on: two live timers
+       cannot be reconciled, so the newer save wins outright. Finished runs are
+       history and are unioned by id like every other append-only list. */
+    mockSession: (bNewer ? b.mockSession : a.mockSession) ?? null,
+    mockRuns: mergeMockRuns(a.mockRuns, b.mockRuns),
     // Daily-goal flag: lexicographic max — 'YYYY-MM-DD' keys sort correctly as
     // strings, and "either device already celebrated today" must keep winning
     // so the celebration can never re-fire after a sync.
     goalCelebratedOn: (a.goalCelebratedOn ?? '') > (b.goalCelebratedOn ?? '') ? (a.goalCelebratedOn ?? '') : (b.goalCelebratedOn ?? ''),
+    studyProgram: mergeStudyProgram(a.studyProgram, b.studyProgram, bNewer),
     _v: 6,
     _savedAt: Math.max(num(a._savedAt), num(b._savedAt)),
   }

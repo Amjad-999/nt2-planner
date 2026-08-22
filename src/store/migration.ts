@@ -1,7 +1,11 @@
-import type { State, VocabWord, ExamWord, SkillKey } from './types'
+import type {
+  State, VocabWord, ExamWord, SkillKey, LessonStatusKey, StudyBlockKind, StudyBlockSnapshot,
+} from './types'
 import { clampNum } from '@/lib/utils'
 import { boxToFsrsFields } from '@/features/vocab/fsrs-lite'
 import { reconcileInburgeringExams } from '@/data/inburgering'
+import { isValidSession } from '@/features/exam/mock'
+import { isKnownLesson, CURRICULUM_BOOKS } from '@/data/curriculum'
 
 const TOTAL_PLAN_DAYS = 46
 const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'] as const
@@ -47,8 +51,105 @@ export function defaultState(): State {
     grammarProgress: {},
     inburgeringExams: reconcileInburgeringExams(null),
     goalCelebratedOn: '',
+    /* لا تواريخ مزروعة: البرنامج يبقى غير مفعَّل حتى يختار المستخدم نافذته. */
+    studyProgram: { startKey: '', deadlineKey: '', lessons: {}, session: null, maxLessonsPerDay: 12, lessonMinutes: {}, order: 'sequential' },
     _v: 6,
     _savedAt: 0,
+  }
+}
+
+const DAY_KEY_RE = /^\d{4}-\d{2}-\d{2}$/
+const LESSON_STATUSES: LessonStatusKey[] = ['new', 'learning', 'done', 'review', 'weak', 'mastered']
+const BLOCK_KINDS: StudyBlockKind[] = ['recall', 'new', 'review', 'consolidate', 'repair', 'mock', 'test', 'close', 'break']
+
+/**
+ * برنامج الدراسة: تنقية صارمة.
+ *
+ * A malformed session is dropped rather than repaired — exactly the rule
+ * mockSession follows. A timer whose `startedAt` or block durations are junk
+ * would show confident, wrong countdowns, which is worse than asking the user
+ * to press start again. Lesson records are sanitised one by one so a single bad
+ * entry cannot throw away weeks of tracked progress.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function sanitizeStudyProgram(raw: any): State['studyProgram'] {
+  const fallback: State['studyProgram'] = { startKey: '', deadlineKey: '', lessons: {}, session: null, maxLessonsPerDay: 12, lessonMinutes: {}, order: 'sequential' }
+  if (!raw || typeof raw !== 'object') return fallback
+
+  const startKey = DAY_KEY_RE.test(String(raw.startKey)) ? String(raw.startKey) : ''
+  const deadlineKey = DAY_KEY_RE.test(String(raw.deadlineKey)) ? String(raw.deadlineKey) : ''
+
+  const lessons: State['studyProgram']['lessons'] = {}
+  if (raw.lessons && typeof raw.lessons === 'object' && !Array.isArray(raw.lessons)) {
+    for (const [id, v] of Object.entries(raw.lessons as Record<string, unknown>)) {
+      if (!v || typeof v !== 'object') continue
+      const r = v as Record<string, unknown>
+      if (!LESSON_STATUSES.includes(r.s as LessonStatusKey)) continue
+      /* سجلّ لدرس لا وجود له في المنهج (منهج قديم أو بيانات تالفة) يُسقَط:
+         إبقاؤه يجعل نسبة التقدّم تعدّ دروسًا غير موجودة أصلًا. */
+      if (!isKnownLesson(id)) continue
+      lessons[id] = {
+        s: r.s as LessonStatusKey,
+        at: typeof r.at === 'number' && isFinite(r.at) ? r.at : 0,
+        reps: clampNum(parseInt(String(r.reps)) || 0, 0, 999),
+      }
+    }
+  }
+
+  /* تجاوزات المدّة: كتب معروفة فقط، وأرقام في نطاق معقول. */
+  const lessonMinutes: Record<string, number> = {}
+  if (raw.lessonMinutes && typeof raw.lessonMinutes === 'object' && !Array.isArray(raw.lessonMinutes)) {
+    for (const [bookId, v] of Object.entries(raw.lessonMinutes as Record<string, unknown>)) {
+      if (!CURRICULUM_BOOKS.some((b) => b.id === bookId)) continue
+      const n = parseInt(String(v))
+      if (!isNaN(n) && n > 0) lessonMinutes[bookId] = clampNum(n, 5, 120)
+    }
+  }
+
+  let session: State['studyProgram']['session'] = null
+  const s = raw.session
+  if (
+    s && typeof s === 'object' && DAY_KEY_RE.test(String(s.dayKey))
+    && typeof s.startedAt === 'number' && isFinite(s.startedAt) && s.startedAt > 0
+    && Array.isArray(s.blocks) && s.blocks.length > 0
+  ) {
+    const blocks = s.blocks
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((b: any) => b && typeof b === 'object' && BLOCK_KINDS.includes(b.kind)
+        && typeof b.minutes === 'number' && isFinite(b.minutes) && b.minutes > 0)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((b: any): StudyBlockSnapshot => ({
+        id: String(b.id ?? ''),
+        kind: b.kind,
+        titleAr: String(b.titleAr ?? ''),
+        detailAr: String(b.detailAr ?? ''),
+        minutes: clampNum(Math.round(b.minutes), 1, 240),
+        lessonIds: Array.isArray(b.lessonIds) ? b.lessonIds.filter((x: unknown) => typeof x === 'string') : [],
+      }))
+    /* لقطة ناقصة، أو لقطة تشير إلى دروس لم تعد في المنهج (منهج قديم):
+       المؤقّت في الحالتين لا يمثّل يومًا حقيقيًّا، فتُسقَط الجلسة كلها. */
+    const allLessonsKnown = blocks.every(
+      (b: StudyBlockSnapshot) => b.lessonIds.every((id: string) => isKnownLesson(id)),
+    )
+    if (blocks.length === s.blocks.length && allLessonsKnown) {
+      session = {
+        dayKey: String(s.dayKey),
+        startedAt: s.startedAt,
+        blocks,
+        pausedMs: Math.max(0, typeof s.pausedMs === 'number' && isFinite(s.pausedMs) ? s.pausedMs : 0),
+        pausedAt: Math.max(0, typeof s.pausedAt === 'number' && isFinite(s.pausedAt) ? s.pausedAt : 0),
+      }
+    }
+  }
+
+  return {
+    startKey,
+    deadlineKey,
+    lessons,
+    session,
+    maxLessonsPerDay: clampNum(parseInt(String(raw.maxLessonsPerDay)) || 12, 4, 20),
+    lessonMinutes,
+    order: raw.order === 'examFirst' ? 'examFirst' : 'sequential',
   }
 }
 
@@ -217,6 +318,8 @@ export function applyState(parsed: any): State {
         } : fsrsFromBox),
       }
     })
+
+  S.studyProgram = sanitizeStudyProgram(parsed.studyProgram)
 
   S._v = 6
   // '' stays '' (never set); anything unparseable is downgraded to "not set"

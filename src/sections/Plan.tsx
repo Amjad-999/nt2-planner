@@ -1,5 +1,6 @@
 import { useAppStore, generateTodayPlan, getPlanTotal, getCurrentDay } from '@/store/useAppStore'
 import { scaledPhases, planTaskId, SKILL_AR } from '@/data/phases'
+import { ProgramPanel } from '@/components/plan/ProgramPanel'
 
 export default function Plan() {
   const { planDay, planStart, examDate, done, vocab, skill, customDur, toggleTaskDone, setCustomDur } = useAppStore()
@@ -10,18 +11,21 @@ export default function Plan() {
   return (
     <div style={{ padding: '24px 28px 60px', maxWidth: 1100, margin: '0 auto' }}>
       <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
-        <span style={{ color:'var(--orange)' }}>🗓️</span> خطة الدراسة الذكية ({planTotal} يومًا) <span aria-hidden="true">📍</span>
+        <span style={{ color: 'var(--orange-text)' }}>🗓️</span> خطة الدراسة الذكية ({planTotal} يومًا) <span aria-hidden="true">📍</span>
       </h2>
 
       <div style={{ background:'var(--orange-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--orange)', borderRadius:'var(--r-sm)', padding:'14px 18px', marginBottom:18, fontSize:'.9rem', color:'var(--text2)', lineHeight:1.65 }}>
         <strong style={{ color:'var(--text)' }}>محرّك ذكي:</strong> الخطة تُعيد توزيع مهامك تلقائيًا بناءً على الأيام المتبقّية والمهام غير المنجزة.
       </div>
 
+      {/* برنامج الكتب الثلاثة: مؤقّت حيّ وجدول يُعاد بناؤه من الدروس المتبقّية. */}
+      <ProgramPanel />
+
       {/* Today's tasks */}
       <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:18, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)', marginBottom:18 }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:10, marginBottom:10 }}>
           <div>
-            <div style={{ fontWeight:600, color:'var(--text)' }}>خطة اليوم — اليوم <strong style={{ color:'var(--orange)' }}>{planDayNow}</strong> من {planTotal}</div>
+            <div style={{ fontWeight:600, color:'var(--text)' }}>خطة اليوم — اليوم <strong style={{ color: 'var(--orange-text)' }}>{planDayNow}</strong> من {planTotal}</div>
             <div style={{ fontSize:'.82rem', color:'var(--muted)', marginTop:3 }}>
               تمّ اختيار هذه المهام بناءً على: المرحلة الحالية + المهام المتأخّرة + المهارة الأضعف ({gen.weakestSkill}).
             </div>
@@ -77,7 +81,7 @@ export default function Plan() {
           <div key={ph.id} style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:18, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)', marginBottom:12 }}>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:8 }}>
               <div><strong style={{ color:'var(--text)' }}>{ph.title}</strong> <span style={{ fontSize:'.78rem', color:'var(--muted)' }}>(أيام {ph.days})</span></div>
-              <div style={{ fontSize:'.85rem', color:'var(--orange)', fontWeight:600 }}>{pct}% — {pDone.length}/{pTotal}</div>
+              <div style={{ fontSize:'.85rem', color: 'var(--orange-text)', fontWeight:600 }}>{pct}% — {pDone.length}/{pTotal}</div>
             </div>
             <div style={{ marginTop:8, background:'var(--surface3)', height:6, borderRadius:3, overflow:'hidden' }}>
               <div className="progress-wave" style={{ height:'100%', backgroundColor:'var(--orange)', width:`${pct}%`, transition:'width .8s ease' }} />
