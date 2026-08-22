@@ -32,6 +32,8 @@ export function defaultState(): State {
       speaking:  { best: 0, attempts: 0, history: [] },
     },
     examWriting: {},
+    mockSession: null,
+    mockRuns: [],
     examSpeaking: {},
     examReading: {},
     examListening: {},
@@ -173,6 +175,20 @@ export function applyState(parsed: any): State {
   S.unlockedBadges  = Array.isArray(parsed.unlockedBadges) ? parsed.unlockedBadges.filter((x: unknown) => typeof x === 'string') : []
   S.grammarProgress = (parsed.grammarProgress && typeof parsed.grammarProgress === 'object' && !Array.isArray(parsed.grammarProgress)) ? parsed.grammarProgress : {}
   S.inburgeringExams = reconcileInburgeringExams(parsed.inburgeringExams)
+
+  /* A malformed session would freeze the exam engine on a broken timer, so an
+     unrecognised shape is dropped rather than repaired — the user simply starts
+     a new run. Finished runs are sanitised individually so one bad entry does
+     not throw away the whole history. */
+  S.mockSession = isValidSession(parsed.mockSession) ? parsed.mockSession : null
+  S.mockRuns = (Array.isArray(parsed.mockRuns) ? parsed.mockRuns : [])
+    .filter((r: unknown) => {
+      if (typeof r !== 'object' || r === null) return false
+      const o = r as Record<string, unknown>
+      return typeof o.id === 'string' && typeof o.finishedAt === 'number' && typeof o.total === 'number'
+        && typeof o.scores === 'object' && o.scores !== null
+    })
+    .slice(-30)
 
   // ExamWords
   S.examWords = (Array.isArray(parsed.examWords) ? parsed.examWords : [])

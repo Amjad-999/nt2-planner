@@ -100,6 +100,10 @@ export interface State {
   streak: { count: number; last: string }
   skill: Record<SkillKey, SkillRecord>
   examWriting: Record<string, { text: string; score: number; feedback?: string; at?: number }>
+  /** جلسة الامتحان الكامل الجارية. null = لا جلسة. */
+  mockSession: MockSessionState | null
+  /** سجلّ المحاولات المكتملة، الأحدث آخرًا. */
+  mockRuns: MockRun[]
   examSpeaking: Record<string, { score: number; at: number }>
   examReading: Record<string, Record<number, number>>
   examListening: Record<string, Record<number, number>>

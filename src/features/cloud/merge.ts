@@ -74,6 +74,18 @@ function mergeSkill(a?: SkillRecord, b?: SkillRecord): SkillRecord {
  *  (matching how settings — examDate/prefs/theme — resolve). Both sides always
  *  hold the same canonical 5 after applyState, so this is effectively
  *  newer-wins; the union only guards a future id present on one side only. */
+/** Union finished runs by id, keep chronological order, cap the history. */
+function mergeMockRuns(a: State['mockRuns'] = [], b: State['mockRuns'] = []): State['mockRuns'] {
+  const map = new Map<string, State['mockRuns'][number]>()
+  for (const r of [...(a ?? []), ...(b ?? [])]) {
+    if (!r || typeof r.id !== 'string') continue
+    const prev = map.get(r.id)
+    // Same run seen on both devices: the one that finished later is the complete one.
+    if (!prev || (r.finishedAt ?? 0) > (prev.finishedAt ?? 0)) map.set(r.id, r)
+  }
+  return [...map.values()].sort((x, y) => (x.finishedAt ?? 0) - (y.finishedAt ?? 0)).slice(-30)
+}
+
 function mergeExams(a: State['inburgeringExams'] = [], b: State['inburgeringExams'] = [], bNewer: boolean): State['inburgeringExams'] {
   const older = bNewer ? a : b
   const newer = bNewer ? b : a

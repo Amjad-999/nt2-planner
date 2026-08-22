@@ -22,3 +22,28 @@ export function lastMockScore(
   }
   return latest
 }
+
+/**
+ * The headline number for the dashboard card.
+ *
+ * A completed four-part run wins over any single-skill attempt, because that is
+ * the only figure comparable to a real exam sitting. Falls back to the
+ * single-skill history so a user who has never run a full mock still sees
+ * something real instead of an empty card.
+ */
+export function headlineMock(
+  skill: State['skill'],
+  runs: State['mockRuns'],
+): { score: number; label: string; full: boolean } | null {
+  const last = (runs ?? []).reduce<State['mockRuns'][number] | null>(
+    (best, r) => (!best || (r.finishedAt ?? 0) >= (best.finishedAt ?? 0) ? r : best),
+    null,
+  )
+  if (last) {
+    const parts = Object.keys(last.scores ?? {}).length
+    return { score: last.total, label: `امتحان كامل · ${parts} مهارات`, full: true }
+  }
+  const single = lastMockScore(skill)
+  if (!single) return null
+  return { score: single.score, label: `${SKILL_NL[single.skill]} · ${single.date}`, full: false }
+}

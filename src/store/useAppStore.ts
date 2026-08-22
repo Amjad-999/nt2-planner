@@ -125,6 +125,11 @@ export interface AppStore extends State {
   resetWriting: (id: string) => void
   setSpeakingScore: (id: string, score: number) => void
 
+  // Full mock exam
+  startMock: (now: number, order?: SkillKey[], minutes?: Record<SkillKey, number>) => void
+  submitMockSkill: (score: number, now: number) => void
+  cancelMock: () => void
+
   // ExamWords
   addExamWord: (nl: string, ar: string, ex: string, level: string) => boolean
   removeExamWord: (id: string) => void
@@ -425,6 +430,38 @@ export const useAppStore = create<AppStore>()(
           }
           return { examSpeaking: newSpeaking, skill: { ...st.skill, speaking: sk } }
         })
+        get().save()
+      },
+
+      /* ── Full mock exam ──
+         The session holds only the clock and the handed-in scores. Answers stay
+         in examReading/examListening/examWriting/examSpeaking, which are already
+         persisted, so closing the app mid-exam loses nothing. */
+      startMock: (now, order, minutes) => {
+        set({ mockSession: createSession(now, order, minutes) })
+        get().save()
+      },
+
+      submitMockSkill: (score, now) => {
+        const cur = get().mockSession
+        if (!cur) return
+        const next = advance(cur, score, now)
+        // recordExam keeps the per-skill best/history that the report compares against.
+        get().recordExam(cur.skill, Math.max(0, Math.min(100, Math.round(score))))
+        if (isFinished(next)) {
+          const vals = Object.values(next.scores).filter((n): n is number => typeof n === 'number')
+          const total = vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : 0
+          const run = { id: next.id, startedAt: next.startedAt, finishedAt: now, scores: next.scores, total }
+          set((st) => ({ mockSession: null, mockRuns: [...st.mockRuns, run].slice(-30) }))
+          if (total >= PASS_THRESHOLD) celebrate('exam')
+        } else {
+          set({ mockSession: next })
+        }
+        get().save()
+      },
+
+      cancelMock: () => {
+        set({ mockSession: null })
         get().save()
       },
 
