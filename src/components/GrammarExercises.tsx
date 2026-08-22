@@ -59,7 +59,7 @@ export function GrammarExercises({ lessonId }: Props) {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ color: 'var(--orange)' }}>✏️</span> تمارين
+          <span style={{ color: 'var(--orange-text)' }}>✏️</span> تمارين
         </h3>
         <span style={{ fontSize: '.82rem', color: 'var(--muted)', fontWeight: 600 }}>{correctCount} / {list.length}</span>
       </div>
@@ -71,7 +71,7 @@ export function GrammarExercises({ lessonId }: Props) {
           return (
             <div key={i} style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', padding: '12px 14px', background: 'var(--surface2)' }}>
               <div style={{ fontSize: '.9rem', color: 'var(--text)', marginBottom: ex.cue ? 8 : 10, display: 'flex', gap: 8, alignItems: 'baseline' }}>
-                <span style={{ color: 'var(--orange)', fontWeight: 700 }}>{i + 1}.</span>
+                <span style={{ color: 'var(--orange-text)', fontWeight: 700 }}>{i + 1}.</span>
                 <span>{ex.promptAr}</span>
               </div>
 
@@ -109,7 +109,7 @@ export function GrammarExercises({ lessonId }: Props) {
               )}
 
               {st && st.done && (
-                <div style={{ marginTop: 10, fontSize: '.86rem', lineHeight: 1.6, color: st.correct ? 'var(--green)' : 'var(--red)' }}>
+                <div style={{ marginTop: 10, fontSize: '.86rem', lineHeight: 1.6, color: st.correct ? 'var(--green-text)' : 'var(--red-text)' }}>
                   {st.correct ? '✅ صحيح! ' : '❌ غير صحيح. '}
                   {!st.correct && ex.kind === 'gap' && (<>الإجابة: <strong style={{ color: 'var(--text)' }}>{ex.answer}</strong> — </>)}
                   {!st.correct && ex.kind === 'mcq' && (<>الإجابة: <strong style={{ color: 'var(--text)' }}>{ex.options[ex.answer]}</strong> — </>)}

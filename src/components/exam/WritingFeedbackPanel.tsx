@@ -29,16 +29,19 @@ const box: React.CSSProperties = {
 }
 
 function Bar({ pct, label, weight }: { pct: number; label: string; weight: number }) {
-  const tone = pct >= 70 ? 'var(--green)' : pct >= 45 ? 'var(--orange)' : 'var(--red)'
+  /* Two tokens per state, not one: the fill only needs 3:1 so it uses the plain
+     accent, while the number and the icon are text and must clear 4.5:1. */
+  const fill = pct >= 70 ? 'var(--green)' : pct >= 45 ? 'var(--orange)' : 'var(--red)'
+  const ink = pct >= 70 ? 'var(--green-text)' : pct >= 45 ? 'var(--orange-text)' : 'var(--red-text)'
   const icon = pct >= 70 ? '✔' : pct >= 45 ? '•' : '✕'
   return (
     <div style={{ margin: '8px 0' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
-        <span><span style={{ color: tone }}>{icon}</span> {label} <span style={{ color: 'var(--muted)' }}>({weight}%)</span></span>
-        <strong style={{ color: tone }}>{pct}</strong>
+        <span><span style={{ color: ink }}>{icon}</span> {label} <span style={{ color: 'var(--muted)' }}>({weight}%)</span></span>
+        <strong style={{ color: ink }}>{pct}</strong>
       </div>
       <div style={{ height: 6, borderRadius: 6, background: 'var(--border)', overflow: 'hidden', marginTop: 4 }}>
-        <div style={{ width: `${pct}%`, height: '100%', background: tone, transition: 'width .25s' }} />
+        <div style={{ width: `${pct}%`, height: '100%', background: fill, transition: 'width .25s' }} />
       </div>
     </div>
   )
@@ -93,7 +96,7 @@ export function WritingFeedbackPanel({ task, text, onRecord }: Props) {
         {task.points.map((p) => {
           const done = !report.missingPointsAr.includes(p.ar)
           return (
-            <div key={p.ar} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 'var(--text-sm)', margin: '4px 0', color: done ? 'var(--green)' : 'var(--muted)' }}>
+            <div key={p.ar} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 'var(--text-sm)', margin: '4px 0', color: done ? 'var(--green-text)' : 'var(--muted)' }}>
               <span aria-hidden>{done ? '✔' : '○'}</span>
               <span>{p.ar}</span>
             </div>
@@ -129,9 +132,9 @@ export function WritingFeedbackPanel({ task, text, onRecord }: Props) {
           {report.issues.map((it, i) => (
             <div key={i} style={{ margin: '6px 0', paddingBottom: 6, borderBottom: '1px solid var(--border)' }}>
               <div dir="ltr" lang="nl" style={{ fontFamily: 'var(--font-latin)', fontSize: 'var(--text-sm)' }}>
-                <span style={{ color: 'var(--red)', textDecoration: 'line-through' }}>{it.found}</span>
+                <span style={{ color: 'var(--red-text)', textDecoration: 'line-through' }}>{it.found}</span>
                 {' → '}
-                <span style={{ color: 'var(--green)' }}>{it.fixNl}</span>
+                <span style={{ color: 'var(--green-text)' }}>{it.fixNl}</span>
               </div>
               <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>{it.whyAr}</div>
             </div>
@@ -178,9 +181,9 @@ export function WritingFeedbackPanel({ task, text, onRecord }: Props) {
               {ai.issues.map((it, i) => (
                 <div key={i} style={{ margin: '6px 0', paddingBottom: 6, borderBottom: '1px solid var(--border)' }}>
                   <div dir="ltr" lang="nl" style={{ fontFamily: 'var(--font-latin)', fontSize: 'var(--text-sm)' }}>
-                    <span style={{ color: 'var(--red)', textDecoration: 'line-through' }}>{it.fout}</span>
+                    <span style={{ color: 'var(--red-text)', textDecoration: 'line-through' }}>{it.fout}</span>
                     {' → '}
-                    <span style={{ color: 'var(--green)' }}>{it.goed}</span>
+                    <span style={{ color: 'var(--green-text)' }}>{it.goed}</span>
                   </div>
                   <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>{it.uitlegAr}</div>
                 </div>

@@ -17,7 +17,7 @@ export function HighlightText({ text, indices }: Props) {
     <>
       {segs.map((s, i) =>
         s.highlight
-          ? <mark key={i} style={{ background: 'var(--orange-l)', color: 'var(--orange)', borderRadius: 2, padding: '0 1px' }}>{s.text}</mark>
+          ? <mark key={i} style={{ background: 'var(--orange-l)', color: 'var(--orange-text)', borderRadius: 2, padding: '0 1px' }}>{s.text}</mark>
           : <span key={i}>{s.text}</span>
       )}
     </>

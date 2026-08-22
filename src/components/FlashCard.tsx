@@ -23,10 +23,10 @@ const GRADE_BUTTONS: {
   quality: FsrsQuality; label: string; icon: string
   color: string; bg: string; key: string
 }[] = [
-  { quality: 0, label: 'لم أعرفها', icon: '❌', color: 'var(--red)',   bg: 'var(--red-l)',   key: '1' },
-  { quality: 1, label: 'صعبة',      icon: '🤔', color: 'var(--amber)', bg: 'var(--amber-l)', key: '2' },
+  { quality: 0, label: 'لم أعرفها', icon: '❌', color: 'var(--red-text)',   bg: 'var(--red-l)',   key: '1' },
+  { quality: 1, label: 'صعبة',      icon: '🤔', color: 'var(--amber-text)', bg: 'var(--amber-l)', key: '2' },
   { quality: 2, label: 'عرفتها',    icon: '👍', color: 'var(--blue)',  bg: 'var(--blue-l)',  key: '3' },
-  { quality: 3, label: 'سهلة',      icon: '✅', color: 'var(--green)', bg: 'var(--green-l)', key: '4' },
+  { quality: 3, label: 'سهلة',      icon: '✅', color: 'var(--green-text)', bg: 'var(--green-l)', key: '4' },
 ]
 
 // Shortcuts listed for the help overlay
@@ -150,7 +150,7 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
             width: 26, height: 26, borderRadius: '50%',
             border: '1px solid var(--btn-border)',
             background: helpOpen ? 'var(--orange-l)' : 'var(--btn-bg)',
-            color: helpOpen ? 'var(--orange)' : 'var(--muted)',
+            color: helpOpen ? 'var(--orange-text)' : 'var(--muted)',
             cursor: 'pointer', fontSize: '.8rem', fontWeight: 700,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontFamily: 'inherit',

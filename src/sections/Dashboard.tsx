@@ -4,6 +4,7 @@ import { PASS_THRESHOLD, SKILL_AR, LEARNED_BOX } from '@/data/phases'
 import { JourneyHero } from '@/components/hero/JourneyHero'
 import { TodayFocus } from '@/components/dashboard/TodayFocus'
 import { QuoteTicker } from '@/components/dashboard/QuoteTicker'
+import { TodayPlan } from '@/components/dashboard/TodayPlan'
 import { AuthBar } from '@/components/auth/AuthBar'
 import { PlanHealth } from '@/components/PlanHealth'
 import { ExamCountdowns } from '@/components/ExamCountdowns'
@@ -92,12 +93,15 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
       <JourneyHero />
       <TodayFocus onStartSession={() => setActiveTab('plan')} />
 
+      {/* الحلقة اليومية: TodayFocus يقول أين ضعفك، وهذه تقول ما تفعله الآن بالأرقام */}
+      <TodayPlan />
+
       <QuoteTicker />
       <PlanHealth />
 
       <ExamCountdowns />
 
-      <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>🎯</span> مؤشّرات اليوم</h2></Reveal>
+      <Reveal><h2 style={SH}><span style={{ color: 'var(--orange-text)' }}>🎯</span> مؤشّرات اليوم</h2></Reveal>
       {/* دخول فيزيائي متدرّج (نابض) بدل منحنى زمني — البطاقات تستقرّ كأجسام */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(165px,1fr))', gap:12, marginBottom:18 }}>
         {kpis.map((k, i) => (
@@ -137,7 +141,7 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
         </div>
       )}
 
-      <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>💡</span> رؤى ذكية</h2></Reveal>
+      <Reveal><h2 style={SH}><span style={{ color: 'var(--orange-text)' }}>💡</span> رؤى ذكية</h2></Reveal>
       <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:12, marginBottom:18 }}>
         {insights.map((ins, i) => (
           <Reveal key={i} delay={Math.min(i * 0.05, 0.3)}>
@@ -146,7 +150,7 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
         ))}
       </div>
 
-      <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>⚡</span> إجراءات سريعة</h2></Reveal>
+      <Reveal><h2 style={SH}><span style={{ color: 'var(--orange-text)' }}>⚡</span> إجراءات سريعة</h2></Reveal>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:12 }}>
         {[
           { label:'📝 ابدأ محاكاة الامتحان', action:()=>setActiveTab('exam'), primary:true },
@@ -173,7 +177,7 @@ export default function Dashboard({ onOpenStudyTime }: Props) {
         ))}
       </div>
 
-      <Reveal><h2 style={SH}><span style={{ color:'var(--orange)' }}>🏅</span> إنجازاتي</h2></Reveal>
+      <Reveal><h2 style={SH}><span style={{ color: 'var(--orange-text)' }}>🏅</span> إنجازاتي</h2></Reveal>
       <AchievementsPanel />
     </div>
   )

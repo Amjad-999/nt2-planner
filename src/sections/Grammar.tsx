@@ -60,7 +60,7 @@ export default function Grammar() {
         color: 'var(--text)', margin: '0 0 4px',
         display: 'flex', alignItems: 'center', gap: 10,
       }}>
-        <span style={{ color: 'var(--orange)' }}>📖</span> قواعد ونصائح <span aria-hidden="true">🇳🇱</span>
+        <span style={{ color: 'var(--orange-text)' }}>📖</span> قواعد ونصائح <span aria-hidden="true">🇳🇱</span>
       </h2>
       <p style={{ fontSize: '.88rem', color: 'var(--text2)', marginBottom: 18, lineHeight: 1.6 }}>
         كل المستويات A1 · A2 · B1 · B2 — اختر مستوًى ثمّ درسًا، وبعد كل درس تمارين تفاعلية.
@@ -113,7 +113,7 @@ export default function Grammar() {
                 borderRadius: 12,
                 background: active ? 'var(--orange-l)' : 'var(--glass-bg)',
                 backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-                color: active ? 'var(--orange)' : 'var(--text2)',
+                color: active ? 'var(--orange-text)' : 'var(--text2)',
                 fontFamily: 'inherit', cursor: 'pointer',
                 fontWeight: active ? 700 : 500,
                 transition: 'border-color .15s, background .15s',

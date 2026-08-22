@@ -1,5 +1,75 @@
 export type Level = 'A1' | 'A2' | 'B1' | 'B2' | 'C1'
 export type SkillKey = 'reading' | 'listening' | 'writing' | 'speaking'
+
+/** A timed full-exam run in progress. Mirrors MockSession in features/exam/mock. */
+export interface MockSessionState {
+  id: string
+  skill: SkillKey
+  order: SkillKey[]
+  startedAt: number
+  endsAt: number
+  scores: Partial<Record<SkillKey, number>>
+  minutes: Record<SkillKey, number>
+}
+
+/** A finished full-exam run, kept for the comparison column in the report. */
+export interface MockRun {
+  id: string
+  startedAt: number
+  finishedAt: number
+  scores: Partial<Record<SkillKey, number>>
+  total: number
+}
+/* ── برنامج الدراسة (منهج الكتب الثلاثة على أيام محدودة) ──
+   Mirrors the shapes in features/plan/*. Kept declared here, import-free, the
+   same way MockSessionState mirrors features/exam/mock — a drift between the
+   two surfaces as a type error at the store boundary. */
+
+export type LessonStatusKey = 'new' | 'learning' | 'done' | 'review' | 'weak' | 'mastered'
+
+export type StudyBlockKind =
+  | 'recall' | 'new' | 'review' | 'consolidate' | 'repair' | 'mock' | 'test' | 'close' | 'break'
+
+export interface LessonRecordState {
+  s: LessonStatusKey
+  at: number
+  reps: number
+}
+
+/** لقطة كتلة واحدة داخل جلسة اليوم — تُجمَّد وقت البدء. */
+export interface StudyBlockSnapshot {
+  id: string
+  kind: StudyBlockKind
+  titleAr: string
+  detailAr: string
+  minutes: number
+  lessonIds: string[]
+}
+
+/** جلسة يوم دراسي جارية. المرجع الوحيد للوقت هو startedAt. */
+export interface StudyProgramSession {
+  dayKey: string
+  startedAt: number
+  blocks: StudyBlockSnapshot[]
+  pausedMs: number
+  pausedAt: number
+}
+
+/** تسلسلي = كما رُتّبت الكتب. أولوية الامتحان = دروس B1 قبل بقيّة A2. */
+export type StudyOrderKey = 'sequential' | 'examFirst'
+
+export interface StudyProgramState {
+  /** '' = غير مفعَّل. لا يخترع التطبيق تاريخًا. */
+  startKey: string
+  deadlineKey: string
+  lessons: Record<string, LessonRecordState>
+  session: StudyProgramSession | null
+  maxLessonsPerDay: number
+  /** تجاوز مدّة الدرس لكل كتاب: معرّف الكتاب إلى دقائق. فارغ = مدّة الكتاب الافتراضية. */
+  lessonMinutes: Record<string, number>
+  order: StudyOrderKey
+}
+
 export type ThemeKey = 'light' | 'dark'
 export type TtsEngine = 'auto' | 'online' | 'browser'
 export type TabId = 'dashboard' | 'plan' | 'vocab' | 'books' | 'exam' | 'exercises' | 'grammar' | 'stats' | 'resources' | 'platform'
@@ -100,6 +170,10 @@ export interface State {
   streak: { count: number; last: string }
   skill: Record<SkillKey, SkillRecord>
   examWriting: Record<string, { text: string; score: number; feedback?: string; at?: number }>
+  /** جلسة الامتحان الكامل الجارية. null = لا جلسة. */
+  mockSession: MockSessionState | null
+  /** سجلّ المحاولات المكتملة، الأحدث آخرًا. */
+  mockRuns: MockRun[]
   examSpeaking: Record<string, { score: number; at: number }>
   examReading: Record<string, Record<number, number>>
   examListening: Record<string, Record<number, number>>
@@ -113,6 +187,8 @@ export interface State {
   grammarProgress: Record<string, number[]>   // topicId → indices of correctly-answered exercises
   inburgeringExams: InburgeringExam[]
   goalCelebratedOn: string   // dayKey ('YYYY-MM-DD') of the last daily-goal celebration; '' = never
+  /** برنامج الكتب: حالة كل درس، ونافذة التواريخ، وجلسة اليوم الجارية. */
+  studyProgram: StudyProgramState
   _v: number
   _savedAt: number
 }

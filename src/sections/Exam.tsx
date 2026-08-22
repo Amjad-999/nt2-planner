@@ -7,11 +7,12 @@ import { FlashCard } from '@/components/FlashCard'
 import { WordCard } from '@/components/WordCard'
 import { SpeakAndCheck } from '@/components/SpeakAndCheck'
 import { WritingFeedbackPanel } from '@/components/exam/WritingFeedbackPanel'
+import { MockExamPanel } from '@/components/exam/MockExamPanel'
 import { useFuzzySearch, getMatchIndices } from '@/hooks/useFuzzySearch'
 import { useNow } from '@/hooks/useNow'
 import { wordCount } from '@/lib/utils'
 import type { AppStore } from '@/store/useAppStore'
-import type { ExamWord } from '@/store/types'
+import type { ExamWord, SkillKey } from '@/store/types'
 import type { IFuseOptions } from 'fuse.js'
 
 const EXAM_FUSE_OPTIONS: IFuseOptions<ExamWord> = {
@@ -27,13 +28,19 @@ const EXAM_FUSE_OPTIONS: IFuseOptions<ExamWord> = {
   ignoreLocation: true,
 }
 
-type ExamView = 'reading' | 'listening' | 'writing' | 'speaking' | 'words'
+type ExamView = 'mock' | 'reading' | 'listening' | 'writing' | 'speaking' | 'words'
+
+/** Maps a mock-exam skill onto the tab that holds its questions. */
+const SKILL_TAB: Record<SkillKey, ExamView> = {
+  reading: 'reading', listening: 'listening', writing: 'writing', speaking: 'speaking',
+}
 
 export default function Exam() {
   const [view, setView] = useState<ExamView>('reading')
   const s = useAppStore()
 
   const SEG: { id: ExamView; label: string }[] = [
+    { id:'mock',      label:'⏱️ امتحان كامل' },
     { id:'reading',   label:'📖 القراءة (Lezen)' },
     { id:'listening', label:'🎧 الاستماع (Luisteren)' },
     { id:'writing',   label:'✍️ الكتابة (Schrijven)' },
@@ -44,7 +51,7 @@ export default function Exam() {
   return (
     <div style={{ padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto' }}>
       <h2 style={{ fontFamily:'var(--font-ar)', fontSize:'var(--text-xl)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
-        <span style={{ color:'var(--orange)' }}>📝</span> محاكاة امتحان NT2 — مستوى B1 حقيقي <span aria-hidden="true">🎯</span>
+        <span style={{ color: 'var(--orange-text)' }}>📝</span> محاكاة امتحان NT2 — مستوى B1 حقيقي <span aria-hidden="true">🎯</span>
       </h2>
       <div style={{ background:'var(--orange-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--orange)', borderRadius:'var(--r-sm)', padding:'14px 18px', marginBottom:16, fontSize:'var(--text-sm)', color:'var(--text2)', lineHeight:1.65 }}>
         <strong style={{ color:'var(--text)' }}>مُعايَر على امتحانات DUO الرسمية.</strong> المحتوى أصليّ لكنّه مكتوب لتطابق المستوى B1 الفعلي.
@@ -52,11 +59,12 @@ export default function Exam() {
       <div style={{ display:'flex', gap:4, background:'var(--glass-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--glass-border)', borderRadius:14, padding:4, marginBottom:16, overflowX:'auto', scrollbarWidth:'none' }} role="tablist">
         {SEG.map((sg) => (
           <button key={sg.id} role="tab" aria-selected={view===sg.id} onClick={() => setView(sg.id)}
-            style={{ flex:1, minWidth:'max-content', background:view===sg.id?'var(--glass-bg-strong)':'transparent', color:view===sg.id?'var(--orange)':'var(--muted)', fontWeight:view===sg.id?600:500, border:'none', padding:'9px 14px', borderRadius:10, fontSize:'var(--text-sm)', cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap', transition:'.15s' }}>
+            style={{ flex:1, minWidth:'max-content', background:view===sg.id?'var(--glass-bg-strong)':'transparent', color:view===sg.id?'var(--orange-text)':'var(--muted)', fontWeight:view===sg.id?600:500, border:'none', padding:'9px 14px', borderRadius:10, fontSize:'var(--text-sm)', cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap', transition:'.15s' }}>
             {sg.label}
           </button>
         ))}
       </div>
+      {view==='mock'      && <MockExamPanel onGoToSkill={(k) => setView(SKILL_TAB[k])} />}
       {view==='reading'   && <ReadingView   s={s} />}
       {view==='listening' && <ListeningView s={s} />}
       {view==='writing'   && <WritingView   s={s} />}
@@ -70,12 +78,12 @@ function PassBar({ pct }: { pct: number }) {
   const pass = pct >= PASS_THRESHOLD
   return (
     <div style={{ padding:16, borderRadius:'var(--r)', background:'var(--glass-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--glass-border)', margin:'14px 0', textAlign:'center', boxShadow:'var(--elev-1)' }}>
-      <div style={{ fontFamily:'var(--font-latin)', fontSize:'var(--text-2xl)', fontWeight:600, color:pass?'var(--green)':'var(--orange)', lineHeight:1.1, fontFeatureSettings:"'tnum'" }}>{pct}%</div>
+      <div style={{ fontFamily:'var(--font-latin)', fontSize:'var(--text-2xl)', fontWeight:600, color:pass?'var(--green-text)':'var(--orange-text)', lineHeight:1.1, fontFeatureSettings:"'tnum'" }}>{pct}%</div>
       <div style={{ fontSize:'var(--text-sm)', color:'var(--text2)', marginTop:4 }}>{pass?'✅ فوق عتبة النجاح (65%)':'❌ تحت العتبة — استمرّ!'}</div>
       <div style={{ height:8, background:'var(--surface3)', borderRadius:4, margin:'14px 0 4px', overflow:'hidden', position:'relative' }}>
         <div className="progress-wave" style={{ height:'100%', backgroundColor:pass?'var(--green)':'var(--orange)', width:`${pct}%`, transition:'width .8s ease' }} />
         <div style={{ position:'absolute', top:-3, bottom:-3, width:2, background:'var(--green)', insetInlineStart:`${PASS_THRESHOLD}%` }}>
-          <span style={{ position:'absolute', top:-18, insetInlineStart:'50%', transform:'translateX(-50%)', fontSize:'.65rem', color:'var(--green)', fontWeight:600, whiteSpace:'nowrap' }}>العتبة</span>
+          <span style={{ position:'absolute', top:-18, insetInlineStart:'50%', transform:'translateX(-50%)', fontSize:'.65rem', color: 'var(--green-text)', fontWeight:600, whiteSpace:'nowrap' }}>العتبة</span>
         </div>
       </div>
     </div>
@@ -206,7 +214,7 @@ function WritingView({ s }: { s: S }) {
             <textarea value={cur.text??''} onChange={(e)=>{ s.saveWriting(w.id,e.target.value); clearTimeout((window as unknown as Record<string,number>)._wSave); (window as unknown as Record<string,ReturnType<typeof setTimeout>>)._wSave=setTimeout(()=>s.save(),600) }} rows={8} placeholder="اكتب إجابتك بالهولندية هنا..." dir="ltr" lang="nl"
               style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', backdropFilter:'blur(6px)', fontFamily:'var(--font-latin)', fontSize:'var(--text-base)', color:'var(--text)', resize:'vertical', minHeight:80, lineHeight:1.5 }} />
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:8, flexWrap:'wrap', gap:8 }}>
-              <div style={{ fontSize:'var(--text-sm)', color:inRange?'var(--green)':'var(--muted)' }}><strong>{wc}</strong> كلمة / {w.minWords}–{w.maxWords}</div>
+              <div style={{ fontSize:'var(--text-sm)', color:inRange?'var(--green-text)':'var(--muted)' }}><strong>{wc}</strong> كلمة / {w.minWords}–{w.maxWords}</div>
               <div style={{ display:'flex', gap:6 }}>
                 <GhostBtn onClick={()=>s.resetWriting(w.id)}>🔄 مسح</GhostBtn>
               </div>
@@ -229,7 +237,7 @@ function SpeakingView({ s }: { s: S }) {
   const d2 = EXAM_SPEAKING.filter((x)=>x.deel===2)
   return (
     <div>
-      <InfoBox color="blue">🗣️ <strong>Spreken — أسلوب DUO:</strong> الجزء 1: إجابات قصيرة (20 ث)، الجزء 2: موسّعة (30 ث). استمع للنموذج، ثمّ قيّم نفسك.</InfoBox>
+      <InfoBox color="blue">🗣️ <strong>Spreken — أسلوب DUO:</strong> {EXAM_SPEAKING.length} مهمّة: {d1.length} قصيرة (20 ث) و{d2.length} موسّعة (30 ث). استمع للنموذج، ثمّ قيّم نفسك.</InfoBox>
       {[
         {n:'Deel 1 — Korte reactie (20 sec.)', arr:d1},
         {n:'Deel 2 — Uitgebreide reactie (30 sec.)', arr:d2},
@@ -241,8 +249,10 @@ function SpeakingView({ s }: { s: S }) {
             return (
               <Card key={sp.id}>
                 {/* Dutch task label — no Arabic title */}
+                {/* الترقيم داخل كل جزء يبدأ من واحد، فبدونه يبدو الجزء الثاني
+                    وكأنّه كلّ البنك. إضافة المجموع تُزيل هذا الالتباس. */}
                 <div dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', fontWeight:600, color:'var(--text)', marginBottom:6 }}>
-                  🎤 Spreektaak {idx + 1}
+                  🎤 Spreektaak {idx + 1} / {grp.arr.length}
                 </div>
                 {/* Dutch situation + task → LTR, no Arabic translations */}
                 <div dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', background:'var(--glass-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:'18px 20px', marginBottom:10, boxShadow:'var(--elev-1)', lineHeight:1.65 }}>
@@ -259,7 +269,7 @@ function SpeakingView({ s }: { s: S }) {
                   <label style={{ display:'block', fontSize:'var(--text-sm)', fontWeight:500, color:'var(--text2)', marginBottom:6 }}>قيّم نفسك (0–100):</label>
                   <div style={{ display:'flex', gap:6, alignItems:'center' }}>
                     <input type="range" min={0} max={100} value={saved.score} onChange={(e)=>s.setSpeakingScore(sp.id,parseInt(e.target.value))} style={{ flex:1, minWidth:160, accentColor:'var(--orange)' }} />
-                    <span style={{ fontFamily:'var(--font-latin)', fontWeight:700, color:'var(--orange)', minWidth:32 }}>{saved.score}</span>
+                    <span style={{ fontFamily:'var(--font-latin)', fontWeight:700, color: 'var(--orange-text)', minWidth:32 }}>{saved.score}</span>
                   </div>
                 </div>
               </Card>
@@ -348,7 +358,7 @@ function TtsPlayer({ text, label = '🔊 استمع للنصّ' }: { text: strin
         borderRadius:12, border:'1px solid var(--btn-border)', cursor:'pointer',
         backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)',
         background: speaking ? 'var(--orange-l)' : 'var(--btn-bg)',
-        color: speaking ? 'var(--orange)' : 'var(--text2)',
+        color: speaking ? 'var(--orange-text)' : 'var(--text2)',
         fontFamily:'inherit', fontSize:'.88rem', fontWeight:600, boxShadow:'var(--elev-1)',
       }}
     >

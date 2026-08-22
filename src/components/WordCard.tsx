@@ -28,10 +28,10 @@ interface Props {
 }
 
 const LEVEL_STYLE: Record<string, { bg: string; color: string }> = {
-  A1: { bg: 'var(--green-l)',  color: 'var(--green)'  },
+  A1: { bg: 'var(--green-l)',  color: 'var(--green-text)'  },
   A2: { bg: 'var(--blue-l)',   color: 'var(--blue)'   },
-  B1: { bg: 'var(--orange-l)', color: 'var(--orange)' },
-  B2: { bg: 'var(--amber-l)',  color: 'var(--amber)'  },
+  B1: { bg: 'var(--orange-l)', color: 'var(--orange-text)' },
+  B2: { bg: 'var(--amber-l)',  color: 'var(--amber-text)'  },
   C1: { bg: 'var(--purple-l)', color: 'var(--purple)' },
 }
 
@@ -84,7 +84,7 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4, hlNl,
                 className="text-[.72rem] px-1 py-[1px] rounded border cursor-pointer"
                 style={{
                   borderColor: showPractice ? 'var(--orange)' : 'var(--border2)',
-                  color: showPractice ? 'var(--orange)' : 'var(--muted)',
+                  color: showPractice ? 'var(--orange-text)' : 'var(--muted)',
                   background: showPractice ? 'var(--orange-l)' : 'transparent',
                   flexShrink: 0,
                 }}
@@ -96,7 +96,7 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4, hlNl,
           <div className="flex gap-1.5 items-center flex-wrap mt-1.5">
             <span className="inline-block px-2 py-[2px] rounded-full text-[.7rem] font-semibold" style={{ background: lvStyle.bg, color: lvStyle.color }}>{word.level}</span>
             <span className="inline-block px-2 py-[2px] rounded-full text-[.7rem] font-semibold bg-[var(--surface3)] text-[var(--muted)]">📦 {word.box}/{5}</span>
-            {isDue && <span className="inline-block px-2 py-[2px] rounded-full text-[.7rem] font-semibold" style={{ background: 'var(--orange-l)', color: 'var(--orange)' }}>⏰ مستحقّة</span>}
+            {isDue && <span className="inline-block px-2 py-[2px] rounded-full text-[.7rem] font-semibold" style={{ background: 'var(--orange-l)', color: 'var(--orange-text)' }}>⏰ مستحقّة</span>}
           </div>
         </div>
         <div className="flex gap-1.5">
@@ -110,7 +110,7 @@ export function WordCard({ word, onDelete, onAdd, showAdd, learnedBox = 4, hlNl,
             <button
               onClick={() => { if (confirm('حذف هذه الكلمة؟')) onDelete(word.id) }}
               className="text-[.8rem] px-2.5 py-1.5 rounded-[8px] border cursor-pointer"
-              style={{ borderColor: 'var(--red)', color: 'var(--red)', background: 'transparent' }}
+              style={{ borderColor: 'var(--red)', color: 'var(--red-text)', background: 'transparent' }}
               aria-label={`حذف ${nl}`}
             >🗑</button>
           )}

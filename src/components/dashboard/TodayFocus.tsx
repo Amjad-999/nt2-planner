@@ -5,7 +5,7 @@ import { LEARNED_BOX, SKILL_AR } from '@/data/phases'
 import { useNow } from '@/hooks/useNow'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { breathePulse, pressSpring, pressTransition, springCardAt } from '@/lib/animations'
-import { SKILL_NL, lastMockScore } from './lastMock'
+import { SKILL_NL, headlineMock } from './lastMock'
 import type { TabId } from '@/store/types'
 
 interface CardProps {
@@ -73,13 +73,14 @@ function FocusCard({ index, icon, label, value, hint, tone, onClick, cta }: Card
 export function TodayFocus({ onStartSession }: { onStartSession: () => void }) {
   const vocab = useAppStore((s) => s.vocab)
   const skill = useAppStore((s) => s.skill)
+  const mockRuns = useAppStore((s) => s.mockRuns)
   const setActiveTab = useAppStore((s) => s.setActiveTab)
   const reduced = useReducedMotion()
   const now = useNow()
 
   const focus = weakestSkill(skill)
   const due = vocab.filter((w) => (w.due ?? 0) <= now && !(w.fsrs_state !== undefined ? isFsrsLearned(w) : w.box >= LEARNED_BOX)).length
-  const last = lastMockScore(skill)
+  const last = headlineMock(skill, mockRuns)
 
   const go = (tab: TabId) => () => setActiveTab(tab)
 
@@ -127,7 +128,7 @@ export function TodayFocus({ onStartSession }: { onStartSession: () => void }) {
           index={2} icon={last ? '🎯' : '🚀'} tone={last ? 'good' : 'brand'}
           label="آخر محاكاة"
           value={last ? `${last.score}%` : 'لم تبدأ بعد'}
-          hint={last ? `${SKILL_NL[last.skill]} · ${last.date}` : 'أول محاكاة امتحان تعطيك خطّ الأساس.'}
+          hint={last ? last.label : 'أول محاكاة امتحان تعطيك خطّ الأساس.'}
           cta="افتح محاكاة الامتحان"
           onClick={go('exam')}
         />

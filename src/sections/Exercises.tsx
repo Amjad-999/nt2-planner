@@ -141,7 +141,7 @@ function DroppableArSlot({ pair, placed, result, onTap }: {
     >
       <span style={{ fontSize: '.88rem', color: 'var(--text2)', direction: 'rtl' }}>{pair.ar}</span>
       {placed && (
-        <span style={{ fontSize: '.85rem', fontWeight: 700, color: result === false ? 'var(--red)' : result === true ? 'var(--green)' : 'var(--orange)' }}>
+        <span style={{ fontSize: '.85rem', fontWeight: 700, color: result === false ? 'var(--red-text)' : result === true ? 'var(--green-text)' : 'var(--orange-text)' }}>
           {placed.nl}
         </span>
       )}
@@ -550,7 +550,7 @@ function GapDropZone({ placed, isOver, result, onTap }: {
         }`,
         background: isOver ? 'var(--orange-l)' : hasResult ? (result ? 'var(--green-l)' : 'var(--red-l)') : 'var(--surface3)',
         fontSize: '.9rem', fontWeight: 700,
-        color: hasResult ? (result ? 'var(--green)' : 'var(--red)') : placed ? 'var(--orange)' : 'var(--muted)',
+        color: hasResult ? (result ? 'var(--green-text)' : 'var(--red-text)') : placed ? 'var(--orange-text)' : 'var(--muted)',
         cursor: 'pointer', verticalAlign: 'middle', margin: '0 4px',
         direction: 'ltr',
       }}
@@ -746,7 +746,7 @@ export default function Exercises() {
   return (
     <div dir="rtl" style={{ padding: '24px 28px 80px', maxWidth: 760, margin: '0 auto' }}>
       <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ color: 'var(--orange)' }}>🎮</span> تمارين تفاعلية <span aria-hidden="true">🇳🇱</span>
+        <span style={{ color: 'var(--orange-text)' }}>🎮</span> تمارين تفاعلية <span aria-hidden="true">🇳🇱</span>
       </h2>
       <p style={{ fontSize: '.88rem', color: 'var(--text2)', marginBottom: 18, lineHeight: 1.6 }}>
         تمارين مُولَّدة من مفرداتك. تدعم السحب والإفلات ولوحة المفاتيح واللمس.
@@ -768,7 +768,7 @@ export default function Exercises() {
               border: `1px solid ${mode === m.id ? 'var(--orange)' : 'var(--glass-border)'}`,
               borderRadius: 12,
               background: mode === m.id ? 'var(--orange-l)' : 'var(--glass-bg)',
-              color: mode === m.id ? 'var(--orange)' : 'var(--text2)',
+              color: mode === m.id ? 'var(--orange-text)' : 'var(--text2)',
               fontWeight: mode === m.id ? 700 : 500,
               cursor: 'pointer', fontFamily: 'inherit', fontSize: '.85rem',
               backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',

@@ -211,7 +211,7 @@ export default function Stats() {
   return (
     <div style={{ padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto' }}>
       <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
-        <span style={{ color:'var(--orange)' }}>📈</span> لوحة التحليلات الاستراتيجية <span aria-hidden="true">📍</span>
+        <span style={{ color: 'var(--orange-text)' }}>📈</span> لوحة التحليلات الاستراتيجية <span aria-hidden="true">📍</span>
       </h2>
       <div style={{ background:'var(--purple-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--purple)', borderRadius:'var(--r-sm)', padding:'14px 18px', marginBottom:18, fontSize:'.9rem', color:'var(--text2)', lineHeight:1.65 }}>
         <strong style={{ color:'var(--text)' }}>تتبّع يومي وأسبوعي شامل:</strong> كلّ الرسوم البيانية تستخدم بياناتك الحقيقية من سجلّ التطبيق.
@@ -263,7 +263,7 @@ export default function Stats() {
           {streakCount>=1?'🔥':'🕯️'}
         </span>
         موجة النشاط
-        <span style={{ display:'inline-flex', alignItems:'center', borderRadius:999, padding:'2px 10px', fontSize:'.78rem', fontWeight:600, background:streakCount===0?'var(--surface3)':'var(--orange-l)', color:streakCount===0?'var(--muted)':'var(--orange)' }} aria-label="عدد أيام السلسلة">
+        <span style={{ display:'inline-flex', alignItems:'center', borderRadius:999, padding:'2px 10px', fontSize:'.78rem', fontWeight:600, background:streakCount===0?'var(--surface3)':'var(--orange-l)', color:streakCount===0?'var(--muted)':'var(--orange-text)' }} aria-label="عدد أيام السلسلة">
           {streakCount} يوم متتالٍ
         </span>
       </h3>
