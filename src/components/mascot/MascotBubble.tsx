@@ -9,10 +9,11 @@ const TYPE_SPEED_MS = 22
 interface Props {
   line: MascotLine
   onClose: () => void
+  onOpenPanel: () => void
   onDismissForever: () => void
 }
 
-export function MascotBubble({ line, onClose, onDismissForever }: Props) {
+export function MascotBubble({ line, onClose, onOpenPanel, onDismissForever }: Props) {
   const reduced = useReducedMotion()
   const [shown, setShown] = useState('')
 
@@ -56,7 +57,7 @@ export function MascotBubble({ line, onClose, onDismissForever }: Props) {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
           <span style={{ fontFamily: 'var(--font-display)', fontSize: '.82rem', fontWeight: 'var(--fw-heading)', color: 'var(--orange-ink)' }}>
-            🦊 {MASCOT_NAME_AR}
+            🐱 {MASCOT_NAME_AR}
           </span>
           <button
             onClick={onClose} aria-label="إغلاق"
@@ -81,8 +82,19 @@ export function MascotBubble({ line, onClose, onDismissForever }: Props) {
         )}
 
         <button
+          onClick={onOpenPanel}
+          style={{
+            display: 'block', width: '100%', marginTop: 10, padding: '7px 10px',
+            background: 'var(--btn-bg)', border: '1px solid var(--glass-border)', borderRadius: 10,
+            cursor: 'pointer', color: 'var(--text)', fontSize: '.78rem', fontFamily: 'inherit',
+          }}
+        >
+          ☰ كل ما أستطيع فعله
+        </button>
+
+        <button
           onClick={onDismissForever}
-          style={{ display: 'block', marginTop: 10, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '.72rem', textDecoration: 'underline', padding: 0, fontFamily: 'inherit' }}
+          style={{ display: 'block', marginTop: 8, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '.72rem', textDecoration: 'underline', padding: 0, fontFamily: 'inherit' }}
         >
           إخفاء {MASCOT_NAME_AR} نهائيًّا
         </button>

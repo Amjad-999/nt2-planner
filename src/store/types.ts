@@ -83,6 +83,9 @@ export interface InburgeringExam {
 
 export interface State {
   name: string
+  /** ISO datetime the user picked for their NT2 exam. `''` = not chosen yet —
+   *  never a default the app invented. Persisted with the rest of the store
+   *  (localStorage + idb-keyval) and merged to Supabase like any other field. */
   examDate: string
   planDay: number
   planStart: string
@@ -92,6 +95,7 @@ export interface State {
   focusMode: boolean
   guestMode: boolean
   mascotDismissed: boolean
+  botWordReminders: boolean
   vocab: VocabWord[]
   streak: { count: number; last: string }
   skill: Record<SkillKey, SkillRecord>
@@ -108,6 +112,7 @@ export interface State {
   unlockedBadges: string[]
   grammarProgress: Record<string, number[]>   // topicId → indices of correctly-answered exercises
   inburgeringExams: InburgeringExam[]
+  goalCelebratedOn: string   // dayKey ('YYYY-MM-DD') of the last daily-goal celebration; '' = never
   _v: number
   _savedAt: number
 }
@@ -144,6 +149,14 @@ export interface ExamListeningItem {
   questions: ExamListeningQuestion[]
 }
 
+/** One content point the answer has to cover, with the Dutch wordings that prove it. */
+export interface ExamWritingPoint {
+  /** ما المطلوب، بالعربية — يُعرض للمستخدم في قائمة التحقّق. */
+  ar: string
+  /** Any one of these Dutch fragments counts as covering the point. Lowercase. */
+  any: string[]
+}
+
 export interface ExamWritingItem {
   id: string
   kind: string
@@ -153,6 +166,10 @@ export interface ExamWritingItem {
   briefAr: string
   minWords: number
   maxWords: number
+  /** formeel = u/uw required; informeel = je/jij is fine. Drives the register check. */
+  register: 'formeel' | 'informeel'
+  /** The points the task asks for. Empty is not allowed — content is the main criterion. */
+  points: ExamWritingPoint[]
 }
 
 export interface ExamSpeakingItem {

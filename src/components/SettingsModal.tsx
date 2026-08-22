@@ -51,10 +51,9 @@ export function SettingsModal({ onClose }: Props) {
     r.readAsText(f); e.target.value = ''
   }
 
-  // Full reload (not just onClose) after resetAll(): a couple of widgets
-  // (e.g. ExamCountdown) seed their own useState from localStorage once at
-  // mount rather than reading the store, so they'd keep showing stale
-  // values until the next full page load otherwise.
+  // Full reload (not just onClose) after resetAll(): theme/focus attributes are
+  // written straight to <html> and several widgets seed useState once at mount,
+  // so a reload is the cheapest way to guarantee nothing stale survives.
   const handleReset = () => {
     if (!confirm('سيتم حذف كلّ بياناتك — هل أنت متأكّد؟')) return
     s.resetAll()
@@ -70,10 +69,14 @@ export function SettingsModal({ onClose }: Props) {
 
       <CloudPanel />
 
-      <Field label="فوكسي 🦊">
+      <Field label="كاتيا 🐱">
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '.88rem', color: 'var(--text2)', cursor: 'pointer' }}>
           <input type="checkbox" checked={!s.mascotDismissed} onChange={() => s.toggleMascot()} />
-          إظهار فوكسي (المرشد التفاعلي) في زاوية الشاشة
+          إظهار كاتيا (المرشدة التفاعلية) في زاوية الشاشة
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '.88rem', color: 'var(--text2)', cursor: 'pointer', marginTop: 6 }}>
+          <input type="checkbox" checked={s.botWordReminders} onChange={() => s.toggleBotWordReminders()} />
+          تذكير بكلمات المهام المكتملة كل دقيقتين
         </label>
       </Field>
 

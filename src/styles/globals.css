@@ -306,7 +306,7 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
 }
 @keyframes skel-shimmer { 0% { background-position: 200% 0 } 100% { background-position: -100% 0 } }
 
-/* ── Error shake + daily-achievement pulse (P6) ─────────────────────────── */
+/* ── Error shake ────────────────────────────────────────────────────────── */
 .shake { animation: shake .4s ease; }
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
@@ -315,30 +315,6 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
   60% { transform: translateX(-4px); }
   80% { transform: translateX(3px); }
 }
-.pulse-ok { animation: pulse-ok 1.8s ease infinite; }
-@keyframes pulse-ok {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(249,162,63,.45); }
-  50%      { box-shadow: 0 0 0 7px rgba(249,162,63,0); }
-}
-
-/* ── 3D heading (hero) — عمق + تدرج يتدفق على الحروف + توهج خفيف ─────────
-   background-clip:text يجعل التدرج نصّ الحروف؛ الظلال عبر drop-shadow
-   (وليس text-shadow الذي يظهر خلف الحروف الشفافة). */
-.title-3d {
-  background: linear-gradient(100deg,
-    #EBBDA2 0%, #FCF3EA 28%, #E07A3E 52%, #F7E4D9 76%, #EBBDA2 100%);
-  background-size: 220% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  animation: title-flow 7s linear infinite;
-  filter:
-    drop-shadow(0 1px 0 rgba(16,13,6,.55))
-    drop-shadow(0 3px 1px rgba(16,13,6,.32))
-    drop-shadow(0 6px 20px rgba(249,162,63,.4));
-}
-@keyframes title-flow { to { background-position: -220% 0; } }
 
 /* ── Staggered list/grid reveal (lists spec: 50ms per item) ──────────────
    Add class="stagger" to a list/grid container; each child fades+slides in
@@ -384,10 +360,166 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes secIn { from { opacity: 0; transform: translateY(10px) scale(.995); } to { opacity: 1; transform: none; } }
 @keyframes popIn { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: none; } }
-@keyframes blob-drift { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(var(--blob-dx,-18px),var(--blob-dy,12px)) scale(1.08); } }
-@keyframes blob-drift2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(var(--b2-dx,20px),var(--b2-dy,-12px)) scale(1.1); } }
-@keyframes ember-rise { 0% { transform: translateY(0) translateX(0) scale(.6); opacity: 0; } 12% { opacity: .85; } 80% { opacity: .55; } 100% { transform: translateY(calc(-1 * var(--erise,150px))) translateX(var(--edx,14px)) scale(1); opacity: 0; } }
 @keyframes flame-flicker { 0%,100% { transform: scale(1) rotate(-1deg); } 50% { transform: scale(1.06) rotate(1deg); } }
-@keyframes burst-a { 0% { transform: translate(0,0) scale(.4); opacity: 1; } 100% { transform: translate(-40px,-22px) scale(.8); opacity: 0; } }
-@keyframes burst-b { 0% { transform: translate(0,0) scale(.4); opacity: 1; } 100% { transform: translate(-58px,8px) scale(.8); opacity: 0; } }
-@keyframes burst-c { 0% { transform: translate(0,0) scale(.4); opacity: 1; } 100% { transform: translate(-28px,28px) scale(.6); opacity: 0; } }
+
+/* ── JourneyHero ambient scene ───────────────────────────────────────────
+   Every animated property below is transform or opacity — nothing here can
+   force layout or repaint beyond the compositor. The reduced-motion block
+   freezes all of it (the component additionally skips embers + pointer
+   listeners, so the static scene carries identical information). */
+.hero-phase { position: absolute; inset: 0; opacity: 0; transition: opacity 1.8s ease; pointer-events: none; }
+.hero-phase.on { opacity: 1; }
+.hero-sky { position: absolute; pointer-events: none; will-change: transform; }
+.ember {
+  position: absolute;
+  bottom: 10%;
+  width: var(--es, 6px);
+  height: var(--es, 6px);
+  border-radius: 50%;
+  background: var(--ember-cool);
+  opacity: 0;
+  pointer-events: none;
+  animation: ember-rise var(--ed, 9s) linear var(--edl, 0s) infinite;
+}
+@keyframes ember-rise { 0% { transform: translateY(0) translateX(0) scale(.6); opacity: 0; } 12% { opacity: .85; } 80% { opacity: .55; } 100% { transform: translateY(calc(-1 * var(--erise, 150px))) translateX(var(--edx, 14px)) scale(1); opacity: 0; } }
+@media (pointer: coarse) {
+  .hero-sky { will-change: auto; }
+}
+.ring-pulse { animation: ring-pulse .7s ease-out 3; }
+@keyframes ring-pulse { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.07); } }
+@media (prefers-reduced-motion: reduce) {
+  .hero-phase { transition: none; }
+  .ember { display: none; }
+  .ring-pulse { animation: none; }
+}
+
+/* ── كاتيا 🐱: أيقونة الإطلاق — قرص زجاجي بحلقة برتقالية وهالة نابضة، كي
+   تُقرأ كزرّ حيّ في الزاوية لا كرسمة عابرة. القرص زجاجي (لا برتقالي) عمدًا:
+   القطة نفسها برتقالية، فلو كان القرص برتقاليًّا لذابت فيه في كلا المظهرين. ── */
+/* opacity مثبّتة صراحةً على كل حلقة في سلسلة الأيقونة — شبكة أمان ضد أي
+   حركة أو متغيّر مستقبلي يحاول تمرير شفافية صفرية (انظر mascot-pop أدناه). */
+.mascot-stage { position: relative; display: inline-block; opacity: 1; }
+.mascot-3d { transform-style: preserve-3d; opacity: 1; }
+.mascot-launcher, .mascot-orb { opacity: 1; }
+
+.mascot-orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 96px;
+  block-size: 96px;
+  border-radius: 50%;
+  overflow: hidden;               /* clips the portrait to the disc */
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(12px) saturate(1.6);
+  border: 2px solid var(--orange);
+  box-shadow: var(--elev-3), inset 0 1px 0 var(--glass-hi);
+}
+
+/* الصورة الحقيقية داخل القرص — تأطير على الوجه.
+   لماذا تموضع مطلق بدل object-fit: الصورة عرضية (1500×1072) و`cover` داخل
+   مربّع يملأ الارتفاع تمامًا فلا يبقى فائض رأسي، ما يجعل object-position
+   الرأسي بلا أثر وأي تكبير يتمركز على صدر القطة لا وجهها.
+   الأرقام مشتقّة من قياس بكسلات الصورة: الرأس يمتدّ 23%→72% أفقيًّا
+   و15%→58% رأسيًّا، ومركزه (47.5%, 36.5%).
+   left/top فيزيائيان عمدًا لا inset-inline-*: التطبيق RTL، والمنطقي منها
+   ينقلب إلى اليمين فيعكس القصّ ويؤطّر الجهة الخطأ.
+   القيم الحالية تضع مركز الرأس عند (50.8%, 45.9%) من القرص وتقصّ شريحة
+   رفيعة من طرف الأذن والخدّ — مقايضة مقصودة: الرأس أعرض من ارتفاعه
+   (735×461 بكسل) فإظهاره كاملًا يملأ 61% من ارتفاع القرص ويترك خلفية فارغة.
+   للضبط: --katya-zoom: 200% مع --katya-x: -45% و--katya-y: -5% يُظهر الأذنين
+   كاملتين بوجه أصغر. كبّر الـ zoom للاقتراب أكثر. */
+.mascot-photo {
+  position: absolute;
+  inline-size: var(--katya-zoom, 230%);
+  block-size: auto;
+  max-inline-size: none;
+  left: var(--katya-x, -59%);
+  top: var(--katya-y, -14%);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* الظلّ الأرضي — يضيق كلّما استدارت الأيقونة (scaleX من rotateY في Mascot.tsx) */
+.mascot-shadow {
+  position: absolute;
+  inset-block-end: -12px;
+  inset-inline-start: 50%;
+  inline-size: 76px;
+  block-size: 14px;
+  margin-inline-start: -38px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, var(--mascot-shadow), transparent 72%);
+  pointer-events: none;
+}
+/* الهالة النابضة — على الزرّ لا على القرص: القرص يقصّ ما يتجاوزه
+   (overflow:hidden لتدوير الصورة)، فهالة داخله كانت ستُقصّ وتختفي.
+   الإيقاف عند تقليل الحركة يأتي من القاعدة العامة أعلى الملف. */
+.mascot-launcher::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 2px solid var(--orange);
+  opacity: 0;
+  pointer-events: none;
+  animation: mascot-halo 2.8s ease-out infinite;
+}
+@keyframes mascot-halo {
+  0%   { transform: scale(1);    opacity: .55; }
+  70%  { transform: scale(1.24); opacity: 0; }
+  100% { transform: scale(1.24); opacity: 0; }
+}
+/* ظهور الأيقونة عند أول تركيب.
+   قاعدة صارمة: هذه الحركة لا تملك opacity أبدًا، وتبدأ من تكبير طفيف لا من
+   الصفر. السبب: لو تجمّدت الإطارات (تبويب خلفي، جهاز مخنوق، معاينة لا تُركِّب
+   إطارات) تبقى الحركة عالقة عند إطارها الأول — فلو كان ذلك الإطار opacity:0
+   لعادت الأيقونة للاختفاء تمامًا، وهو العطل نفسه الذي أخفى كاتيا أصلًا.
+   أسوأ حالة الآن: أيقونة ظاهرة بالكامل بحجم 88% بدل 100%. */
+.mascot-enter { animation: mascot-pop .42s cubic-bezier(.34, 1.56, .64, 1) both; }
+@keyframes mascot-pop {
+  from { transform: scale(.88); }
+  to   { transform: scale(1); }
+}
+.mascot-launcher { transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); }
+.mascot-launcher:hover .mascot-orb { border-color: var(--orange-d); box-shadow: var(--elev-3), 0 0 0 6px var(--orange-l); }
+.mascot-launcher:active .mascot-orb { transform: scale(.94); }
+/* شارة عدد كلمات اليوم — أبيض على --orange-ink = 4.96:1 (AA) في المظهرين */
+.mascot-badge {
+  position: absolute;
+  inset-block-start: -2px;
+  inset-inline-end: -2px;
+  min-inline-size: 22px;
+  block-size: 22px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--orange-ink);
+  color: #fff;
+  font-family: var(--font-latin);
+  font-size: .72rem;
+  font-weight: 700;
+  line-height: 1;
+  border: 2px solid var(--bg);
+}
+
+/* ── كاتيا 🐱: رقصة الأطراف والذيل — تأرجح الجسم الكامل يعيش في
+   MascotAnimations.ts (framer-motion). class «mascot-dancing» تُضاف فقط
+   عندما mood==='dancing' وبدون prefers-reduced-motion (انظر Mascot.tsx)؛
+   الـ media query أدناه شبكة أمان إضافية بنفس عادة بقية الملف. ── */
+.cat-arm-l, .cat-arm-r, .cat-tail { transform-box: fill-box; }
+.cat-arm-l { transform-origin: 50% 12%; }
+.cat-arm-r { transform-origin: 50% 12%; }
+.cat-tail  { transform-origin: 15% 85%; }
+.mascot-dancing .cat-arm-l { animation: cat-arm-swing-l .58s ease-in-out infinite; }
+.mascot-dancing .cat-arm-r { animation: cat-arm-swing-r .58s ease-in-out infinite; }
+.mascot-dancing .cat-tail  { animation: cat-tail-wag .58s ease-in-out infinite; }
+@keyframes cat-arm-swing-l { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-38deg); } }
+@keyframes cat-arm-swing-r { 0%, 100% { transform: rotate(38deg); } 50% { transform: rotate(0deg); } }
+@keyframes cat-tail-wag    { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(16deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .mascot-dancing .cat-arm-l,
+  .mascot-dancing .cat-arm-r,
+  .mascot-dancing .cat-tail { animation: none; }
+}

@@ -1,7 +1,6 @@
 import { useAppStore, getDaysLeft } from '@/store/useAppStore'
 import { todayKey } from '@/lib/utils'
 import { useNow } from '@/hooks/useNow'
-import { QUOTES, dayOfYear } from '@/data/dutchQuotes'
 
 type Period = 'morning' | 'afternoon' | 'evening' | 'night'
 type Phase = 'normal' | 'late' | 'examDay' | 'passed'
@@ -58,6 +57,21 @@ function getGreetingState(examDate: string, now: number): { phase: Phase; daysLe
   return { phase: 'normal', daysLeft }
 }
 
+/* 'normal' is the only phase reachable with daysLeft === null (no exam date
+ *  chosen yet — see getGreetingState), and morning.normal is the only
+ *  template that embeds {days}. Filling it with the ?? 0 fallback used below
+ *  would print "0 يوم متبقي" — an invented countdown for a date the user
+ *  never picked, exactly what the rest of the app (ExamCountdownRing, the
+ *  TopBar pill, JourneyHero) is careful never to show. */
+function greetingText(period: Period, phase: Phase, daysLeft: number | null, lessons: number): string {
+  if (phase === 'normal' && period === 'morning' && daysLeft == null) {
+    return 'صباح الدراسة — حدّد موعد امتحانك لتبدأ رحلتك'
+  }
+  return GREETINGS[period][phase]
+    .replace('{days}', String(daysLeft ?? 0))
+    .replace('{lessons}', String(lessons))
+}
+
 export function SmartGreeting() {
   const examDate     = useAppStore((s) => s.examDate)
   const dailyHistory = useAppStore((s) => s.dailyHistory)
@@ -67,60 +81,28 @@ export function SmartGreeting() {
   const { phase, daysLeft } = getGreetingState(examDate, now)
   const lessons = dailyHistory[todayKey()]?.tasks ?? 0
 
-  const text = GREETINGS[period][phase]
-    .replace('{days}', String(daysLeft ?? 0))
-    .replace('{lessons}', String(lessons))
-
-  const quote = QUOTES[dayOfYear(now) % QUOTES.length]
+  const text = greetingText(period, phase, daysLeft, lessons)
 
   return (
     <div>
-      {/* العنوان */}
       <h1
         style={{
           fontFamily: 'var(--font-display)',
           fontSize: 'clamp(1.2rem, 2.5vw, 1.5rem)',
           fontWeight: 'var(--fw-heading)',
-          color: '#FBF3EA',
+          color: 'var(--hero-ink)',
           margin: 0,
           lineHeight: 1.3,
         }}
       >
         {text}
       </h1>
-
-      {/* الاقتباس — مدمج في البطاقة؛ يُخفى في وضع التركيز (زخرفي وليس أساسيًا) */}
-      <div
-        className="decor-flourish"
-        style={{
-          marginTop: 10,
-          padding: '10px 14px',
-          background: 'rgba(255,244,235,0.06)',
-          borderRadius: 'var(--r-sm)',
-          borderRight: '3px solid var(--orange)',
-        }}
-      >
-        <div
-          style={{
-            fontFamily: 'Georgia, serif',
-            fontSize: '1rem',
-            fontStyle: 'italic',
-            color: 'rgba(251,243,234,0.95)',
-            lineHeight: 1.4,
-          }}
-        >
-          "{quote.nl}"
-        </div>
-        <div
-          style={{
-            fontSize: '.82rem',
-            color: 'rgba(217,201,184,0.78)',
-            marginTop: 4,
-          }}
-        >
-          {quote.ar}
-        </div>
-      </div>
+      {/* السطر الثاني — يوضّح ما الذي يقيسه العدّاد المجاور */}
+      <p style={{ margin: '6px 0 0', fontSize: '.86rem', color: 'var(--hero-ink2)', lineHeight: 1.6 }}>
+        {daysLeft == null
+          ? 'حدّد موعد امتحانك ليبدأ العدّ التنازلي ويُضبط إيقاع خطّتك عليه.'
+          : `${lessons} مهمّة أنجزتها اليوم — تابع بخطوة صغيرة الآن.`}
+      </p>
     </div>
   )
 }

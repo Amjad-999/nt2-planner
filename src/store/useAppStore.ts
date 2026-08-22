@@ -14,9 +14,11 @@ import { toast } from '@/components/Toast'
 const SK6 = 'nt2planner_v6'
 const SK5 = 'nt2planner_v5'
 const SK_BACKUP = 'nt2planner_v6_backup'
-/* Owned by src/components/countdown/ExamCountdown.tsx (kept as a literal
-   here, not an import, so the store doesn't reach into components) — must
-   stay in sync with that file's own STORAGE_KEY so resetAll() below clears it too. */
+/* Legacy key from the old standalone countdown card, which kept a SECOND copy
+   of the exam date outside the store. The date is now a plain store field
+   (State.examDate, persisted + cloud-merged like everything else); this key is
+   only still cleared by resetAll() so an upgrading device doesn't leave the
+   stale value behind in localStorage. */
 const EXAM_COUNTDOWN_KEY = 'nt2_exam_date'
 
 /* ── Custom storage: reads Zustand-wrapped OR original raw JSON ── */
@@ -88,6 +90,7 @@ export interface AppStore extends State {
   toggleFocusMode: () => void
   setGuestMode: () => void
   toggleMascot: () => void
+  toggleBotWordReminders: () => void
 
   // Persistence
   save: () => void
@@ -98,6 +101,7 @@ export interface AppStore extends State {
   bumpStreak: () => void
   recordStudyMinutes: (mins: number) => void
   setDayMinutes: (dayKey: string, mins: number) => void
+  markGoalCelebrated: (day: string) => void
 
   // Gamification
   unlockBadge: (id: string) => void
@@ -196,6 +200,13 @@ export const useAppStore = create<AppStore>()(
         get().save()
       },
 
+      // "Remind me of completed-task words every 2 min" — the mascot's word
+      // reminder loop (useMascot). Synced like any other setting.
+      toggleBotWordReminders: () => {
+        set({ botWordReminders: !get().botWordReminders })
+        get().save()
+      },
+
       save: () => {
         // Exclude activeTab — parity with the persist partialize below
         const { activeTab, ...state } = get()
@@ -258,6 +269,16 @@ export const useAppStore = create<AppStore>()(
           return { dailyHistory: { ...st.dailyHistory, [dayKey]: { ...prev, mins: m } } }
         })
         if (dayKey === todayKey() && m > 0) get().bumpStreak()
+        get().save()
+      },
+
+      // Record that today's daily-goal celebration was consumed (hero ring
+      // pulse + confetti) — keyed by dayKey so it fires at most once per
+      // calendar day across reloads and, via the cloud-merge max, across
+      // devices.
+      markGoalCelebrated: (day) => {
+        if (get().goalCelebratedOn === day) return
+        set({ goalCelebratedOn: day })
         get().save()
       },
 

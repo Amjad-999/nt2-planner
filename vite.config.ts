@@ -34,7 +34,10 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,woff2,png,svg,ico}'],
+        // jpg is here for the mascot portrait (public/images/cartoon-cat.jpg) — without
+        // it the file is never precached, so the icon silently drops to its drawn
+        // SVG fallback the moment the app runs offline
+        globPatterns: ['**/*.{js,css,html,woff2,png,jpg,svg,ico}'],
         runtimeCaching: [
           { urlPattern: /translate\.google\.com/, handler: 'NetworkOnly' },
           { urlPattern: /translate\.googleapis\.com/, handler: 'NetworkOnly' },
@@ -45,14 +48,39 @@ export default defineConfig({
           },
           { urlPattern: /fonts\.googleapis\.com/, handler: 'StaleWhileRevalidate' },
           { urlPattern: /fonts\.gstatic\.com/, handler: 'CacheFirst' },
+          /* مصادر كاتيا الحيّة (src/features/world). محتوى موسوعي وقاموسي
+             شبه ثابت → CacheFirst لأسبوع، فتُقرأ الاستعلامات المتكرّرة فورًا
+             وتظلّ متاحة دون اتصال. */
+          {
+            urlPattern: /(nl|ar)\.wikipedia\.org/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'wiki-cache', expiration: { maxEntries: 120, maxAgeSeconds: 604800 } },
+          },
+          {
+            urlPattern: /nl\.wiktionary\.org/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'wiktionary-cache', expiration: { maxEntries: 200, maxAgeSeconds: 604800 } },
+          },
+          /* الطقس والأخبار يفقدان قيمتهما إن قدُما: الشبكة أوّلًا، والنسخة
+             المخزّنة شبكة أمان قصيرة العمر حين ينقطع الاتصال. */
+          {
+            urlPattern: /api\.open-meteo\.com/,
+            handler: 'NetworkFirst',
+            options: { cacheName: 'weather-cache', networkTimeoutSeconds: 5, expiration: { maxEntries: 12, maxAgeSeconds: 3600 } },
+          },
+          {
+            urlPattern: /corsproxy\.io/,
+            handler: 'NetworkFirst',
+            options: { cacheName: 'news-cache', networkTimeoutSeconds: 6, expiration: { maxEntries: 8, maxAgeSeconds: 1800 } },
+          },
         ],
       },
     }),
   ],
   // No manualChunks: every heavy library here has a single lazy consumer
-  // (three→3D hero, dnd-kit→Exercises, markdown→Grammar, chart→Stats,
-  // pdf/wavesurfer→Exam), so default chunking already keeps them out of the
-  // eager critical path. Hand-grouping them pulled shared modules (react-dom,
-  // jsx-runtime, zustand) into those chunks and forced the entry to
-  // modulepreload 1.4 MB of lazy vendor code at startup.
+  // (dnd-kit→Exercises, markdown→Grammar, chart→Stats, pdf/wavesurfer→Exam),
+  // so default chunking already keeps them out of the eager critical path.
+  // Hand-grouping them pulled shared modules (react-dom, jsx-runtime,
+  // zustand) into those chunks and forced the entry to modulepreload 1.4 MB
+  // of lazy vendor code at startup.
 })

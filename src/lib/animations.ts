@@ -1,4 +1,4 @@
-import type { Transition, Variants } from 'framer-motion'
+import type { TargetAndTransition, Transition, Variants } from 'framer-motion'
 
 /**
  * Shared framer-motion variants/transitions. Import ONLY into files that
@@ -44,6 +44,35 @@ export const springFill: Transition = { type: 'spring', stiffness: 120, damping:
 /** Button interactions — spread onto whileTap/whileHover. */
 export const buttonTap = { scale: 0.95 }
 export const buttonHover = { y: -2 }
+
+/* ── Physics-based dashboard motion ───────────────────────────────────────
+   Real spring physics (mass/stiffness/damping), not timed easing curves:
+   a card that settles instead of stopping reads as a physical object, which
+   is the whole point of using motion on a study dashboard — it should feel
+   calm and organic, never mechanical. No spinners, no infinite rotation. */
+
+/** Entrance spring for dashboard cards. Underdamped just enough to settle
+ *  with a single soft overshoot. */
+export const springCard: Transition = { type: 'spring', damping: 20, stiffness: 100 }
+
+/** Same spring, staggered by list position — the cards arrive as a wave
+ *  rather than all at once. Cap the delay so long grids stay responsive. */
+export function springCardAt(index: number): Transition {
+  return { ...springCard, delay: Math.min(index * 0.07, 0.42) }
+}
+
+/** Press feedback: 0.96 on press, spring back to 1 on release. Spread onto
+ *  whileTap together with `pressTransition`. */
+export const pressSpring: TargetAndTransition = { scale: 0.96 }
+export const pressTransition: Transition = { type: 'spring', stiffness: 420, damping: 24, mass: 0.5 }
+
+/** Breathing pulse for the ONE primary call-to-action on the page. Slow
+ *  enough (3.4s) to read as breathing rather than blinking; must be gated on
+ *  the caller's useReducedMotion(). */
+export const breathePulse: TargetAndTransition = {
+  scale: [1, 1.028, 1],
+  transition: { duration: 3.4, repeat: Infinity, ease: 'easeInOut' },
+}
 
 /** Success-state emoji: pops in with a small spring overshoot + slight
  *  rotation. Pair with confetti (@/lib/celebrate) for the full success beat. */
