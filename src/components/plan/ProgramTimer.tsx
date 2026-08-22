@@ -128,7 +128,7 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
   const isBreak = current.kind === 'break'
   const blockMs = current.minutes * 60000
   const blockPct = blockMs > 0 ? Math.round(((blockMs - pos.remainingInBlockMs) / blockMs) * 100) : 0
-  const nextStartsAt = pos.next ? blockStartsAt(session, pos.index + 1) : 0
+  const nextStartsAt = pos.next ? blockStartsAt(session, pos.index + 1, now) : 0
 
   return shell(
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>

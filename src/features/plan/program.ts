@@ -4,8 +4,8 @@ import {
 } from './schedule'
 import { buildDayBlocks, type DayBlockPlan } from './blocks'
 import {
-  computeProgress, isCovered, orderLessons, programHealth, recoverSchedule, remainingLessonIds,
-  statusOf,
+  computeProgress, isCovered, lessonsByDay, orderLessons, programHealth, recoverSchedule,
+  remainingLessonIds, statusOf,
   type LessonBook, type ProgramHealth, type ProgressSummary, type RecoveryPlan, type StudyOrder,
 } from './progress'
 
@@ -121,11 +121,15 @@ export function buildProgramView(program: StudyProgramState, todayKey: string): 
     config: { maxLessonsPerDay: program.maxLessonsPerDay },
   })
 
+  /* ما دُرس فعلًا قبل اليوم — بدونه يفقد اليوم الجاري كتلتَي المراجعة كلتيهما. */
+  const priorDays = lessonsByDay(book)
+
   const recovery = recoverSchedule({
     startKey: program.startKey,
     todayKey,
     deadlineKey: program.deadlineKey,
     lessonIds: remainingLessonIds(book, order),
+    priorDays,
     maxLessonsPerDay: program.maxLessonsPerDay,
   })
   const live = recovery.live

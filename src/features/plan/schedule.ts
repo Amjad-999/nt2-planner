@@ -62,6 +62,15 @@ export interface ScheduleInput {
   fromKey?: string
   /** الدروس التي ما زالت تحتاج جدولة، بالترتيب. */
   lessonIds: string[]
+  /**
+   * ما دُرس فعلًا في أيام سابقة لـ fromKey: مفتاح اليوم إلى معرّفات دروسه.
+   *
+   * The live schedule starts at today, so the days that carry today's recall
+   * (yesterday) and today's spaced review (three days back) are outside its
+   * window. Without this the executed day silently loses both review blocks —
+   * every single day, since today is always the window's first day.
+   */
+  priorDays?: Record<string, string[]>
   config?: Partial<ScheduleConfig>
 }
 
@@ -228,7 +237,7 @@ export function buildSchedule(input: ScheduleInput): ScheduleResult {
   })
 
   const unscheduled = input.lessonIds.slice(cursor)
-  linkReviews(days, config)
+  linkReviews(days, config, input.priorDays ?? {})
 
   return {
     days,
@@ -247,20 +256,19 @@ export function buildSchedule(input: ScheduleInput): ScheduleResult {
  * Expanding intervals (1 day, 3 days, ~7 days) rather than fixed ones: each
  * successful retrieval buys a longer gap, which is the point of spacing.
  */
-function linkReviews(days: ScheduledDay[], cfg: ScheduleConfig): void {
+function linkReviews(days: ScheduledDay[], cfg: ScheduleConfig, priorDays: Record<string, string[]>): void {
   const byKey = new Map(days.map((d) => [d.dayKey, d]))
   const span = Math.max(1, cfg.consolidateEvery)
+  /* أيام الجدول أوّلًا، ثم ما دُرس فعلًا قبل بداية النافذة. */
+  const lessonsOn = (key: string): string[] => byKey.get(key)?.lessonIds ?? priorDays[key] ?? []
 
   for (const d of days) {
-    d.recallLessonIds = byKey.get(addDays(d.dayKey, -1))?.lessonIds ?? []
-    d.reviewLessonIds = byKey.get(addDays(d.dayKey, -cfg.spacedGapDays))?.lessonIds ?? []
+    d.recallLessonIds = lessonsOn(addDays(d.dayKey, -1))
+    d.reviewLessonIds = lessonsOn(addDays(d.dayKey, -cfg.spacedGapDays))
 
     if (d.kind === 'consolidate' || d.kind === 'mock' || d.kind === 'final') {
       const bag: string[] = []
-      for (let back = 1; back <= span; back++) {
-        const src = byKey.get(addDays(d.dayKey, -back))
-        if (src) bag.push(...src.lessonIds)
-      }
+      for (let back = 1; back <= span; back++) bag.push(...lessonsOn(addDays(d.dayKey, -back)))
       d.consolidateLessonIds = bag
     }
   }

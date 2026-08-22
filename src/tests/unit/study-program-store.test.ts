@@ -303,6 +303,47 @@ describe('program view', () => {
     expect(v.overBudgetDays).toBe(0)
   })
 
+  it(`keeps today's recall and spaced review, which the live window used to drop`, () => {
+    /* انحدار: الجدول الحيّ يبدأ من اليوم، فأيام الأمس وما قبل ثلاثة أيام تقع
+       خارج نافذته. قبل الإصلاح كان اليوم المنفَّذ يفقد كتلتَي المراجعة كلتيهما
+       — كل يوم، لأن اليوم هو دائمًا أوّل أيام النافذة. */
+    const DAY = 86_400_000
+    const anchor = Date.parse('2026-08-24T10:00:00')
+    const lessons: State['studyProgram']['lessons'] = {}
+    const ids = allLessonIds()
+    ids.slice(0, 9).forEach((id) => { lessons[id] = { s: 'done', at: anchor - 3 * DAY, reps: 1 } })
+    ids.slice(9, 18).forEach((id) => { lessons[id] = { s: 'done', at: anchor - 2 * DAY, reps: 1 } })
+    ids.slice(18, 27).forEach((id) => { lessons[id] = { s: 'done', at: anchor - 1 * DAY, reps: 1 } })
+
+    const v = buildProgramView(
+      { startKey: START, deadlineKey: DEADLINE, lessons, maxLessonsPerDay: 12 },
+      '2026-08-24',
+    )
+    const today = v.live.days[0]
+    expect(today.dayKey).toBe('2026-08-24')
+    expect(today.recallLessonIds).toEqual(ids.slice(18, 27))
+    expect(today.reviewLessonIds).toEqual(ids.slice(0, 9))
+
+    const kinds = v.todayBlocks!.blocks.map((b) => b.kind)
+    expect(kinds).toContain('recall')
+    expect(kinds).toContain('review')
+    expect(kinds[0]).toBe('recall')
+  })
+
+  it('quizzes what was actually studied, not what the plan expected', () => {
+    /* الاسترجاع يُبنى على سجلّات الإنجاز الحقيقية، فلو دُرس درسان فقط أمس
+       فالكتلة تسأل عنهما لا عن التسعة التي كان الجدول يتوقّعها. */
+    const anchor = Date.parse('2026-08-24T10:00:00')
+    const lessons: State['studyProgram']['lessons'] = {}
+    const ids = allLessonIds()
+    ids.slice(0, 2).forEach((id) => { lessons[id] = { s: 'done', at: anchor - 86_400_000, reps: 1 } })
+    const v = buildProgramView(
+      { startKey: START, deadlineKey: DEADLINE, lessons, maxLessonsPerDay: 12 },
+      '2026-08-24',
+    )
+    expect(v.live.days[0].recallLessonIds).toEqual(ids.slice(0, 2))
+  })
+
   it('exam-first ordering puts every B1 lesson before the rest of A2', () => {
     const all = allLessonIds()
     const reordered = orderLessons(all, 'examFirst')

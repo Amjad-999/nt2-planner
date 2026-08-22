@@ -13,7 +13,7 @@ import {
   type LessonBook,
 } from '@/features/plan/progress'
 import {
-  createSession, elapsedMs, isStale, pause, positionOf, restartBlock, resume,
+  blockStartsAt, createSession, elapsedMs, isStale, pause, positionOf, restartBlock, resume,
   sessionTotalMs, skipToNext, formatDuration, formatMinutes,
 } from '@/features/plan/timer'
 
@@ -370,6 +370,20 @@ describe('session timer', () => {
     const after = positionOf(skipToNext(sess, T0 + MIN), T0 + MIN)
     expect(after.index).toBe(before.index + 1)
     expect(after.totalMs).toBe(before.totalMs)
+  })
+
+  it('does not show a next-block time that has already passed while paused', () => {
+    /* انحدار: pausedMs لا يسجّل إلا التوقّفات المنتهية، فأثناء توقّف جارٍ كان
+       وقت بدء الكتلة التالية يُعرض في الماضي بمقدار مدّة التوقّف. */
+    const sess = pause(createSession(day.dayKey, blocks, T0), T0 + 5 * MIN)
+    const now = T0 + 65 * MIN                       // متوقّف منذ ساعة
+    const shown = blockStartsAt(sess, 1, now)
+    const truth = now + positionOf(sess, now).remainingInBlockMs
+    expect(shown).toBe(truth)
+    expect(shown).toBeGreaterThan(now)
+    /* وبلا توقّف يبقى الحساب كما هو. */
+    const running = createSession(day.dayKey, blocks, T0)
+    expect(blockStartsAt(running, 1, T0 + MIN)).toBe(T0 + blocks[0].minutes * MIN)
   })
 
   it('restarts the current block back to full', () => {

@@ -1,5 +1,6 @@
 import { CURRICULUM_LESSONS, TOTAL_LESSONS, makeMinutesResolver } from '@/data/curriculum'
 import { AR_DAY, AR_LESSON, countAr } from '@/lib/arabicCount'
+import { todayKey } from '@/lib/utils'
 import {
   buildSchedule, dayDiff, type ScheduleConfig, type ScheduleResult, type ScheduledDay,
 } from './schedule'
@@ -140,6 +141,24 @@ export function orderLessons(ids: string[], order: StudyOrder = 'sequential'): s
   return [...exam.sort(bySeq), ...rest.sort(bySeq)]
 }
 
+/**
+ * ما دُرس فعلًا في كل يوم مضى: مفتاح اليوم إلى معرّفات دروسه.
+ *
+ * Grouped by the day the lesson's status was actually recorded, not by the day
+ * the plan expected it — the recall block should quiz what the learner really
+ * did yesterday, not what they were supposed to do.
+ */
+export function lessonsByDay(book: LessonBook): Record<string, string[]> {
+  const out: Record<string, string[]> = {}
+  for (const l of CURRICULUM_LESSONS) {
+    const rec = book[l.id]
+    if (!rec || !isCovered(rec.s) || !rec.at) continue
+    const key = todayKey(new Date(rec.at))
+    ;(out[key] ??= []).push(l.id)
+  }
+  return out
+}
+
 /** الدروس التي ما زالت تحتاج جدولة، بترتيب المنهج أو بأولوية الامتحان. */
 export function remainingLessonIds(book: LessonBook, order: StudyOrder = 'sequential'): string[] {
   const ids = CURRICULUM_LESSONS.filter((l) => !isCovered(statusOf(book, l.id))).map((l) => l.id)
@@ -268,6 +287,8 @@ export interface RecoveryInput {
   todayKey: string
   deadlineKey: string
   lessonIds: string[]
+  /** ما دُرس فعلًا في الأيام السابقة — يغذّي مراجعات اليوم. */
+  priorDays?: Record<string, string[]>
   /** أقصى ما يقبله المستخدم من دروس في اليوم. */
   maxLessonsPerDay?: number
 }
@@ -284,6 +305,7 @@ export function recoverSchedule(input: RecoveryInput): RecoveryPlan {
       fromKey: input.todayKey,
       deadlineKey: input.deadlineKey,
       lessonIds: input.lessonIds,
+      priorDays: input.priorDays,
       config: patch,
     })
     last = live

@@ -155,11 +155,19 @@ export function positionOf(s: ProgramSession, now: number): SessionPosition {
   }
 }
 
-/** وقت البدء الجداري المتوقّع لكتلة، بعد أخذ التوقّفات في الحسبان. */
-export function blockStartsAt(s: ProgramSession, index: number): number {
+/**
+ * وقت البدء الجداري المتوقّع لكتلة، بعد أخذ التوقّفات في الحسبان.
+ *
+ * `pausedMs` only records pauses that have already ended, so during a live pause
+ * the stored total lags by however long the user has been stopped. Without
+ * `now` this returned a wall-clock time in the past — a paused session showed
+ * the next block starting at a moment that had already gone by.
+ */
+export function blockStartsAt(s: ProgramSession, index: number, now?: number): number {
   const tl = timeline(s)
   if (index < 0 || index >= tl.length) return s.startedAt
-  return s.startedAt + s.pausedMs + tl[index].start
+  const ongoingPause = s.pausedAt > 0 && typeof now === 'number' ? Math.max(0, now - s.pausedAt) : 0
+  return s.startedAt + s.pausedMs + ongoingPause + tl[index].start
 }
 
 /* ── تحكّم ── */
