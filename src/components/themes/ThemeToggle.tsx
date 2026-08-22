@@ -23,7 +23,7 @@ export function ThemeToggle() {
         aria-label="وضع التركيز"
         title={focusMode ? 'إيقاف وضع التركيز' : 'تفعيل وضع التركيز — واجهة أبسط بلا تشتيت'}
       >
-        <span aria-hidden="true" style={{ opacity: focusMode ? 1 : 0.7, color: focusMode ? 'var(--orange)' : undefined }}>
+        <span aria-hidden="true" style={{ opacity: focusMode ? 1 : 0.7, color: focusMode ? 'var(--orange-text)' : undefined }}>
           🧘
         </span>
       </IconBtn>

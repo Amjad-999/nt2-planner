@@ -155,7 +155,7 @@ export function SpeakAndCheck({ targetNl, label }: Props) {
           <button
             onClick={stop}
             aria-label="أوقف التسجيل"
-            style={{ ...btnBase, background: 'var(--red-l)', color: 'var(--red)', borderColor: 'var(--red)' }}
+            style={{ ...btnBase, background: 'var(--red-l)', color: 'var(--red-text)', borderColor: 'var(--red)' }}
           >
             ⏹ إيقاف
           </button>
@@ -253,7 +253,7 @@ function MicButton({
         ...btnBase,
         background: 'var(--orange-l)',
         borderColor: 'var(--orange)',
-        color: 'var(--orange)',
+        color: 'var(--orange-text)',
         animation: reducedMotion ? 'none' : 'mic-pulse 2s ease-in-out infinite',
       }}
     >

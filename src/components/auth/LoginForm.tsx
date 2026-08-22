@@ -31,7 +31,7 @@ export function LoginForm({ onSwitchToSignup }: Props) {
           value={email} onChange={(e) => setEmail(e.target.value)} onBlur={() => setTouched(true)}
           placeholder="name@example.com" aria-invalid={!!emailError} aria-describedby={emailError ? 'login-email-err' : undefined}
         />
-        {emailError && <span id="login-email-err" role="alert" style={{ color: 'var(--red)', fontSize: '.78rem', display: 'block', marginTop: 4 }}>{emailError}</span>}
+        {emailError && <span id="login-email-err" role="alert" style={{ color: 'var(--red-text)', fontSize: '.78rem', display: 'block', marginTop: 4 }}>{emailError}</span>}
       </Field>
 
       <Field label="كلمة المرور">
@@ -42,7 +42,7 @@ export function LoginForm({ onSwitchToSignup }: Props) {
       </Field>
 
       {message && (
-        <p role={status === 'error' ? 'alert' : undefined} style={{ color: status === 'error' ? 'var(--red)' : 'var(--green)', fontSize: '.82rem', margin: '0 0 10px' }}>
+        <p role={status === 'error' ? 'alert' : undefined} style={{ color: status === 'error' ? 'var(--red-text)' : 'var(--green-text)', fontSize: '.82rem', margin: '0 0 10px' }}>
           {message}
         </p>
       )}

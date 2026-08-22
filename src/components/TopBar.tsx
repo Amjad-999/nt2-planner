@@ -67,7 +67,7 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
           aria-hidden="true"
         >NT</div>
         <div aria-hidden="true" className="font-display text-[1.25rem] font-bold text-[var(--text)] tracking-tight leading-none">
-          NT2<span style={{ color: 'var(--orange)' }}>·</span>Planner
+          NT2<span style={{ color: 'var(--orange-text)' }}>·</span>Planner
         </div>
       </a>
 
@@ -84,7 +84,7 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
           style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
           title="الأيام المتبقية حتى الامتحان"
         >
-          <AppIcon icon={CalendarDots} size={15} style={{ color: 'var(--orange)' }} />
+          <AppIcon icon={CalendarDots} size={15} style={{ color: 'var(--orange-text)' }} />
           {/* لون النص الأساسي يضمن ≥4.5:1 — الأيقونة البرتقالية تحمل الهوية */}
           <strong style={{ color: 'var(--text)', fontWeight: 600 }}>{daysLeft}</strong>
           <span>يومًا للامتحان</span>
@@ -97,7 +97,7 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
         style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
         title="عدد أيام المواظبة المتتالية"
       >
-        <AppIcon icon={Fire} size={15} style={{ color: 'var(--orange)' }} />
+        <AppIcon icon={Fire} size={15} style={{ color: 'var(--orange-text)' }} />
         <strong style={{ color: 'var(--text)', fontWeight: 600 }}>{streak.count}</strong>
         <span>يوم</span>
       </div>

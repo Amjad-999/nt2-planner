@@ -10,7 +10,9 @@
 :root {
   --bg:#FAF7F2;--surface:rgba(255,250,244,.74);--surface2:rgba(255,250,244,.52);--surface3:#F0E6DA;
   --border:rgba(45,42,38,.13);--border2:rgba(45,42,38,.24);
-  --text:#2D2A26;--text2:#47433E;--muted:#6B6560;--muted2:#BAB5B0;
+  /* --muted darkened from #6B6560: it was 4.43:1 on the tinted washes, just
+     under AA. It is a text-only token, so this is safe to change in place. */
+  --text:#2D2A26;--text2:#47433E;--muted:#68625E;--muted2:#BAB5B0;
   /* --orange = brand hue for fills/borders/icons (not held to text-contrast,
      WCAG 1.4.11 non-text 3:1 only). --orange-ink = same hue darkened to
      4.62:1 on --bg — use this instead of --orange wherever the color is the
@@ -22,6 +24,18 @@
   --blue:#7B675C;--blue-l:rgba(123,103,92,.14);                 /* info */
   --green:#965D3B;--green-l:rgba(150,93,59,.14);                /* success / pass */
   --amber:#B4551D;--amber-l:rgba(180,85,29,.14);
+  /* ── نسخ نصّية من ألوان الحالة ──
+     The plain accents above are calibrated for fills, borders and progress
+     bars, where WCAG asks 3:1. As TEXT they fail 4.5:1 — --orange sat at
+     2.31:1 on the tinted washes, which is unreadable, not merely tight.
+     These variants keep the same hue and are darkened until the WORST
+     text-on-surface pair in the app clears 4.6:1, measured over every
+     translucent surface composited onto --bg. Use them for `color:`, never
+     for backgrounds. src/tests/unit/token-contrast.test.ts enforces this. */
+  --orange-text:#9F4B19;
+  --green-text:#8B5637;
+  --red-text:#A3460F;
+  --amber-text:#9E4B19;
   --purple:#A05845;--purple-l:rgba(160,88,69,.14);              /* tertiary / stats accent */
   --red:#B14C10;--red-l:rgba(177,76,16,.14);                    /* error */
   --teal:var(--green);--teal-l:var(--green-l);
@@ -134,7 +148,8 @@
 :root[data-theme="dark"] {
   --bg:#1A1A1A;--surface:rgba(44,38,32,.55);--surface2:rgba(44,38,32,.4);--surface3:#2C2620;
   --border:rgba(255,244,235,.10);--border2:rgba(255,244,235,.18);
-  --text:#F5F0EB;--text2:#B8B4B0;--muted:#92908D;--muted2:#575655;
+  /* --muted lightened from #92908D for the same reason on dark surfaces. */
+  --text:#F5F0EB;--text2:#B8B4B0;--muted:#999895;--muted2:#575655;
   --orange:#E07A3E;--orange-d:#E89E72;--orange-l:#422210;--orange-m:#914E27;
   /* Dark theme: --orange already clears AA as TEXT on --bg (5.82:1), so no
      darkening is needed for that use. --orange-ink is still needed here —
@@ -145,6 +160,11 @@
   --blue:#9B8C83;--blue-l:rgba(155,140,131,.18);
   --green:#B78466;--green-l:rgba(183,132,102,.18);
   --amber:#E66B23;--amber-l:rgba(230,107,35,.18);
+  /* Same idea in reverse: lightened until the worst pair clears 4.6:1 on dark. */
+  --orange-text:#E18047;
+  --green-text:#BE8F74;
+  --red-text:#E97A3A;
+  --amber-text:#E97A3A;
   --purple:#B88274;--purple-l:rgba(184,130,116,.18);
   --red:#E66B23;--red-l:rgba(230,107,35,.18);
   --teal:var(--green);--teal-l:var(--green-l);

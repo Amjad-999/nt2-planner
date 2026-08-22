@@ -64,7 +64,7 @@ export default function Vocab() {
   return (
     <div style={{ padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto' }}>
       <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
-        <span style={{ color:'var(--orange)' }}>📚</span> منصّة المفردات + AI <span aria-hidden="true">🇳🇱</span>
+        <span style={{ color: 'var(--orange-text)' }}>📚</span> منصّة المفردات + AI <span aria-hidden="true">🇳🇱</span>
       </h2>
 
       <AiLookup />
@@ -73,7 +73,7 @@ export default function Vocab() {
       <div style={{ display:'flex', gap:4, background:'var(--glass-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--glass-border)', borderRadius:14, padding:4, marginBottom:16, overflowX:'auto', scrollbarWidth:'none' }} role="tablist">
         {SEG.map((s) => (
           <button key={s.id} role="tab" aria-selected={view === s.id} onClick={() => setView(s.id)}
-            style={{ flex:1, minWidth:'max-content', background: view===s.id ? 'var(--glass-bg-strong)' : 'transparent', color: view===s.id ? 'var(--orange)' : 'var(--muted)', fontWeight: view===s.id ? 600 : 500, border:'none', padding:'9px 14px', borderRadius:10, fontSize:'.85rem', cursor:'pointer', fontFamily:'inherit', boxShadow: view===s.id ? 'var(--elev-1), inset 0 1px 0 rgba(255,255,255,.5)' : 'none', transition:'.15s', whiteSpace:'nowrap' }}>
+            style={{ flex:1, minWidth:'max-content', background: view===s.id ? 'var(--glass-bg-strong)' : 'transparent', color: view===s.id ? 'var(--orange-text)' : 'var(--muted)', fontWeight: view===s.id ? 600 : 500, border:'none', padding:'9px 14px', borderRadius:10, fontSize:'.85rem', cursor:'pointer', fontFamily:'inherit', boxShadow: view===s.id ? 'var(--elev-1), inset 0 1px 0 rgba(255,255,255,.5)' : 'none', transition:'.15s', whiteSpace:'nowrap' }}>
             {s.label}
           </button>
         ))}

@@ -82,7 +82,7 @@ export function AchievementsPanel() {
                           {b.title}
                         </span>
                         {earned && (
-                          <span style={{ fontSize: '.65rem', color: 'var(--green)', fontWeight: 600 }}>✓ مكتسب</span>
+                          <span style={{ fontSize: '.65rem', color: 'var(--green-text)', fontWeight: 600 }}>✓ مكتسب</span>
                         )}
                       </div>
                     )

@@ -48,7 +48,7 @@ export function ExamCountdowns() {
   return (
     <section aria-labelledby="inburgering-heading">
       <h2 id="inburgering-heading" style={SH}>
-        <span style={{ color: 'var(--orange)' }}>🎓</span> امتحانات الاندماج
+        <span style={{ color: 'var(--orange-text)' }}>🎓</span> امتحانات الاندماج
       </h2>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" style={{ marginBottom: 18 }}>
@@ -124,7 +124,7 @@ export function ExamCountdowns() {
                   style={{
                     flex: 1, cursor: passed ? 'not-allowed' : 'pointer', fontSize: '.72rem', fontWeight: 600,
                     borderRadius: 8, padding: '5px 8px', background: 'var(--btn-bg)',
-                    border: '1px solid var(--btn-border)', color: 'var(--orange)',
+                    border: '1px solid var(--btn-border)', color: 'var(--orange-text)',
                     opacity: passed ? 0.45 : 1, boxShadow: 'var(--elev-1)',
                   }}
                 >
@@ -139,7 +139,7 @@ export function ExamCountdowns() {
                     flex: 1, cursor: 'pointer', fontSize: '.72rem', fontWeight: 700, borderRadius: 8, padding: '5px 8px',
                     background: passed ? 'var(--pass-btn-bg)' : 'var(--btn-bg)',
                     border: passed ? '1px solid var(--pass-btn-border)' : '1px solid var(--btn-border)',
-                    color: passed ? PASS_TEXT : 'var(--green)', boxShadow: 'var(--elev-1)',
+                    color: passed ? PASS_TEXT : 'var(--green-text)', boxShadow: 'var(--elev-1)',
                   }}
                 >
                   {passed ? '✅ ناجح' : 'نجاح'}

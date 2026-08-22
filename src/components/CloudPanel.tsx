@@ -32,7 +32,7 @@ export function CloudPanel() {
   return (
     <div dir="rtl" style={card}>
       <h3 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 'var(--fw-heading)', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ color: 'var(--orange)' }}>☁️</span> الحفظ السحابي
+        <span style={{ color: 'var(--orange-text)' }}>☁️</span> الحفظ السحابي
       </h3>
 
       {!configured ? (
@@ -66,12 +66,12 @@ export function CloudPanel() {
             <button className="btn-shine" style={btn()} onClick={() => signOut()}>تسجيل الخروج</button>
           </div>
           {!confirmDel ? (
-            <button style={{ ...btn(), color: 'var(--red)', borderColor: 'var(--red)', marginTop: 10 }} onClick={() => setConfirmDel(true)}>حذف بياناتي السحابية…</button>
+            <button style={{ ...btn(), color: 'var(--red-text)', borderColor: 'var(--red)', marginTop: 10 }} onClick={() => setConfirmDel(true)}>حذف بياناتي السحابية…</button>
           ) : (
             <div style={{ marginTop: 10, padding: '10px 12px', background: 'var(--red-l)', borderRadius: 8, border: '1px solid var(--red)' }}>
               <div style={{ fontSize: '.82rem', color: 'var(--text)', marginBottom: 8 }}>سيُحذف نسختك السحابية فقط — بياناتك المحلّية على هذا الجهاز تبقى. متابعة؟</div>
               <div style={{ display: 'flex', gap: 8 }}>
-                <button style={{ ...btn(), color: 'var(--red)', borderColor: 'var(--red)' }} onClick={() => { deleteCloud(); setConfirmDel(false) }}>نعم، احذف السحابي</button>
+                <button style={{ ...btn(), color: 'var(--red-text)', borderColor: 'var(--red)' }} onClick={() => { deleteCloud(); setConfirmDel(false) }}>نعم، احذف السحابي</button>
                 <button className="btn-shine" style={btn()} onClick={() => setConfirmDel(false)}>إلغاء</button>
               </div>
             </div>
@@ -79,7 +79,7 @@ export function CloudPanel() {
         </div>
       )}
 
-      {message && <div style={{ marginTop: 10, fontSize: '.8rem', color: status === 'error' ? 'var(--red)' : 'var(--green)', lineHeight: 1.6 }}>{message}</div>}
+      {message && <div style={{ marginTop: 10, fontSize: '.8rem', color: status === 'error' ? 'var(--red-text)' : 'var(--green-text)', lineHeight: 1.6 }}>{message}</div>}
     </div>
   )
 }

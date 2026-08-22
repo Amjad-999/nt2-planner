@@ -107,7 +107,7 @@ const components: Components = {
         fontFamily: 'ui-monospace, Consolas, monospace',
         fontSize: '.84em',
         background: 'var(--surface3)',
-        color: 'var(--orange)',
+        color: 'var(--orange-text)',
         padding: '1px 5px',
         borderRadius: 4,
         border: '1px solid var(--border)',
@@ -169,7 +169,7 @@ const components: Components = {
   // Disable raw HTML entirely — no anchor override needed for lesson content
   a: ({ children, href }) => (
     <a href={href} target="_blank" rel="noopener noreferrer"
-      style={{ color: 'var(--orange)', textDecoration: 'underline', textUnderlineOffset: 3 }}>
+      style={{ color: 'var(--orange-text)', textDecoration: 'underline', textUnderlineOffset: 3 }}>
       {children}
     </a>
   ),

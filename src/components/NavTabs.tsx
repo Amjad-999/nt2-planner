@@ -115,7 +115,7 @@ export function NavTabs() {
             tabIndex={isActive ? 0 : -1}
             className="relative flex items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent rounded-t-xl px-5 py-[14px] text-[.88rem] font-medium cursor-pointer font-[inherit] bg-none border-none transition-all"
             style={{
-              color: isActive ? 'var(--orange)' : isPlatform ? 'var(--orange)' : 'var(--muted)',
+              color: isActive ? 'var(--orange-text)' : isPlatform ? 'var(--orange-text)' : 'var(--muted)',
               fontWeight: isActive || isPlatform ? 600 : 500,
               background: isActive ? 'linear-gradient(180deg,var(--orange-l),transparent)' : undefined,
             }}
