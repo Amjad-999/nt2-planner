@@ -118,6 +118,7 @@ export function buildProgramView(program: StudyProgramState, todayKey: string): 
     startKey: program.startKey,
     deadlineKey: program.deadlineKey,
     lessonIds: orderLessons(allLessonIds(), order),
+    minutesOf,
     config: { maxLessonsPerDay: program.maxLessonsPerDay },
   })
 
@@ -131,6 +132,7 @@ export function buildProgramView(program: StudyProgramState, todayKey: string): 
     lessonIds: remainingLessonIds(book, order),
     priorDays,
     maxLessonsPerDay: program.maxLessonsPerDay,
+    minutesOf,
   })
   const live = recovery.live
 

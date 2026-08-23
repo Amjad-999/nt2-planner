@@ -71,6 +71,14 @@ export interface ScheduleInput {
    * every single day, since today is always the window's first day.
    */
   priorDays?: Record<string, string[]>
+  /**
+   * مدّة الدرس بالدقائق، كما يحلّها makeMinutesResolver من تجاوزات المستخدم.
+   *
+   * Without it every lesson is treated as costing the same, which is what the
+   * count-based split silently assumes. Passing it lets the allocator balance
+   * days by minutes once a per-book override makes lessons unequal.
+   */
+  minutesOf?: (id: string) => number
   config?: Partial<ScheduleConfig>
 }
 
@@ -156,6 +164,75 @@ export function distributeByWeight(n: number, weights: number[]): number[] {
   return base
 }
 
+/** هل كل الدروس متساوية المدّة؟ عندها التوزيع بالعدد = التوزيع بالدقائق. */
+function uniformMinutes(ids: string[], minutesOf?: (id: string) => number): boolean {
+  if (!minutesOf || ids.length === 0) return true
+  const first = minutesOf(ids[0])
+  return ids.every((id) => minutesOf(id) === first)
+}
+
+/**
+ * توزيع الدروس بحيث تتوازن **دقائق** الأيام، لا أعدادها.
+ *
+ * distributeByWeight balances lesson counts, which is correct only while every
+ * lesson costs the same. The moment a per-book override lands (B1 lessons are
+ * roughly twice the pages of A2, so 40 vs 20 is the realistic setting), equal
+ * counts stop meaning equal work: measured on the real curriculum, days ran
+ * from 120 to 360 minutes of new material — a 3x spread, with the heaviest
+ * nine days all landing at the end.
+ *
+ * Targets are recomputed from what is actually left rather than fixed upfront,
+ * so a day closed early by the cap does not push its shortfall onto the tail.
+ */
+function allocateByMinutes(
+  lessonIds: string[],
+  weights: number[],
+  cap: number,
+  minutesOf: (id: string) => number,
+): number[] {
+  const slots = weights.length
+  const counts: number[] = new Array(slots).fill(0)
+  if (slots === 0 || lessonIds.length === 0) return counts
+
+  let remainingWeight = weights.reduce((a, b) => a + b, 0)
+  if (remainingWeight <= 0) return counts
+  let remainingMinutes = lessonIds.reduce((s, id) => s + minutesOf(id), 0)
+
+  let cursor = 0
+  for (let i = 0; i < slots && cursor < lessonIds.length; i++) {
+    const target = remainingWeight > 0 ? (remainingMinutes * weights[i]) / remainingWeight : remainingMinutes
+    let acc = 0
+
+    while (cursor < lessonIds.length && counts[i] < cap) {
+      /* اترك درسًا واحدًا على الأقل لكل يوم متبقٍّ بعد هذا اليوم. */
+      const daysAfter = slots - i - 1
+      if (counts[i] > 0 && lessonIds.length - cursor <= daysAfter) break
+
+      const m = minutesOf(lessonIds[cursor])
+      /* نصف درس تسامحًا: يمنع ترك اليوم ناقصًا لمجرّد أن الدرس التالي يتجاوز الهدف بقليل. */
+      if (counts[i] > 0 && acc + m / 2 > target) break
+
+      counts[i] += 1
+      acc += m
+      cursor += 1
+    }
+
+    remainingMinutes -= acc
+    remainingWeight -= weights[i]
+  }
+
+  /* ما تبقّى بسبب السقف يملأ أي يوم فيه متّسع — نفس سياسة applyCap. */
+  for (let i = 0; i < slots && cursor < lessonIds.length; i++) {
+    const room = cap - counts[i]
+    if (room <= 0) continue
+    const take = Math.min(room, lessonIds.length - cursor)
+    counts[i] += take
+    cursor += take
+  }
+
+  return counts
+}
+
 /** يفرض السقف اليومي بنقل الفائض إلى أيام تحت السقف. يعيد ما تعذّر نقله. */
 function applyCap(counts: number[], cap: number): number {
   let overflow = 0
@@ -227,7 +304,13 @@ export function buildSchedule(input: ScheduleInput): ScheduleResult {
   }
 
   const weights = learnIdx.map((d) => (d.kind === 'ramp' ? config.rampWeight : 1))
-  const counts = distributeByWeight(input.lessonIds.length, weights)
+
+  /* بالمدد المتساوية، موازنة الدقائق تساوي موازنة الأعداد — فنُبقي المسار
+     الأصلي (أكبر الباقي) حرفيًا حتى لا يتغيّر أي جدول قائم. المسار الموزون
+     يعمل فقط حين تختلف المدد فعلًا، وهو ما يحدث مع تجاوزات الكتب. */
+  const counts = uniformMinutes(input.lessonIds, input.minutesOf)
+    ? distributeByWeight(input.lessonIds.length, weights)
+    : allocateByMinutes(input.lessonIds, weights, config.maxLessonsPerDay, input.minutesOf!)
   const overflow = applyCap(counts, config.maxLessonsPerDay)
 
   let cursor = 0
