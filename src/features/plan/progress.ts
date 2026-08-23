@@ -291,6 +291,8 @@ export interface RecoveryInput {
   priorDays?: Record<string, string[]>
   /** أقصى ما يقبله المستخدم من دروس في اليوم. */
   maxLessonsPerDay?: number
+  /** مدّة الدرس — تُمرَّر للموزّع حتى تتوازن الأيام بالدقائق لا بالعدد. */
+  minutesOf?: (id: string) => number
 }
 
 export function recoverSchedule(input: RecoveryInput): RecoveryPlan {
@@ -306,6 +308,7 @@ export function recoverSchedule(input: RecoveryInput): RecoveryPlan {
       deadlineKey: input.deadlineKey,
       lessonIds: input.lessonIds,
       priorDays: input.priorDays,
+      minutesOf: input.minutesOf,
       config: patch,
     })
     last = live
