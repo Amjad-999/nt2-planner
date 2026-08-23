@@ -7,7 +7,11 @@ import type {
   State, VocabWord, ExamWord, SkillKey, TabId, LessonStatusKey, StudyBlockSnapshot, StudyOrderKey,
 } from './types'
 import { isKnownLesson, sectionOf } from '@/data/curriculum'
-import { skipToNext as skipToNextBlock, restartBlock as restartCurrentBlock } from '@/features/plan/timer'
+import { isCovered as isCoveredStatus, statusOf as lessonStatusOf } from '@/features/plan/progress'
+import {
+  skipToNext as skipToNextBlock, restartBlock as restartCurrentBlock,
+  completedFocusMinutes, isStale as isSessionStale,
+} from '@/features/plan/timer'
 import { TOTAL_PLAN_DAYS, LEARNED_BOX, PASS_THRESHOLD, planTaskId, scaledPhases, SKILL_AR } from '@/data/phases'
 import { isFsrsLearned, type FsrsQuality } from '@/features/vocab/fsrs-lite'
 import { completionPct } from '@/features/exam/scoring'
@@ -155,6 +159,8 @@ export interface AppStore extends State {
   resumeStudyDay: (now: number) => void
   skipStudyBlock: (now: number) => void
   restartStudyBlock: (now: number) => void
+  /** يكتب دقائق التركيز المنقضية في السجلّ اليومي. آمن للتكرار. */
+  syncStudyMinutes: (now: number) => void
   endStudyDay: () => void
 
   // Inburgering exams
@@ -529,6 +535,21 @@ export const useAppStore = create<AppStore>()(
       setLessonsStatus: (lessonIds, status) => {
         if (lessonIds.length === 0) return
         const at = Date.now()
+        /* الدروس التي تعبر إلى "مغطّى" الآن هي وحدها مهامّ منجزة جديدة.
+           إعادة تعليم درس مغطّى بالفعل لا تضيف مهمّة، وإلا انتفخ السجلّ
+           بالنقر المتكرّر. */
+        const before = get().studyProgram.lessons
+        /* statusOf وليس before[id]?.s — الأخير undefined للدرس بلا سجلّ،
+           و isCovered(undefined) تُرجع true (ليست 'new' ولا 'learning')،
+           فينقلب المعنى ولا يُحتسب أي درس جديد إطلاقًا. */
+        /* المعرّفات المكرّرة داخل الدفعة الواحدة تُطوى: الدرس نفسه مرّتين
+           هو درس واحد، وعدّه مرّتين يضخّم "المهام المنجزة" بلا عمل. */
+        const newlyCovered = isCoveredStatus(status)
+          ? [...new Set(lessonIds)].filter(
+              (id) => isKnownLesson(id) && !isCoveredStatus(lessonStatusOf(before, id)),
+            )
+          : []
+
         set((st) => {
           const lessons = { ...st.studyProgram.lessons }
           for (const id of lessonIds) {
@@ -542,6 +563,13 @@ export const useAppStore = create<AppStore>()(
           }
           return { studyProgram: { ...st.studyProgram, lessons } }
         })
+
+        /* التحليلات تقرأ dailyHistory وحده: درس أُنجز ولم يُسجَّل هنا لا يظهر
+           في "المهام المنجزة" ولا في مخطّط الأربعة عشر يومًا ولا في السلسلة. */
+        if (newlyCovered.length > 0) {
+          get().bumpHist('tasks', newlyCovered.length)
+          get().bumpStreak()
+        }
         get().save()
       },
 
@@ -612,7 +640,39 @@ export const useAppStore = create<AppStore>()(
         get().save()
       },
 
+      /**
+       * يكتب دقائق التركيز المنقضية في السجلّ اليومي — مصدر كل رقم في التحليلات.
+       *
+       * Idempotent by watermark: the session clock is derived from wall time and
+       * read many times a minute, so only the difference against what was already
+       * written is ever added. Replaying a tick, a second tab, or a refresh mid
+       * session all add nothing.
+       *
+       * Breaks are excluded — the analytics tab reports work, not elapsed time.
+       */
+      syncStudyMinutes: (now) => {
+        const s = get().studyProgram.session
+        if (!s) return
+        /* ساعة رجعت للخلف أو جلسة ليوم آخر: أرقامها ليست وقت دراسة حقيقيًّا. */
+        if (isSessionStale(s, now, todayKey())) return
+
+        const done = completedFocusMinutes(s, now)
+        const already = get().studyProgram.loggedMinutes[s.dayKey] ?? 0
+        const delta = done - already
+        if (delta <= 0) return
+
+        set((st) => ({
+          studyProgram: {
+            ...st.studyProgram,
+            loggedMinutes: { ...st.studyProgram.loggedMinutes, [s.dayKey]: done },
+          },
+        }))
+        get().recordStudyMinutes(delta)   // يضيف للسجلّ ويحدّث السلسلة ويحفظ
+      },
+
       endStudyDay: () => {
+        /* اسحب آخر دقيقة قبل إسقاط الجلسة — وإلا ضاع ما بين آخر مزامنة والإنهاء. */
+        get().syncStudyMinutes(Date.now())
         set((st) => ({ studyProgram: { ...st.studyProgram, session: null } }))
         get().save()
       },

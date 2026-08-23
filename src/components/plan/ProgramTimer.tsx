@@ -1,4 +1,5 @@
 import { useAppStore } from '@/store/useAppStore'
+import { useEffect } from 'react'
 import { useTicker } from '@/hooks/useTicker'
 import { todayKey } from '@/lib/utils'
 import { BLOCK_KIND_AR, type DayBlockPlan } from '@/features/plan/blocks'
@@ -40,8 +41,14 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
   const restartStudyBlock = useAppStore((s) => s.restartStudyBlock)
   const endStudyDay = useAppStore((s) => s.endStudyDay)
   const setLessonStatus = useAppStore((s) => s.setLessonStatus)
+  const syncStudyMinutes = useAppStore((s) => s.syncStudyMinutes)
   const now = useTicker()
   const today = todayKey()
+
+  /* كل دقيقة تركيز تُكتب في السجلّ اليومي أثناء الجلسة، لا عند إنهائها فقط.
+     الكتابة عند الإنهاء وحدها تفقد كل شيء لو أُغلق التطبيق دون ضغط "أنهِ".
+     الفعل نفسه لا يكتب إلا عند تغيّر الدقيقة، فالنبضة الثانوية بلا كلفة. */
+  useEffect(() => { syncStudyMinutes(now) }, [now, syncStudyMinutes])
 
   const shell = (children: React.ReactNode) => (
     <section

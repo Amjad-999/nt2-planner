@@ -86,6 +86,29 @@ export function elapsedMs(s: ProgramSession, now: number): number {
 }
 
 /**
+ * دقائق التركيز التي انقضت فعلًا — الاستراحات مستثناة.
+ *
+ * This is the number the analytics tab is entitled to: what the learner
+ * actually worked, not how long the day was open. Derived from `elapsedMs`
+ * rather than accumulated, so it inherits the same properties — a refresh, a
+ * closed tab or a sleeping phone cannot inflate or lose it.
+ *
+ * Monotonic while the session runs, which is what lets the store record it as
+ * a watermark and write only the difference. Pausing freezes it; it never
+ * decreases.
+ */
+export function completedFocusMinutes(s: ProgramSession, now: number): number {
+  const el = elapsedMs(s, now)
+  const tl = timeline(s)
+  let ms = 0
+  for (let i = 0; i < s.blocks.length; i++) {
+    if (s.blocks[i].kind === 'break') continue
+    ms += Math.max(0, Math.min(el, tl[i].end) - tl[i].start)
+  }
+  return Math.floor(ms / MIN_MS)
+}
+
+/**
  * جلسة بائتة: ساعة الجهاز رجعت إلى الوراء، أو مرّ عليها وقت طويل جدًّا،
  * أو صارت لِيومٍ آخر. الواجهة تعرض إعادة بناء بدل أرقام كاذبة.
  */

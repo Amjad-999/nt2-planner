@@ -68,7 +68,7 @@ function mergeStudyProgram(
   y: State['studyProgram'] | undefined,
   bNewer: boolean,
 ): State['studyProgram'] {
-  const empty: State['studyProgram'] = { startKey: '', deadlineKey: '', lessons: {}, session: null, maxLessonsPerDay: 12, lessonMinutes: {}, order: 'sequential' }
+  const empty: State['studyProgram'] = { startKey: '', deadlineKey: '', lessons: {}, session: null, maxLessonsPerDay: 12, lessonMinutes: {}, order: 'sequential', loggedMinutes: {} }
   const a = x ?? empty
   const b = y ?? empty
   const newer = bNewer ? b : a
@@ -93,7 +93,19 @@ function mergeStudyProgram(
        لا يمحو جهازٌ ضبطَ كتابٍ لم يضبطه هو أصلًا. */
     lessonMinutes: { ...(older.lessonMinutes ?? {}), ...(newer.lessonMinutes ?? {}) },
     order: newer.order ?? older.order ?? 'sequential',
+    /* العلامة المائية تتبع dailyHistory.mins وهو يُدمج بالأقصى — فلو أخذنا
+       الأحدث هنا لأعاد الجهاز الأقل كتابةَ الفارق وتضاعفت دقائق ذلك اليوم. */
+    loggedMinutes: mergeWatermark(a.loggedMinutes, b.loggedMinutes),
   }
+}
+
+/** الأقصى لكل يوم — العلامة المائية لا تتراجع. */
+function mergeWatermark(a: Record<string, number> = {}, b: Record<string, number> = {}): Record<string, number> {
+  const out: Record<string, number> = {}
+  for (const k of uniqStrs(Object.keys(a ?? {}), Object.keys(b ?? {}))) {
+    out[k] = Math.max(num(a?.[k]), num(b?.[k]))
+  }
+  return out
 }
 
 function mergeDay(x?: DayRecord, y?: DayRecord): DayRecord {
