@@ -1,8 +1,10 @@
+import type { ProgramState } from '@/features/program/types'
+
 export type Level = 'A1' | 'A2' | 'B1' | 'B2' | 'C1'
 export type SkillKey = 'reading' | 'listening' | 'writing' | 'speaking'
 export type ThemeKey = 'light' | 'dark'
 export type TtsEngine = 'auto' | 'online' | 'browser'
-export type TabId = 'dashboard' | 'plan' | 'vocab' | 'books' | 'exam' | 'exercises' | 'grammar' | 'stats' | 'resources' | 'platform'
+export type TabId = 'dashboard' | 'program' | 'plan' | 'vocab' | 'books' | 'exam' | 'exercises' | 'grammar' | 'stats' | 'resources' | 'platform'
 export type PlanHealthStatus = 'ok' | 'tight' | 'crit'
 
 export interface VocabWord {
@@ -90,6 +92,7 @@ export interface State {
   onboarded: boolean
   unlockedBadges: string[]
   grammarProgress: Record<string, number[]>   // topicId → indices of correctly-answered exercises
+  program: ProgramState                        // برنامج الدراسة المؤقَّت (164 درسًا)
   _v: number
   _savedAt: number
 }

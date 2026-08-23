@@ -7,6 +7,12 @@ import type { State, VocabWord, ExamWord, SkillKey, TabId } from './types'
 import { TOTAL_PLAN_DAYS, LEARNED_BOX, PASS_THRESHOLD, planTaskId, scaledPhases, SKILL_AR } from '@/data/phases'
 import { scheduleCard, isFsrsLearned, type FsrsQuality } from '@/features/vocab/fsrs'
 import { celebrate } from '@/lib/celebrate'
+import type { LessonStatus, ProgramConfig, DayTimeline } from '@/features/program/types'
+import {
+  startRun, pauseRun, resumeRun, advanceRun, rewindRun, reconcileRun,
+  resumeStaleAtLastSeen, acceptStaleElapsed, isRunValid,
+} from '@/features/program/runtime'
+import { localToday } from '@/features/program/dates'
 
 /* ── localStorage keys (match original) ── */
 const SK6 = 'nt2planner_v6'
@@ -125,10 +131,32 @@ export interface AppStore extends State {
 
   // Grammar exercises progress
   markGrammarDone: (topicId: string, exIndex: number) => void
+
+  // Study program (164-lesson timed program)
+  programEnable: (on: boolean) => void
+  setLessonStatus: (lessonId: string, status: LessonStatus) => void
+  setLessonStatusBulk: (lessonIds: string[], status: LessonStatus) => void
+  setProgramConfig: (patch: Partial<ProgramConfig>) => void
+  programStartRun: (timeline: DayTimeline, atMs: number, cursor?: number) => void
+  programPause: (atMs: number) => void
+  programResume: (atMs: number) => void
+  programAdvance: (timeline: DayTimeline, atMs: number, chain: boolean) => void
+  programRewind: (timeline: DayTimeline, atMs: number) => void
+  programStop: () => void
+  /** Heartbeat + auto-advance. Returns true when the session went stale. */
+  programSync: (timeline: DayTimeline, atMs: number) => boolean
+  programResolveStale: (timeline: DayTimeline, atMs: number, mode: 'resume' | 'accept') => void
+  /** Push this day's completed study minutes into dailyHistory (idempotent). */
+  programLogMinutes: (dayKey: string, minutes: number) => void
+
+  /** Mark/unmark one timeline block done — works with or without a running timer. */
+  toggleBlockDone: (dayKey: string, blockId: string) => void
+  /** Bulk set completion for a day's blocks. */
+  setBlocksDone: (dayKey: string, blockIds: string[], done: boolean) => void
 }
 
 /* Deep-link support: ?tab=exam opens the app on that tab (never persisted) */
-const VALID_TABS: TabId[] = ['dashboard', 'plan', 'vocab', 'books', 'exam', 'exercises', 'grammar', 'stats', 'resources', 'platform']
+const VALID_TABS: TabId[] = ['dashboard', 'program', 'plan', 'vocab', 'books', 'exam', 'exercises', 'grammar', 'stats', 'resources', 'platform']
 function initialTab(): TabId {
   try {
     const t = new URLSearchParams(window.location.search).get('tab') as TabId | null
@@ -443,6 +471,171 @@ export const useAppStore = create<AppStore>()(
         set((st) => ({ grammarProgress: { ...st.grammarProgress, [topicId]: [...(st.grammarProgress[topicId] ?? []), exIndex] } }))
         get().save()
       },
+
+      /* ── Study program ───────────────────────────────────────────────
+         The timer never stores a countdown. Every action here only moves
+         absolute anchors; the remaining time is always derived from the
+         system clock at read time (see features/program/runtime.ts).      */
+
+      programEnable: (on) => {
+        set((st) => ({ program: { ...st.program, enabled: on, lastActiveDate: localToday() } }))
+        get().save()
+      },
+
+      setLessonStatus: (lessonId, status) => {
+        set((st) => ({
+          program: { ...st.program, statuses: { ...st.program.statuses, [lessonId]: status } },
+        }))
+        // A lesson leaving 'new' is real progress worth a streak day.
+        if (status !== 'new') get().bumpStreak()
+        get().save()
+      },
+
+      setLessonStatusBulk: (lessonIds, status) => {
+        if (lessonIds.length === 0) return
+        set((st) => {
+          const statuses = { ...st.program.statuses }
+          for (const id of lessonIds) statuses[id] = status
+          return { program: { ...st.program, statuses } }
+        })
+        if (status !== 'new') get().bumpStreak()
+        get().save()
+      },
+
+      setProgramConfig: (patch) => {
+        set((st) => ({ program: { ...st.program, config: { ...st.program.config, ...patch } } }))
+        get().save()
+      },
+
+      programStartRun: (timeline, atMs, cursor = 0) => {
+        set((st) => ({
+          program: { ...st.program, run: startRun(timeline, atMs, cursor), lastActiveDate: timeline.date },
+        }))
+        get().save()
+      },
+
+      programPause: (atMs) => {
+        const run = get().program.run
+        if (!run) return
+        set((st) => ({ program: { ...st.program, run: pauseRun(run, atMs) } }))
+        get().save()
+      },
+
+      programResume: (atMs) => {
+        const run = get().program.run
+        if (!run) return
+        set((st) => ({ program: { ...st.program, run: resumeRun(run, atMs) } }))
+        get().save()
+      },
+
+      programAdvance: (timeline, atMs, chain) => {
+        const run = get().program.run
+        if (!run) return
+        const next = advanceRun(run, timeline, atMs, chain)
+        set((st) => ({
+          program: {
+            ...st.program,
+            run: next,
+            completedBlocks: mergeCompleted(st.program.completedBlocks, next.date, next.completed),
+          },
+        }))
+        get().save()
+      },
+
+      programRewind: (timeline, atMs) => {
+        const run = get().program.run
+        if (!run) return
+        set((st) => ({ program: { ...st.program, run: rewindRun(run, timeline, atMs) } }))
+        get().save()
+      },
+
+      programStop: () => {
+        set((st) => ({ program: { ...st.program, run: null } }))
+        get().save()
+      },
+
+      programSync: (timeline, atMs) => {
+        const run = get().program.run
+        if (!run || !isRunValid(run, timeline)) return false
+        const { run: next, stale } = reconcileRun(run, timeline, atMs)
+        if (stale) return true
+        // Only touch the store when something actually moved. This runs on a
+        // 1s ticker, so a naive set() here would thrash React and localStorage.
+        const moved = next.cursor !== run.cursor || next.completed.length !== run.completed.length
+        if (!moved && Math.abs(next.lastSeenMs - run.lastSeenMs) < 15_000) return false
+        set((st) => ({
+          program: {
+            ...st.program,
+            run: next,
+            completedBlocks: moved
+              ? mergeCompleted(st.program.completedBlocks, next.date, next.completed)
+              : st.program.completedBlocks,
+          },
+        }))
+        // Persist only on a real block transition; the heartbeat rides along
+        // with the existing pagehide/visibilitychange save in initStore().
+        if (moved) get().save()
+        return false
+      },
+
+      programResolveStale: (timeline, atMs, mode) => {
+        const run = get().program.run
+        if (!run) return
+        const next = mode === 'resume'
+          ? resumeStaleAtLastSeen(run, timeline, atMs)
+          : acceptStaleElapsed(run, timeline, atMs)
+        set((st) => ({ program: { ...st.program, run: next } }))
+        get().save()
+      },
+
+      programLogMinutes: (dayKey, minutes) => {
+        const already = get().program.loggedMinutes[dayKey] ?? 0
+        const delta = Math.round(minutes) - already
+        if (delta <= 0) return   // idempotent: only ever log the increment
+        set((st) => ({
+          program: { ...st.program, loggedMinutes: { ...st.program.loggedMinutes, [dayKey]: Math.round(minutes) } },
+        }))
+        // Sessions can now run on ANY day, so credit the day that was actually
+        // studied. recordStudyMinutes always credits "today", so it only fits
+        // when the studied day is today.
+        if (dayKey === localToday()) {
+          get().recordStudyMinutes(delta)
+        } else {
+          const prev = get().dailyHistory[dayKey]?.mins ?? 0
+          get().setDayMinutes(dayKey, prev + delta)
+          set((st) => ({ studySec: st.studySec + delta * 60 }))
+          get().save()
+        }
+      },
+
+      toggleBlockDone: (dayKey, blockId) => {
+        set((st) => {
+          const cur = st.program.completedBlocks[dayKey] ?? []
+          const next = cur.includes(blockId)
+            ? cur.filter((id) => id !== blockId)
+            : [...cur, blockId]
+          const completedBlocks = { ...st.program.completedBlocks }
+          if (next.length) completedBlocks[dayKey] = next
+          else delete completedBlocks[dayKey]
+          return { program: { ...st.program, completedBlocks } }
+        })
+        get().bumpStreak()
+        get().save()
+      },
+
+      setBlocksDone: (dayKey, blockIds, done) => {
+        if (blockIds.length === 0) return
+        set((st) => {
+          const cur = new Set(st.program.completedBlocks[dayKey] ?? [])
+          for (const id of blockIds) { if (done) cur.add(id); else cur.delete(id) }
+          const completedBlocks = { ...st.program.completedBlocks }
+          if (cur.size) completedBlocks[dayKey] = [...cur]
+          else delete completedBlocks[dayKey]
+          return { program: { ...st.program, completedBlocks } }
+        })
+        if (done) get().bumpStreak()
+        get().save()
+      },
     }),
     {
       name: SK6,
@@ -462,6 +655,18 @@ export const useAppStore = create<AppStore>()(
     },
   ),
 )
+
+/** دمج كتل الجلسة المكتملة في الخريطة الدائمة لليوم. */
+function mergeCompleted(
+  map: Record<string, string[]>,
+  dayKey: string,
+  ids: string[],
+): Record<string, string[]> {
+  if (ids.length === 0) return map
+  const merged = Array.from(new Set([...(map[dayKey] ?? []), ...ids]))
+  if (merged.length === (map[dayKey] ?? []).length) return map
+  return { ...map, [dayKey]: merged }
+}
 
 /* ── Selector helpers ── */
 export function getDaysLeft(examDate: string): number | null {

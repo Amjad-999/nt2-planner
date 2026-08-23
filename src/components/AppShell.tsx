@@ -10,6 +10,7 @@ import { TabErrorBoundary } from './TabErrorBoundary'
 import { useBadgeCheck } from '@/hooks/useBadgeCheck'
 
 const Dashboard  = lazy(() => import('@/sections/Dashboard'))
+const Program    = lazy(() => import('@/sections/Program'))
 const Plan       = lazy(() => import('@/sections/Plan'))
 const Vocab      = lazy(() => import('@/sections/Vocab'))
 const Books      = lazy(() => import('@/sections/Books'))
@@ -21,7 +22,7 @@ const Resources  = lazy(() => import('@/sections/Resources'))
 const Platform   = lazy(() => import('@/sections/Platform'))
 
 const SECTION_MAP = {
-  dashboard: Dashboard, plan: Plan, vocab: Vocab, books: Books,
+  dashboard: Dashboard, program: Program, plan: Plan, vocab: Vocab, books: Books,
   exam: Exam, exercises: Exercises, grammar: Grammar, stats: Stats, resources: Resources, platform: Platform,
 } as const
 

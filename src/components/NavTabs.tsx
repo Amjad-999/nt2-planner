@@ -4,12 +4,13 @@ import type { TabId } from '@/store/types'
 import { AppIcon } from './AppIcon'
 import type { Icon } from '@phosphor-icons/react'
 import {
-  SquaresFour, CalendarCheck, Translate, BookOpen,
+  SquaresFour, CalendarCheck, Translate, BookOpen, Target,
   ClipboardText, GameController, TextAa, ChartLineUp, Globe, Star,
 } from '@phosphor-icons/react'
 
 const TABS: { id: TabId; Icon: Icon; label: string }[] = [
   { id: 'dashboard', Icon: SquaresFour,   label: 'لوحة التحكم' },
+  { id: 'program',   Icon: Target,        label: 'البرنامج' },
   { id: 'plan',      Icon: CalendarCheck, label: 'الخطة' },
   { id: 'vocab',     Icon: Translate,     label: 'المفردات + AI' },
   { id: 'books',     Icon: BookOpen,      label: 'الكتب' },

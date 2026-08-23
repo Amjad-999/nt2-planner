@@ -1,4 +1,6 @@
 import type { State, VocabWord, ExamWord, DayRecord, SkillKey, SkillRecord } from '@/store/types'
+import type { ProgramState } from '@/features/program/types'
+import { defaultProgram } from '@/store/migration'
 
 /**
  * دمج آمن بلا فقدان: يُنتج حالةً تَجمع كل تقدّم الطرفين (المحلّي + السحابي).
@@ -61,6 +63,48 @@ function mergeNestedAnswers(a: Record<string, Record<number, number>> = {}, b: R
   return out
 }
 
+/**
+ * دمج برنامج الدراسة.
+ *  • حالات الدروس: الأحدث يفوز عند التعارض، والأقدم يملأ الفراغات — لأن
+ *    «ضعيف» قد يكون تصحيحًا متعمَّدًا بعد «متقن»، فلا نأخذ الأعلى دائمًا.
+ *  • جلسة المؤقّت: جهازيّة بطبعها (مثبّتة على ساعة جهاز بعينه) — نأخذ الأحدث فقط.
+ *  • الدقائق المسجَّلة: الأقصى لكل يوم، حتى لا يتكرّر الاحتساب بعد الدمج.
+ */
+function mergeProgram(a: State['program'], b: State['program'], bNewer: boolean): ProgramState {
+  const base = defaultProgram()
+  const pa = a ?? base
+  const pb = b ?? base
+  const newer = bNewer ? pb : pa
+  const older = bNewer ? pa : pb
+
+  const loggedMinutes: Record<string, number> = { ...(older.loggedMinutes ?? {}) }
+  for (const [k, v] of Object.entries(pb.loggedMinutes ?? {})) {
+    loggedMinutes[k] = Math.max(loggedMinutes[k] ?? 0, num(v))
+  }
+  for (const [k, v] of Object.entries(pa.loggedMinutes ?? {})) {
+    loggedMinutes[k] = Math.max(loggedMinutes[k] ?? 0, num(v))
+  }
+
+  // اتّحاد الكتل المكتملة: الإنجاز لا يُفقد عند الدمج بين جهازين.
+  const completedBlocks: Record<string, string[]> = {}
+  for (const src of [pa.completedBlocks ?? {}, pb.completedBlocks ?? {}]) {
+    for (const [k, v] of Object.entries(src)) {
+      completedBlocks[k] = Array.from(new Set([...(completedBlocks[k] ?? []), ...(v ?? [])]))
+    }
+  }
+
+  return {
+    enabled: !!(pa.enabled || pb.enabled),
+    statuses: { ...(older.statuses ?? {}), ...(newer.statuses ?? {}) },
+    run: newer.run ?? null,
+    config: newer.config ?? base.config,
+    lastActiveDate: (pa.lastActiveDate ?? '') > (pb.lastActiveDate ?? '')
+      ? pa.lastActiveDate : pb.lastActiveDate,
+    loggedMinutes,
+    completedBlocks,
+  }
+}
+
 export function mergeStates(a: State, b: State): State {
   const bNewer = num(b._savedAt) >= num(a._savedAt)
   const newer = bNewer ? b : a
@@ -121,6 +165,7 @@ export function mergeStates(a: State, b: State): State {
     customDur: { ...older.customDur, ...newer.customDur },
     unlockedBadges: uniqStrs(a.unlockedBadges, b.unlockedBadges),
     grammarProgress: unionRecordNums(a.grammarProgress, b.grammarProgress),
+    program: mergeProgram(a.program, b.program, bNewer),
     _v: 6,
     _savedAt: Math.max(num(a._savedAt), num(b._savedAt)),
   }

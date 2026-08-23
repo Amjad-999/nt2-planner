@@ -5,8 +5,23 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+const pad2 = (n: number) => String(n).padStart(2, '0')
+
+/**
+ * مفتاح اليوم YYYY-MM-DD **بالتوقيت المحلّي للمستخدم**.
+ *
+ * كان يستخدم `toISOString()` وهو UTC دائمًا. الفارق ليس نظريًا: في هولندا
+ * (UTC+2 صيفًا) كل جلسة تبدأ بين 00:00 و02:00 محلّيًا كانت تُسجَّل في بوابة
+ * *أمس*، فينقسم اليوم الواحد على يومين في السجلّ، وتنكسر السلسلة اليومية،
+ * وتظهر خريطة النشاط مزاحة. والعكس في المناطق غربي غرينتش: العمل المسائي
+ * يُسجَّل على *الغد*.
+ *
+ * هذه الدالة هي المصدر الوحيد لمفاتيح الأيام في التطبيق كلّه — سجلّ الدراسة،
+ * السلسلة، التحليلات، والشارات، وكذلك جدول البرنامج عبر `program/dates.ts`.
+ */
 export function todayKey(d?: Date): string {
-  return (d ?? new Date()).toISOString().slice(0, 10)
+  const x = d ?? new Date()
+  return `${x.getFullYear()}-${pad2(x.getMonth() + 1)}-${pad2(x.getDate())}`
 }
 
 export function dayKeyOffset(off: number): string {

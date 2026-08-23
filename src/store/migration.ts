@@ -1,9 +1,112 @@
 import type { State, VocabWord, ExamWord, SkillKey } from './types'
 import { clampNum } from '@/lib/utils'
 import { boxToFsrsFields } from '@/features/vocab/fsrs'
+import { DEFAULT_CONFIG } from '@/features/program/schedule'
+import { localToday } from '@/features/program/dates'
+import type { LessonStatus, ProgramState, RunState } from '@/features/program/types'
+import { isKnownLesson } from '@/data/curriculum'
 
 const TOTAL_PLAN_DAYS = 46
 const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'] as const
+const LESSON_STATUSES: LessonStatus[] = ['new', 'active', 'done', 'review', 'weak', 'mastered']
+
+export function defaultProgram(): ProgramState {
+  return {
+    enabled: false,
+    statuses: {},
+    run: null,
+    config: { ...DEFAULT_CONFIG },
+    lastActiveDate: localToday(),
+    loggedMinutes: {},
+    completedBlocks: {},
+  }
+}
+
+/* Program state arrives from localStorage — validate every field so a corrupt
+   or hand-edited payload can never crash the scheduler or the timer. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function applyProgram(raw: any): ProgramState {
+  const base = defaultProgram()
+  if (!raw || typeof raw !== 'object') return base
+
+  // معرّفات الدروس تتغيّر عند تصحيح المنهج. أيّ مفتاح لا يوجد في المنهج
+  // الحالي يُطرح بدل أن يُحتسب في النِسَب ويجعل التقدّم يتجاوز 100%.
+  const statuses: Record<string, LessonStatus> = {}
+  if (raw.statuses && typeof raw.statuses === 'object') {
+    for (const [k, v] of Object.entries(raw.statuses)) {
+      if (typeof k === 'string' && isKnownLesson(k) && LESSON_STATUSES.includes(v as LessonStatus)) {
+        statuses[k] = v as LessonStatus
+      }
+    }
+  }
+
+  const cfg = raw.config && typeof raw.config === 'object' ? raw.config : {}
+  const num = (v: unknown, def: number, min: number, max: number) =>
+    typeof v === 'number' && isFinite(v) ? clampNum(Math.round(v), min, max) : def
+  const str = (v: unknown, def: string) => (typeof v === 'string' && v ? v : def)
+
+  const config = {
+    startDate: str(cfg.startDate, base.config.startDate),
+    deadline: str(cfg.deadline, base.config.deadline),
+    dayStart: /^\d{1,2}:\d{2}$/.test(String(cfg.dayStart)) ? String(cfg.dayStart) : base.config.dayStart,
+    bufferDays: num(cfg.bufferDays, base.config.bufferDays, 0, 10),
+    consolidationDays: num(cfg.consolidationDays, base.config.consolidationDays, 0, 14),
+    recallMinutes: num(cfg.recallMinutes, base.config.recallMinutes, 0, 30),
+    shortBreak: num(cfg.shortBreak, base.config.shortBreak, 0, 30),
+    longBreak: num(cfg.longBreak, base.config.longBreak, 0, 60),
+    blocksBeforeLongBreak: num(cfg.blocksBeforeLongBreak, base.config.blocksBeforeLongBreak, 1, 10),
+    closeMinutes: num(cfg.closeMinutes, base.config.closeMinutes, 0, 30),
+    dailyCapacityMinutes: num(cfg.dailyCapacityMinutes, base.config.dailyCapacityMinutes, 30, 900),
+    durationModel: cfg.durationModel === 'pages' ? 'pages' as const : 'flat' as const,
+  }
+
+  // A run whose fields aren't all finite numbers is unusable — drop it rather
+  // than let NaN propagate into every countdown on screen.
+  let run: RunState | null = null
+  const r = raw.run
+  if (r && typeof r === 'object' && typeof r.date === 'string') {
+    const finite = (v: unknown) => typeof v === 'number' && isFinite(v)
+    if (finite(r.anchorMs) && finite(r.cursor) && finite(r.startedAtMs)) {
+      run = {
+        date: r.date,
+        cursor: Math.max(0, Math.round(r.cursor)),
+        anchorMs: r.anchorMs,
+        pausedAtMs: finite(r.pausedAtMs) ? r.pausedAtMs : null,
+        driftMs: finite(r.driftMs) ? Math.max(0, r.driftMs) : 0,
+        lastSeenMs: finite(r.lastSeenMs) ? r.lastSeenMs : r.anchorMs,
+        startedAtMs: r.startedAtMs,
+        completed: Array.isArray(r.completed) ? r.completed.filter((x: unknown) => typeof x === 'string') : [],
+      }
+    }
+  }
+
+  const loggedMinutes: Record<string, number> = {}
+  if (raw.loggedMinutes && typeof raw.loggedMinutes === 'object') {
+    for (const [k, v] of Object.entries(raw.loggedMinutes)) {
+      if (typeof v === 'number' && isFinite(v) && v >= 0) loggedMinutes[k] = Math.round(v)
+    }
+  }
+
+  const completedBlocks: Record<string, string[]> = {}
+  if (raw.completedBlocks && typeof raw.completedBlocks === 'object') {
+    for (const [k, v] of Object.entries(raw.completedBlocks)) {
+      if (typeof k === 'string' && Array.isArray(v)) {
+        const ids = v.filter((x: unknown): x is string => typeof x === 'string')
+        if (ids.length) completedBlocks[k] = Array.from(new Set(ids))
+      }
+    }
+  }
+
+  return {
+    enabled: raw.enabled === true,
+    statuses,
+    run,
+    config,
+    lastActiveDate: str(raw.lastActiveDate, base.lastActiveDate),
+    loggedMinutes,
+    completedBlocks,
+  }
+}
 
 export function defaultState(): State {
   const d = new Date()
@@ -37,6 +140,7 @@ export function defaultState(): State {
     onboarded: false,
     unlockedBadges: [],
     grammarProgress: {},
+    program: defaultProgram(),
     _v: 6,
     _savedAt: 0,
   }
@@ -136,6 +240,7 @@ export function applyState(parsed: any): State {
   S.onboarded       = typeof parsed.onboarded === 'boolean' ? parsed.onboarded : !!(parsed.name || parsed.examDate)
   S.unlockedBadges  = Array.isArray(parsed.unlockedBadges) ? parsed.unlockedBadges.filter((x: unknown) => typeof x === 'string') : []
   S.grammarProgress = (parsed.grammarProgress && typeof parsed.grammarProgress === 'object' && !Array.isArray(parsed.grammarProgress)) ? parsed.grammarProgress : {}
+  S.program         = applyProgram(parsed.program)
 
   // ExamWords
   S.examWords = (Array.isArray(parsed.examWords) ? parsed.examWords : [])
