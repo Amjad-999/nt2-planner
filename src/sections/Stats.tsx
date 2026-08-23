@@ -4,6 +4,8 @@ import { PASS_THRESHOLD, SKILL_AR } from '@/data/phases'
 import { dayKeyOffset, hexA } from '@/lib/utils'
 import { InsightCard } from '@/components/InsightCard'
 import { useCountUp } from '@/hooks/useCountUp'
+import { computeProgress, lessonsByDay } from '@/features/plan/progress'
+import { isProgramActive } from '@/features/plan/program'
 
 /* Chart.js generics make Chart<'bar'> unassignable to Chart[] — all the
    leak fix needs is destroy(), so track instances by that shape alone */
@@ -47,6 +49,11 @@ export default function Stats() {
   const streak       = useAppStore((s) => s.streak)
   const dailyHistory = useAppStore((s) => s.dailyHistory)
   const theme        = useAppStore((s) => s.theme)
+  const studyProgram = useAppStore((s) => s.studyProgram)
+
+  const lessonBook     = studyProgram.lessons
+  const programActive  = isProgramActive(studyProgram)
+  const progress       = computeProgress(lessonBook, studyProgram.lessonMinutes)
   const mountKey     = useRef(0)
   // Live Chart instances — each holds a canvas ref + ResizeObserver, so they
   // must be destroyed on unmount or every visit to this tab leaks all six
@@ -68,6 +75,23 @@ export default function Stats() {
     { kind: weekT>=lastWT?'good':'warn', icon:'✅', title:'المهام المنجزة', desc:`${weekT} مهمّة هذا الأسبوع مقابل ${lastWT} سابقًا (${pctChg(weekT,lastWT)>=0?'+':''}${pctChg(weekT,lastWT)}%)` },
     { kind: weekW>=lastWW?'good':'warn', icon:'📚', title:'كلمات جديدة مُضافة', desc:`${weekW} كلمة هذا الأسبوع مقابل ${lastWW} سابقًا (${pctChg(weekW,lastWW)>=0?'+':''}${pctChg(weekW,lastWW)}%)` },
   ]
+
+  /* دروس البرنامج تُنسب لأيامها من طابع `at` في كل سجلّ — نفس المصدر الذي
+     تقرأ منه الخطة، فلا يظهر رقمان مختلفان لنفس الأسبوع. */
+  if (programActive) {
+    const byDay = lessonsByDay(lessonBook)
+    const inWindow = (from: number, to: number) =>
+      Array.from({ length: to - from }, (_, i) => byDay[dayKeyOffset(-(from + i))]?.length ?? 0)
+        .reduce((a, b) => a + b, 0)
+    const weekL = inWindow(0, 7)
+    const lastWL = inWindow(7, 7)
+    weekInsights.push({
+      kind: weekL >= lastWL ? 'good' : 'warn',
+      icon: '🎯',
+      title: 'دروس المنهج المنجزة',
+      desc: `${weekL} درسًا هذا الأسبوع مقابل ${lastWL} سابقًا (${pctChg(weekL,lastWL)>=0?'+':''}${pctChg(weekL,lastWL)}%) — التغطية ${progress.coveredPct}% والإتقان ${progress.masteryPct}%`,
+    })
+  }
 
   // Chart rendering — re-runs on theme change
   useEffect(() => {

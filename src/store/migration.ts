@@ -52,7 +52,7 @@ export function defaultState(): State {
     inburgeringExams: reconcileInburgeringExams(null),
     goalCelebratedOn: '',
     /* لا تواريخ مزروعة: البرنامج يبقى غير مفعَّل حتى يختار المستخدم نافذته. */
-    studyProgram: { startKey: '', deadlineKey: '', lessons: {}, session: null, maxLessonsPerDay: 12, lessonMinutes: {}, order: 'sequential' },
+    studyProgram: { startKey: '', deadlineKey: '', lessons: {}, session: null, maxLessonsPerDay: 12, lessonMinutes: {}, order: 'sequential', loggedMinutes: {} },
     _v: 6,
     _savedAt: 0,
   }
@@ -73,7 +73,7 @@ const BLOCK_KINDS: StudyBlockKind[] = ['recall', 'new', 'review', 'consolidate',
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function sanitizeStudyProgram(raw: any): State['studyProgram'] {
-  const fallback: State['studyProgram'] = { startKey: '', deadlineKey: '', lessons: {}, session: null, maxLessonsPerDay: 12, lessonMinutes: {}, order: 'sequential' }
+  const fallback: State['studyProgram'] = { startKey: '', deadlineKey: '', lessons: {}, session: null, maxLessonsPerDay: 12, lessonMinutes: {}, order: 'sequential', loggedMinutes: {} }
   if (!raw || typeof raw !== 'object') return fallback
 
   const startKey = DAY_KEY_RE.test(String(raw.startKey)) ? String(raw.startKey) : ''
@@ -103,6 +103,16 @@ function sanitizeStudyProgram(raw: any): State['studyProgram'] {
       if (!CURRICULUM_BOOKS.some((b) => b.id === bookId)) continue
       const n = parseInt(String(v))
       if (!isNaN(n) && n > 0) lessonMinutes[bookId] = clampNum(n, 5, 120)
+    }
+  }
+
+  /* العلامة المائية للدقائق المكتوبة في dailyHistory. قيمة تالفة هنا تعني
+     إمّا احتساب الدقائق مرّتين أو ضياعها، فتُطرح المفاتيح غير السليمة. */
+  const loggedMinutes: Record<string, number> = {}
+  if (raw.loggedMinutes && typeof raw.loggedMinutes === 'object') {
+    for (const [k, v] of Object.entries(raw.loggedMinutes)) {
+      const n = Math.round(Number(v))
+      if (DAY_KEY_RE.test(k) && isFinite(n) && n > 0) loggedMinutes[k] = n
     }
   }
 
@@ -150,6 +160,7 @@ function sanitizeStudyProgram(raw: any): State['studyProgram'] {
     maxLessonsPerDay: clampNum(parseInt(String(raw.maxLessonsPerDay)) || 12, 4, 20),
     lessonMinutes,
     order: raw.order === 'examFirst' ? 'examFirst' : 'sequential',
+    loggedMinutes,
   }
 }
 

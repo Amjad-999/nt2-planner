@@ -68,6 +68,16 @@ export interface StudyProgramState {
   /** تجاوز مدّة الدرس لكل كتاب: معرّف الكتاب إلى دقائق. فارغ = مدّة الكتاب الافتراضية. */
   lessonMinutes: Record<string, number>
   order: StudyOrderKey
+  /**
+   * دقائق التركيز المكتوبة بالفعل في dailyHistory لكل يوم — علامة مائية.
+   *
+   * The session clock is derived from wall time, so it is read many times a
+   * minute; without a watermark each read would add its own minutes again and
+   * the analytics tab would climb without anyone studying. Storing what was
+   * already written makes recording idempotent: only the difference is ever
+   * added, so a refresh, a second tab or a replayed tick all cost nothing.
+   */
+  loggedMinutes: Record<string, number>
 }
 
 export type ThemeKey = 'light' | 'dark'
