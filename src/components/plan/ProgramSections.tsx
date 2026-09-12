@@ -15,7 +15,7 @@ import { AR_LESSON, countAr } from '@/lib/arabicCount'
  */
 
 const BTN: React.CSSProperties = {
-  minHeight: 36, padding: '5px 12px', borderRadius: 10, cursor: 'pointer',
+  minHeight: 'var(--tap-min)', padding: '5px 12px', borderRadius: 'var(--r-sm)', cursor: 'pointer',
   fontFamily: 'inherit', fontSize: 'var(--text-sm)',
   background: 'transparent', border: '1px solid var(--border2)', color: 'var(--text2)',
 }
@@ -34,7 +34,7 @@ function SectionRow({ sectionId, title, lessonIds, lessons, minutesOf }: {
 
   return (
     <li style={{
-      display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+      display: 'flex', alignItems: 'center', gap: 'var(--sp-3)', flexWrap: 'wrap',
       padding: '9px 12px', borderRadius: 'var(--r-sm)',
       background: 'var(--btn-bg)', border: '1px solid var(--border)',
       borderInlineStart: `3px solid ${all ? 'var(--green)' : done > 0 ? 'var(--amber)' : 'var(--border2)'}`,
@@ -43,7 +43,7 @@ function SectionRow({ sectionId, title, lessonIds, lessons, minutesOf }: {
       <span aria-hidden style={{ color: all ? 'var(--green-text)' : done > 0 ? 'var(--amber-text)' : 'var(--text2)' }}>
         {all ? '✔' : done > 0 ? '◐' : '○'}
       </span>
-      <span style={{ flex: '1 1 200px', fontSize: '.88rem', color: 'var(--text)' }}>{title}</span>
+      <span style={{ flex: '1 1 200px', fontSize: 'var(--text-sm)', color: 'var(--text)' }}>{title}</span>
       <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', whiteSpace: 'nowrap' }}>
         {done} / {lessonIds.length} · {formatMinutes(minutes)}
       </span>
@@ -79,23 +79,23 @@ export function ProgramSections() {
     <section
       aria-label="الكتب والأقسام"
       style={{
-        padding: '18px 22px 20px', marginBottom: 18,
+        padding: '18px 22px 20px', marginBottom: 'var(--sp-4)',
         background: 'var(--surface)', border: '1px solid var(--border)',
         borderRadius: 'var(--r)', boxShadow: 'var(--elev-1)',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-        <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)' }}>الكتب والأقسام</h3>
-        <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} style={{ ...BTN, minHeight: 40 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--sp-3)', flexWrap: 'wrap' }}>
+        <h3 style={{ margin: 0, fontSize: 'var(--text-md)', fontWeight: 'var(--fw-cta)', color: 'var(--text)' }}>الكتب والأقسام</h3>
+        <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} style={{ ...BTN, minHeight: 'var(--tap-min)' }}>
           {open ? 'أخفِ الأقسام' : 'اعرض الأقسام'}
         </button>
       </div>
-      <p style={{ margin: '8px 0 0', fontSize: '.86rem', color: 'var(--text2)', lineHeight: 1.7 }}>
+      <p style={{ margin: '8px 0 0', fontSize: 'var(--text-sm)', color: 'var(--text2)', lineHeight: 'var(--lh-arabic)' }}>
         {countAr(totalDone, AR_LESSON)} مغطّى. علّم هنا ما أنجزتَه قبل تفعيل البرنامج، فيُحذف تلقائيًّا من الجدول.
       </p>
 
       {open && (
-        <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div style={{ marginTop: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)' }}>
           {CURRICULUM_BOOKS.map((b) => {
             const bookLessons = b.sections.flatMap((s) => s.lessonIds)
             const bookDone = bookLessons.filter((id) => isCovered(statusOf(lessons, id))).length
@@ -104,18 +104,18 @@ export function ProgramSections() {
               <div key={b.id}>
                 <div style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  gap: 10, flexWrap: 'wrap', marginBottom: 8,
+                  gap: 'var(--sp-3)', flexWrap: 'wrap', marginBottom: 'var(--sp-2)',
                   paddingInlineStart: 10, borderInlineStart: `3px solid ${b.accent}`,
                 }}>
-                  <strong style={{ color: 'var(--text)', fontSize: '.95rem' }}>{b.title}</strong>
+                  <strong style={{ color: 'var(--text)', fontSize: 'var(--text-base)' }}>{b.title}</strong>
                   <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
                     {bookDone} / {bookLessons.length}
                   </span>
                 </div>
 
                 <label style={{
-                  display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
-                  fontSize: 'var(--text-sm)', color: 'var(--text2)', marginBottom: 8,
+                  display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', flexWrap: 'wrap',
+                  fontSize: 'var(--text-sm)', color: 'var(--text2)', marginBottom: 'var(--sp-2)',
                 }}>
                   مدّة الدرس في هذا الكتاب
                   <input
@@ -127,7 +127,7 @@ export function ProgramSections() {
                     }}
                     aria-label={`مدّة الدرس بالدقائق في ${b.title}`}
                     style={{
-                      width: 76, minHeight: 36, padding: '5px 8px', borderRadius: 9,
+                      width: 76, minHeight: 'var(--tap-min)', padding: '5px 8px', borderRadius: 'var(--r-xs)',
                       border: '1px solid var(--border2)', background: 'var(--bg)', color: 'var(--text)',
                       fontFamily: 'inherit', fontSize: 'var(--text-sm)',
                     }}
@@ -140,7 +140,7 @@ export function ProgramSections() {
                   )}
                 </label>
 
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
                   {b.sections.map((s) => (
                     <SectionRow
                       key={s.id}

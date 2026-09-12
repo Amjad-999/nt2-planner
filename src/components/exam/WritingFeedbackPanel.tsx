@@ -23,9 +23,9 @@ interface Props {
 const box: React.CSSProperties = {
   background: 'var(--glass-bg)',
   border: '1px solid var(--glass-border)',
-  borderRadius: 12,
+  borderRadius: 'var(--r-sm)',
   padding: '12px 14px',
-  marginTop: 10,
+  marginTop: 'var(--sp-3)',
 }
 
 function Bar({ pct, label, weight }: { pct: number; label: string; weight: number }) {
@@ -40,7 +40,7 @@ function Bar({ pct, label, weight }: { pct: number; label: string; weight: numbe
         <span><span style={{ color: ink }}>{icon}</span> {label} <span style={{ color: 'var(--muted)' }}>({weight}%)</span></span>
         <strong style={{ color: ink }}>{pct}</strong>
       </div>
-      <div style={{ height: 6, borderRadius: 6, background: 'var(--border)', overflow: 'hidden', marginTop: 4 }}>
+      <div style={{ height: 6, borderRadius: 'var(--r-xs)', background: 'var(--border)', overflow: 'hidden', marginTop: 'var(--sp-1)' }}>
         <div style={{ width: `${pct}%`, height: '100%', background: fill, transition: 'width .25s' }} />
       </div>
     </div>
@@ -54,7 +54,7 @@ function Btn({ children, onClick, disabled }: { children: React.ReactNode; onCli
       onClick={onClick}
       disabled={disabled}
       style={{
-        padding: '8px 14px', borderRadius: 10, cursor: disabled ? 'not-allowed' : 'pointer',
+        padding: '8px 14px', borderRadius: 'var(--r-sm)', cursor: disabled ? 'not-allowed' : 'pointer',
         border: '1px solid var(--border2)', background: 'var(--btn-bg)', color: 'var(--text)',
         fontSize: 'var(--text-sm)', opacity: disabled ? 0.55 : 1,
       }}
@@ -87,23 +87,23 @@ export function WritingFeedbackPanel({ task, text, onRecord }: Props) {
   const empty = report.wordCount === 0
 
   return (
-    <div style={{ marginTop: 12 }}>
+    <div style={{ marginTop: 'var(--sp-3)' }}>
       {/* قائمة النقاط المطلوبة — تتحدّث مع الكتابة */}
       <div style={box}>
-        <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>
+        <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)', color: 'var(--text)', marginBottom: 'var(--sp-2)' }}>
           النقاط المطلوبة — {report.coveredPoints} من {task.points.length}
         </div>
         {task.points.map((p) => {
           const done = !report.missingPointsAr.includes(p.ar)
           return (
-            <div key={p.ar} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 'var(--text-sm)', margin: '4px 0', color: done ? 'var(--green-text)' : 'var(--muted)' }}>
+            <div key={p.ar} style={{ display: 'flex', gap: 'var(--sp-2)', alignItems: 'flex-start', fontSize: 'var(--text-sm)', margin: '4px 0', color: done ? 'var(--green-text)' : 'var(--muted)' }}>
               <span aria-hidden>{done ? '✔' : '○'}</span>
               <span>{p.ar}</span>
             </div>
           )
         })}
         {task.register === 'formeel' && (
-          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginTop: 6 }}>
+          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginTop: 'var(--sp-2)' }}>
             هذه المهمّة رسمية: استخدم صيغة الاحترام.
           </div>
         )}
@@ -113,8 +113,8 @@ export function WritingFeedbackPanel({ task, text, onRecord }: Props) {
       {!empty && (
         <div style={box}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text)' }}>التقييم المحلّي</div>
-            <div style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text)' }}>{report.total}</div>
+            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)', color: 'var(--text)' }}>التقييم المحلّي</div>
+            <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--fw-cta)', color: 'var(--text)' }}>{report.total}</div>
           </div>
           {report.criteria.map((c) => <Bar key={c.key} pct={c.score} label={c.labelAr} weight={c.weight} />)}
           <ul style={{ margin: '8px 0 0', paddingInlineStart: 18, fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
@@ -126,7 +126,7 @@ export function WritingFeedbackPanel({ task, text, onRecord }: Props) {
       {/* أخطاء مؤكّدة فقط */}
       {report.issues.length > 0 && (
         <div style={box}>
-          <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>
+          <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)', color: 'var(--text)', marginBottom: 'var(--sp-2)' }}>
             أخطاء مؤكّدة — {report.issues.length}
           </div>
           {report.issues.map((it, i) => (
@@ -142,7 +142,7 @@ export function WritingFeedbackPanel({ task, text, onRecord }: Props) {
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 'var(--sp-2)', marginTop: 'var(--sp-3)', flexWrap: 'wrap' }}>
         <Btn onClick={() => onRecord(report.total, `المحتوى ${report.coveredPoints} من ${task.points.length} • ${report.wordCount} كلمة`)} disabled={empty}>
           سجّل الدرجة
         </Btn>
@@ -166,8 +166,8 @@ export function WritingFeedbackPanel({ task, text, onRecord }: Props) {
       {ai && (
         <div style={{ ...box, borderColor: 'var(--green)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text)' }}>التصحيح الذكي</div>
-            <div style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text)' }}>{ai.totaal}</div>
+            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)', color: 'var(--text)' }}>التصحيح الذكي</div>
+            <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--fw-cta)', color: 'var(--text)' }}>{ai.totaal}</div>
           </div>
           <Bar pct={ai.scores.inhoud} label="المحتوى" weight={25} />
           <Bar pct={ai.scores.taal} label="التركيب اللغوي" weight={25} />
@@ -193,12 +193,12 @@ export function WritingFeedbackPanel({ task, text, onRecord }: Props) {
 
           <details>
             <summary style={{ cursor: 'pointer', fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>نصّك مصحّحًا</summary>
-            <p dir="ltr" lang="nl" style={{ fontFamily: 'var(--font-latin)', fontSize: 'var(--text-sm)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{ai.correctedNl}</p>
+            <p dir="ltr" lang="nl" style={{ fontFamily: 'var(--font-latin)', fontSize: 'var(--text-sm)', lineHeight: 'var(--lh-arabic)', whiteSpace: 'pre-wrap' }}>{ai.correctedNl}</p>
           </details>
 
           <details>
             <summary style={{ cursor: 'pointer', fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>نموذج أقوى للمقارنة</summary>
-            <p dir="ltr" lang="nl" style={{ fontFamily: 'var(--font-latin)', fontSize: 'var(--text-sm)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{ai.modelNl}</p>
+            <p dir="ltr" lang="nl" style={{ fontFamily: 'var(--font-latin)', fontSize: 'var(--text-sm)', lineHeight: 'var(--lh-arabic)', whiteSpace: 'pre-wrap' }}>{ai.modelNl}</p>
           </details>
         </div>
       )}

@@ -24,14 +24,16 @@ The owner is not a professional developer: prefer simple, working, verified solu
 ## Structure (real paths)
 - `src/App.tsx` — thin shell, registers the service worker, renders `AppShell`
 - `src/components/AppShell.tsx` — tab shell + navigation
-- `src/sections/` — top-level tabs: `Dashboard` `Plan` `Vocab` `Books` `Exam` `Exercises` `Grammar` `Stats` `Resources` `Platform`
-- `src/components/` — reusable UI (+ subfolders: `hero/` `mascot/` `auth/` `countdown/` `themes/`)
-- `src/features/` — feature logic: `achievements` `ai` `cloud` `exam` `exercises` `mascot` `speaking` `tts` `vocab` `world`
+- `src/sections/` — top-level tabs: `Dashboard` `Plan` `Vocab` `Books` `Exam` `Exercises` `Situations` `Grammar` `Stats` `Resources` `Platform`
+  (navigation groups them into five: الرئيسية · تعلّم · تدرّب · المفردات · تقدّمي)
+- `src/components/` — reusable UI (+ subfolders: `ui/` `practice/` `progress/` `dashboard/` `exam/` `plan/` `hero/` `mascot/` `auth/` `countdown/` `themes/`)
+- `src/components/ui/` — design-system primitives: `Button` `Segmented` `ProgressBar` `Callout`; their CSS lives in `src/styles/components.css` (`.btn` `.segmented` `.card` `.chip` `.choice` `.progress` `.bubble`)
+- `src/features/` — feature logic: `achievements` `ai` `cloud` `exam` `exercises` `grammar` `mascot` `plan` `progress` `speaking` `tts` `vocab` `world`
 - `src/store/useAppStore.ts` — the Zustand store (+ `types.ts`, `migration.ts`)
 - `src/hooks/` — `useNow` `useTheme` `useAuth` `useMascot` `useCountdown` …
 - `src/lib/` — `supabase.ts` `idb.ts` `auth.ts` `utils.ts` `animations.ts` `celebrate.ts` `pdfWorker.ts`
-- `src/data/` — static typed content: `dutchQuotes.ts` (30 quotes) `themas.ts` `grammarExercises.ts` `examPdfs.ts` `examAudio.ts` …
-- `src/styles/tokens.css` — **every color lives here**; `globals.css` for base styles
+- `src/data/` — static typed content: `dutchQuotes.ts` (30 quotes) `themas.ts` `situations.ts` (8 real-life dialogues) `grammarExercises.ts` `examPdfs.ts` `examAudio.ts` …
+- `src/styles/tokens.css` — **every color lives here**; `globals.css` for base styles; `components.css` for the shared control classes
 - `src/tests/` — `unit/` and `smoke/`
 - `public/exams/` — ~300 MB of PDFs and audio. **Never read, list, grep or open these files.** Only their filenames matter, and `npm run check:exams` verifies those.
 
@@ -41,23 +43,43 @@ The owner is not a professional developer: prefer simple, working, verified solu
 - `npm run typecheck` — `tsc -b`
 - `npm run lint` — eslint
 - `npm test` — vitest run
+- `npm run doctor` — plain-Arabic health report for the owner; runs every gate and
+  ends with the one thing to fix next. Changes nothing.
 - `npm run check:digits` — fails if Arabic-Indic digits appear in source
 - `npm run check:exams` — verifies exam filenames exist under `public/exams/`
+- `npm run check:rls` — proves the cloud table is not readable without a session
+  (skips cleanly when no backend is configured)
+- `npm run check:docs` — fails if CLAUDE.md or AGENTS.md describes something that
+  does not exist
 
-There is **no CI**. These scripts are the only quality gate — see the `check-before-pr` skill.
+CI runs every gate above on each push and pull request (`.github/workflows/ci.yml`).
+Run them locally first anyway — see the `check-before-pr` skill, or just `npm run doctor`.
 
-### Verifying from a Linux sandbox (assistant only)
-The checked-in `node_modules/` is built for the owner's Windows machine, so an assistant
-running in a Linux sandbox cannot execute the suite against it. Use the mirror harness:
+### Definition of done
+A change is done when **all** of these pass, not just the first three:
 
-- `bash scripts/verify-sandbox.sh static` — typecheck + lint + check:digits + build
-- `bash scripts/verify-sandbox.sh test` — the 237-test suite (~42 s, needs its own call)
-- `... test1` / `... test2` — the same suite in halves, when one call is too slow
+`npm run typecheck` · `npm run lint` · `npm test` · `npm run check:digits` ·
+`npm run check:exams` · `npm run check:docs` · `npm run build`
 
-It rsyncs `src/`, `scripts/`, `public/` (minus `exams/`) and the config files into
-`/tmp/nt2-verify`, which keeps its own Linux `node_modules/`. It never writes to the
-project folder and never touches `public/exams/`. Run **both** modes before claiming done.
-The owner still runs the plain `npm` scripts on Windows.
+Never report a task complete on inspection alone. If a gate cannot be run, say which and why.
+
+`npm run check:rls` is an operational check, not a gate — it needs a reachable backend,
+so it is expected to fail offline. Run it after a deploy or a cloud schema change.
+
+### Running the gates on Windows
+`npm test` goes through `scripts/run-vitest.mjs`, which normalises the drive letter
+before Vitest starts. This matters: `process.cwd()` is `C:\...` from PowerShell and cmd
+but `c:\...` from Git Bash, and Vite treats those as two different modules — the whole
+suite then fails to collect with
+`Cannot read properties of undefined (reading 'config')` even though nothing is wrong.
+
+So: run the suite with `npm test`. Calling `npx vitest run` directly bypasses the
+launcher and will fail from a Git Bash shell. `src/tests/unit/test-runner-cwd.test.ts`
+guards this.
+
+### Dependency policy
+Do not add a runtime dependency without asking. Everything needed is already installed.
+Build-only tools belong in `devDependencies`. Prefer a small local helper over a package.
 
 ## Critical rules (NEVER break)
 1. WCAG AA contrast ≥ 4.5:1 for text; pair every color-coded state with an icon.
@@ -66,19 +88,41 @@ The owner still runs the plain `npm` scripts on Windows.
 4. ASCII digits only in source. Arabic-Indic digits (٠-٩) fail `npm run check:digits`.
 5. RTL + mobile-first. Directional icons must flip — see the `rtl-icon-check` skill.
 6. Never call `Date.now()` during React render — use `useNow()`.
-7. Never commit secrets. Only `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are public by design.
+7. Never commit secrets. Only `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` and
+   `VITE_PIXABAY_API_KEY` are public by design.
 8. New store fields that must sync need the full pattern — see the `add-synced-field` skill.
-9. After any change: run lint, typecheck and test before saying it is done.
+9. After any change: run **every** gate in "Definition of done" above — not just three of them.
 
 ## Working style (keeps sessions fast and accurate)
 - Read only the files you need. Never open `node_modules/`, `dist/`, `.git/`, `public/exams/`, `package-lock.json`.
 - Prefer targeted search over reading whole files; `src/data/themas.ts` alone is 1300 lines.
 - Some existing files are large (`Exercises.tsx` ~800 lines, `useAppStore.ts` ~700). Do **not** refactor or split them unless explicitly asked. New components: aim under ~200 lines.
 - One task per session. Run `/clear` between unrelated tasks — a long session makes answers slower and less accurate.
-- Check `.claude/skills/` first: there are 16 project skills covering most recurring tasks.
+- Check `.claude/skills/` first: there are 22 project skills covering most recurring tasks (16 written for this app, 6 from ECC).
+
+## ECC layer (curated subset)
+A hand-picked subset of the ECC agent system is installed. What, why, and what was left out:
+`.claude/ecc/README.md`
+- Agents in `.claude/agents/` (10: planner, code/React/TypeScript/security reviewers, tdd-guide,
+  build fixers, a11y, silent-failure-hunter). They cost a separate run: use one only when the owner asks.
+- Skills: `react-patterns` `react-testing` `vite-patterns` `accessibility` `tdd-workflow` `verification-loop`.
+- Rules in `.claude/rules/ecc/` load on their own when matching files are touched.
+- No ECC hooks, on purpose (cost and speed).
+- ECC is generic. **On any conflict this file wins**: no Next.js or server components; do not run
+  Prettier (installed, but no config or script, so it would rewrite whole files); no new dependency
+  (Zod, Playwright, MSW, axe …) without asking; never split the large files; never delete
+  `package-lock.json`; the Definition of done gates replace ECC's 80% coverage and `npx tsc` checks.
+
+## Do not change these without being asked
+- `src/styles/tokens.css` — contrast ratios are calculated and enforced by
+  `src/tests/unit/token-contrast.test.ts`. Editing a colour means re-running that test.
+- `src/store/migration.ts` and the `_v` version — a mistake here loses real user data.
+- The large files named above. Splitting them is not a refactor to slip into another task.
+- `vite.config.ts` chunking — the current setup is the result of a measurement recorded
+  in the file's own comment.
 
 ## When a screenshot is sent
 1. Describe the visual problem precisely.
-2. Propose the fix in Plan Mode.
+2. Propose the fix and wait for agreement before editing.
 3. Ask if anything is ambiguous.
 4. Only then implement, then verify with the commands above.

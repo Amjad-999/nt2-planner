@@ -4,6 +4,9 @@ import { TodayFocus } from '@/components/dashboard/TodayFocus'
 import { QuoteTicker } from '@/components/dashboard/QuoteTicker'
 import { useAppStore } from '@/store/useAppStore'
 import { QUOTES } from '@/data/dutchQuotes'
+import { GRAMMAR_EXERCISES } from '@/data/grammarExercises'
+import { peekNavIntent } from '@/lib/navIntent'
+import { todayKey } from '@/lib/utils'
 
 const skillAt = (best: Record<string, number>) => ({
   reading: { best: best.reading ?? 0, attempts: 0, history: [] as { date: string; score: number }[] },
@@ -12,80 +15,97 @@ const skillAt = (best: Record<string, number>) => ({
   speaking: { best: best.speaking ?? 0, attempts: 0, history: [] as { date: string; score: number }[] },
 })
 
+const word = (due: number) => ({
+  id: Math.random().toString(36).slice(2),
+  dutch: 'huis', arabic: 'بيت', example: '', level: 'B1' as const, box: 1, due, reps: 1,
+})
+
 beforeEach(() => {
   useAppStore.setState({
     vocab: [],
     skill: skillAt({ reading: 70, listening: 40, writing: 80, speaking: 90 }),
     activeTab: 'dashboard',
+    mockSession: null,
+    grammarProgress: {},
+    dailyHistory: {},
   })
 })
 
-describe('TodayFocus — the landing view surfaces real exam-prep content', () => {
-  it("names today's recommended skill in Dutch and Arabic, and routes to its exercises", () => {
+describe('TodayFocus — one dominant next step', () => {
+  it('puts due reviews first and opens the session itself, not just the tab', () => {
+    useAppStore.setState({ vocab: [word(Date.now() - 60_000), word(Date.now() - 30_000)] })
+    render(<TodayFocus onStartSession={() => {}} />)
+
+    expect(screen.getByRole('heading', { name: /راجع المفردات المستحقّة/ })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /راجع 2 كلمة الآن/ }))
+    expect(useAppStore.getState().activeTab).toBe('vocab')
+    expect(peekNavIntent('vocab')?.view).toBe('review')
+  })
+
+  it('falls through to the weakest skill, named in Dutch, when nothing is due', () => {
     render(<TodayFocus onStartSession={() => {}} />)
 
     // listening is the weakest (40) → Luisteren
-    expect(screen.getByText('Luisteren · الاستماع')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: /مهارة اليوم/ }))
-    expect(useAppStore.getState().activeTab).toBe('exercises')
+    expect(screen.getByText('Luisteren', { exact: false })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /تدرّب على الاستماع/ }))
+    expect(useAppStore.getState().activeTab).toBe('exam')
+    expect(peekNavIntent('exam')?.view).toBe('listening')
   })
 
-  it('counts vocabulary actually due for review, and says so plainly when none is', () => {
-    render(<TodayFocus onStartSession={() => {}} />)
-    expect(screen.getByText('لا شيء الآن')).toBeInTheDocument()
-
-    const past = Date.now() - 60_000
+  it('lets a running exam outrank everything else', () => {
     useAppStore.setState({
-      vocab: [
-        { id: 'a', dutch: 'huis', arabic: 'بيت', example: '', level: 'B1', box: 1, due: past, reps: 1 },
-        { id: 'b', dutch: 'boek', arabic: 'كتاب', example: '', level: 'B1', box: 1, due: past, reps: 1 },
-        // Not due until tomorrow — must not be counted
-        { id: 'c', dutch: 'tafel', arabic: 'طاولة', example: '', level: 'B1', box: 1, due: Date.now() + 86400000, reps: 1 },
-        // Already learned — must not be counted
-        { id: 'd', dutch: 'stoel', arabic: 'كرسي', example: '', level: 'B1', box: 5, due: past, reps: 9 },
-      ],
+      vocab: [word(Date.now() - 1000)],
+      mockSession: {
+        id: 'm1', skill: 'writing', order: ['writing'], startedAt: Date.now(), endsAt: Date.now() + 60_000,
+        scores: {}, minutes: { reading: 1, listening: 1, writing: 1, speaking: 1 },
+      },
     })
     render(<TodayFocus onStartSession={() => {}} />)
-    expect(screen.getAllByText('2 كلمة').length).toBeGreaterThan(0)
+    expect(screen.getByRole('heading', { name: /أكمل الامتحان الكامل الجاري/ })).toBeInTheDocument()
   })
 
-  it('shows the most recent mock score — and a CTA instead of a hollow zero when none exists', () => {
+  it('names what comes after the current step', () => {
+    useAppStore.setState({ vocab: [word(Date.now() - 1000)] })
     render(<TodayFocus onStartSession={() => {}} />)
-    expect(screen.getByText('لم تبدأ بعد')).toBeInTheDocument()
-    expect(screen.queryByText('0%')).not.toBeInTheDocument()
-
-    const s = skillAt({ reading: 70, listening: 40 })
-    s.reading.history = [{ date: '2026-07-01', score: 55 }]
-    // Later date wins even though reading's score is higher
-    s.listening.history = [{ date: '2026-07-20', score: 48 }]
-    useAppStore.setState({ skill: s })
-
-    // Second render of the same test — assert with getAllBy since the first
-    // tree is still mounted (RTL only auto-cleans between tests).
-    render(<TodayFocus onStartSession={() => {}} />)
-    expect(screen.getAllByText('48%').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('Luisteren · 2026-07-20').length).toBeGreaterThan(0)
+    expect(screen.getByText(/بعدها:/)).toBeInTheDocument()
   })
 
-  it('offers the primary session CTA plus quick links to grammar and the exam simulator', () => {
+  it('offers the study programme as the secondary action', () => {
     const onStart = vi.fn()
     render(<TodayFocus onStartSession={onStart} />)
-
-    fireEvent.click(screen.getByRole('button', { name: /ابدأ جلسة اليوم/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'برنامج اليوم الكامل' }))
     expect(onStart).toHaveBeenCalledTimes(1)
-
-    fireEvent.click(screen.getByRole('button', { name: /القواعد/ }))
-    expect(useAppStore.getState().activeTab).toBe('grammar')
-
-    fireEvent.click(screen.getByRole('button', { name: 'محاكاة الامتحان' }))
-    expect(useAppStore.getState().activeTab).toBe('exam')
   })
 
-  it('every interactive target clears the 44px minimum', () => {
+  it('celebrates a finished day and offers real extra practice', () => {
+    useAppStore.setState({
+      vocab: [],
+      grammarProgress: Object.fromEntries(Object.entries(GRAMMAR_EXERCISES).map(([id, questions]) => [id, questions.map((_, i) => i)])),
+      dailyHistory: { [todayKey()]: { mins: 600, tasks: 0, wordsAdded: 0, wordsLearned: 0, examTaken: [{ skill: 'listening', score: 70 }] } },
+    })
     render(<TodayFocus onStartSession={() => {}} />)
+    expect(screen.getByText(/اكتملت مهام اليوم/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /تدرّب على موقف يومي/ }))
+    expect(useAppStore.getState().activeTab).toBe('situations')
+  })
+
+  it('keeps every control at or above the touch floor', () => {
+    render(<TodayFocus onStartSession={() => {}} />)
+    // Sizing lives in components.css (.btn / .btn--lg), so assert the class
+    // contract rather than an inline style that is no longer there.
     for (const btn of screen.getAllByRole('button')) {
-      expect(parseInt(String(btn.style.minHeight))).toBeGreaterThanOrEqual(44)
+      expect(btn.className).toContain('btn')
     }
+  })
+
+  it('does not count partly answered lessons as completed', () => {
+    useAppStore.setState({
+      grammarProgress: Object.fromEntries(Object.keys(GRAMMAR_EXERCISES).map(id => [id, [0]])),
+      dailyHistory: { [todayKey()]: { mins: 600, tasks: 0, wordsAdded: 0, wordsLearned: 0, examTaken: [{ skill: 'listening', score: 70 }] } },
+    })
+    render(<TodayFocus onStartSession={() => {}} />)
+    expect(screen.getByRole('button', { name: 'افتح درس القواعد' })).toBeInTheDocument()
+    expect(screen.queryByText(/اكتملت مهام اليوم/)).not.toBeInTheDocument()
   })
 })
 

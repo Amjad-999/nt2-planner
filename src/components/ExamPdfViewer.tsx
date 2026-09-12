@@ -109,7 +109,7 @@ export function ExamPdfViewer({ src, title }: Props) {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 4,
+          gap: 'var(--sp-1)',
           padding: '8px 10px',
           background: 'var(--glass-bg)',
           backdropFilter: 'blur(10px)',
@@ -123,7 +123,7 @@ export function ExamPdfViewer({ src, title }: Props) {
         <span
           aria-live="polite"
           aria-atomic="true"
-          style={{ fontSize: '.82rem', color: 'var(--text2)', minWidth: 64, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}
+          style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', minWidth: 64, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}
         >
           {numPages > 0 ? `${page} / ${numPages}` : '—'}
         </span>
@@ -133,7 +133,7 @@ export function ExamPdfViewer({ src, title }: Props) {
 
         {/* Zoom controls */}
         <TbBtn onClick={zoomOut} disabled={!fitWidth && scale <= MIN_SCALE} aria-label="تصغير" title="تصغير (-)">−</TbBtn>
-        <span style={{ fontSize: '.78rem', color: 'var(--text2)', minWidth: 40, textAlign: 'center' }}>
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text2)', minWidth: 40, textAlign: 'center' }}>
           {fitWidth ? 'عرض' : `${Math.round(scale * 100)}%`}
         </span>
         <TbBtn onClick={zoomIn} disabled={!fitWidth && scale >= MAX_SCALE} aria-label="تكبير" title="تكبير (+)">+</TbBtn>
@@ -141,7 +141,7 @@ export function ExamPdfViewer({ src, title }: Props) {
           onClick={toggleFit}
           aria-label={fitWidth ? 'التكبير اليدوي' : 'ملاءمة العرض'}
           title={fitWidth ? 'التكبير اليدوي' : 'ملاءمة العرض'}
-          style={{ fontSize: '.72rem', padding: '5px 8px' }}
+          style={{ fontSize: 'var(--text-2xs)', padding: '5px 8px' }}
         >
           {fitWidth ? '↔' : '⊡'}
         </TbBtn>
@@ -206,7 +206,7 @@ export function ExamPdfViewer({ src, title }: Props) {
           style={{
             display: 'flex',
             justifyContent: 'center',
-            gap: 8,
+            gap: 'var(--sp-2)',
             padding: '8px',
             borderTop: '1px solid var(--glass-border)',
             background: 'var(--glass-bg)',
@@ -215,11 +215,11 @@ export function ExamPdfViewer({ src, title }: Props) {
           }}
         >
           <TbBtn onClick={prev} disabled={page <= 1} aria-label="الصفحة السابقة"
-            style={{ padding: '7px 18px', fontSize: '.85rem' }}>
+            style={{ padding: '7px 18px', fontSize: 'var(--text-sm)' }}>
             ‹ السابقة
           </TbBtn>
           <TbBtn onClick={next} disabled={page >= numPages} aria-label="الصفحة التالية"
-            style={{ padding: '7px 18px', fontSize: '.85rem' }}>
+            style={{ padding: '7px 18px', fontSize: 'var(--text-sm)' }}>
             التالية ›
           </TbBtn>
         </div>
@@ -250,19 +250,19 @@ function TbBtn({
         alignItems: 'center',
         justifyContent: 'center',
         minWidth: 32,
-        minHeight: 32,
+        minHeight: 'var(--tap-min)',
         padding: '5px 9px',
         border: '1px solid var(--btn-border)',
-        borderRadius: 7,
+        borderRadius: 'var(--r-xs)',
         background: 'var(--btn-bg)',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
         color: 'var(--text2)',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.4 : 1,
-        fontSize: '1rem',
+        fontSize: 'var(--text-base)',
         fontFamily: 'inherit',
-        fontWeight: 600,
+        fontWeight: 'var(--fw-heading)',
         transition: 'background .12s, border-color .12s',
         ...style,
       }}
@@ -278,8 +278,8 @@ function msgStyle(bg: string, border: string, color = 'var(--red)'): React.CSSPr
     padding: '12px 18px',
     background: bg,
     border: border !== 'transparent' ? `1px solid ${border}` : 'none',
-    borderRadius: 8,
-    fontSize: '.9rem',
+    borderRadius: 'var(--r-xs)',
+    fontSize: 'var(--text-sm)',
     color,
     textAlign: 'center',
   }

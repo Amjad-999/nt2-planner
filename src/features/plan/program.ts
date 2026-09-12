@@ -18,7 +18,19 @@ import {
  * trustworthy.
  */
 
-export interface StudyProgramState {
+/**
+ * What buildProgramView needs: the stored program plus the day's real budget.
+ *
+ * Named for its role rather than after the store slice. It used to be called
+ * StudyProgramState — the same name store/types.ts gives to a DIFFERENT shape
+ * (that one carries `session`, this one carries `dailyBudgetMinutes`), which
+ * made two unrelated types look like one that had drifted.
+ *
+ * The store's slice still has to satisfy this type: ProgramPanel builds the
+ * argument as `{ ...program, dailyBudgetMinutes }`, so any incompatibility
+ * between the two really is a compile error at that call site.
+ */
+export interface ProgramViewInput {
   /** '' يعني أنّ البرنامج لم يُفعَّل بعد. لا تواريخ يخترعها التطبيق. */
   startKey: string
   deadlineKey: string
@@ -75,11 +87,11 @@ const EMPTY_SCHEDULE: ScheduleResult = {
   unscheduled: [], feasible: true, peakLessonsPerDay: 0, learningDays: 0,
 }
 
-export function isProgramActive(p: StudyProgramState | null | undefined): boolean {
+export function isProgramActive(p: ProgramViewInput | null | undefined): boolean {
   return !!p && !!p.startKey && !!p.deadlineKey && dayDiff(p.startKey, p.deadlineKey) >= 0
 }
 
-export function buildProgramView(program: StudyProgramState, todayKey: string): ProgramView {
+export function buildProgramView(program: ProgramViewInput, todayKey: string): ProgramView {
   if (!isProgramActive(program)) {
     return {
       active: false,

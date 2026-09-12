@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { readFileSync, readdirSync } from 'node:fs'
+import { resolve, join, sep } from 'node:path'
 
 /**
  * WCAG AA على ألوان النصّ، محسوبًا لا مُقدَّرًا.
@@ -21,13 +21,41 @@ const CSS = readFileSync(resolve(process.cwd(), 'src/styles/tokens.css'), 'utf8'
 const AA_TEXT = 4.5
 
 /** Tokens used as `color:` somewhere in the app. */
-const TEXT_TOKENS = ['text', 'text2', 'muted', 'orange-text', 'green-text', 'red-text', 'amber-text'] as const
+const TEXT_TOKENS = [
+  'text', 'text2', 'muted',
+  'orange-text', 'green-text', 'red-text', 'amber-text', 'blue-text', 'purple-text',
+] as const
 
 /** Backgrounds those tokens can sit on. */
 const SURFACES = [
   'bg', 'surface', 'surface2', 'surface3',
   'btn-bg', 'glass-bg', 'glass-bg-strong',
-  'green-l', 'red-l', 'orange-l', 'amber-l',
+  'green-l', 'red-l', 'orange-l', 'amber-l', 'blue-l', 'purple-l',
+  'modal-bg', 'topbar-bg',
+] as const
+
+/**
+ * Surfaces owned by a single component, audited against exactly the text
+ * tokens that land on them. Keeping them out of the cartesian sweep above is
+ * deliberate: --pass-btn-bg is a .22 wash, denser than every -l tint, and
+ * holding EVERY text token to it would over-constrain the palette for a
+ * surface only one button uses. Listing the real pairs is both tighter and
+ * honest about intent.
+ */
+const SCOPED_SURFACES: { surface: string; text: readonly string[] }[] = [
+  { surface: 'pass-bg', text: ['text', 'text2', 'green-text'] },
+  { surface: 'pass-btn-bg', text: ['text'] },
+]
+
+/**
+ * Tokens calibrated for FILLS, borders and icons (WCAG 1.4.11, 3:1) — never
+ * for `color:`. Every one of them was measured below 4.5:1 as text on at
+ * least one surface it actually landed on, so the guard below reads the
+ * source and fails rather than trusting review to catch the next one.
+ */
+const FILL_ONLY = [
+  'orange', 'orange-d', 'orange-m', 'orange-ink',
+  'green', 'red', 'amber', 'blue', 'purple', 'teal',
 ] as const
 
 type Rgb = [number, number, number]
@@ -102,6 +130,19 @@ function auditTheme(map: Record<string, string>): { pair: string; ratio: number 
       if (ratio < AA_TEXT) failures.push({ pair: `--${tName} on --${sName}`, ratio })
     }
   }
+
+  for (const { surface: sName, text } of SCOPED_SURFACES) {
+    const s = parseColor(`var(--${sName})`, map)
+    if (!s) continue
+    const surface = composite(s, pageRgb)
+    for (const tName of text) {
+      const t = parseColor(`var(--${tName})`, map)
+      if (!t) continue
+      const ratio = contrast(composite(t, surface), surface)
+      if (ratio < AA_TEXT) failures.push({ pair: `--${tName} on --${sName}`, ratio })
+    }
+  }
+
   return failures
 }
 
@@ -148,5 +189,57 @@ describe('the accent tokens are still distinguishable from body text', () => {
         expect(diff, `${t} is too close to --text`).toBeGreaterThan(40)
       }
     }
+  })
+})
+
+/**
+ * The audit above proves the PALETTE is sound. It cannot see a component that
+ * reaches past the palette and paints text with a fill token — which is
+ * exactly how --blue (4.18:1), --purple (4.12:1), --orange on hover (2.45:1)
+ * and --orange-ink on a tint (4.01:1) all shipped. This guard closes that gap
+ * by reading the source instead of the stylesheet.
+ */
+describe('no fill-only token is ever used as a text colour', () => {
+  const SRC = resolve(process.cwd(), 'src')
+
+  function tsxFiles(dir: string): string[] {
+    const out: string[] = []
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, e.name)
+      if (e.isDirectory()) out.push(...tsxFiles(full))
+      else if (e.name.endsWith('.tsx')) out.push(full)
+    }
+    return out
+  }
+
+  /** Matches `color: 'var(--x)'` and every `…text-[var(--x)]` variant. */
+  const INLINE_COLOR = /color:\s*['"`]var\(--([a-z0-9-]+)\)['"`]/g
+  const CLASS_COLOR = /text-\[var\(--([a-z0-9-]+)\)\]/g
+
+  it('finds no offender in any component', () => {
+    const offenders: string[] = []
+    const fill: readonly string[] = FILL_ONLY
+
+    for (const file of tsxFiles(SRC)) {
+      const rel = file.slice(SRC.length + 1).split(sep).join('/')
+      readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
+        for (const re of [INLINE_COLOR, CLASS_COLOR]) {
+          re.lastIndex = 0
+          for (const m of line.matchAll(re)) {
+            if (fill.includes(m[1])) offenders.push(`src/${rel}:${i + 1} paints text with --${m[1]}`)
+          }
+        }
+      })
+    }
+
+    expect(
+      offenders,
+      'these are fill/border tokens (3:1) used as text (needs 4.5:1) — switch to the matching --*-text token',
+    ).toEqual([])
+  })
+
+  it('guards a token set that actually exists in the stylesheet', () => {
+    // A typo in FILL_ONLY would silently disarm the guard.
+    for (const t of FILL_ONLY) expect(parseColor(`var(--${t})`, LIGHT), t).not.toBeNull()
   })
 })

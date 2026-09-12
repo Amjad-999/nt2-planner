@@ -1,4 +1,6 @@
 @import './tokens.css';
+@import './navigation.css';
+@import './components.css';
 
 @tailwind base;
 @tailwind components;
@@ -53,29 +55,41 @@ body {
    ligatures + contextual alternates for cleaner Latin rendering. */
 :lang(nl) {
   font-family: var(--font-latin);
-  line-height: 1.5;
+  line-height: var(--lh-ui);
   letter-spacing: -0.01em;
   font-feature-settings: 'liga' 1, 'calt' 1;
 }
 
 /* Mesh gradient background — three drifting colour blobs per the glass spec */
 html { background: var(--bg); }
+/* Drifts on `transform` instead of `background-position`, which repainted the
+   full viewport on every frame of a 15s infinite loop.
+   The geometry is an exact translation of the old one, not an approximation:
+   the old layer was viewport-sized with `background-size: 200% 200%`, so the
+   gradient image measured 2x the viewport and slid by exactly one viewport
+   width. This layer IS that 2x image (200vw x 200vh, offset -50vh so it
+   straddles the viewport the same way `background-position: … 50%` did), and
+   translateX(-50%) of 200vw is the same one-viewport slide.
+   Deliberately no `will-change`: pinning a 4x-viewport texture in memory
+   costs more than it saves for a background that drifts once every 15s. */
 body::before {
   content: '';
   position: fixed;
-  inset: 0;
+  left: 0;
+  top: -50vh;
+  inline-size: 200vw;
+  block-size: 200vh;
   z-index: -1;
   pointer-events: none;
   background:
     radial-gradient(at 20% 30%, var(--mesh1) 0%, transparent 50%),
     radial-gradient(at 80% 20%, var(--mesh2) 0%, transparent 50%),
     radial-gradient(at 50% 80%, var(--mesh3) 0%, transparent 50%);
-  background-size: 200% 200%;
   animation: mesh-move 15s ease infinite;
 }
 @keyframes mesh-move {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-50%, 0, 0); }
 }
 /* Touch devices: keep the mesh but stop the drift — a full-screen
    background-position animation repaints every frame and drains battery.
@@ -102,6 +116,78 @@ body::before {
 html[data-focus="on"] body::before { display: none; }
 html[data-focus="on"] .decor-flourish { display: none !important; }
 
+/* ── Page shell ─────────────────────────────────────────────────────────
+   One container for every top-level section. It replaces an inline
+   `padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto'` that was copied
+   into ten files — and, being inline, could not be made responsive at all.
+   The padding is now fluid, so a 320px phone gets 24px of its width back.
+   `.page--narrow` is the reading-width variant (grammar lessons).
+──────────────────────────────────────────────────────────────────────── */
+.page {
+  max-inline-size: var(--page-max);
+  margin-inline: auto;
+  padding-block: var(--page-pad-top) var(--page-pad-bottom);
+  padding-inline: var(--page-pad-x);
+}
+.page--narrow { max-inline-size: var(--page-max-narrow); }
+
+/* ── Touch targets ──────────────────────────────────────────────────────
+   A coarse pointer is a fingertip, and a fingertip does not land inside a
+   36px box reliably. Raising the floor only for coarse pointers keeps the
+   desktop layout exactly as it is while giving touch the 44px it needs.
+──────────────────────────────────────────────────────────────────────── */
+@media (pointer: coarse) {
+  :root { --tap-min: 44px; }
+}
+.icon-btn {
+  inline-size: var(--tap-min);
+  block-size: var(--tap-min);
+  flex-shrink: 0;
+}
+
+/* ── The sticky bars ─────────────────────────────────────────────────────
+   Height and gutter live here so the top bar and the tab strip cannot drift
+   apart, and so both line up with the .page content beneath them. NavTabs
+   sits at `top: var(--topbar-h)`; that used to be a literal 62px repeated in
+   two files.
+──────────────────────────────────────────────────────────────────────── */
+.app-bar {
+  block-size: var(--topbar-h);
+  padding-inline: var(--page-pad-x);
+}
+.nav-tabs { padding-inline: var(--page-pad-x); }
+
+/* Ten tabs on a phone means seven are off-screen, and `scrollbar-hide` left
+   no hint that they exist. The fade appears only on the side that still has
+   content behind it, so a bar with nothing to scroll looks untouched.
+   `data-overflow` is set from the scroll position in NavTabs. */
+.nav-tabs[data-overflow='end']   { mask-image: linear-gradient(to left,  transparent 0, #000 28px); }
+.nav-tabs[data-overflow='start'] { mask-image: linear-gradient(to right, transparent 0, #000 28px); }
+.nav-tabs[data-overflow='both']  {
+  mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
+}
+
+/* ── Section heading ────────────────────────────────────────────────────
+   Nine sections each carried their own copy of this style object, differing
+   only in margin — so the headings drifted apart as the app grew.
+   `gap` holds the leading emoji away from the words; the emoji itself is
+   decorative and marked aria-hidden at the call site.
+──────────────────────────────────────────────────────────────────────── */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-3);
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-heading);
+  line-height: var(--lh-heading);
+  color: var(--text);
+}
+/* A heading that follows content rather than opening the page needs air
+   above it; this is the only margin variation the nine copies actually had. */
+.section-title--spaced { margin-block-start: var(--sp-6); }
+
 /* ── Screen-reader only ── */
 .sr-only {
   position: absolute;
@@ -125,12 +211,16 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
   color: var(--text);
   border: 1px solid var(--border2);
   box-shadow: var(--elev-2);
-  font-weight: 600;
-  font-size: .9rem;
+  font-weight: var(--fw-heading);
+  font-size: var(--text-sm);
   text-decoration: none;
-  transition: inset-block-start .16s ease;
+  /* Parked off-screen with a transform rather than sliding `inset-block-start`,
+     which is a layout property. */
+  inset-block-start: 12px;
+  transform: translateY(-160%);
+  transition: transform .16s ease;
 }
-.skip-link:focus { inset-block-start: 12px; }
+.skip-link:focus { transform: translateY(0); }
 
 /* ── Scrollbar hide ── */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
@@ -157,7 +247,7 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
   backdrop-filter: blur(8px);
   color: var(--text);
   font-family: inherit;
-  font-size: .92rem;
+  font-size: var(--text-sm);
   transition: border-color .15s ease, box-shadow .15s ease;
 }
 .form-in:focus {
@@ -190,6 +280,10 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
 /* Shine: a skewed light strip parked off-canvas; hover sweeps it across.
    The transition lives on the hover rule only, so it snaps back invisibly
    on mouse-out instead of animating in reverse. */
+/* The strip travels on `transform`, not on `left`. Animating `left` made every
+   button hover run layout on every frame; the strip is 45% of the button wide,
+   so the old -70% -> 130% slide (200% of the button) is 200/45 = 444% of the
+   strip's own width. Identical motion, compositor only. */
 .btn-glass::after, .btn-shine::after {
   content: '';
   position: absolute;
@@ -197,12 +291,12 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
   left: -70%;
   width: 45%;
   background: linear-gradient(105deg, transparent, rgba(255,255,255,.5), transparent);
-  transform: skewX(-18deg);
+  transform: translateX(0) skewX(-18deg);
   pointer-events: none;
 }
 .btn-glass:hover:not(:disabled)::after, .btn-shine:hover:not(:disabled)::after {
-  left: 130%;
-  transition: left .55s ease;
+  transform: translateX(444%) skewX(-18deg);
+  transition: transform .55s ease;
 }
 
 /* ── Glow card — cursor spotlight + hover accent ──────────────────────────
@@ -349,8 +443,13 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
   background-image: linear-gradient(105deg,
     rgba(255,255,255,0) 30%, rgba(255,255,255,.35) 50%, rgba(255,255,255,0) 70%);
   background-size: 220% 100%;
+  /* RTL: the bar fills from the right edge, same origin JourneyHero uses. */
+  transform-origin: 100% 50%;
 }
-@keyframes progress-fill { from { width: 0 } }
+/* Grows on scaleX, not width. The element keeps its inline `width: N%` so
+   layout is computed once; only the compositor animates. JourneyHero already
+   did this for the hero bar and explained why — the shared class did not. */
+@keyframes progress-fill { from { transform: scaleX(0) } to { transform: scaleX(1) } }
 @keyframes progress-wave {
   0%   { background-position: 200% 0; }
   100% { background-position: -100% 0; }
@@ -361,6 +460,23 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
 @keyframes secIn { from { opacity: 0; transform: translateY(10px) scale(.995); } to { opacity: 1; transform: none; } }
 @keyframes popIn { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: none; } }
 @keyframes flame-flicker { 0%,100% { transform: scale(1) rotate(-1deg); } 50% { transform: scale(1.06) rotate(1deg); } }
+
+/* ── JourneyHero stat tiles ─────────────────────────────────────────────
+   Two columns on a phone, four from 560px. A hard `repeat(4, 1fr)` left about
+   24px of usable width per tile at 320px — narrow enough that a value like
+   "12/184" could not render on one line. A bare `auto-fit` was rejected: it
+   passes through a 464-583px band where three columns fit and the fourth
+   wraps alone, which reads worse than a clean 2x2.
+──────────────────────────────────────────────────────────────────────── */
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-2);
+  margin-block-start: var(--sp-4);
+}
+@media (min-width: 560px) {
+  .hero-stats { grid-template-columns: repeat(4, 1fr); gap: var(--sp-3); }
+}
 
 /* ── JourneyHero ambient scene ───────────────────────────────────────────
    Every animated property below is transform or opacity — nothing here can
@@ -498,9 +614,9 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
   background: var(--orange-ink);
   color: #fff;
   font-family: var(--font-latin);
-  font-size: .72rem;
-  font-weight: 700;
-  line-height: 1;
+  font-size: var(--text-2xs);
+  font-weight: var(--fw-cta);
+  line-height: var(--lh-none);
   border: 2px solid var(--bg);
 }
 

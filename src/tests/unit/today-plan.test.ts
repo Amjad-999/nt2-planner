@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildTodayPlan, dueCount, latestMockRun, weakest } from '@/features/plan/todayPlan'
+import { buildTodayPlan, dueCount, latestMockRun, nextTask, weakest } from '@/features/plan/todayPlan'
 import type { State, VocabWord } from '@/store/types'
 
 const NOW = 1_700_000_000_000
@@ -31,20 +31,74 @@ const base = (over: Partial<PlanState> = {}): PlanState => ({
   ...over,
 } as PlanState)
 
-const input = { now: NOW, todayKey: TODAY, learnedBox: 4, reviewBatch: 20, totalLessons: 34 }
+const input = { now: NOW, todayKey: TODAY, reviewBatch: 20, totalLessons: 34 }
 
 describe('dueCount', () => {
   it('counts only words whose time has come', () => {
     const v = [word({ due: NOW - 1 }), word({ due: NOW + 60_000 }), word({ due: NOW })]
-    expect(dueCount(v, NOW, 4)).toBe(2)
+    expect(dueCount(v, NOW)).toBe(2)
   })
 
-  it('skips words already learned', () => {
-    expect(dueCount([word({ box: 4 }), word({ box: 5 }), word({ box: 1 })], NOW, 4)).toBe(1)
+  it('counts mastered words too, so the figure equals the session it opens', () => {
+    /* This used to skip box >= 4. The review session did not, so the
+       dashboard could say "لا شيء الآن" while twelve cards waited — and a
+       mastered word whose FSRS date has arrived is exactly the word spaced
+       repetition exists to bring back. */
+    expect(dueCount([word({ box: 4 }), word({ box: 5 }), word({ box: 1 })], NOW)).toBe(3)
   })
 
   it('handles an empty list', () => {
-    expect(dueCount([], NOW, 4)).toBe(0)
+    expect(dueCount([], NOW)).toBe(0)
+  })
+})
+
+describe('buildTodayPlan — today\'s lessons from the study programme', () => {
+  it('has no programme row when none is scheduled today', () => {
+    expect(buildTodayPlan(base(), input).tasks.some((t) => t.id === 'program')).toBe(false)
+    expect(buildTodayPlan(base(), { ...input, program: { total: 0, done: 0 } }).tasks.some((t) => t.id === 'program')).toBe(false)
+  })
+
+  it('counts what is left of today\'s lessons', () => {
+    const p = buildTodayPlan(base(), { ...input, program: { total: 3, done: 1 } })
+    const t = p.tasks.find((x) => x.id === 'program')!
+    expect(t.done).toBe(false)
+    expect(t.detailAr).toContain('1')
+    expect(t.detailAr).toContain('3')
+    expect(t.tab).toBe('plan')
+  })
+
+  it('closes the row once every lesson of the day is covered', () => {
+    const p = buildTodayPlan(base(), { ...input, program: { total: 2, done: 2 } })
+    expect(p.tasks.find((x) => x.id === 'program')!.done).toBe(true)
+  })
+
+  it('ranks reviews before new lessons, and a running exam before both', () => {
+    const st = base({
+      vocab: [word()],
+      mockSession: {
+        id: 'm1', skill: 'reading', order: ['reading'], startedAt: NOW, endsAt: NOW + 1,
+        scores: {}, minutes: { reading: 1, listening: 1, writing: 1, speaking: 1 },
+      },
+    })
+    const ids = buildTodayPlan(st, { ...input, program: { total: 2, done: 0 } }).tasks.map((t) => t.id)
+    expect(ids.indexOf('mock')).toBeLessThan(ids.indexOf('vocab'))
+    expect(ids.indexOf('vocab')).toBeLessThan(ids.indexOf('program'))
+  })
+})
+
+describe('nextTask — the one thing to do now', () => {
+  it('is the first unfinished row, so home and the checklist agree', () => {
+    const p = buildTodayPlan(base({ vocab: [word()] }), input)
+    expect(nextTask(p)!.id).toBe('vocab')
+  })
+
+  it('is null once the day is finished', () => {
+    const all = Object.fromEntries(Array.from({ length: 34 }, (_, i) => [`l${i}`, [1]]))
+    const st = base({
+      grammarProgress: all,
+      dailyHistory: { [TODAY]: { mins: 60, tasks: 0, wordsAdded: 0, wordsLearned: 0, examTaken: [{ skill: 'listening', score: 70 }] } },
+    })
+    expect(nextTask(buildTodayPlan(st, input))).toBeNull()
   })
 })
 

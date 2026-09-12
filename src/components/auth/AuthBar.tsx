@@ -51,16 +51,16 @@ export function AuthBar() {
       animate={{ opacity: 1, y: 0 }}
       transition={springCard}
       style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        flexWrap: 'wrap', marginBottom: 14, minHeight: TOUCH,
+        display: 'flex', alignItems: 'center', gap: 'var(--sp-3)',
+        flexWrap: 'wrap', marginBottom: 'var(--sp-3)', minHeight: TOUCH,
       }}
     >
       {isAuthenticated ? (
         <>
           <div
             style={{
-              display: 'flex', alignItems: 'center', gap: 10, minHeight: TOUCH,
-              padding: '5px 14px 5px 5px', borderRadius: 999, minWidth: 0,
+              display: 'flex', alignItems: 'center', gap: 'var(--sp-3)', minHeight: TOUCH,
+              padding: '5px 14px 5px 5px', borderRadius: 'var(--r-pill)', minWidth: 0,
               background: 'var(--surface)', border: '1px solid var(--glass-border)',
               boxShadow: 'var(--elev-1)',
             }}
@@ -68,16 +68,16 @@ export function AuthBar() {
             {avatarUrl ? (
               <img
                 src={avatarUrl} alt="" width={34} height={34}
-                style={{ borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                style={{ borderRadius: 'var(--r-full)', objectFit: 'cover', flexShrink: 0 }}
               />
             ) : (
               <span
                 aria-hidden="true"
                 style={{
-                  width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+                  width: 34, height: 34, borderRadius: 'var(--r-full)', flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: 'var(--grad-primary)', color: 'var(--on-primary)',
-                  fontSize: '.78rem', fontWeight: 700,
+                  fontSize: 'var(--text-xs)', fontWeight: 'var(--fw-cta)',
                 }}
               >
                 {initials(displayName)}
@@ -86,13 +86,13 @@ export function AuthBar() {
             <span style={{ minWidth: 0 }}>
               <span
                 style={{
-                  display: 'block', fontSize: '.86rem', fontWeight: 600, color: 'var(--text)',
+                  display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)', color: 'var(--text)',
                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 180,
                 }}
               >
                 {displayName}
               </span>
-              <span style={{ display: 'block', fontSize: '.72rem', color: syncColor }}>
+              <span style={{ display: 'block', fontSize: 'var(--text-2xs)', color: syncColor }}>
                 <span aria-hidden="true">{syncIcon}</span> {syncLabel}
               </span>
             </span>
@@ -105,11 +105,11 @@ export function AuthBar() {
             transition={pressTransition}
             aria-label="تسجيل الخروج من الحساب"
             style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              minHeight: TOUCH, padding: '0 14px', borderRadius: 999,
+              display: 'inline-flex', alignItems: 'center', gap: 'var(--sp-2)',
+              minHeight: TOUCH, padding: '0 14px', borderRadius: 'var(--r-pill)',
               background: 'var(--btn-bg)', border: '1px solid var(--btn-border)',
-              color: 'var(--text2)', fontFamily: 'inherit', fontSize: '.84rem',
-              fontWeight: 600, cursor: 'pointer',
+              color: 'var(--text2)', fontFamily: 'inherit', fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--fw-heading)', cursor: 'pointer',
             }}
           >
             <AppIcon icon={SignOut} size={17} flipOnRtl />
@@ -125,17 +125,17 @@ export function AuthBar() {
             transition={pressTransition}
             aria-haspopup="dialog"
             style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              minHeight: TOUCH, padding: '0 18px', borderRadius: 999,
+              display: 'inline-flex', alignItems: 'center', gap: 'var(--sp-2)',
+              minHeight: TOUCH, padding: '0 18px', borderRadius: 'var(--r-pill)',
               background: 'var(--btn-bg)', border: '1px solid var(--btn-border)',
-              color: 'var(--text)', fontFamily: 'inherit', fontSize: '.9rem',
-              fontWeight: 700, cursor: 'pointer', boxShadow: 'var(--elev-1)',
+              color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--fw-cta)', cursor: 'pointer', boxShadow: 'var(--elev-1)',
             }}
           >
-            <AppIcon icon={CloudArrowUp} size={19} style={{ color: 'var(--orange-ink)' }} />
+            <AppIcon icon={CloudArrowUp} size={19} style={{ color: 'var(--orange-text)' }} />
             زامن تقدّمك
           </motion.button>
-          <span style={{ fontSize: '.78rem', color: 'var(--muted)' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>
             بياناتك محفوظة على هذا الجهاز فقط.
           </span>
         </>

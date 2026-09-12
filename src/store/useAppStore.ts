@@ -172,7 +172,7 @@ export interface AppStore extends State {
 }
 
 /* Deep-link support: ?tab=exam opens the app on that tab (never persisted) */
-const VALID_TABS: TabId[] = ['dashboard', 'plan', 'vocab', 'books', 'exam', 'exercises', 'grammar', 'stats', 'resources', 'platform']
+const VALID_TABS: TabId[] = ['dashboard', 'plan', 'vocab', 'books', 'exam', 'exercises', 'situations', 'grammar', 'stats', 'resources', 'platform']
 function initialTab(): TabId {
   try {
     const t = new URLSearchParams(window.location.search).get('tab') as TabId | null
@@ -870,7 +870,7 @@ export function initStore() {
   const state = useAppStore.getState()
   document.documentElement.setAttribute('data-theme', state.theme)
   document.documentElement.setAttribute('data-focus', state.focusMode ? 'on' : 'off')
-  const fs = state.prefs.fontSize ?? 15
+  const fs = state.prefs.fontSize ?? 16
   document.documentElement.style.setProperty('--font-size-base', `${fs}px`)
 
   // IDB fallback restore

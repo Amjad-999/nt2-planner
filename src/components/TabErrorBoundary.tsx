@@ -33,34 +33,34 @@ export class TabErrorBoundary extends Component<Props, State> {
       return (
         <div
           dir="rtl"
-          style={{ padding: '32px 28px', maxWidth: 560, margin: '0 auto', textAlign: 'center' }}
+          style={{ padding: 'var(--sp-8) 28px', maxWidth: 560, margin: '0 auto', textAlign: 'center' }}
         >
           <div style={{
             background: 'var(--red-l, rgba(177,76,16,.14))',
             border: '1px solid var(--red, #B14C10)',
             borderRadius: 'var(--r, 16px)',
-            padding: '28px 24px',
+            padding: 'var(--sp-8) 24px',
             boxShadow: 'var(--elev-1)',
           }}>
-            <div style={{ fontSize: '2.2rem', marginBottom: 10 }}>⚠️</div>
+            <div style={{ fontSize: 'var(--glyph-lg)', marginBottom: 'var(--sp-3)' }}>⚠️</div>
             <div style={{
               fontFamily: 'var(--font-display)',
-              fontSize: '1.1rem',
-              fontWeight: 700,
+              fontSize: 'var(--text-lg)',
+              fontWeight: 'var(--fw-cta)',
               color: 'var(--text)',
-              marginBottom: 8,
+              marginBottom: 'var(--sp-2)',
             }}>
               حدث خطأ في هذا القسم
             </div>
-            <div style={{ fontSize: '.82rem', color: 'var(--text2)', marginBottom: 12, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', marginBottom: 'var(--sp-3)', lineHeight: 'var(--lh-ui)' }}>
               القسم الآخر والتطبيق كلّه لا يزالان يعملان بشكل طبيعي.
             </div>
             {this.state.error && (
               <pre style={{
-                fontSize: '.7rem',
+                fontSize: 'var(--text-2xs)',
                 color: 'var(--muted)',
                 background: 'var(--surface3)',
-                borderRadius: 8,
+                borderRadius: 'var(--r-xs)',
                 padding: '10px 14px',
                 margin: '0 0 16px',
                 textAlign: 'left',
@@ -79,10 +79,10 @@ export class TabErrorBoundary extends Component<Props, State> {
               className="btn-glass"
               style={{
                 color: 'var(--text)',
-                borderRadius: 12,
+                borderRadius: 'var(--r-sm)',
                 padding: '9px 22px',
-                fontWeight: 700,
-                fontSize: '.9rem',
+                fontWeight: 'var(--fw-cta)',
+                fontSize: 'var(--text-sm)',
                 cursor: 'pointer',
                 fontFamily: 'inherit',
               }}

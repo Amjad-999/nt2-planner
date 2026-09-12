@@ -12,7 +12,7 @@
   --border:rgba(45,42,38,.13);--border2:rgba(45,42,38,.24);
   /* --muted darkened from #6B6560: it was 4.43:1 on the tinted washes, just
      under AA. It is a text-only token, so this is safe to change in place. */
-  --text:#2D2A26;--text2:#47433E;--muted:#68625E;--muted2:#BAB5B0;
+  --text:#2D2A26;--text2:#47433E;--muted:#68625E;
   /* --orange = brand hue for fills/borders/icons (not held to text-contrast,
      WCAG 1.4.11 non-text 3:1 only). --orange-ink = same hue darkened to
      4.62:1 on --bg — use this instead of --orange wherever the color is the
@@ -36,19 +36,70 @@
   --green-text:#8B5637;
   --red-text:#A3460F;
   --amber-text:#9E4B19;
+  /* Same treatment for the two remaining accents. --blue (info) and --purple
+     (tertiary) were being used directly as `color:` on their own tints and
+     measured 4.18:1 / 4.12:1 — below AA, and invisible to the old test
+     because it only audited tokens whose name ends in -text. Darkened along
+     lightness only (hue and saturation untouched) until the worst text/
+     surface pair in the app clears 4.7:1. They stay close to --muted on
+     purpose: this palette differentiates state by lightness, not hue, and
+     the meaning is carried by the level letter + icon, never by the colour. */
+  --blue-text:#715E54;
+  --purple-text:#92503F;
   --purple:#A05845;--purple-l:rgba(160,88,69,.14);              /* tertiary / stats accent */
   --red:#B14C10;--red-l:rgba(177,76,16,.14);                    /* error */
   --teal:var(--green);--teal-l:var(--green-l);
+  /* Reference-app accents: cool blue for navigation/progress, green for
+     completed learning states. Both themes define the same roles. */
+  --ui-blue:#287FBE;--ui-blue-text:#185B8A;--ui-blue-l:#E8F4FB;
+  --ui-green:#3BA66B;--ui-green-text:#246F46;--ui-green-l:#E8F6EE;
   /* Chart categorical ramp — one hue, six lightness steps (distinguish by
      shade, not color-by-category; pair with a legend label, not color alone) */
-  --c1:#EFBC9E;--c2:#E7986A;--c3:#E07A3E;--c4:#CA5F20;--c5:#9E4B19;--c6:#723612;
-  --shadow-sm:0 1px 2px rgba(40,34,26,.06), 0 2px 8px rgba(40,34,26,.05);
-  --shadow:0 6px 20px rgba(40,34,26,.10), 0 2px 6px rgba(40,34,26,.06);
-  --shadow-lg:0 24px 60px rgba(40,34,26,.20), 0 10px 24px rgba(40,34,26,.10);
-  /* Glass card radius per spec (16px) — this is the app's one card radius,
-     used everywhere var(--r) appears; --r-sm unchanged for chips/inputs */
-  --r:16px;--r-sm:12px;
-  --hero-bg:#2B241D;
+
+  /* ── Radius ladder ── the app had 22 distinct radii (2·3·4·5·6·7·8·9·10·
+     11·12·14·16·99·999·50%) applied to elements of the same kind, which is
+     what made surfaces read as unrelated. Six steps cover every real case.
+     --r stays the glass-card radius per spec; --r-sm stays chips/inputs. */
+  --r-2xs:4px;      /* hairline chips, progress-bar caps */
+  --r-xs:8px;       /* small buttons, dense controls */
+  --r-sm:12px;      /* inputs, inner cards, chips */
+  --r:16px;         /* the glass card */
+  --r-lg:20px;      /* modals, large panels */
+  --r-pill:999px;   /* pills and capsules */
+  --r-full:50%;     /* circles */
+  /* ── Spacing ── a 4px rhythm. Before this the app used 12 distinct gaps
+     and 13 distinct bottom margins, so no two sections shared a beat. */
+  --sp-0:2px;  --sp-1:4px;  --sp-2:8px;  --sp-3:12px;
+  --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-12:48px;
+  /* ── Page shell ── one container, defined once. The horizontal padding was
+     a hard 28px in an inline style repeated in ten files, which no media
+     query can reach: on a 320px phone it ate 17.5% of the viewport. */
+  /* The sticky stack. NavTabs used to hardcode `top: '62px'` to sit under the
+     top bar — a magic number duplicated in two files that would silently
+     break the layout the moment either changed. */
+  --topbar-h:62px;
+  /* Minimum hit area. Every control in the app already cleared WCAG 2.2
+     2.5.8 (24px), but the top bar sat at 36px and several chips at 32-34px —
+     under the 44px that touch actually wants (2.5.5 / the platform HIGs).
+     Splitting it by pointer type buys the touch size without inflating
+     desktop density: mouse users keep the current 36px rhythm. */
+  --tap-min:36px;
+  --page-max:1100px;
+  --page-max-narrow:820px;
+  --page-pad-x:clamp(16px, 4vw, 28px);
+  --page-pad-top:clamp(16px, 3vw, 24px);
+  --page-pad-bottom:60px;
+  /* The hero carries its own inner gutter on top of the page one. Both were
+     fixed at 28px, so a 320px phone spent 112px of its 320 on padding. */
+  --hero-pad-x:clamp(16px, 4vw, 28px);
+  --hero-pad-y:clamp(18px, 3vw, 24px);
+  /* The decorative skyline rises from the hero's bottom edge. It used to be
+     60px tall while the content stopped 24px short of that edge, so the
+     silhouette climbed 36px INTO the stat tiles: their lower third went dark
+     behind a hard horizontal line and the tiles read as half-submerged.
+     One number now drives both the graphic and the space reserved for it. */
+  --hero-sky-h:40px;
+
   --topbar-bg:rgba(224,122,62,.08);
   --overlay-bg:rgba(38,32,26,.45);
   /* Page mesh — three lightness/alpha steps of the one brand hue (was a
@@ -71,7 +122,7 @@
      near its lighter end (TopBar logo badge, active nav/tab pills). */
   --grad-primary:linear-gradient(135deg,#B9571E 0%,#8D4217 100%);
   --grad-hero:linear-gradient(140deg,#241E17 0%,#332A20 46%,#4A3220 100%);
-  --blob-cool1:hsla(22,90%,58%,.5);--blob-cool2:hsla(30,55%,45%,.22);
+
   /* ── JourneyHero time-of-day scene ── stops tuned against the measured
      worst case (sand labels rgba(217,201,184,.9) on a .10 translucent chip
      over the lightest stop): 4.62:1 there, ≥7.7:1 for the cream #FBF3EA
@@ -92,7 +143,7 @@
   --hero-ink:#FBF3EA;                    /* primary text on the hero */
   --hero-ink2:rgba(217,201,184,.92);     /* secondary labels on the hero */
   --hero-veil:rgba(255,244,235,.08);     /* chip / tile wash */
-  --hero-veil2:rgba(255,244,235,.12);    /* pressed / emphasised wash */
+      /* pressed / emphasised wash */
   --hero-line:rgba(255,244,235,.14);     /* hairline + empty ring track */
   --hero-hi:rgba(255,244,235,.08);       /* inset top highlight */
   /* Ink on --grad-primary (deep burnt orange in both themes): 8.9:1 */
@@ -104,42 +155,85 @@
         headings in this app are Arabic UI chrome, not a separate face. ── */
   --font-latin: 'Inter', system-ui, sans-serif;
   --font-arabic: 'Tajawal', system-ui, sans-serif;
-  --font-ar: var(--font-arabic);
+
   --font-display: var(--font-arabic);
-  /* Weight scale: body 400 · headings 600 · CTAs/buttons 700.
-     Tajawal's static (non-variable) build only ships 400/700 — there is no
-     600 face. A font-weight:600 request therefore resolves, per the CSS
-     Fonts matching algorithm, to the nearest *heavier* loaded face (700).
-     Headings still read var(--fw-heading) everywhere (single source of
-     truth, and correct the moment a 600 face is ever added) even though
-     today they render visually identical to CTA weight. */
+  /* ── Weight ladder — four steps, and every one of them now RENDERS. ──
+     Tajawal has no 600 face at all (the family ships 200/300/400/500/700/
+     800/900), so --fw-heading resolves per the CSS font-matching algorithm
+     to the nearest heavier loaded face: 700. That is intentional and stays —
+     Arabic needs more optical weight than Latin to read as emphatic, so the
+     same token gives Tajawal 700 and Inter 600, which is the correct pairing
+     rather than an accident.
+     --fw-medium is the step that was BROKEN: 500 was declared at 19 call
+     sites while only 400/700 were imported, so every one of them silently
+     rendered as body text and the interface had two visible weights, not
+     four. main.tsx now imports tajawal/500 (Inter already ships 500), which
+     is what turns this ladder on. */
   --fw-body: 400;
+  --fw-medium: 500;
   --fw-heading: 600;
   --fw-cta: 700;
   /* Arabic body copy: taller line-height for comfortable reading + zero
      letter-spacing (tracking distorts joined Arabic letterforms). Latin/nl
      content overrides both back to Western defaults via :lang(nl). */
-  --lh-arabic: 1.8;
+  /* 1.7, not 1.8. This is not taste: 44 component call sites had already
+     overridden the old 1.8 body value down to 1.55-1.75 (median ~1.65), which
+     is the app telling us what it actually wants, and it sits inside the
+     1.6-1.8 range Arabic body copy needs for tashkeel and joined forms.
+     One prose line-height instead of a body value nobody used plus a
+     component value everybody re-typed. Revert = this one number. */
+  --lh-arabic: 1.7;
   --ls-arabic: 0;
-  --text-xs: 0.8125rem;   /* 13px */
-  --text-sm: 0.875rem;    /* 14px */
-  --text-base: 1rem;      /* 16px */
-  --text-md: 1.0625rem;   /* 17px — exam passage body */
-  --text-xl: clamp(1.25rem, 2.2vw, 1.625rem);  /* 20–26px section titles */
-  --text-2xl: clamp(1.75rem, 3vw, 2.25rem);    /* 28–36px card numbers */
+  /* Line height by role. Arabic body needs 1.6-1.8 because tashkeel and the
+     connected script extend well above and below the baseline; headings and
+     single-line numerics must NOT inherit that or they float apart. */
+  --lh-heading: 1.3;
+  --lh-tight: 1.15;
+  --lh-ui: 1.5;
+  --lh-none: 1;      /* numeric displays: clocks, counters, big figures */
+  /* ── Type scale ── nine steps, derived from the app's real distribution
+     (530 sizing declarations spread over 43 ad-hoc values before this).
+     Every px note below assumes --font-size-base: 16px, which is now also
+     the store default — the two used to disagree (16 here, 15 forced by
+     TopBar) so every comment in this block was wrong by 6.7%.
+     --text-2xs is a hard FLOOR: Arabic carries diacritics and joined forms
+     that stop resolving below ~12px, and 137 declarations sat under it. */
+  --text-2xs: 0.75rem;    /* 12px — floor: chip counts, badge meta */
+  --text-xs: 0.8125rem;   /* 13px — captions, helper text, table meta */
+  --text-sm: 0.875rem;    /* 14px — secondary body, buttons, labels */
+  --text-base: 1rem;      /* 16px — body */
+  --text-md: 1.0625rem;   /* 17px — exam passage body (Dutch, Inter) */
+  --text-lg: 1.1875rem;   /* 19px — lead / sub-heading */
+  --text-xl: 1.375rem;    /* 22px — card heading, inline edit field */
+  /* Fluid steps are written as `rem + vw`, never as bare `vw`. A pure-vw
+     middle term ignores the root font size, so the A-/A+ control in the top
+     bar would move every fixed step and leave these two frozen — the user
+     asks for larger text and the headings refuse (WCAG 1.4.4). The rem term
+     tracks the preference; the vw term adds the viewport response.
+     Solved so each step hits its minimum at a 360px viewport and its
+     maximum at 1200px. */
+  --text-2xl: clamp(1.5rem, 1.393rem + 0.476vw, 1.75rem);   /* 24–28px — section <h2>, KPI numbers */
+  --text-3xl: clamp(1.75rem, 1.536rem + 0.952vw, 2.25rem);  /* 28–36px — display: flashcard word, hero */
+  --text-4xl: clamp(2.25rem, 1.821rem + 1.905vw, 3.25rem);  /* 36–52px — the study-block timer, the one true display element */
+  /* ── Glyph scale ── emoji used AS ICONS were being sized off the type
+     scale, which is most of why that scale had 43 values. They are artwork,
+     not text: they never need a reading size, and they must not drag the
+     type ramp around. Kept separate on purpose. */
+  --glyph-sm: 1.25rem;    /* 20px — inline inside a line of text */
+  --glyph-md: 1.625rem;   /* 26px — list / card icon */
+  --glyph-lg: 2.375rem;   /* 38px — modal header, empty state, error screen */
   /* ── Spotlight / interactive-card ── */
   --spot-color: rgba(224,122,62,.13);        /* brand glow, light — low opacity keeps WCAG AA */
   --card-fg-hover: #211D17;                  /* slightly deeper than --text; ≥4.5:1 on hover bg */
-  --card-accent-hover: var(--orange-d);      /* #C96A32 — same accent, darker shade */
+        /* #C96A32 — same accent, darker shade */
   /* ── Inburgering "passed" state — folded into --green (success), which is
         itself the orange/brown family darkened to ≥4.5:1 (measured 5.0:1 on
         --bg, 4.64:1 on the glass card wash) ── */
-  --pass-bg:var(--green-l);--pass-border:rgba(150,93,59,.3);--pass-text:var(--green);
+  --pass-bg:var(--green-l);--pass-border:rgba(150,93,59,.3);--pass-text:var(--green-text);
   --pass-btn-bg:rgba(150,93,59,.22);--pass-btn-border:rgba(150,93,59,.45);
   /* ── Exam countdown card — now just the standard glass card recipe above,
         with --orange-ink for AA-safe text (4.62:1 on the card wash) ── */
-  --countdown-bg:var(--glass-bg);--countdown-border:var(--glass-border);--countdown-text:var(--orange-ink);
-  --countdown-accent-bg:rgba(224,122,62,.15);--countdown-accent-border:rgba(224,122,62,.3);
+
   /* ── Katja's 3D contact shadow — decorative only (never behind text), so it
         is tuned for depth, not contrast ── */
   --mascot-shadow:rgba(40,30,20,.32);
@@ -149,7 +243,7 @@
   --bg:#1A1A1A;--surface:rgba(44,38,32,.55);--surface2:rgba(44,38,32,.4);--surface3:#2C2620;
   --border:rgba(255,244,235,.10);--border2:rgba(255,244,235,.18);
   /* --muted lightened from #92908D for the same reason on dark surfaces. */
-  --text:#F5F0EB;--text2:#B8B4B0;--muted:#999895;--muted2:#575655;
+  --text:#F5F0EB;--text2:#B8B4B0;--muted:#999895;
   --orange:#E07A3E;--orange-d:#E89E72;--orange-l:#422210;--orange-m:#914E27;
   /* Dark theme: --orange already clears AA as TEXT on --bg (5.82:1), so no
      darkening is needed for that use. --orange-ink is still needed here —
@@ -165,14 +259,14 @@
   --green-text:#BE8F74;
   --red-text:#E97A3A;
   --amber-text:#E97A3A;
+  --blue-text:#A4968E;
+  --purple-text:#BF8E82;
   --purple:#B88274;--purple-l:rgba(184,130,116,.18);
   --red:#E66B23;--red-l:rgba(230,107,35,.18);
   --teal:var(--green);--teal-l:var(--green-l);
-  --c1:#843E15;--c2:#B0531C;--c3:#DC6823;--c4:#E3864F;--c5:#EAA47B;--c6:#F1C2A7;
-  --shadow-sm:0 1px 2px rgba(0,0,0,.5), 0 2px 10px rgba(0,0,0,.4);
-  --shadow:0 8px 24px rgba(0,0,0,.55), 0 3px 8px rgba(0,0,0,.4);
-  --shadow-lg:0 28px 64px rgba(0,0,0,.65), 0 12px 28px rgba(0,0,0,.5);
-  --hero-bg:#1E1A16;
+  --ui-blue:#5FB2EA;--ui-blue-text:#B9E1FF;--ui-blue-l:rgba(53,132,190,.26);
+  --ui-green:#70D49A;--ui-green-text:#B9F0CC;--ui-green-l:rgba(45,136,85,.28);
+
   --topbar-bg:rgba(224,122,62,.10);
   --overlay-bg:rgba(6,5,4,.6);
   --mesh1:hsla(22,70%,58%,.22);--mesh2:hsla(22,55%,48%,.16);--mesh3:hsla(30,70%,55%,.14);
@@ -190,7 +284,7 @@
      intentionally identical rather than brightened for dark mode. */
   --grad-primary:linear-gradient(135deg,#B9571E 0%,#8D4217 100%);
   --grad-hero:linear-gradient(140deg,#141210 0%,#1E1A16 50%,#2E2013 100%);
-  --blob-cool1:hsla(22,90%,58%,.5);--blob-cool2:hsla(30,55%,45%,.18);
+
   /* JourneyHero phases, dark theme: same hues one step deeper — text
      contrast only improves relative to the light-theme values above. */
   --hero-dawn:linear-gradient(160deg,#261A2B 0%,#3E242E 55%,#4E3127 100%);
@@ -203,15 +297,14 @@
   /* ── Spotlight / interactive-card ── */
   --spot-color: rgba(224,122,62,.18);        /* brighter on dark bg */
   --card-fg-hover: #FBF6F0;                  /* slightly brighter than --text; ≥4.5:1 on hover bg */
-  --card-accent-hover: var(--orange-d);      /* #E89E72 in dark theme */
+        /* #E89E72 in dark theme */
   /* ── Inburgering "passed" state (dark) — folded into --green (5.39:1 on
         --bg, 4.54:1 on the glass card wash) ── */
-  --pass-bg:var(--green-l);--pass-border:rgba(183,132,102,.4);--pass-text:var(--green);
+  --pass-bg:var(--green-l);--pass-border:rgba(183,132,102,.4);--pass-text:var(--green-text);
   --pass-btn-bg:rgba(183,132,102,.24);--pass-btn-border:rgba(183,132,102,.5);
   /* ── Exam countdown card (dark) — standard glass card recipe; the base
         orange already clears AA here so --countdown-text just reuses it ── */
-  --countdown-bg:var(--glass-bg);--countdown-border:var(--glass-border);--countdown-text:var(--orange);
-  --countdown-accent-bg:rgba(224,122,62,.15);--countdown-accent-border:rgba(224,122,62,.3);
+
   /* Deeper on the dark page so the icon still reads as lifted off the surface */
   --mascot-shadow:rgba(0,0,0,.55);
 }

@@ -1,0 +1,332 @@
+/* ── Design-system primitives ──────────────────────────────────────────────
+   One definition per control, composed by the React wrappers in
+   src/components/ui/. Screens use these instead of restyling a <button>
+   inline, so a state (hover, pressed, disabled, selected, focus) is designed
+   once and behaves the same everywhere. Colours come from tokens.css only.
+
+   Motion here is transform / colour only — never a layout property — so it
+   stays on the compositor (src/tests/unit/motion-budget.test.ts). */
+
+/* ── Button ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-block-size: var(--tap-min);
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--btn-border);
+  border-radius: var(--r-sm);
+  background: var(--btn-bg);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--fw-heading);
+  line-height: var(--lh-ui);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .1s ease;
+}
+.btn:hover:not(:disabled) { border-color: var(--orange); }
+.btn:active:not(:disabled) { transform: scale(.98); }
+.btn:disabled { cursor: not-allowed; opacity: .6; }
+.btn[aria-busy='true'] { cursor: progress; }
+
+.btn--primary {
+  background: var(--grad-primary);
+  border-color: transparent;
+  color: var(--on-primary);
+  box-shadow: var(--elev-1);
+}
+.btn--primary:hover:not(:disabled) { border-color: transparent; box-shadow: var(--elev-2); }
+
+.btn--ghost { background: transparent; border-color: var(--border2); color: var(--text2); }
+.btn--ghost:hover:not(:disabled) { color: var(--text); }
+
+.btn--lg {
+  min-block-size: 52px;
+  padding: var(--sp-3) var(--sp-6);
+  font-size: var(--text-base);
+  font-weight: var(--fw-cta);
+}
+.btn--block { inline-size: 100%; }
+
+/* ── Segmented control (view switch inside a screen) ──
+   Wraps instead of scrolling: a hidden horizontal scrollbar cut labels such
+   as "الاستماع (Luisteren)" mid-word with nothing saying there was more. */
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+  padding: var(--sp-1);
+  margin-block-end: var(--sp-4);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-sm);
+  background: var(--glass-bg);
+}
+.segmented > button {
+  flex: 1 1 auto;
+  min-block-size: var(--tap-min);
+  padding: var(--sp-2) var(--sp-3);
+  border: 0;
+  border-radius: var(--r-xs);
+  background: transparent;
+  color: var(--text2);
+  font: inherit;
+  font-size: var(--text-sm);
+  line-height: var(--lh-ui);
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+.segmented > button:hover { color: var(--text); }
+.segmented > button[aria-pressed='true'] {
+  background: var(--surface);
+  color: var(--orange-text);
+  font-weight: var(--fw-heading);
+  box-shadow: var(--elev-1);
+}
+
+/* ── Progress bar ── the fill scales, it never animates width. */
+.progress {
+  block-size: 8px;
+  border-radius: var(--r-pill);
+  background: var(--surface3);
+  overflow: hidden;
+}
+.progress > span {
+  display: block;
+  block-size: 100%;
+  inline-size: 100%;
+  border-radius: inherit;
+  background: var(--orange);
+  transform-origin: right center;
+  transition: transform .35s ease;
+}
+[dir='ltr'] .progress > span { transform-origin: left center; }
+
+/* ── Chip (level, article, status) ── every tone is paired with text, and
+   state chips with an icon, so colour is never the only signal. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-pill);
+  background: var(--surface3);
+  color: var(--text2);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-heading);
+  line-height: var(--lh-ui);
+  white-space: nowrap;
+}
+.chip--brand { background: var(--orange-l); color: var(--orange-text); }
+.chip--success { background: var(--green-l); color: var(--green-text); }
+.chip--info { background: var(--blue-l); color: var(--blue-text); }
+.chip--warn { background: var(--amber-l); color: var(--amber-text); }
+
+/* ── Card ── the one quiet surface every learning screen sits on. */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: var(--sp-4);
+  box-shadow: var(--elev-1);
+}
+.card + .card { margin-block-start: var(--sp-3); }
+
+/* ── Reference-style home overview ──────────────────────────────────────── */
+.home-overview {
+  margin-block-end: var(--sp-4);
+  padding: var(--sp-5);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r);
+  background: var(--surface);
+  box-shadow: var(--elev-1);
+}
+.home-overview__heading,
+.home-week__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+.home-overview h1,
+.home-week h2 { margin: 0; color: var(--text); font-size: var(--text-2xl); font-weight: var(--fw-cta); line-height: var(--lh-heading); }
+.home-overview__subtitle { margin: var(--sp-1) 0 0; color: var(--text2); font-size: var(--text-sm); line-height: var(--lh-arabic); }
+.home-level { display: inline-flex; flex-direction: column; align-items: center; gap: var(--sp-1); min-inline-size: 76px; padding: var(--sp-2) var(--sp-3); border: 1px solid var(--ui-blue); border-radius: var(--r-sm); background: var(--ui-blue-l); color: var(--ui-blue-text); font-size: var(--text-2xs); font-weight: var(--fw-heading); text-align: center; }
+.home-level__value { font-size: var(--text-xl); line-height: 1; }
+.home-overview__progress { margin-block-start: var(--sp-5); padding: var(--sp-3); border-radius: var(--r-sm); background: var(--surface2); }
+.home-overview__progress-label { display: flex; justify-content: space-between; gap: var(--sp-3); color: var(--text2); font-size: var(--text-sm); font-weight: var(--fw-heading); }
+.home-overview__progress-label strong { color: var(--ui-blue-text); }
+.home-overview__progress .progress { margin-block-start: var(--sp-2); background: var(--surface3); }
+.home-overview__progress-fill { background: var(--ui-blue) !important; transform-origin: right center; }
+.home-overview__progress p { margin: var(--sp-2) 0 0; color: var(--muted); font-size: var(--text-xs); }
+.home-overview__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-2); margin-block-start: var(--sp-4); }
+.home-stat { display: flex; flex-direction: column; align-items: center; gap: var(--sp-1); padding: var(--sp-2); border-inline-end: 1px solid var(--border); text-align: center; }
+.home-stat:last-child { border-inline-end: 0; }
+.home-stat strong { color: var(--text); font-size: var(--text-lg); line-height: 1; }
+.home-stat span { color: var(--text2); font-size: var(--text-2xs); }
+.home-stat:nth-child(3) { border-radius: var(--r-sm); background: var(--ui-green-l); border-block-end: 2px solid var(--ui-green); }
+.home-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); margin-block-end: var(--sp-4); }
+.home-action-card { display: flex; align-items: center; gap: var(--sp-3); min-block-size: 72px; padding: var(--sp-3); border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); box-shadow: var(--elev-1); color: var(--text); font: inherit; text-align: start; cursor: pointer; transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease; }
+.home-action-card:hover { transform: translateY(-2px); border-color: var(--ui-blue); box-shadow: var(--elev-2); }
+.home-action-card:focus-visible { outline: 3px solid var(--ui-blue); outline-offset: 2px; }
+.home-action-card__icon { display: inline-flex; align-items: center; justify-content: center; inline-size: 44px; block-size: 44px; flex-shrink: 0; border-radius: var(--r-sm); }
+.home-action-card__icon--blue { background: var(--ui-blue-l); color: var(--ui-blue-text); }
+.home-action-card__icon--orange { background: var(--orange-l); color: var(--orange-text); }
+.home-action-card__copy { display: flex; min-inline-size: 0; flex-direction: column; gap: var(--sp-1); }
+.home-action-card__copy strong { font-size: var(--text-sm); }
+.home-action-card__copy span { overflow-wrap: anywhere; color: var(--text2); font-size: var(--text-xs); }
+.home-week { margin-block-end: var(--sp-4); }
+.home-week__heading { align-items: center; }
+.home-week__heading .btn { flex-shrink: 0; }
+.home-week__chart { display: flex; align-items: end; justify-content: space-between; gap: var(--sp-2); block-size: 104px; margin-block-start: var(--sp-4); padding-inline: var(--sp-1); }
+.home-week__day { display: flex; flex: 1; block-size: 100%; flex-direction: column; align-items: center; justify-content: end; gap: var(--sp-1); color: var(--text2); font-size: var(--text-2xs); }
+.home-week__bar-track { display: flex; align-items: end; inline-size: min(22px, 100%); block-size: 80px; overflow: hidden; border-radius: var(--r-pill); background: var(--ui-blue-l); }
+.home-week__bar { display: block; inline-size: 100%; border-radius: var(--r-pill); background: var(--ui-blue); }
+.home-legacy-hero { display: none; }
+.vocab-overview { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-5); margin-block-end: var(--sp-4); padding: var(--sp-5); border: 1px solid var(--glass-border); border-radius: var(--r); background: var(--surface); box-shadow: var(--elev-1); }
+.vocab-overview h1, .vocab-session-heading h1 { margin: 0; color: var(--text); font-size: var(--text-2xl); font-weight: var(--fw-cta); line-height: var(--lh-heading); }
+.vocab-overview p:not(.eyebrow), .vocab-session-heading p:not(.eyebrow) { margin: var(--sp-1) 0 0; color: var(--text2); font-size: var(--text-sm); line-height: var(--lh-arabic); }
+.vocab-overview__stats { display: grid; grid-template-columns: repeat(3, minmax(72px, 1fr)); gap: var(--sp-2); min-inline-size: min(52%, 320px); }
+.vocab-overview__stats > div { display: flex; flex-direction: column; align-items: center; gap: var(--sp-1); padding: var(--sp-2); border-radius: var(--r-sm); background: var(--surface2); color: var(--ui-blue-text); text-align: center; }
+.vocab-overview__stats > div:nth-child(2) { color: var(--orange-text); }
+.vocab-overview__stats > div:nth-child(3) { color: var(--ui-green-text); }
+.vocab-overview__stats strong { color: var(--text); font-size: var(--text-lg); line-height: 1; }
+.vocab-overview__stats span { color: var(--text2); font-size: var(--text-2xs); }
+.vocab-session-heading { margin-block-end: var(--sp-4); }
+.word-meaning-visual {
+  display: grid;
+  place-items: center;
+  flex: 0 0 76px;
+  inline-size: 76px;
+  block-size: 76px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-sm);
+  background: var(--surface2);
+  box-shadow: var(--elev-1);
+  font-size: 2.5rem;
+  line-height: 1;
+}
+.word-meaning-visual span { display: block; transform: translateY(-1px); }
+.word-meaning-visual img { inline-size: 100%; block-size: 100%; object-fit: cover; border-radius: inherit; }
+.flashcard-shell { max-inline-size: 520px; margin-inline: auto; text-align: center; }
+@media (max-width: 480px) {
+  .home-overview { padding: var(--sp-4); }
+  .home-overview__heading { gap: var(--sp-2); }
+  .home-overview__subtitle { max-inline-size: 22ch; }
+  .home-level { min-inline-size: 64px; padding-inline: var(--sp-2); }
+  .home-actions { grid-template-columns: 1fr; }
+  .home-week__heading .btn { padding-inline: var(--sp-2); }
+  .vocab-overview { flex-direction: column; padding: var(--sp-4); }
+  .vocab-overview__stats { inline-size: 100%; min-inline-size: 0; }
+  .word-meaning-visual { flex-basis: 64px; inline-size: 64px; block-size: 64px; font-size: 2rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-action-card { transition: none; }
+  .home-action-card:hover { transform: none; }
+}
+
+/* ── Eyebrow ── the small "where am I" label above a heading. */
+.eyebrow {
+  margin: 0 0 var(--sp-1);
+  color: var(--text2);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-heading);
+  line-height: var(--lh-ui);
+}
+
+/* ── Answer choice ── one control for every multiple-choice question.
+   States are carried by an icon + text + border style, not colour alone:
+   the brand palette folds success and error into one hue family. */
+.choice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  inline-size: 100%;
+  min-block-size: 48px;
+  padding: var(--sp-3);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-base);
+  line-height: var(--lh-ui);
+  text-align: start;
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.choice:hover:not(:disabled) { border-color: var(--orange); }
+.choice:disabled { cursor: default; }
+.choice__mark {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 28px;
+  block-size: 28px;
+  border: 1px solid var(--border2);
+  border-radius: var(--r-full);
+  color: var(--text2);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-cta);
+}
+.choice[data-state='correct'] { border: 2px solid var(--green); background: var(--green-l); }
+.choice[data-state='correct'] .choice__mark { border: 2px solid var(--green); color: var(--green-text); }
+.choice[data-state='wrong'] { border: 2px dashed var(--red); background: var(--red-l); }
+.choice[data-state='wrong'] .choice__mark { border-color: var(--red); color: var(--red-text); }
+.choice[data-state='muted'] { opacity: .75; }
+
+/* ── Dialogue bubbles ── the other person on the reading side (start),
+   the learner on the far side, as in an RTL chat app. The Dutch inside each
+   bubble keeps its own LTR direction. */
+.dialogue {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-4);
+  padding: 0;
+  list-style: none;
+}
+.bubble {
+  max-inline-size: min(34rem, 88%);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+.bubble--other { align-self: flex-start; border-start-start-radius: var(--r-2xs); }
+.bubble--me {
+  align-self: flex-end;
+  border-start-end-radius: var(--r-2xs);
+  background: var(--orange-l);
+  border-color: var(--orange-m);
+}
+.bubble__who {
+  display: block;
+  margin-block-end: var(--sp-1);
+  color: var(--text2);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-heading);
+}
+.bubble__nl {
+  margin: 0;
+  font-family: var(--font-latin);
+  font-size: var(--text-base);
+  line-height: var(--lh-ui);
+  overflow-wrap: anywhere;
+}
+
+/* ── Dutch reading text ── comfortable measure and leading for passages. */
+.reading-text {
+  max-inline-size: 68ch;
+  font-family: var(--font-latin);
+  font-size: var(--text-md);
+  line-height: var(--lh-arabic);
+  color: var(--text);
+}
+.reading-text p { margin: 0 0 var(--sp-3); }
+.reading-text p:last-child { margin-block-end: 0; }

@@ -22,8 +22,13 @@ export interface MockRun {
 }
 /* ── برنامج الدراسة (منهج الكتب الثلاثة على أيام محدودة) ──
    Mirrors the shapes in features/plan/*. Kept declared here, import-free, the
-   same way MockSessionState mirrors features/exam/mock — a drift between the
-   two surfaces as a type error at the store boundary. */
+   same way MockSessionState mirrors features/exam/mock.
+
+   What that actually guarantees, stated precisely: this slice is passed to
+   buildProgramView (as ProgramViewInput) from ProgramPanel, so a change here
+   that stops satisfying what the plan layer requires is a compile error at
+   that call site. It does NOT catch a field added on one side only and never
+   passed across — that still needs a human. */
 
 export type LessonStatusKey = 'new' | 'learning' | 'done' | 'review' | 'weak' | 'mastered'
 
@@ -72,7 +77,7 @@ export interface StudyProgramState {
 
 export type ThemeKey = 'light' | 'dark'
 export type TtsEngine = 'auto' | 'online' | 'browser'
-export type TabId = 'dashboard' | 'plan' | 'vocab' | 'books' | 'exam' | 'exercises' | 'grammar' | 'stats' | 'resources' | 'platform'
+export type TabId = 'dashboard' | 'plan' | 'vocab' | 'books' | 'exam' | 'exercises' | 'situations' | 'grammar' | 'stats' | 'resources' | 'platform'
 export type PlanHealthStatus = 'ok' | 'tight' | 'crit'
 
 export interface VocabWord {

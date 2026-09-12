@@ -23,12 +23,12 @@ export function ExamDateModal({ onClose, onSave, currentDate }: Props) {
   return (
     <Overlay onClose={onClose} label="تحديد موعد امتحان NT2">
       <Reveal>
-        <div style={{ textAlign: 'center', marginBottom: 14 }}>
-          <div style={{ fontSize: '2.4rem' }}>📅</div>
-          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: '6px 0 4px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 'var(--sp-3)' }}>
+          <div style={{ fontSize: 'var(--glyph-lg)' }}>📅</div>
+          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-xl)', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: '6px 0 4px' }}>
             متى موعد امتحانك؟
           </h3>
-          <p style={{ color: 'var(--muted)', fontSize: '.86rem', margin: 0 }}>
+          <p style={{ color: 'var(--muted)', fontSize: 'var(--text-sm)', margin: 0 }}>
             حدّد التاريخ لنبدأ العدّ التنازلي الحقيقي حتى يوم الامتحان.
           </p>
         </div>
@@ -43,7 +43,7 @@ export function ExamDateModal({ onClose, onSave, currentDate }: Props) {
         />
       </Field>
 
-      <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 18 }}>
+      <div style={{ display: 'flex', gap: 'var(--sp-3)', justifyContent: 'flex-end', marginTop: 'var(--sp-4)' }}>
         <button onClick={onClose} className="btn-shine" style={btnStyle('ghost')}>إلغاء</button>
         <button
           onClick={save}

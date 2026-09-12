@@ -1,0 +1,65 @@
+# Runs every quality gate automatically, so nobody has to remember them.
+#
+# The project has no other CI. Until now the only thing standing between a
+# broken change and the live site was the owner remembering to run seven
+# commands by hand. This runs them on every push and pull request instead.
+#
+# check:rls is deliberately NOT here: it needs a reachable backend and would
+# fail for reasons that have nothing to do with the change being tested.
+name: Checks
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+# A new push to the same branch makes the previous run pointless.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          # Only the latest commit. The repository carries ~283 MB of exam
+          # media in its history, and a full clone would spend minutes on
+          # versions no gate looks at.
+          fetch-depth: 1
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install exactly what the lockfile says
+        run: npm ci
+
+      # Each gate is its own step so a failure names itself in the summary
+      # instead of hiding inside one long log.
+      - name: Types
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Tests
+        run: npm test
+
+      - name: ASCII digits only
+        run: npm run check:digits
+
+      - name: Exam files present
+        run: npm run check:exams
+
+      - name: Agent briefs are accurate
+        run: npm run check:docs
+
+      - name: Production build
+        run: npm run build

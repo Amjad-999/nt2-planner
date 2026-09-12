@@ -33,11 +33,11 @@ const KIND_COLOR: Record<DayKind, string> = {
 
 const TH: React.CSSProperties = {
   padding: '9px 10px', textAlign: 'start', borderBottom: '1px solid var(--border)',
-  color: 'var(--muted)', fontWeight: 500, fontSize: '.76rem', letterSpacing: '.3px', whiteSpace: 'nowrap',
+  color: 'var(--muted)', fontWeight: 'var(--fw-medium)', fontSize: 'var(--text-xs)', letterSpacing: '.3px', whiteSpace: 'nowrap',
 }
 
 const TD: React.CSSProperties = {
-  padding: '9px 10px', borderBottom: '1px solid var(--border)', fontSize: '.83rem', color: 'var(--text2)',
+  padding: '9px 10px', borderBottom: '1px solid var(--border)', fontSize: 'var(--text-sm)', color: 'var(--text2)',
 }
 
 function lessonRange(day: ScheduledDay): { book: string; section: string; nums: string } {
@@ -76,13 +76,13 @@ export function ProgramSchedule({ days, lessons, todayKey, minutesOf }: {
     <section
       aria-label="الجدول الكامل"
       style={{
-        padding: '18px 22px 20px', marginBottom: 18,
+        padding: '18px 22px 20px', marginBottom: 'var(--sp-4)',
         background: 'var(--surface)', border: '1px solid var(--border)',
         borderRadius: 'var(--r)', boxShadow: 'var(--elev-1)',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-        <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--sp-3)', flexWrap: 'wrap' }}>
+        <h3 style={{ margin: 0, fontSize: 'var(--text-md)', fontWeight: 'var(--fw-cta)', color: 'var(--text)' }}>
           الجدول الكامل — {countAr(days.length, AR_DAY)}
         </h3>
         <button
@@ -90,8 +90,8 @@ export function ProgramSchedule({ days, lessons, todayKey, minutesOf }: {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           style={{
-            minHeight: 40, padding: '6px 14px', borderRadius: 11, cursor: 'pointer',
-            fontFamily: 'inherit', fontSize: '.86rem',
+            minHeight: 40, padding: '6px 14px', borderRadius: 'var(--r-sm)', cursor: 'pointer',
+            fontFamily: 'inherit', fontSize: 'var(--text-sm)',
             background: 'var(--btn-bg)', border: '1px solid var(--border2)', color: 'var(--text2)',
           }}
         >
@@ -99,12 +99,12 @@ export function ProgramSchedule({ days, lessons, todayKey, minutesOf }: {
         </button>
       </div>
 
-      <p style={{ margin: '8px 0 0', fontSize: '.86rem', color: 'var(--text2)', lineHeight: 1.7 }}>
+      <p style={{ margin: '8px 0 0', fontSize: 'var(--text-sm)', color: 'var(--text2)', lineHeight: 'var(--lh-arabic)' }}>
         {countAr(totals.lessons, AR_LESSON)} · تركيز {formatMinutes(totals.focus)} · بالوقت الجداري {formatMinutes(totals.wall)}
       </p>
 
       {open && (
-        <div style={{ overflowX: 'auto', marginTop: 12 }}>
+        <div style={{ overflowX: 'auto', marginTop: 'var(--sp-3)' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 760 }}>
             <thead>
               <tr>
@@ -134,7 +134,7 @@ export function ProgramSchedule({ days, lessons, todayKey, minutesOf }: {
                       {d.dayKey}{isToday && <span style={{ color: 'var(--orange-text)' }}> · اليوم</span>}
                     </td>
                     <td style={{ ...TD, whiteSpace: 'nowrap' }}>
-                      <span aria-hidden style={{ color: KIND_COLOR[d.kind], marginInlineEnd: 5 }}>{KIND_ICON[d.kind]}</span>
+                      <span aria-hidden style={{ color: KIND_COLOR[d.kind], marginInlineEnd: 'var(--sp-1)' }}>{KIND_ICON[d.kind]}</span>
                       {KIND_AR[d.kind]}
                     </td>
                     <td style={TD}>{book}</td>

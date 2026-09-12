@@ -11,7 +11,10 @@
     "preview": "vite preview",
     "check:exams": "node scripts/check-exams.mjs",
     "check:digits": "node scripts/check-digits.mjs",
-    "test": "vitest run"
+    "check:rls": "node scripts/check-rls.mjs",
+    "check:docs": "node scripts/check-docs.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "test": "node scripts/run-vitest.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

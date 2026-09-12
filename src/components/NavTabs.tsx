@@ -1,134 +1,87 @@
-import { useRef, useEffect, useCallback } from 'react'
+﻿import { useRef, type KeyboardEvent } from 'react'
 import { useAppStore } from '@/store/useAppStore'
-import { useFocusMode } from '@/hooks/useFocusMode'
 import type { TabId } from '@/store/types'
 import { AppIcon } from './AppIcon'
-import type { LiteIcon } from './icons'
-import {
-  SquaresFour, CalendarCheck, Translate, BookOpen,
-  ClipboardText, GameController, TextAa, ChartLineUp, Globe, Star,
-} from './icons'
+import { SquaresFour, BookOpen, PencilSimple, Translate, ChartLineUp } from './icons'
 
-/* رموز جغرافية توضيحية: 🇳🇱 محتوى هولندي · 🎯 متعلّق بالامتحان ·
-   📍 موقعك/تقدّمك الحالي · 🌍 عام/شامل (مصادر خارجية أو نظرة عامة) */
-const TABS: { id: TabId; Icon: LiteIcon; label: string; geo: string }[] = [
-  { id: 'dashboard', Icon: SquaresFour,   label: 'لوحة التحكم',     geo: '🌍' },
-  { id: 'plan',      Icon: CalendarCheck, label: 'الخطة',            geo: '📍' },
-  { id: 'vocab',     Icon: Translate,     label: 'المفردات + AI',   geo: '🇳🇱' },
-  { id: 'books',     Icon: BookOpen,      label: 'الكتب',            geo: '🇳🇱' },
-  { id: 'exam',      Icon: ClipboardText, label: 'محاكاة الامتحان', geo: '🎯' },
-  { id: 'exercises', Icon: GameController,label: 'تمارين',           geo: '🇳🇱' },
-  { id: 'grammar',   Icon: TextAa,        label: 'قواعد',            geo: '🇳🇱' },
-  { id: 'stats',     Icon: ChartLineUp,   label: 'التحليلات',        geo: '📍' },
-  { id: 'resources', Icon: Globe,         label: 'مصادر DUO',       geo: '🌍' },
-  { id: 'platform',  Icon: Star,          label: 'منصّتي',           geo: '🌍' },
-]
+const GROUPS = [
+  { id: 'home', label: 'الرئيسية', Icon: SquaresFour, tabs: ['dashboard', 'resources', 'platform'] },
+  { id: 'learn', label: 'تعلّم', Icon: BookOpen, tabs: ['plan', 'grammar', 'books'] },
+  { id: 'practice', label: 'تدرّب', Icon: PencilSimple, tabs: ['exercises', 'situations', 'exam'] },
+  { id: 'words', label: 'المفردات', Icon: Translate, tabs: ['vocab'] },
+  { id: 'progress', label: 'تقدّمي', Icon: ChartLineUp, tabs: ['stats'] },
+] satisfies { id: string; label: string; Icon: typeof BookOpen; tabs: TabId[] }[]
+
+const LABELS: Record<TabId, string> = {
+  dashboard: 'اليوم', resources: 'المصادر', platform: 'منصّتي',
+  plan: 'خطة الدراسة', grammar: 'مسار القواعد', books: 'الكتب',
+  exercises: 'تدريب يومي', situations: 'مواقف يومية', exam: 'تدريب الامتحان', vocab: 'المفردات', stats: 'تقدّمي',
+}
 
 export function NavTabs() {
   const activeTab = useAppStore((s) => s.activeTab)
   const setActiveTab = useAppStore((s) => s.setActiveTab)
-  const { focusMode } = useFocusMode()
-  const navRef = useRef<HTMLElement>(null)
-  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
-  const indicatorRef = useRef<HTMLSpanElement>(null)
+  const refs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const remembered = useRef<Record<string, TabId>>({})
+  const active = GROUPS.find((group) => group.tabs.some((tab) => tab === activeTab)) ?? GROUPS[0]
 
-  const moveIndicatorTo = useCallback((btn: HTMLButtonElement | null) => {
-    const ind = indicatorRef.current
-    if (!ind || !btn) return
-    const pad = 12
-    ind.style.left = `${btn.offsetLeft + pad}px`
-    ind.style.width = `${btn.offsetWidth - pad * 2}px`
-    ind.style.opacity = '1'
-  }, [])
+  const select = (tab: TabId) => {
+    remembered.current[active.id] = activeTab
+    setActiveTab(tab)
+  }
 
-  useEffect(() => {
-    moveIndicatorTo(tabRefs.current[activeTab])
-  }, [activeTab, moveIndicatorTo])
-
-  useEffect(() => {
-    const btn = tabRefs.current[activeTab]
-    btn?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })
-  }, [activeTab])
-
-  const handleKeyDown = (e: React.KeyboardEvent, idx: number) => {
-    const tabs = TABS
-    if (e.key === 'ArrowRight') {
-      e.preventDefault()
-      const prev = tabs[(idx - 1 + tabs.length) % tabs.length]
-      setActiveTab(prev.id)
-      tabRefs.current[prev.id]?.focus()
-    } else if (e.key === 'ArrowLeft') {
-      e.preventDefault()
-      const next = tabs[(idx + 1) % tabs.length]
-      setActiveTab(next.id)
-      tabRefs.current[next.id]?.focus()
-    }
+  // RTL arrows follow visual order; Home/End work on both rows.
+  const move = (event: KeyboardEvent, ids: string[], index: number) => {
+    const next = event.key === 'ArrowLeft' ? (index + 1) % ids.length
+      : event.key === 'ArrowRight' ? (index - 1 + ids.length) % ids.length
+      : event.key === 'Home' ? 0 : event.key === 'End' ? ids.length - 1 : -1
+    if (next < 0) return
+    event.preventDefault()
+    refs.current[ids[next]]?.focus()
   }
 
   return (
-    <nav
-      ref={navRef}
-      className="flex items-center px-7 sticky z-[190] overflow-x-auto scrollbar-hide border-b"
-      style={{
-        top: '62px',
-        background: 'var(--topbar-bg)',
-        backdropFilter: 'blur(20px) saturate(1.8)',
-        WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-        borderColor: 'var(--glass-border)',
-        position: 'relative',
-      }}
-      role="tablist"
-      aria-label="أقسام التطبيق"
-      onMouseLeave={() => moveIndicatorTo(tabRefs.current[activeTab])}
-    >
-      <span
-        ref={indicatorRef}
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          height: 3,
-          borderRadius: 3,
-          background: 'var(--grad-primary)',
-          boxShadow: '0 2px 8px var(--ring-primary)',
-          opacity: 0,
-          pointerEvents: 'none',
-          transition: 'left 220ms cubic-bezier(0.4,0,0.2,1), width 150ms ease, opacity 150ms ease',
-        }}
-      />
-
-      {TABS.map((tab, idx) => {
-        const isActive = tab.id === activeTab
-        const isPlatform = tab.id === 'platform'
-        return (
-          <button
-            key={tab.id}
-            ref={(el) => { tabRefs.current[tab.id] = el }}
-            id={`ntab-${tab.id}`}
-            role="tab"
-            aria-selected={isActive}
-            aria-controls={`tab-${tab.id}`}
-            aria-label={tab.label}
-            onClick={() => setActiveTab(tab.id)}
-            onKeyDown={(e) => handleKeyDown(e, idx)}
-            onMouseEnter={() => moveIndicatorTo(tabRefs.current[tab.id])}
-            tabIndex={isActive ? 0 : -1}
-            className="relative flex items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent rounded-t-xl px-5 py-[14px] text-[.88rem] font-medium cursor-pointer font-[inherit] bg-none border-none transition-all"
-            style={{
-              color: isActive ? 'var(--orange-text)' : isPlatform ? 'var(--orange-text)' : 'var(--muted)',
-              fontWeight: isActive || isPlatform ? 600 : 500,
-              background: isActive ? 'linear-gradient(180deg,var(--orange-l),transparent)' : undefined,
-            }}
-          >
-            <AppIcon icon={tab.Icon} size={20} />
-            {!focusMode && (
-              <>
-                {tab.label} <span aria-hidden="true">{tab.geo}</span>
-              </>
-            )}
-          </button>
-        )
-      })}
-    </nav>
+    <div className="navigation-shell sticky z-[190]" style={{ top: 'var(--topbar-h)' }}>
+      <nav className="primary-nav" aria-label="التنقّل الرئيسي">
+        {GROUPS.map((group, index) => {
+          const selected = active.id === group.id
+          const direct = group.tabs.length === 1
+          return (
+            <button
+              key={group.id}
+              ref={(el) => { refs.current[group.id] = el }}
+              id={direct ? `ntab-${group.tabs[0]}` : `nav-${group.id}`}
+              type="button"
+              aria-current={selected ? 'page' : undefined}
+              aria-label={group.label}
+              title={group.label}
+              className="primary-nav-item"
+              onClick={() => select(group.id === 'home' ? 'dashboard' : selected ? activeTab : remembered.current[group.id] ?? group.tabs[0])}
+              onKeyDown={(event) => move(event, GROUPS.map((g) => g.id), index)}
+            >
+              <AppIcon icon={group.Icon} size={22} />
+              <span>{group.label}</span>
+            </button>
+          )
+        })}
+      </nav>
+      {active.tabs.length > 1 && (
+        <nav className="section-nav" aria-label={`أقسام ${active.label}`}>
+          {active.tabs.map((tab, index) => (
+            <button
+              key={tab}
+              id={`ntab-${tab}`}
+              ref={(el) => { refs.current[tab] = el }}
+              type="button"
+              aria-current={activeTab === tab ? 'page' : undefined}
+              onClick={() => select(tab)}
+              onKeyDown={(event) => move(event, active.tabs, index)}
+            >
+              {LABELS[tab]}
+            </button>
+          ))}
+        </nav>
+      )}
+    </div>
   )
 }

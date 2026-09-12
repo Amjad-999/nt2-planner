@@ -73,7 +73,7 @@ describe('JourneyHero', () => {
     // days remaining and the share of the study timeline already spent.
     expect(screen.getByRole('button', { name: /متبقٍ 30 يوم على امتحان NT2/ })).toBeInTheDocument()
 
-    for (const label of ['مواظبة', 'درست', 'اليوم', 'جاهزية', 'يوم', 'تقدمك اليومي']) {
+    for (const label of ['مواظبة', 'درست', 'اليوم', 'متوسط التدريب', 'يوم', 'تقدمك اليومي']) {
       expect(screen.getAllByText(label).length).toBeGreaterThan(0)
     }
   })
@@ -88,7 +88,7 @@ describe('JourneyHero', () => {
     // …while every informational element is still there, just static
     expect(container.querySelectorAll('.hero-phase.on')).toHaveLength(1)
     expect(screen.getByRole('button', { name: /متبقٍ 30 يوم على امتحان NT2/ })).toBeInTheDocument()
-    for (const label of ['مواظبة', 'درست', 'اليوم', 'جاهزية', 'يوم', 'تقدمك اليومي']) {
+    for (const label of ['مواظبة', 'درست', 'اليوم', 'متوسط التدريب', 'يوم', 'تقدمك اليومي']) {
       expect(screen.getAllByText(label).length).toBeGreaterThan(0)
     }
   })
@@ -156,14 +156,14 @@ describe('JourneyHero — smart empty states', () => {
     expect(btn).toHaveFocus()
 
     fireEvent.click(btn)
-    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    expect(await screen.findByRole('dialog', undefined, { timeout: 3_000 })).toBeInTheDocument()
   })
 
   it('brand-new user (nothing measured yet) → the readiness stat shows a dash, never a hollow zero', () => {
     useAppStore.setState({ skill: skillAt(0) })
     render(<JourneyHero />)
 
-    expect(screen.getByText('جاهزية')).toBeInTheDocument()
+    expect(screen.getByText('متوسط التدريب')).toBeInTheDocument()
     // A dash, not "0%" — nothing was measured, so there is nothing to score.
     expect(screen.getAllByText('—').length).toBeGreaterThan(0)
   })

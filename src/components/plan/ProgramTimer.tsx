@@ -9,6 +9,7 @@ import {
 import { AR_BLOCK, countAr } from '@/lib/arabicCount'
 import { LESSON_STATUS_AR, LESSON_STATUS_ICON, statusOf } from '@/features/plan/progress'
 import { lessonById, sectionTitle } from '@/data/curriculum'
+import { Callout } from '@/components/ui/Callout'
 
 /**
  * المؤقّت الحيّ: المهمّة الحالية، العدّ التنازلي، والمهمّة القادمة.
@@ -20,13 +21,13 @@ import { lessonById, sectionTitle } from '@/data/curriculum'
  */
 
 const CHIP: React.CSSProperties = {
-  fontSize: 'var(--text-sm)', padding: '3px 9px', borderRadius: 999,
+  fontSize: 'var(--text-sm)', padding: '3px 9px', borderRadius: 'var(--r-pill)',
   border: '1px solid var(--border2)', color: 'var(--text2)', whiteSpace: 'nowrap',
 }
 
 const BTN: React.CSSProperties = {
-  minHeight: 44, padding: '8px 16px', borderRadius: 12, cursor: 'pointer',
-  fontFamily: 'inherit', fontSize: '.9rem', fontWeight: 600,
+  minHeight: 44, padding: '8px 16px', borderRadius: 'var(--r-sm)', cursor: 'pointer',
+  fontFamily: 'inherit', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)',
   background: 'var(--btn-bg)', border: '1px solid var(--border2)', color: 'var(--text)',
 }
 
@@ -47,7 +48,7 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
     <section
       aria-label="مؤقّت اليوم"
       style={{
-        padding: '18px 22px 20px', marginBottom: 18,
+        padding: '18px 22px 20px', marginBottom: 'var(--sp-4)',
         background: 'var(--surface)', border: '1px solid var(--border)',
         borderInlineStart: '4px solid var(--orange)',
         borderRadius: 'var(--r)', boxShadow: 'var(--elev-1)',
@@ -65,10 +66,10 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
 
   if (!session || stale) {
     return shell(
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
         <div>
-          <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)' }}>يوم اليوم جاهز</h3>
-          <p style={{ margin: '6px 0 0', fontSize: '.9rem', color: 'var(--text2)', lineHeight: 1.7 }}>
+          <h3 style={{ margin: 0, fontSize: 'var(--text-md)', fontWeight: 'var(--fw-cta)', color: 'var(--text)' }}>يوم اليوم جاهز</h3>
+          <p style={{ margin: '6px 0 0', fontSize: 'var(--text-sm)', color: 'var(--text2)', lineHeight: 'var(--lh-arabic)' }}>
             {countAr(blocks.blocks.length, AR_BLOCK)}، منها {formatMinutes(blocks.focusMinutes)} تركيزًا
             و {formatMinutes(blocks.breakMinutes)} استراحات.
             {stale && ' الجلسة السابقة انتهت صلاحيّتها — ابدأ من جديد.'}
@@ -93,30 +94,27 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
      المؤقّت يواصل على لقطته حتى لا تقفز الساعة، لكن الفارق يُعلَن لا يُخفى. */
   const planChanged = blocksSignature(session.blocks) !== blocksSignature(blocks.blocks)
   const rebuildBanner = planChanged ? (
-    <div style={{
-      padding: '10px 12px', borderRadius: 'var(--r-sm)',
-      background: 'var(--amber-l)', border: '1px solid var(--border)', borderInlineStart: '3px solid var(--amber)',
-      fontSize: '.86rem', color: 'var(--text2)', lineHeight: 1.7,
-      display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
-    }}>
-      <span><strong style={{ color: 'var(--amber-text)' }}><span aria-hidden>!</span> تغيّرت الخطة</strong> بعد بدء اليوم. المؤقّت يعمل على الترتيب القديم.</span>
+    <Callout tone="warn" density="compact">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
+      <span><strong style={{ color: 'var(--amber-text)' }}>تغيّرت الخطة</strong> بعد بدء اليوم. المؤقّت يعمل على الترتيب القديم.</span>
       <button
         type="button"
         onClick={() => startStudyDay(today, blocks.blocks.map(toSessionBlock), Date.now())}
-        style={{ ...BTN, minHeight: 36, padding: '5px 12px' }}
+        style={{ ...BTN, minHeight: 'var(--tap-min)', padding: '5px 12px' }}
       >
         أعد بناء اليوم
       </button>
-    </div>
+      </div>
+    </Callout>
   ) : null
 
   if (pos.finished) {
     return shell(
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--green-text)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+        <h3 style={{ margin: 0, fontSize: 'var(--text-md)', fontWeight: 'var(--fw-cta)', color: 'var(--green-text)' }}>
           <span aria-hidden>✔</span> انتهى وقت اليوم
         </h3>
-        <p style={{ margin: 0, fontSize: '.9rem', color: 'var(--text2)' }}>
+        <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
           علّم حالة دروس اليوم قبل الإغلاق، ثم أنهِ الجلسة.
         </p>
         <div><button type="button" onClick={endStudyDay} style={BTN}>أنهِ الجلسة</button></div>
@@ -131,13 +129,13 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
   const nextStartsAt = pos.next ? blockStartsAt(session, pos.index + 1, now) : 0
 
   return shell(
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
       {rebuildBanner}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-        <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 'var(--sp-3)', flexWrap: 'wrap' }}>
+        <h3 style={{ margin: 0, fontSize: 'var(--text-md)', fontWeight: 'var(--fw-cta)', color: 'var(--text)' }}>
           المهمّة الحالية
         </h3>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
           <span style={CHIP}>{BLOCK_KIND_AR[current.kind]}</span>
           <span style={CHIP}>الكتلة {pos.index + 1} من {session.blocks.length}</span>
           {pos.paused && <span style={{ ...CHIP, color: 'var(--amber-text)', border: '1px solid var(--amber)' }}>
@@ -146,13 +144,13 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-4)', flexWrap: 'wrap' }}>
         <div
           role="timer"
           aria-live="off"
           aria-label={`المتبقّي في ${current.titleAr}: ${formatDuration(pos.remainingInBlockMs)}`}
           style={{
-            fontSize: 'clamp(2.4rem, 9vw, 3.4rem)', fontWeight: 800, lineHeight: 1,
+            fontSize: 'var(--text-4xl)', fontWeight: 'var(--fw-cta)', lineHeight: 'var(--lh-tight)',
             fontVariantNumeric: 'tabular-nums', letterSpacing: '.02em',
             color: isBreak ? 'var(--green-text)' : 'var(--orange-text)',
             direction: 'ltr',
@@ -161,12 +159,12 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
           {formatDuration(pos.remainingInBlockMs)}
         </div>
         <div style={{ flex: '1 1 220px', minWidth: 200 }}>
-          <div style={{ fontWeight: 700, color: 'var(--text)', fontSize: '1rem' }}>{current.titleAr}</div>
-          <div style={{ fontSize: '.86rem', color: 'var(--text2)', marginTop: 3, lineHeight: 1.6 }}>{current.detailAr}</div>
+          <div style={{ fontWeight: 'var(--fw-cta)', color: 'var(--text)', fontSize: 'var(--text-base)' }}>{current.titleAr}</div>
+          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', marginTop: 'var(--sp-1)', lineHeight: 'var(--lh-arabic)' }}>{current.detailAr}</div>
         </div>
       </div>
 
-      <div style={{ height: 8, borderRadius: 8, background: 'var(--border)', overflow: 'hidden' }}>
+      <div style={{ height: 8, borderRadius: 'var(--r-xs)', background: 'var(--border)', overflow: 'hidden' }}>
         <div style={{
           width: `${blockPct}%`, height: '100%',
           background: isBreak ? 'var(--green)' : 'var(--orange)', transition: 'width .5s linear',
@@ -174,17 +172,17 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
       </div>
 
       {current.lessonIds.length > 0 && (current.kind === 'new' || current.kind === 'close') && (
-        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
           {current.lessonIds.map((id) => {
             const l = lessonById(id)
             const st = statusOf(lessons, id)
             return (
               <li key={id} style={{
-                display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
+                display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', flexWrap: 'wrap',
                 padding: '8px 10px', borderRadius: 'var(--r-sm)',
                 background: 'var(--btn-bg)', border: '1px solid var(--border)',
               }}>
-                <span style={{ flex: '1 1 150px', fontSize: '.86rem', color: 'var(--text)' }}>
+                <span style={{ flex: '1 1 150px', fontSize: 'var(--text-sm)', color: 'var(--text)' }}>
                   {l ? `${sectionTitle(l.sectionId)} · الدرس ${l.indexInSection}` : id}
                 </span>
                 <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
@@ -198,7 +196,7 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
                     aria-pressed={st === s}
                     aria-label={`${LESSON_STATUS_AR[s]}: ${l ? `الدرس ${l.indexInSection}` : id}`}
                     style={{
-                      minHeight: 32, padding: '3px 10px', borderRadius: 9, cursor: 'pointer',
+                      minHeight: 'var(--tap-min)', padding: '3px 10px', borderRadius: 'var(--r-xs)', cursor: 'pointer',
                       fontFamily: 'inherit', fontSize: 'var(--text-sm)',
                       background: st === s ? 'var(--orange-l)' : 'transparent',
                       border: `1px solid ${st === s ? 'var(--orange)' : 'var(--border2)'}`,
@@ -215,8 +213,8 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
       )}
 
       <div style={{
-        display: 'flex', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap',
-        paddingTop: 12, borderTop: '1px solid var(--border)', fontSize: '.86rem', color: 'var(--text2)',
+        display: 'flex', justifyContent: 'space-between', gap: 'var(--sp-3)', flexWrap: 'wrap',
+        paddingTop: 12, borderTop: '1px solid var(--border)', fontSize: 'var(--text-sm)', color: 'var(--text2)',
       }}>
         <span>
           {pos.next
@@ -237,7 +235,7 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
         </span>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
         {pos.paused
           ? <button type="button" onClick={() => resumeStudyDay(Date.now())}
               style={{ ...BTN, background: 'var(--orange)', border: '1px solid var(--orange)', color: '#fff' }}>

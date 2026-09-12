@@ -34,28 +34,28 @@ export function AchievementsPanel() {
           fontFamily: 'inherit',
         }}
       >
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-md)', fontWeight: 'var(--fw-cta)', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
           🏅 إنجازاتي
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
           <ProgressPips unlocked={count} total={total} />
-          <span style={{ fontSize: '.82rem', color: 'var(--text2)' }}>{count}/{total}</span>
-          <span aria-hidden="true" style={{ fontSize: '.78rem', color: 'var(--muted)', transform: open ? 'rotate(180deg)' : undefined, display: 'inline-block', transition: 'transform .2s' }}>▼</span>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>{count}/{total}</span>
+          <span aria-hidden="true" style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', transform: open ? 'rotate(180deg)' : undefined, display: 'inline-block', transition: 'transform .2s' }}>▼</span>
         </span>
       </button>
 
       {/* Badge grid */}
       {open && (
         <div id="ach-body" role="list" aria-label="قائمة الإنجازات"
-          style={{ marginTop: 14 }}>
+          style={{ marginTop: 'var(--sp-3)' }}>
           {TIER_ORDER.map(tier => {
             const group = BADGE_DEFS.filter(b => b.tier === tier)
             return (
-              <div key={tier} style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: '.72rem', fontWeight: 700, color: TIER_COLOR[tier], textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>
+              <div key={tier} style={{ marginBottom: 'var(--sp-3)' }}>
+                <div style={{ fontSize: 'var(--text-2xs)', fontWeight: 'var(--fw-cta)', color: TIER_COLOR[tier], textTransform: 'uppercase', letterSpacing: 1, marginBottom: 'var(--sp-2)' }}>
                   {TIER_LABEL[tier]}
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(130px, 100%), 1fr))', gap: 'var(--sp-2)' }}>
                   {group.map(b => {
                     const earned = unlocked.includes(b.id)
                     return (
@@ -64,8 +64,8 @@ export function AchievementsPanel() {
                         role="listitem"
                         aria-label={`${b.title} — ${earned ? 'مكتسب' : 'مقفل'}: ${b.desc}`}
                         style={{
-                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                          padding: '10px 8px', borderRadius: 10, textAlign: 'center',
+                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--sp-1)',
+                          padding: '10px 8px', borderRadius: 'var(--r-sm)', textAlign: 'center',
                           background: earned ? 'var(--orange-l)' : 'var(--surface3)',
                           border: `1px solid ${earned ? 'var(--orange-m)' : 'var(--border)'}`,
                           opacity: earned ? 1 : 0.55,
@@ -74,15 +74,15 @@ export function AchievementsPanel() {
                       >
                         <span
                           aria-hidden="true"
-                          style={{ fontSize: '1.6rem', filter: earned ? undefined : 'grayscale(100%)' }}
+                          style={{ fontSize: 'var(--glyph-md)', filter: earned ? undefined : 'grayscale(100%)' }}
                         >
                           {b.emoji}
                         </span>
-                        <span style={{ fontSize: '.78rem', fontWeight: 600, color: earned ? 'var(--text)' : 'var(--muted)', lineHeight: 1.3 }}>
+                        <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--fw-heading)', color: earned ? 'var(--text)' : 'var(--muted)', lineHeight: 'var(--lh-heading)' }}>
                           {b.title}
                         </span>
                         {earned && (
-                          <span style={{ fontSize: '.65rem', color: 'var(--green-text)', fontWeight: 600 }}>✓ مكتسب</span>
+                          <span style={{ fontSize: 'var(--text-2xs)', color: 'var(--green-text)', fontWeight: 'var(--fw-heading)' }}>✓ مكتسب</span>
                         )}
                       </div>
                     )
@@ -106,14 +106,14 @@ function ProgressPips({ unlocked, total }: { unlocked: number; total: number }) 
       aria-valuemin={0}
       aria-valuemax={total}
       aria-label={`${unlocked} من ${total} إنجاز`}
-      style={{ display: 'flex', alignItems: 'center', gap: 2 }}
+      style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-0)' }}
     >
       {Array.from({ length: Math.min(8, total) }, (_, i) => (
         <span
           key={i}
           aria-hidden="true"
           style={{
-            width: 6, height: 6, borderRadius: '50%',
+            width: 6, height: 6, borderRadius: 'var(--r-full)',
             background: i < Math.round(pct * Math.min(8, total))
               ? 'var(--orange)'
               : 'var(--border2)',

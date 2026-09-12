@@ -88,17 +88,17 @@ export function SmartGreeting() {
       <h1
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(1.2rem, 2.5vw, 1.5rem)',
+          fontSize: 'var(--text-2xl)',
           fontWeight: 'var(--fw-heading)',
           color: 'var(--hero-ink)',
           margin: 0,
-          lineHeight: 1.3,
+          lineHeight: 'var(--lh-heading)',
         }}
       >
         {text}
       </h1>
       {/* السطر الثاني — يوضّح ما الذي يقيسه العدّاد المجاور */}
-      <p style={{ margin: '6px 0 0', fontSize: '.86rem', color: 'var(--hero-ink2)', lineHeight: 1.6 }}>
+      <p style={{ margin: '6px 0 0', fontSize: 'var(--text-sm)', color: 'var(--hero-ink2)', lineHeight: 'var(--lh-arabic)' }}>
         {daysLeft == null
           ? 'حدّد موعد امتحانك ليبدأ العدّ التنازلي ويُضبط إيقاع خطّتك عليه.'
           : `${lessons} مهمّة أنجزتها اليوم — تابع بخطوة صغيرة الآن.`}

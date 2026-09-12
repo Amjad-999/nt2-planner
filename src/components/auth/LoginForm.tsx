@@ -31,7 +31,7 @@ export function LoginForm({ onSwitchToSignup }: Props) {
           value={email} onChange={(e) => setEmail(e.target.value)} onBlur={() => setTouched(true)}
           placeholder="name@example.com" aria-invalid={!!emailError} aria-describedby={emailError ? 'login-email-err' : undefined}
         />
-        {emailError && <span id="login-email-err" role="alert" style={{ color: 'var(--red-text)', fontSize: '.78rem', display: 'block', marginTop: 4 }}>{emailError}</span>}
+        {emailError && <span id="login-email-err" role="alert" style={{ color: 'var(--red-text)', fontSize: 'var(--text-xs)', display: 'block', marginTop: 'var(--sp-1)' }}>{emailError}</span>}
       </Field>
 
       <Field label="كلمة المرور">
@@ -42,7 +42,7 @@ export function LoginForm({ onSwitchToSignup }: Props) {
       </Field>
 
       {message && (
-        <p role={status === 'error' ? 'alert' : undefined} style={{ color: status === 'error' ? 'var(--red-text)' : 'var(--green-text)', fontSize: '.82rem', margin: '0 0 10px' }}>
+        <p role={status === 'error' ? 'alert' : undefined} style={{ color: status === 'error' ? 'var(--red-text)' : 'var(--green-text)', fontSize: 'var(--text-sm)', margin: '0 0 10px' }}>
           {message}
         </p>
       )}
@@ -54,14 +54,14 @@ export function LoginForm({ onSwitchToSignup }: Props) {
       <button
         type="button" disabled={busy || !!validateEmail(email)}
         onClick={() => signInMagicLink(email)}
-        className="btn-shine" style={{ ...btnStyle('ghost'), width: '100%', marginTop: 8 }}
+        className="btn-shine" style={{ ...btnStyle('ghost'), width: '100%', marginTop: 'var(--sp-2)' }}
       >
         ✨ إرسال رابط دخول سحري بلا كلمة مرور
       </button>
 
-      <p style={{ fontSize: '.82rem', color: 'var(--muted)', textAlign: 'center', marginTop: 14 }}>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', textAlign: 'center', marginTop: 'var(--sp-3)' }}>
         ليس لديك حساب؟{' '}
-        <button type="button" onClick={onSwitchToSignup} style={{ background: 'none', border: 'none', color: 'var(--orange-ink)', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>
+        <button type="button" onClick={onSwitchToSignup} style={{ background: 'none', border: 'none', color: 'var(--orange-text)', fontWeight: 'var(--fw-heading)', cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>
           أنشئ حسابًا
         </button>
       </p>

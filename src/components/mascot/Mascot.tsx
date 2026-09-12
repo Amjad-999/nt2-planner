@@ -241,9 +241,10 @@ export function Mascot() {
 
   return (
     <div
+      className="floating-assistant"
       style={{
-        position: 'fixed', insetBlockEnd: 18, insetInlineEnd: 18, zIndex: 850,
-        display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10,
+        position: 'fixed', insetInlineEnd: 18, zIndex: 850,
+        display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 'var(--sp-3)',
       }}
     >
       {panelOpen && (

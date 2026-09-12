@@ -1,6 +1,7 @@
 import { useAppStore, generateTodayPlan, getPlanTotal, getCurrentDay } from '@/store/useAppStore'
 import { scaledPhases, planTaskId, SKILL_AR } from '@/data/phases'
 import { ProgramPanel } from '@/components/plan/ProgramPanel'
+import { Callout } from '@/components/ui/Callout'
 
 export default function Plan() {
   const { planDay, planStart, examDate, done, vocab, skill, customDur, toggleTaskDone, setCustomDur } = useAppStore()
@@ -9,38 +10,38 @@ export default function Plan() {
   const gen = generateTodayPlan({ planDay, done, vocab, skill, planStart, examDate })
 
   return (
-    <div style={{ padding: '24px 28px 60px', maxWidth: 1100, margin: '0 auto' }}>
-      <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
+    <div className="page">
+      <h2 className="section-title">
         <span style={{ color: 'var(--orange-text)' }}>🗓️</span> خطة الدراسة الذكية ({planTotal} يومًا) <span aria-hidden="true">📍</span>
       </h2>
 
-      <div style={{ background:'var(--orange-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--orange)', borderRadius:'var(--r-sm)', padding:'14px 18px', marginBottom:18, fontSize:'.9rem', color:'var(--text2)', lineHeight:1.65 }}>
+      <Callout icon="🧠" style={{ marginBottom: 'var(--sp-4)' }}>
         <strong style={{ color:'var(--text)' }}>محرّك ذكي:</strong> الخطة تُعيد توزيع مهامك تلقائيًا بناءً على الأيام المتبقّية والمهام غير المنجزة.
-      </div>
+      </Callout>
 
       {/* برنامج الكتب الثلاثة: مؤقّت حيّ وجدول يُعاد بناؤه من الدروس المتبقّية. */}
       <ProgramPanel />
 
       {/* Today's tasks */}
-      <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:18, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)', marginBottom:18 }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:10, marginBottom:10 }}>
+      <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:18, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)', marginBottom:'var(--sp-4)' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'var(--sp-3)', marginBottom:'var(--sp-3)' }}>
           <div>
-            <div style={{ fontWeight:600, color:'var(--text)' }}>خطة اليوم — اليوم <strong style={{ color: 'var(--orange-text)' }}>{planDayNow}</strong> من {planTotal}</div>
-            <div style={{ fontSize:'.82rem', color:'var(--muted)', marginTop:3 }}>
+            <div style={{ fontWeight:'var(--fw-heading)', color:'var(--text)' }}>خطة اليوم — اليوم <strong style={{ color: 'var(--orange-text)' }}>{planDayNow}</strong> من {planTotal}</div>
+            <div style={{ fontSize:'var(--text-sm)', color:'var(--muted)', marginTop:'var(--sp-1)' }}>
               تمّ اختيار هذه المهام بناءً على: المرحلة الحالية + المهام المتأخّرة + المهارة الأضعف ({gen.weakestSkill}).
             </div>
           </div>
         </div>
 
         {gen.tasks.length === 0 ? (
-          <div style={{ background:'var(--green-l)', borderRadius:'var(--r-sm)', padding:'12px 16px', color:'var(--text2)', fontSize:'.9rem' }}>✅ أنجزت كلّ مهام اليوم — أحسنت!</div>
+          <div style={{ background:'var(--green-l)', borderRadius:'var(--r-sm)', padding:'12px 16px', color:'var(--text2)', fontSize:'var(--text-sm)' }}>✅ أنجزت كلّ مهام اليوم — أحسنت!</div>
         ) : (
           <div style={{ overflowX:'auto' }}>
             <table style={{ width:'100%', borderCollapse:'collapse' }}>
               <thead>
                 <tr style={{ background:'var(--glass-bg)' }}>
                   {['', 'المهمّة', 'دقائق', 'المهارة', 'السبب'].map((h) => (
-                    <th key={h} style={{ padding:'9px 12px', textAlign:'start', borderBottom:'1px solid var(--border)', color:'var(--muted)', fontWeight:500, fontSize:'.78rem', textTransform:'uppercase', letterSpacing:'.4px' }}>{h}</th>
+                    <th key={h} style={{ padding:'9px 12px', textAlign:'start', borderBottom:'1px solid var(--border)', color:'var(--muted)', fontWeight:'var(--fw-medium)', fontSize:'var(--text-xs)', textTransform:'uppercase', letterSpacing:'.4px' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -50,16 +51,16 @@ export default function Plan() {
                     <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)' }}>
                       <input type="checkbox" checked={!!done[t.id]} onChange={() => toggleTaskDone(t.id)} aria-label={`إكمال: ${t.name}`} style={{ accentColor:'var(--orange)' }} />
                     </td>
-                    <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontWeight:500, color:'var(--text)', textDecoration: done[t.id] ? 'line-through' : 'none' }}>{t.name}</td>
-                    <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'.86rem', color:'var(--text2)', whiteSpace:'nowrap' }}>
+                    <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontWeight:'var(--fw-medium)', color:'var(--text)', textDecoration: done[t.id] ? 'line-through' : 'none' }}>{t.name}</td>
+                    <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'var(--text-sm)', color:'var(--text2)', whiteSpace:'nowrap' }}>
                       <input type="number" min={5} max={180} value={customDur[t.id] ?? t.mins}
                         onChange={(e)=>{ const n=parseInt(e.target.value); if(!isNaN(n)) setCustomDur(t.id, n) }}
                         aria-label={`دقائق المهمّة: ${t.name}`}
-                        style={{ width:54, padding:'4px 6px', border:'1px solid var(--border2)', borderRadius:8, background:'var(--surface)', color:'var(--text)', fontFamily:'inherit', fontSize:'.84rem' }} />
-                      <span style={{ marginInlineStart:4, color:'var(--muted)' }}>د</span>
+                        style={{ width:54, padding:'4px 6px', border:'1px solid var(--border2)', borderRadius:'var(--r-xs)', background:'var(--surface)', color:'var(--text)', fontFamily:'inherit', fontSize:'var(--text-sm)' }} />
+                      <span style={{ marginInlineStart:'var(--sp-1)', color:'var(--muted)' }}>د</span>
                     </td>
-                    <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'.86rem', color:'var(--text2)' }}>{SKILL_AR[t.skill] ?? t.skill}</td>
-                    <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'.78rem', color:'var(--muted)' }}>{t.why}</td>
+                    <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'var(--text-sm)', color:'var(--text2)' }}>{SKILL_AR[t.skill] ?? t.skill}</td>
+                    <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'var(--text-xs)', color:'var(--muted)' }}>{t.why}</td>
                   </tr>
                 ))}
               </tbody>
@@ -69,7 +70,7 @@ export default function Plan() {
       </div>
 
       {/* Phase overview */}
-      <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'18px 0 10px' }}>الخطة الكاملة — 5 مراحل</h3>
+      <h3 style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'18px 0 10px' }}>الخطة الكاملة — 5 مراحل</h3>
       {scaledPhases(planTotal).map((ph) => {
         const pDone: number[] = []
         let pTotal = 0
@@ -78,21 +79,24 @@ export default function Plan() {
         }
         const pct = pTotal ? Math.round((pDone.length / pTotal) * 100) : 0
         return (
-          <div key={ph.id} style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:18, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)', marginBottom:12 }}>
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:8 }}>
-              <div><strong style={{ color:'var(--text)' }}>{ph.title}</strong> <span style={{ fontSize:'.78rem', color:'var(--muted)' }}>(أيام {ph.days})</span></div>
-              <div style={{ fontSize:'.85rem', color: 'var(--orange-text)', fontWeight:600 }}>{pct}% — {pDone.length}/{pTotal}</div>
+          <div key={ph.id} style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:18, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)', marginBottom:'var(--sp-3)' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'var(--sp-2)' }}>
+              <div><strong style={{ color:'var(--text)' }}>{ph.title}</strong> <span style={{ fontSize:'var(--text-xs)', color:'var(--muted)' }}>(أيام {ph.days})</span></div>
+              <div style={{ fontSize:'var(--text-sm)', color: 'var(--orange-text)', fontWeight:'var(--fw-heading)' }}>{pct}% — {pDone.length}/{pTotal}</div>
             </div>
-            <div style={{ marginTop:8, background:'var(--surface3)', height:6, borderRadius:3, overflow:'hidden' }}>
+            <div style={{ marginTop:'var(--sp-2)', background:'var(--surface3)', height:6, borderRadius:'var(--r-2xs)', overflow:'hidden' }}>
               <div className="progress-wave" style={{ height:'100%', backgroundColor:'var(--orange)', width:`${pct}%`, transition:'width .8s ease' }} />
             </div>
-            <details style={{ marginTop:10 }}>
-              <summary style={{ cursor:'pointer', color:'var(--text2)', fontSize:'.86rem' }}>عرض مهام هذه المرحلة</summary>
-              <table style={{ width:'100%', borderCollapse:'collapse', marginTop:8 }}>
+            <details style={{ marginTop:'var(--sp-3)' }}>
+              <summary style={{ cursor:'pointer', color:'var(--text2)', fontSize:'var(--text-sm)' }}>عرض مهام هذه المرحلة</summary>
+              {/* نفس غلاف التمرير الأفقي الذي يملكه الجدول الشقيق أعلاه —
+                  كان ناقصًا هنا وحده، فالجدول يدفع الصفحة أفقيًّا على الهاتف. */}
+              <div style={{ overflowX:'auto' }}>
+              <table style={{ width:'100%', borderCollapse:'collapse', marginTop:'var(--sp-2)' }}>
                 <thead>
                   <tr style={{ background:'var(--glass-bg)' }}>
                     {['', 'اليوم', 'المهمّة', 'دقائق'].map((h) => (
-                      <th key={h} style={{ padding:'9px 12px', textAlign:'start', borderBottom:'1px solid var(--border)', color:'var(--muted)', fontWeight:500, fontSize:'.78rem' }}>{h}</th>
+                      <th key={h} style={{ padding:'9px 12px', textAlign:'start', borderBottom:'1px solid var(--border)', color:'var(--muted)', fontWeight:'var(--fw-medium)', fontSize:'var(--text-xs)' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -102,16 +106,17 @@ export default function Plan() {
                       const id = planTaskId(ph.id, d, i)
                       return (
                         <tr key={id} style={{ opacity: done[id] ? .55 : 1 }}>
-                          <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)' }}><input type="checkbox" checked={!!done[id]} onChange={() => toggleTaskDone(id)} style={{ accentColor:'var(--orange)' }} /></td>
-                          <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'.86rem' }}>{d}</td>
-                          <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontWeight:500, color:'var(--text)', textDecoration: done[id] ? 'line-through' : 'none' }}>{t.name}</td>
-                          <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'.86rem', color:'var(--text2)' }}>{t.mins}د</td>
+                          <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)' }}><input type="checkbox" checked={!!done[id]} onChange={() => toggleTaskDone(id)} aria-label={`إكمال: ${t.name}`} style={{ accentColor:'var(--orange)' }} /></td>
+                          <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'var(--text-sm)' }}>{d}</td>
+                          <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontWeight:'var(--fw-medium)', color:'var(--text)', textDecoration: done[id] ? 'line-through' : 'none' }}>{t.name}</td>
+                          <td style={{ padding:'9px 12px', borderBottom:'1px solid var(--border)', fontSize:'var(--text-sm)', color:'var(--text2)' }}>{t.mins}د</td>
                         </tr>
                       )
                     })
                   )}
                 </tbody>
               </table>
+              </div>
             </details>
           </div>
         )

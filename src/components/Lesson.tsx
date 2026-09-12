@@ -12,32 +12,32 @@ const components: Components = {
   h1: ({ children }) => (
     <h1 style={{
       fontFamily: 'var(--font-display)',
-      fontSize: '1.45rem',
+      fontSize: 'var(--text-xl)',
       fontWeight: 'var(--fw-heading)',
       color: 'var(--text)',
       borderBottom: '2px solid var(--orange-m)',
       paddingBottom: '0.4em',
       marginBottom: '1em',
       marginTop: 0,
-      lineHeight: 1.35,
+      lineHeight: 'var(--lh-heading)',
     }}>{children}</h1>
   ),
   h2: ({ children }) => (
     <h2 style={{
       fontFamily: 'var(--font-display)',
-      fontSize: '1.1rem',
+      fontSize: 'var(--text-lg)',
       fontWeight: 'var(--fw-heading)',
       color: 'var(--text)',
       margin: '1.6em 0 0.6em',
       display: 'flex',
       alignItems: 'center',
-      gap: 6,
+      gap: 'var(--sp-2)',
     }}>{children}</h2>
   ),
   h3: ({ children }) => (
     <h3 style={{
-      fontSize: '1rem',
-      fontWeight: 600,
+      fontSize: 'var(--text-base)',
+      fontWeight: 'var(--fw-heading)',
       color: 'var(--text2)',
       margin: '1.2em 0 0.4em',
     }}>{children}</h3>
@@ -45,13 +45,13 @@ const components: Components = {
   p: ({ children }) => (
     <p style={{
       color: 'var(--text2)',
-      lineHeight: 1.75,
+      lineHeight: 'var(--lh-arabic)',
       margin: '0.6em 0',
-      fontSize: '.93rem',
+      fontSize: 'var(--text-sm)',
     }}>{children}</p>
   ),
   strong: ({ children }) => (
-    <strong style={{ color: 'var(--text)', fontWeight: 700 }}>{children}</strong>
+    <strong style={{ color: 'var(--text)', fontWeight: 'var(--fw-cta)' }}>{children}</strong>
   ),
   em: ({ children }) => (
     <em style={{ color: 'var(--text)', fontStyle: 'italic' }}>{children}</em>
@@ -62,7 +62,7 @@ const components: Components = {
       margin: '0.5em 0',
       display: 'flex',
       flexDirection: 'column',
-      gap: 4,
+      gap: 'var(--sp-1)',
     }}>{children}</ul>
   ),
   ol: ({ children }) => (
@@ -71,11 +71,11 @@ const components: Components = {
       margin: '0.5em 0',
       display: 'flex',
       flexDirection: 'column',
-      gap: 4,
+      gap: 'var(--sp-1)',
     }}>{children}</ol>
   ),
   li: ({ children }) => (
-    <li style={{ color: 'var(--text2)', fontSize: '.93rem', lineHeight: 1.65 }}>{children}</li>
+    <li style={{ color: 'var(--text2)', fontSize: 'var(--text-sm)', lineHeight: 'var(--lh-arabic)' }}>{children}</li>
   ),
   blockquote: ({ children }) => (
     <blockquote style={{
@@ -85,7 +85,7 @@ const components: Components = {
       padding: '10px 14px',
       borderRadius: '0 var(--r-sm) var(--r-sm) 0',
       color: 'var(--text2)',
-      fontSize: '.9rem',
+      fontSize: 'var(--text-sm)',
     }}>{children}</blockquote>
   ),
   code: ({ children, className }) => {
@@ -94,7 +94,7 @@ const components: Components = {
       return (
         <code style={{
           fontFamily: 'ui-monospace, Consolas, monospace',
-          fontSize: '.88rem',
+          fontSize: 'var(--text-sm)',
           color: 'var(--text)',
           direction: 'ltr',
           display: 'block',
@@ -109,7 +109,7 @@ const components: Components = {
         background: 'var(--surface3)',
         color: 'var(--orange-text)',
         padding: '1px 5px',
-        borderRadius: 4,
+        borderRadius: 'var(--r-2xs)',
         border: '1px solid var(--border)',
       }}>{children}</code>
     )
@@ -124,7 +124,7 @@ const components: Components = {
       overflowX: 'auto',
       direction: 'ltr',
       textAlign: 'left',
-      lineHeight: 1.7,
+      lineHeight: 'var(--lh-arabic)',
     }}>{children}</pre>
   ),
   table: ({ children }) => (
@@ -132,7 +132,7 @@ const components: Components = {
       <table style={{
         width: '100%',
         borderCollapse: 'collapse',
-        fontSize: '.88rem',
+        fontSize: 'var(--text-sm)',
       }}>{children}</table>
     </div>
   ),
@@ -144,7 +144,7 @@ const components: Components = {
       padding: '8px 12px',
       borderBottom: '2px solid var(--border2)',
       color: 'var(--text)',
-      fontWeight: 700,
+      fontWeight: 'var(--fw-cta)',
       textAlign: 'start',
       whiteSpace: 'nowrap',
     }}>{children}</th>
@@ -183,7 +183,7 @@ const components: Components = {
  */
 export function Lesson({ markdown }: Props) {
   return (
-    <div dir="rtl" style={{ lineHeight: 1.7 }}>
+    <div dir="rtl" style={{ lineHeight: 'var(--lh-arabic)' }}>
       <Markdown
         remarkPlugins={[remarkGfm]}
         skipHtml

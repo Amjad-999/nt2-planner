@@ -55,19 +55,19 @@ export function MascotBubble({ line, onClose, onOpenPanel, onDismissForever }: P
           padding: '14px 16px',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '.82rem', fontWeight: 'var(--fw-heading)', color: 'var(--orange-ink)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--sp-2)' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)', color: 'var(--orange-text)' }}>
             🐱 {MASCOT_NAME_AR}
           </span>
           <button
             onClick={onClose} aria-label="إغلاق"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '1rem', lineHeight: 1, padding: 2 }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: 'var(--text-base)', lineHeight: 'var(--lh-none)', padding: 2 }}
           >
             ✕
           </button>
         </div>
 
-        <p style={{ margin: 0, fontSize: '.9rem', color: 'var(--text)', lineHeight: 1.6, minHeight: '1.6em' }}>
+        <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text)', lineHeight: 'var(--lh-arabic)', minHeight: '1.6em' }}>
           {displayText}
           {!reduced && shown.length < line.ar.length && <span aria-hidden="true" style={{ opacity: 0.5 }}>▍</span>}
         </p>
@@ -75,7 +75,7 @@ export function MascotBubble({ line, onClose, onOpenPanel, onDismissForever }: P
         {line.nl && (
           <div
             dir="ltr" lang="nl"
-            style={{ marginTop: 8, display: 'inline-block', fontFamily: 'var(--font-latin)', fontSize: '.78rem', fontWeight: 600, color: 'var(--orange-ink)', background: 'var(--orange-l)', borderRadius: 8, padding: '2px 8px' }}
+            style={{ marginTop: 'var(--sp-2)', display: 'inline-block', fontFamily: 'var(--font-latin)', fontSize: 'var(--text-xs)', fontWeight: 'var(--fw-heading)', color: 'var(--orange-text)', background: 'var(--orange-l)', borderRadius: 'var(--r-xs)', padding: '2px 8px' }}
           >
             {line.nl}
           </div>
@@ -84,9 +84,9 @@ export function MascotBubble({ line, onClose, onOpenPanel, onDismissForever }: P
         <button
           onClick={onOpenPanel}
           style={{
-            display: 'block', width: '100%', marginTop: 10, padding: '7px 10px',
-            background: 'var(--btn-bg)', border: '1px solid var(--glass-border)', borderRadius: 10,
-            cursor: 'pointer', color: 'var(--text)', fontSize: '.78rem', fontFamily: 'inherit',
+            display: 'block', width: '100%', marginTop: 'var(--sp-3)', padding: '7px 10px',
+            background: 'var(--btn-bg)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r-sm)',
+            cursor: 'pointer', color: 'var(--text)', fontSize: 'var(--text-xs)', fontFamily: 'inherit',
           }}
         >
           ☰ كل ما أستطيع فعله
@@ -94,7 +94,7 @@ export function MascotBubble({ line, onClose, onOpenPanel, onDismissForever }: P
 
         <button
           onClick={onDismissForever}
-          style={{ display: 'block', marginTop: 8, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '.72rem', textDecoration: 'underline', padding: 0, fontFamily: 'inherit' }}
+          style={{ display: 'block', marginTop: 'var(--sp-2)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: 'var(--text-2xs)', textDecoration: 'underline', padding: 0, fontFamily: 'inherit' }}
         >
           إخفاء {MASCOT_NAME_AR} نهائيًّا
         </button>

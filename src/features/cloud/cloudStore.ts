@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { getCloud, cloudConfigured, CLOUD_TABLE, type CloudUser } from '@/lib/supabase'
-import { useAppStore } from '@/store/useAppStore'
+import { useAppStore, type AppStore } from '@/store/useAppStore'
 import { applyState } from '@/store/migration'
 import { mergeStates } from './merge'
 import type { State } from '@/store/types'
@@ -46,6 +46,46 @@ function hydrate(merged: State): void {
 let inited = false
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
+/* activeTab is the app store's one view-only field — save() and the persist
+   partialize both strip it. The sync subscription has to apply the same rule:
+   without it, simply pressing a tab scheduled a full read-merge-write of the
+   entire state blob to the backend, which on a phone is real traffic bought
+   for nothing.
+   A shallow reference scan is the right comparison here: Zustand's set()
+   builds a new top-level object but keeps the reference of every slice it did
+   not touch, so anything that genuinely changed compares unequal. */
+function isSyncRelevantChange(next: AppStore, prev: AppStore): boolean {
+  for (const key of Object.keys(next) as (keyof AppStore)[]) {
+    if (key === 'activeTab') continue
+    if (typeof next[key] === 'function') continue
+    if (next[key] !== prev[key]) return true
+  }
+  return false
+}
+
+/* Ceiling for a single cloud round-trip.
+   The re-entrancy guard below refuses to start a sync while one is already
+   running, so a request that never settles — a stalled connection, a captive
+   portal, a blocked tunnel — used to leave `status` on 'syncing' forever and
+   silently disabled syncing until the page was reloaded.
+   Supabase's query builder exposes no abort signal, so the only way to bound
+   it is to race it. Discarding a late result is safe here: nothing is applied
+   after the race is lost, the merge is loss-less, and the upsert is keyed by
+   user_id, so the next sync converges anyway. Same contract the live sources
+   in features/world/http.ts already follow. */
+const SYNC_TIMEOUT_MS = 20000
+const TIMEOUT_MESSAGE = 'انتهت مهلة المزامنة. تحقّق من الاتصال ثمّ أعِد المحاولة.'
+
+function withTimeout<T>(work: Promise<T>, ms = SYNC_TIMEOUT_MS): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(TIMEOUT_MESSAGE)), ms)
+    work.then(
+      (value) => { clearTimeout(timer); resolve(value) },
+      (err) => { clearTimeout(timer); reject(err) },
+    )
+  })
+}
+
 export const useCloud = create<CloudState>((set, get) => ({
   configured: cloudConfigured(),
   user: null,
@@ -65,8 +105,9 @@ export const useCloud = create<CloudState>((set, get) => ({
       set({ sessionChecked: true })
       cloud.auth.onAuthStateChange((evt, session) => { void evt; set({ user: session ? session.user : null }) })
       // مزامنة مؤجّلة عند أي تغيير محلّي (وليس التغييرات القادمة من السحابة نفسها)
-      useAppStore.subscribe(() => {
+      useAppStore.subscribe((state, prev) => {
         if (!get().user || applyingRemote) return
+        if (!isSyncRelevantChange(state, prev)) return
         if (debounceTimer) clearTimeout(debounceTimer)
         debounceTimer = setTimeout(() => { get().syncNow() }, 4000)
       })
@@ -126,13 +167,17 @@ export const useCloud = create<CloudState>((set, get) => ({
     if (!cloud || !user) { set({ status: cloud ? 'idle' : 'offline' }); return }
     try {
       const local = snapshot()
-      const res = await cloud.from(CLOUD_TABLE).select('data').eq('user_id', user.id).maybeSingle()
+      const res = await withTimeout(
+        Promise.resolve(cloud.from(CLOUD_TABLE).select('data').eq('user_id', user.id).maybeSingle()),
+      )
       if (res.error) throw new Error(res.error.message)
       const remoteRaw = res.data ? res.data.data : null
       const merged = remoteRaw ? mergeStates(local, applyState(remoteRaw)) : local
       merged._savedAt = Date.now()
       hydrate(merged)
-      const up = await cloud.from(CLOUD_TABLE).upsert({ user_id: user.id, data: merged, updated_at: new Date().toISOString() })
+      const up = await withTimeout(
+        Promise.resolve(cloud.from(CLOUD_TABLE).upsert({ user_id: user.id, data: merged, updated_at: new Date().toISOString() })),
+      )
       if (up.error) throw new Error(up.error.message)
       set({ status: 'synced', lastSyncedAt: Date.now(), message: '' })
     } catch (e) {
@@ -144,7 +189,15 @@ export const useCloud = create<CloudState>((set, get) => ({
     const cloud = await getCloud(); const user = get().user
     if (!cloud || !user) return
     set({ status: 'syncing', message: '' })
-    const { error } = await cloud.from(CLOUD_TABLE).delete().eq('user_id', user.id)
-    set({ status: error ? 'error' : 'idle', message: error ? error.message : 'حُذفت بياناتك السحابية (البيانات المحلّية باقية).' })
+    /* Also bounded: this sets the same 'syncing' status that gates syncNow, so
+       a hung delete would wedge syncing exactly like an unbounded read did. */
+    try {
+      const { error } = await withTimeout(
+        Promise.resolve(cloud.from(CLOUD_TABLE).delete().eq('user_id', user.id)),
+      )
+      set({ status: error ? 'error' : 'idle', message: error ? error.message : 'حُذفت بياناتك السحابية (البيانات المحلّية باقية).' })
+    } catch (e) {
+      set({ status: 'error', message: e instanceof Error ? e.message : 'تعذّر الحذف' })
+    }
   },
 }))

@@ -1,0 +1,62 @@
+.navigation-shell { background: var(--topbar-bg); border-bottom: 1px solid var(--border); }
+html { scroll-padding-block-start: calc(var(--topbar-h) + 104px); }
+.primary-nav, .section-nav {
+  display: flex;
+  max-inline-size: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--page-pad-x);
+}
+.primary-nav { gap: var(--sp-2); }
+.primary-nav-item, .section-nav button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-block-size: 48px;
+  padding: var(--sp-2) var(--sp-4);
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--text2);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.primary-nav-item[aria-current='page'], .section-nav button[aria-current='page'] {
+  color: var(--ui-blue-text);
+  border-bottom-color: var(--orange-text);
+  font-weight: var(--fw-heading);
+  background: var(--ui-blue-l);
+}
+.primary-nav-item:hover, .section-nav button:hover { background: var(--surface); }
+.section-nav { gap: var(--sp-1); }
+.section-nav button { flex: 1; padding-inline: var(--sp-2); }
+.floating-assistant, .toast-host { inset-block-end: var(--sp-4); }
+@media (max-width: 639px) {
+  .floating-assistant, .toast-host { inset-block-end: calc(88px + env(safe-area-inset-bottom, 0px)); }
+  .app-layout { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+  .primary-nav {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0;
+    padding: var(--sp-1) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+    border-top: 1px solid var(--border2);
+    background: var(--surface);
+    box-shadow: var(--elev-2);
+  }
+  .primary-nav-item {
+    flex-direction: column;
+    gap: var(--sp-1);
+    padding: var(--sp-2) 0;
+    min-inline-size: 0;
+    min-block-size: 64px;
+    font-size: var(--text-xs);
+    border-radius: var(--r-xs);
+  }
+  .primary-nav-item span { overflow-wrap: anywhere; }
+  .section-nav { padding-inline: var(--sp-2); }
+  html { scroll-padding-block: calc(var(--topbar-h) + 52px) 90px; }
+}

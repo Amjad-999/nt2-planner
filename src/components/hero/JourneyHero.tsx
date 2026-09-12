@@ -183,25 +183,23 @@ export function JourneyHero() {
     { icon: '🔥', value: String(streak.count), label: 'مواظبة' },
     { icon: '⏱️', value: `${todayMins}د`, label: 'درست' },
     { icon: '📍', value: `${planDayNow}/${planTotal}`, label: 'اليوم' },
-    { icon: '🎯', value: readiness ? `${readiness}%` : '—', label: 'جاهزية' },
+    { icon: '🎯', value: Object.values(skill).some(s => s.attempts > 0 || s.best > 0) ? `${readiness}%` : '—', label: 'متوسط التدريب' },
   ]
 
-  /* No wrapper margin and no bottom radius/border: the hero is the TOP half of
-     one continuous slab whose bottom half is TodayFocus (see Dashboard).
-     The old layout ended the hero with a rounded edge and a 20px gap, which
-     read as a divider line with dead space under it. */
+  /* The daily summary follows the learning action and checklist. */
   return (
-    <div>
+    <div style={{ marginBottom: 'var(--sp-4)' }}>
       <div
         ref={rootRef}
         style={{
           background: 'var(--grad-hero)',
-          borderRadius: 'calc(var(--r) + 4px) calc(var(--r) + 4px) 0 0',
+          borderRadius: 'var(--r)',
           border: '1px solid var(--glass-border)',
-          borderBottom: 'none',
           borderTop: '3px solid var(--orange)',
           boxShadow: 'var(--elev-2), inset 0 1px 0 var(--hero-hi)',
-          padding: '24px 28px',
+          /* الحشو السفلي يحجز شريط الأفق كاملًا، فيبقى المشهد تحت المحتوى
+             لا خلفه. */
+          padding: 'var(--hero-pad-y) var(--hero-pad-x) calc(var(--hero-sky-h) + var(--sp-2))',
           position: 'relative',
           overflow: 'hidden',
           isolation: 'isolate',
@@ -219,13 +217,13 @@ export function JourneyHero() {
               a ±10px parallax shift can never reveal a gap. */}
           <svg
             ref={backRef} className="hero-sky" viewBox="0 0 400 48" preserveAspectRatio="none"
-            style={{ left: -16, right: -16, bottom: -1, height: 44, width: 'calc(100% + 32px)', fill: 'var(--sky-back)' }}
+            style={{ left: -16, right: -16, bottom: -1, height: 'calc(var(--hero-sky-h) * 0.73)', width: 'calc(100% + 32px)', fill: 'var(--sky-back)' }}
           >
             {houseRects(SKY_BACK)}
           </svg>
           <svg
             ref={frontRef} className="hero-sky" viewBox="0 0 400 48" preserveAspectRatio="none"
-            style={{ left: -16, right: -16, bottom: -1, height: 60, width: 'calc(100% + 32px)', fill: 'var(--sky-front)' }}
+            style={{ left: -16, right: -16, bottom: -1, height: 'var(--hero-sky-h)', width: 'calc(100% + 32px)', fill: 'var(--sky-front)' }}
           >
             {houseRects(SKY_FRONT)}
           </svg>
@@ -256,25 +254,25 @@ export function JourneyHero() {
               difference piled up as dead space beside the ring. Filling it with
               information the hero already owned beats padding it out, and it
               drops a whole row from the card. */}
-          <div style={{ display: 'flex', gap: 16, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 'var(--sp-4)', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
             <div style={{ flex: '1 1 240px', minWidth: 0 }}>
               <SmartGreeting />
 
               {/* شريط التقدم — scaleX بدل width: التحويل لا يفرض إعادة تخطيط،
                   والأصل من اليمين ليطابق اتجاه التعبئة في RTL */}
-              <div style={{ marginTop: 14 }}>
+              <div style={{ marginTop: 'var(--sp-3)' }}>
                 <div
                   style={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    marginBottom: 6,
+                    marginBottom: 'var(--sp-2)',
                   }}
                 >
-                  <span style={{ fontSize: '.8rem', color: 'var(--hero-ink2)', fontWeight: 500 }}>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--hero-ink2)', fontWeight: 'var(--fw-medium)' }}>
                     تقدمك اليومي
                   </span>
-                  <span style={{ fontSize: '.85rem', color: 'var(--hero-ink)', fontWeight: 700 }}>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--hero-ink)', fontWeight: 'var(--fw-cta)' }}>
                     {progress}%
                   </span>
                 </div>
@@ -282,7 +280,7 @@ export function JourneyHero() {
                   style={{
                     height: 6,
                     background: 'var(--hero-line)',
-                    borderRadius: 3,
+                    borderRadius: 'var(--r-2xs)',
                     overflow: 'hidden',
                   }}
                 >
@@ -292,7 +290,7 @@ export function JourneyHero() {
                     transition={reduced ? { duration: 0 } : springFill}
                     style={{
                       height: '100%',
-                      borderRadius: 3,
+                      borderRadius: 'var(--r-2xs)',
                       transformOrigin: '100% 50%',
                       background: 'linear-gradient(90deg, var(--orange), var(--orange-m))',
                     }}
@@ -305,15 +303,11 @@ export function JourneyHero() {
             </div>
           </div>
 
-          {/* الخانات في صف واحد */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: 10,
-              marginTop: 16,
-            }}
-          >
+          {/* الخانات — عمودان على الهاتف وأربعة من 560px.
+              `repeat(4, 1fr)` الثابتة كانت تُبقي أربعة أعمدة على شاشة 320px،
+              فيبقى نحو 24px صالحة داخل كل خانة لقيمة مثل «12/184». وقياس
+              auto-fit وحده يمرّ بنطاق يعرض 3+1، وهو أسوأ من عمودين. */}
+          <div className="hero-stats">
             {stats.map((s) => (
               <div
                 key={s.label}
@@ -326,11 +320,11 @@ export function JourneyHero() {
                   border: '1px solid var(--hero-line)',
                 }}
               >
-                <div aria-hidden="true" style={{ fontSize: '1.3rem', marginBottom: 4 }}>{s.icon}</div>
+                <div aria-hidden="true" style={{ fontSize: 'var(--glyph-sm)', marginBottom: 'var(--sp-1)' }}>{s.icon}</div>
                 <div
                   style={{
-                    fontSize: '1.1rem',
-                    fontWeight: 700,
+                    fontSize: 'var(--text-lg)',
+                    fontWeight: 'var(--fw-cta)',
                     color: 'var(--hero-ink)',
                     fontFamily: 'var(--font-display)',
                   }}
@@ -339,9 +333,9 @@ export function JourneyHero() {
                 </div>
                 <div
                   style={{
-                    fontSize: '.72rem',
+                    fontSize: 'var(--text-2xs)',
                     color: 'var(--hero-ink2)',
-                    marginTop: 2,
+                    marginTop: 'var(--sp-0)',
                   }}
                 >
                   {s.label}

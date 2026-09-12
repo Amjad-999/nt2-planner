@@ -2,6 +2,8 @@ import { useAppStore } from '@/store/useAppStore'
 
 let _audioEl: HTMLAudioElement | null = null
 export let _audioQueue: Promise<void> = Promise.resolve()
+let controller = new AbortController()
+export const audioSignal = () => controller.signal
 
 function ensureAudio(): HTMLAudioElement {
   if (!_audioEl) {
@@ -34,8 +36,9 @@ export function chunkText(text: string, maxLen = 180): string[] {
   return out
 }
 
-export function playOneClip(url: string, label: string): Promise<string> {
+export function playOneClip(url: string, label: string, signal = audioSignal()): Promise<string> {
   return new Promise((resolve, reject) => {
+    if (signal.aborted) { reject(new DOMException('Stopped', 'AbortError')); return }
     const a = ensureAudio()
     try { a.pause() } catch { /* pause on a fresh element may throw — safe to ignore */ }
     try { a.currentTime = 0 } catch { /* throws before any media is loaded — safe to ignore */ }
@@ -43,18 +46,33 @@ export function playOneClip(url: string, label: string): Promise<string> {
     a.playbackRate = Math.max(0.6, Math.min(1.4, useAppStore.getState().prefs.rate ?? 1.0))
     a.volume = 1.0
     let settled = false
-    const cleanup = () => { a.onended = null; a.onerror = null; a.oncanplaythrough = null }
-    a.onended = () => { if (settled) return; settled = true; cleanup(); resolve(label) }
-    a.onerror = () => { if (settled) return; settled = true; cleanup(); reject(new Error(`${label} load/decode failed`)) }
-    a.oncanplaythrough = () => {
-      a.play().catch((err) => { if (settled) return; settled = true; cleanup(); reject(err) })
+    const cleanup = () => {
+      a.onended = null; a.onerror = null; a.oncanplaythrough = null
+      clearTimeout(timeout); clearTimeout(retry)
+      signal.removeEventListener('abort', abort)
     }
+    const finish = (error?: Error) => {
+      if (settled) return
+      settled = true
+      cleanup()
+      if (error) { a.pause(); reject(error) } else resolve(label)
+    }
+    const abort = () => finish(new DOMException('Stopped', 'AbortError'))
+    signal.addEventListener('abort', abort, { once: true })
+    a.onended = () => finish()
+    a.onerror = () => finish(new Error(`${label} load/decode failed`))
+    a.oncanplaythrough = () => {
+      a.play().catch(finish)
+    }
+    const timeout = setTimeout(() => finish(new Error('Audio timed out')), 45000)
+    const retry = setTimeout(() => { if (!settled && a.readyState >= 2) a.play().catch(finish) }, 1200)
     a.load()
-    setTimeout(() => { if (!settled && a.readyState >= 2) a.play().catch(() => {}) }, 1200)
   })
 }
 
 export function stopAudio() {
+  controller.abort()
+  controller = new AbortController()
   try { window.speechSynthesis?.cancel() } catch { /* synthesis in an odd state — nothing to cancel */ }
   try {
     if (_audioEl) {

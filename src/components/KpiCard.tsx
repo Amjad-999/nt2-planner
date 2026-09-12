@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { Tilt } from './MotionFx'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useCountUp } from '@/hooks/useCountUp'
 
 interface Props {
   cls: string   // k1..k6
@@ -18,29 +18,36 @@ interface Props {
   onEditClick?: () => void
 }
 
+/**
+ * الرقم وحده يعدّ — في مكوّن صغير عمدًا.
+ *
+ * KpiCard used to hand-roll this loop, and got three things wrong that the
+ * shared hook already handles:
+ *   1. no cancelAnimationFrame, so every value change left the previous
+ *      2-second loop running and writing to the same node — two loops racing
+ *      over one textContent, and one still running after unmount;
+ *   2. it restarted from 0 on every change, so typing in the minutes field
+ *      made the number stampede up from zero on each keystroke;
+ *   3. 2000ms meant the card showed a wrong number for most of the time the
+ *      user was looking at it. 900ms keeps the flourish and hands the real
+ *      figure over quickly — these are the numbers the app exists to report.
+ * useCountUp resumes from the displayed value and is covered by
+ * src/tests/unit/count-up.test.ts. It re-renders on each frame, which is why
+ * this wrapper is one <span> and not the whole card.
+ */
+function CountingValue({ target }: { target: number }) {
+  const n = useCountUp(target, 900)
+  return <>{Math.round(n)}</>
+}
+
 export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, editKind = 'number', editRaw, min, max, onSave, onEditClick }: Props) {
-  const valRef = useRef<HTMLDivElement>(null)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
-  const reduced = useReducedMotion()
 
-  useEffect(() => {
-    if (editing || reduced) return
-    const el = valRef.current
-    if (!el) return
-    const num = parseFloat(String(value))
-    if (isNaN(num) || String(value).includes('/')) return
-    let start: number | null = null
-    const duration = 2000
-    const step = (ts: number) => {
-      if (start === null) start = ts
-      const p = Math.min((ts - start) / duration, 1)
-      el.textContent = String(Math.round(num * p))
-      if (p < 1) requestAnimationFrame(step)
-      else el.textContent = String(value)
-    }
-    requestAnimationFrame(step)
-  }, [value, editing, reduced])
+  /* Only a bare integer counts. The other KPIs are composites — "12/184",
+     "65%", "3 يوم" — and animating those would mean animating text. */
+  const raw = String(value)
+  const countable = !editing && /^\d+$/.test(raw)
 
   const deltaColor = deltaClass === 'up' ? 'var(--green)' : deltaClass === 'down' ? 'var(--red)' : 'var(--muted)'
   const deltaIcon  = deltaClass === 'up' ? '↑ ' : deltaClass === 'down' ? '↓ ' : ''
@@ -65,7 +72,11 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
   return (
     <Tilt
       disabled={editing}
-      className="relative overflow-hidden rounded-card p-[14px_16px] glow-card"
+      /* عمود مرن: البطاقات تتساوى في الارتفاع مع صفّ الشبكة، فلو بقي
+         التخطيط كتليًّا تكدّس المحتوى أعلى البطاقة وتُرك فراغ ميت أسفلها،
+         وجلس زرّ «تعديل» عند ارتفاع مختلف في كل بطاقة بحسب طول نصّها.
+         mt-auto يثبّت الإجراء في القاع فتتحاذى الأزرار عبر الصفّ. */
+      className="relative overflow-hidden rounded-card p-[14px_16px] glow-card w-full flex flex-col"
       style={{
         background: 'var(--glass-bg)',
         backdropFilter: 'blur(16px) saturate(1.3)',
@@ -88,7 +99,7 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
         </div>
       )}
 
-      <div className="text-[.74rem] text-[var(--muted)] uppercase tracking-[.5px] mb-1 pe-10">{label}</div>
+      <div className="text-[var(--text-2xs)] text-[var(--muted)] uppercase tracking-[.5px] mb-1 pe-10">{label}</div>
 
       {editing ? (
         <input
@@ -101,20 +112,19 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
           onKeyDown={(e) => { if (e.key === 'Enter') commit(); else if (e.key === 'Escape') cancel() }}
           onBlur={commit}
           aria-label={`قيمة ${label}`}
-          className="w-full text-[1.4rem] font-bold leading-[1.1] text-[var(--text)]"
-          style={{ background: 'var(--surface)', border: '1px solid var(--orange)', borderRadius: 10, padding: '6px 10px', fontFamily: 'inherit', outline: 'none' }}
+          className="w-full text-[var(--text-xl)] font-bold leading-[1.1] text-[var(--text)]"
+          style={{ background: 'var(--surface)', border: '1px solid var(--orange)', borderRadius: 'var(--r-sm)', padding: '6px 10px', fontFamily: 'inherit', outline: 'none' }}
         />
       ) : (
         <div
-          ref={valRef}
-          className="text-[1.65rem] font-bold leading-[1.1] text-[var(--text)] pe-10 card-value"
+          className="text-[var(--text-2xl)] font-bold leading-[1.1] text-[var(--text)] pe-10 card-value"
           style={{ fontFamily: 'var(--font-display)' }}
         >
-          {value}
+          {countable ? <CountingValue target={Number(raw)} /> : value}
         </div>
       )}
 
-      <div className="text-[.78rem] mt-1 font-medium" style={{ color: deltaColor }}>
+      <div className="text-[var(--text-xs)] mt-1 font-medium" style={{ color: deltaColor }}>
         {deltaIcon}{delta}
       </div>
 
@@ -123,14 +133,14 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
           type="button"
           onClick={startEdit}
           aria-label={`تعديل ${label}`}
-          className="mt-2.5 inline-flex items-center gap-1 cursor-pointer text-[.72rem] font-semibold rounded-lg px-2.5 py-1"
+          className="mt-auto pt-2.5 self-start inline-flex items-center gap-1 cursor-pointer text-[var(--text-2xs)] font-semibold rounded-lg px-2.5 py-1"
           style={{ background: 'var(--btn-bg)', border: '1px solid var(--btn-border)', color: 'var(--orange-text)', boxShadow: 'var(--elev-1)' }}
         >
           ✎ تعديل
         </button>
       )}
       {editing && (
-        <div className="mt-2 text-[.7rem]" style={{ color: 'var(--muted)' }}>اضغط Enter للحفظ · Esc للإلغاء</div>
+        <div className="mt-auto pt-2 text-[var(--text-2xs)]" style={{ color: 'var(--muted)' }}>اضغط Enter للحفظ · Esc للإلغاء</div>
       )}
     </Tilt>
   )
