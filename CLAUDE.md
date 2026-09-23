@@ -24,14 +24,15 @@ The owner is not a professional developer: prefer simple, working, verified solu
 ## Structure (real paths)
 - `src/App.tsx` — thin shell, registers the service worker, renders `AppShell`
 - `src/components/AppShell.tsx` — tab shell + navigation
-- `src/sections/` — top-level tabs: `Dashboard` `Plan` `Vocab` `Books` `Exam` `Exercises` `Grammar` `Stats` `Resources` `Platform`
+- `src/sections/` — primary workspaces `Today` `Practice` `Words` `Learning` `LearnSettings` (the default landing is `today`), plus the original tools `Dashboard` `Plan` `Vocab` `Books` `Exam` `Exercises` `Grammar` `Stats` `Resources` `Platform` (reached via «المزيد»)
+- `src/features/observatory/` + `src/components/obs/` + `src/data/observatory/` — the daily-learning layer (session, evidence, role-play). Design package and rules: `docs/observatory/DESIGN.md`
 - `src/components/` — reusable UI (+ subfolders: `hero/` `mascot/` `auth/` `countdown/` `themes/`)
 - `src/features/` — feature logic: `achievements` `ai` `cloud` `exam` `exercises` `mascot` `speaking` `tts` `vocab` `world`
 - `src/store/useAppStore.ts` — the Zustand store (+ `types.ts`, `migration.ts`)
 - `src/hooks/` — `useNow` `useTheme` `useAuth` `useMascot` `useCountdown` …
 - `src/lib/` — `supabase.ts` `idb.ts` `auth.ts` `utils.ts` `animations.ts` `celebrate.ts` `pdfWorker.ts`
 - `src/data/` — static typed content: `dutchQuotes.ts` (30 quotes) `themas.ts` `grammarExercises.ts` `examPdfs.ts` `examAudio.ts` …
-- `src/styles/tokens.css` — **every color lives here**; `globals.css` for base styles
+- `src/styles/tokens.css` — **every color lives here** (`--o-*` observatory tokens + `data-skin` remap of the legacy tokens); `globals.css` for base styles
 - `src/tests/` — `unit/` and `smoke/`
 - `public/exams/` — ~300 MB of PDFs and audio. **Never read, list, grep or open these files.** Only their filenames matter, and `npm run check:exams` verifies those.
 
