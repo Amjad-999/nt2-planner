@@ -18,7 +18,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { Reveal } from '@/components/MotionFx'
 import { pressSpring, pressTransition, springCardAt } from '@/lib/animations'
 
-interface Props { onOpenStudyTime?: () => void }
+interface Props { onOpenStudyTime?: () => void; onOpenSettings?: () => void }
 
 export default function Dashboard({ onOpenStudyTime }: Props) {
   const examDate = useAppStore((s) => s.examDate)
