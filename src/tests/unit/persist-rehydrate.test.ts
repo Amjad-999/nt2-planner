@@ -33,7 +33,7 @@ describe('persist rehydration', () => {
     expect(store.getState().onboarded).toBe(true)
     expect(store.getState().studySec).toBe(4242)
     // activeTab is per-session — must NOT be restored from storage
-    expect(store.getState().activeTab).toBe('dashboard')
+    expect(store.getState().activeTab).toBe('today')
   })
 
   it('migrates a version-0 payload written by the middleware before the fix', async () => {

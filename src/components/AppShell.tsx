@@ -18,6 +18,13 @@ import { useBadgeCheck } from '@/hooks/useBadgeCheck'
 import { useCloud } from '@/features/cloud/cloudStore'
 import { cloudConfigured } from '@/lib/supabase'
 
+/* Observatory workspaces (primary navigation) */
+const Today      = lazy(() => import('@/sections/Today'))
+const Practice   = lazy(() => import('@/sections/Practice'))
+const Words      = lazy(() => import('@/sections/Words'))
+const Learning   = lazy(() => import('@/sections/Learning'))
+const LearnSettings = lazy(() => import('@/sections/LearnSettings'))
+/* Original tools (under «المزيد») */
 const Dashboard  = lazy(() => import('@/sections/Dashboard'))
 const Plan       = lazy(() => import('@/sections/Plan'))
 const Vocab      = lazy(() => import('@/sections/Vocab'))
@@ -35,6 +42,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const SECTION_MAP = {
+  today: Today, practice: Practice, words: Words, learning: Learning, settings: LearnSettings,
   dashboard: Dashboard, plan: Plan, vocab: Vocab, books: Books,
   exam: Exam, exercises: Exercises, grammar: Grammar, stats: Stats, resources: Resources, platform: Platform,
 } as const
@@ -54,6 +62,7 @@ const SectionLoader = () => (
 
 export function AppShell() {
   const activeTab = useAppStore((s) => s.activeTab)
+  const setActiveTab = useAppStore((s) => s.setActiveTab)
   const onboarded = useAppStore((s) => s.onboarded)
   const { isAuthenticated, guestMode, resolved, user } = useAuth()
 
@@ -110,7 +119,7 @@ export function AppShell() {
     }
   }
 
-  const ActiveSection = SECTION_MAP[activeTab] ?? Dashboard
+  const ActiveSection = SECTION_MAP[activeTab] ?? Today
 
   return (
     <div className="min-h-dvh flex flex-col">
@@ -118,7 +127,7 @@ export function AppShell() {
           مباشرةً إلى المحتوى (مخفيّ حتى يُركَّز عليه بلوحة المفاتيح) */}
       <a href="#main-content" className="skip-link">تخطَّ إلى المحتوى</a>
       <TopBar
-        onOpenSettings={() => setShowSettings(true)}
+        onOpenSettings={() => setActiveTab('settings')}
         onOpenProfile={() => setShowProfile(true)}
         onInstall={handleInstall}
         showInstall={showInstall}
@@ -127,21 +136,15 @@ export function AppShell() {
       />
       <NavTabs />
 
-      {/* <main> يحمل معلم landmark للصفحة؛ لوحة التبويب (role=tabpanel) بداخله
-          فيبقى الاثنان معًا (كان الدور tabpanel يلغي معلم main سابقًا) */}
+      {/* <main> هو معلم الصفحة؛ التنقل صار أزرارًا بـ aria-current (لا tablist)
+          فكل قسم يحمل عنوانه h1 الخاص */}
       <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
         {/* key يعيد التركيب عند تبديل التبويب فتعمل حركة الدخول CSS
             (fade + انزلاق .3s) — بلا framer في مسار الإقلاع */}
-        <div
-          key={activeTab}
-          id={`tab-${activeTab}`}
-          role="tabpanel"
-          aria-labelledby={`ntab-${activeTab}`}
-          className="tab-in"
-        >
+        <div key={activeTab} id={`tab-${activeTab}`} className="tab-in">
           <TabErrorBoundary tabKey={activeTab}>
             <Suspense fallback={<SectionLoader />}>
-              <ActiveSection onOpenStudyTime={() => setShowStudyTime(true)} />
+              <ActiveSection onOpenStudyTime={() => setShowStudyTime(true)} onOpenSettings={() => setShowSettings(true)} />
             </Suspense>
           </TabErrorBoundary>
         </div>

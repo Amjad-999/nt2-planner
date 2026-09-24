@@ -242,7 +242,7 @@ export function Mascot() {
   return (
     <div
       style={{
-        position: 'fixed', insetBlockEnd: 18, insetInlineEnd: 18, zIndex: 850,
+        position: 'fixed', insetBlockEnd: 'calc(18px + var(--o-bnav-h, 0px) + env(safe-area-inset-bottom, 0px))', insetInlineEnd: 18, zIndex: 850,
         display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10,
       }}
     >

@@ -1,134 +1,135 @@
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useState, lazy, Suspense } from 'react'
 import { useAppStore } from '@/store/useAppStore'
-import { useFocusMode } from '@/hooks/useFocusMode'
 import type { TabId } from '@/store/types'
 import { AppIcon } from './AppIcon'
 import type { LiteIcon } from './icons'
 import {
-  SquaresFour, CalendarCheck, Translate, BookOpen,
-  ClipboardText, GameController, TextAa, ChartLineUp, Globe, Star,
+  Compass, ChatsCircle, Cube, Path, DotsThreeOutline,
+  SquaresFour, CalendarCheck, Translate, BookOpen, ClipboardText, GameController, TextAa, ChartLineUp, Globe, Star, GearSix,
 } from './icons'
 
-/* رموز جغرافية توضيحية: 🇳🇱 محتوى هولندي · 🎯 متعلّق بالامتحان ·
-   📍 موقعك/تقدّمك الحالي · 🌍 عام/شامل (مصادر خارجية أو نظرة عامة) */
-const TABS: { id: TabId; Icon: LiteIcon; label: string; geo: string }[] = [
-  { id: 'dashboard', Icon: SquaresFour,   label: 'لوحة التحكم',     geo: '🌍' },
-  { id: 'plan',      Icon: CalendarCheck, label: 'الخطة',            geo: '📍' },
-  { id: 'vocab',     Icon: Translate,     label: 'المفردات + AI',   geo: '🇳🇱' },
-  { id: 'books',     Icon: BookOpen,      label: 'الكتب',            geo: '🇳🇱' },
-  { id: 'exam',      Icon: ClipboardText, label: 'محاكاة الامتحان', geo: '🎯' },
-  { id: 'exercises', Icon: GameController,label: 'تمارين',           geo: '🇳🇱' },
-  { id: 'grammar',   Icon: TextAa,        label: 'قواعد',            geo: '🇳🇱' },
-  { id: 'stats',     Icon: ChartLineUp,   label: 'التحليلات',        geo: '📍' },
-  { id: 'resources', Icon: Globe,         label: 'مصادر DUO',       geo: '🌍' },
-  { id: 'platform',  Icon: Star,          label: 'منصّتي',           geo: '🌍' },
+/* ── Navigation: four daily workspaces + «المزيد» ─────────────────────────
+   The brief's rule: primary navigation answers "what do I do today", and
+   everything else lives inside the workspace it belongs to or under «More».
+   The ten original tools are all still here — one tap further — so nothing
+   the learner relied on disappeared.
+   Desktop/tablet: a sticky row under the top bar. Phones (<768px): a bottom
+   bar (thumb reach, safe-area aware) that hides during a lesson so the
+   keyboard and the answer field get the room. Framer-free: this is the boot
+   path. */
+
+interface Entry { id: TabId; Icon: LiteIcon; label: string }
+
+const PRIMARY: Entry[] = [
+  { id: 'today', Icon: Compass, label: 'اليوم' },
+  { id: 'practice', Icon: ChatsCircle, label: 'تدريب' },
+  { id: 'words', Icon: Cube, label: 'كلماتي' },
+  { id: 'learning', Icon: Path, label: 'تعلّمي' },
 ]
+
+const MORE_GROUPS: { title: string; items: Entry[] }[] = [
+  { title: 'الإعدادات', items: [{ id: 'settings', Icon: GearSix, label: 'الإعدادات والنسخ الاحتياطي' }] },
+  {
+    title: 'الامتحان والتمارين',
+    items: [
+      { id: 'exam', Icon: ClipboardText, label: 'محاكاة الامتحان' },
+      { id: 'exercises', Icon: GameController, label: 'تمارين' },
+      { id: 'grammar', Icon: TextAa, label: 'قواعد' },
+    ],
+  },
+  {
+    title: 'الخطة والتقدّم',
+    items: [
+      { id: 'dashboard', Icon: SquaresFour, label: 'لوحة التحكم' },
+      { id: 'plan', Icon: CalendarCheck, label: 'خطة الكتب' },
+      { id: 'stats', Icon: ChartLineUp, label: 'التحليلات' },
+    ],
+  },
+  {
+    title: 'المكتبة',
+    items: [
+      { id: 'vocab', Icon: Translate, label: 'المفردات + AI' },
+      { id: 'books', Icon: BookOpen, label: 'الكتب' },
+      { id: 'resources', Icon: Globe, label: 'مصادر DUO' },
+      { id: 'platform', Icon: Star, label: 'منصّتي' },
+    ],
+  },
+]
+
+const MORE_IDS = new Set(MORE_GROUPS.flatMap((g) => g.items.map((i) => i.id)))
+const labelOf = (id: TabId) => MORE_GROUPS.flatMap((g) => g.items).find((i) => i.id === id)?.label ?? ''
+
+const MoreSheet = lazy(() => import('./nav/MoreSheet').then((m) => ({ default: m.MoreSheet })))
 
 export function NavTabs() {
   const activeTab = useAppStore((s) => s.activeTab)
   const setActiveTab = useAppStore((s) => s.setActiveTab)
-  const { focusMode } = useFocusMode()
-  const navRef = useRef<HTMLElement>(null)
-  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
-  const indicatorRef = useRef<HTMLSpanElement>(null)
+  const [moreOpen, setMoreOpen] = useState(false)
+  const moreBtn = useRef<HTMLButtonElement | null>(null)
+  const inMore = MORE_IDS.has(activeTab)
 
-  const moveIndicatorTo = useCallback((btn: HTMLButtonElement | null) => {
-    const ind = indicatorRef.current
-    if (!ind || !btn) return
-    const pad = 12
-    ind.style.left = `${btn.offsetLeft + pad}px`
-    ind.style.width = `${btn.offsetWidth - pad * 2}px`
-    ind.style.opacity = '1'
-  }, [])
-
-  useEffect(() => {
-    moveIndicatorTo(tabRefs.current[activeTab])
-  }, [activeTab, moveIndicatorTo])
-
-  useEffect(() => {
-    const btn = tabRefs.current[activeTab]
-    btn?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })
-  }, [activeTab])
-
-  const handleKeyDown = (e: React.KeyboardEvent, idx: number) => {
-    const tabs = TABS
-    if (e.key === 'ArrowRight') {
-      e.preventDefault()
-      const prev = tabs[(idx - 1 + tabs.length) % tabs.length]
-      setActiveTab(prev.id)
-      tabRefs.current[prev.id]?.focus()
-    } else if (e.key === 'ArrowLeft') {
-      e.preventDefault()
-      const next = tabs[(idx + 1) % tabs.length]
-      setActiveTab(next.id)
-      tabRefs.current[next.id]?.focus()
-    }
+  const go = (id: TabId) => {
+    setActiveTab(id)
+    setMoreOpen(false)
+    // New workspace, new reading position: start at the top, focus the content.
+    window.scrollTo({ top: 0 })
+    requestAnimationFrame(() => document.getElementById('main-content')?.focus({ preventScroll: true }))
   }
 
-  return (
-    <nav
-      ref={navRef}
-      className="flex items-center px-7 sticky z-[190] overflow-x-auto scrollbar-hide border-b"
-      style={{
-        top: '62px',
-        background: 'var(--topbar-bg)',
-        backdropFilter: 'blur(20px) saturate(1.8)',
-        WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-        borderColor: 'var(--glass-border)',
-        position: 'relative',
-      }}
-      role="tablist"
-      aria-label="أقسام التطبيق"
-      onMouseLeave={() => moveIndicatorTo(tabRefs.current[activeTab])}
-    >
-      <span
-        ref={indicatorRef}
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          height: 3,
-          borderRadius: 3,
-          background: 'var(--grad-primary)',
-          boxShadow: '0 2px 8px var(--ring-primary)',
-          opacity: 0,
-          pointerEvents: 'none',
-          transition: 'left 220ms cubic-bezier(0.4,0,0.2,1), width 150ms ease, opacity 150ms ease',
-        }}
-      />
+  const item = (e: Entry, where: 'top' | 'bottom') => {
+    const current = e.id === activeTab
+    return (
+      <li key={e.id}>
+        <button
+          type="button"
+          id={where === 'top' ? `ntab-${e.id}` : undefined}
+          className="o-nav-btn"
+          aria-current={current ? 'page' : undefined}
+          onClick={() => go(e.id)}
+        >
+          <AppIcon icon={e.Icon} size={where === 'top' ? 20 : 22} />
+          <span className="o-nav-label">{e.label}</span>
+        </button>
+      </li>
+    )
+  }
 
-      {TABS.map((tab, idx) => {
-        const isActive = tab.id === activeTab
-        const isPlatform = tab.id === 'platform'
-        return (
-          <button
-            key={tab.id}
-            ref={(el) => { tabRefs.current[tab.id] = el }}
-            id={`ntab-${tab.id}`}
-            role="tab"
-            aria-selected={isActive}
-            aria-controls={`tab-${tab.id}`}
-            aria-label={tab.label}
-            onClick={() => setActiveTab(tab.id)}
-            onKeyDown={(e) => handleKeyDown(e, idx)}
-            onMouseEnter={() => moveIndicatorTo(tabRefs.current[tab.id])}
-            tabIndex={isActive ? 0 : -1}
-            className="relative flex items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent rounded-t-xl px-5 py-[14px] text-[.88rem] font-medium cursor-pointer font-[inherit] bg-none border-none transition-all"
-            style={{
-              color: isActive ? 'var(--orange-text)' : isPlatform ? 'var(--orange-text)' : 'var(--muted)',
-              fontWeight: isActive || isPlatform ? 600 : 500,
-              background: isActive ? 'linear-gradient(180deg,var(--orange-l),transparent)' : undefined,
-            }}
-          >
-            <AppIcon icon={tab.Icon} size={20} />
-            {!focusMode && (
-              <>
-                {tab.label} <span aria-hidden="true">{tab.geo}</span>
-              </>
-            )}
-          </button>
-        )
-      })}
-    </nav>
+  const moreButton = (where: 'top' | 'bottom') => (
+    <li>
+      <button
+        type="button"
+        ref={where === 'top' ? moreBtn : undefined}
+        className="o-nav-btn"
+        aria-haspopup="dialog"
+        aria-expanded={moreOpen}
+        aria-current={inMore ? 'page' : undefined}
+        onClick={(ev) => { moreBtn.current = ev.currentTarget; setMoreOpen(true) }}
+      >
+        <AppIcon icon={DotsThreeOutline} size={where === 'top' ? 20 : 22} />
+        <span className="o-nav-label">{inMore && where === 'top' ? `المزيد · ${labelOf(activeTab)}` : 'المزيد'}</span>
+      </button>
+    </li>
+  )
+
+  return (
+    <>
+      <nav className="o-topnav" aria-label="التنقل الرئيسي">
+        <ul>
+          {PRIMARY.map((e) => item(e, 'top'))}
+          {moreButton('top')}
+        </ul>
+      </nav>
+      <nav className="o-bottomnav" aria-label="التنقل الرئيسي (أسفل الشاشة)">
+        <ul>
+          {PRIMARY.map((e) => item(e, 'bottom'))}
+          {moreButton('bottom')}
+        </ul>
+      </nav>
+      {moreOpen && (
+        <Suspense fallback={null}>
+          <MoreSheet groups={MORE_GROUPS} active={activeTab} onPick={go} onClose={() => setMoreOpen(false)} returnTo={moreBtn} />
+        </Suspense>
+      )}
+    </>
   )
 }

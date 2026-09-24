@@ -1,4 +1,5 @@
 import type { State, VocabWord, ExamWord, DayRecord, SkillKey, SkillRecord } from '@/store/types'
+import { mergeObs } from '@/features/observatory/state'
 
 /**
  * دمج آمن بلا فقدان: يُنتج حالةً تَجمع كل تقدّم الطرفين (المحلّي + السحابي).
@@ -231,6 +232,9 @@ export function mergeStates(a: State, b: State): State {
     // so the celebration can never re-fire after a sync.
     goalCelebratedOn: (a.goalCelebratedOn ?? '') > (b.goalCelebratedOn ?? '') ? (a.goalCelebratedOn ?? '') : (b.goalCelebratedOn ?? ''),
     studyProgram: mergeStudyProgram(a.studyProgram, b.studyProgram, bNewer),
+    /* Evidence is append-only (sessions, uses, attempts: union by id); the
+       live session and settings follow the newer device. See mergeObs. */
+    observatory: mergeObs(a.observatory, b.observatory, bNewer),
     _v: 6,
     _savedAt: Math.max(num(a._savedAt), num(b._savedAt)),
   }
