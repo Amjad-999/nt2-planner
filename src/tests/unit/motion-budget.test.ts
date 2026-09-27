@@ -15,7 +15,9 @@ import { resolve } from 'node:path'
  */
 
 const SRC = resolve(process.cwd(), 'src')
-const GLOBALS = readFileSync(resolve(SRC, 'styles/globals.css'), 'utf8')
+// Git on Windows (core.autocrlf) checks the stylesheet out with CRLF; the
+// slicing below looks for '}\n', so normalise first.
+const GLOBALS = readFileSync(resolve(SRC, 'styles/globals.css'), 'utf8').replace(/\r\n/g, '\n')
 
 /** Properties whose animation forces layout on every frame. */
 const LAYOUT_PROPS = [

@@ -43,7 +43,7 @@ export function ToastHost() {
     <div
       className="toast-host"
       aria-live="polite"
-      style={{ position: 'fixed', insetInlineStart: '50%', transform: 'translateX(50%)',
+      style={{ position: 'fixed', bottom: 'calc(18px + var(--o-bnav-h, 0px) + env(safe-area-inset-bottom, 0px))', insetInlineStart: '50%', transform: 'translateX(50%)',
         zIndex: 950, display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', alignItems: 'center', pointerEvents: 'none' }}
     >
       {/* الإعلان لقارئ الشاشة يأتي من aria-live على الحاوية أعلاه، فلا حاجة

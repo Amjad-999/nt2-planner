@@ -308,3 +308,256 @@
   /* Deeper on the dark page so the icon still reads as lifted off the surface */
   --mascot-shadow:rgba(0,0,0,.55);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OBSERVATORY — "Living Language Observatory" design layer
+   ─────────────────────────────────────────────────────────────────────────
+   Two parts:
+   1. --o-* tokens: the vocabulary of the new workspaces (Today, Lesson,
+      Practice, Words, My Learning, Settings). Defined for light + dark.
+   2. data-skin="observatory": remaps the legacy tokens (--bg, --orange …) so
+      the older sections share the same palette. data-skin="classic" (or no
+      attribute) keeps the original burnt-orange look untouched above.
+   Source palette (brief): obsidian #101820 · deep panel #17232B · warm paper
+   #F5F3EB · muted gray #9DABA9 · cobalt #6D8AFF · mint #7CE1BB · lime
+   #D7FF72 · coral #D58A65 · warning #FFD081 · error #FF8B8B.
+   The bright accents are tuned for dark planes; on paper each gets an *-ink
+   twin darkened until it clears 4.5:1 (measured in
+   src/tests/unit/observatory-tokens.test.ts, which fails the suite on drift).
+   Lime is the primary action fill only — never text on a light surface.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* ── planes ── */
+  --o-page:#ECE9DF;            /* page: slightly deeper than paper so planes lift */
+  --o-paper:#F5F3EB;           /* reading + answering plane */
+  --o-paper-2:#FBFAF6;         /* raised: inputs, open cards */
+  --o-paper-sunk:#E4E0D4;      /* sunk: wells, track of a meter */
+  --o-night:#101820;           /* structural dark area (Today hero, speaking stage) */
+  --o-night-2:#17232B;         /* raised plane inside the night area */
+  --o-night-3:#1E2C36;
+  /* ── ink ── */
+  --o-ink:#101820;             /* 14.7:1 on page */
+  --o-ink-2:#2E3A42;           /* 9.6:1 on page */
+  --o-muted:#56625F;           /* 5.2:1 on page, 5.7:1 on paper */
+  --o-on-night:#F5F3EB;        /* 16.1:1 on night */
+  --o-on-night-2:#B9C4C2;      /* 10.0:1 on night, 8.9:1 on night-2 */
+  /* ── lines ── */
+  --o-line:rgba(16,24,32,.12);
+  --o-line-2:#6F7E7C;          /* input boundary: ≥3:1 non-text on paper */
+  --o-line-night:rgba(245,243,235,.14);
+  /* ── semantic accents: fill · ink (text on paper) · wash (tint) ── */
+  --o-cobalt:#6D8AFF;  --o-cobalt-ink:#3149C4;  --o-cobalt-wash:#DFE4FA;
+  --o-mint:#7CE1BB;    --o-mint-ink:#17684A;    --o-mint-wash:#D5F1E4;
+  --o-lime:#D7FF72;    --o-on-lime:#101820;     --o-lime-edge:#7F9A2E;
+  --o-coral:#D58A65;   --o-coral-ink:#94472A;   --o-coral-wash:#F3DFD3;
+  --o-warn:#FFD081;    --o-warn-ink:#7A5000;    --o-warn-wash:#FBEBCB;
+  --o-error:#FF8B8B;   --o-error-ink:#B02A2A;   --o-error-wash:#F8DCD8;
+  /* accents as they appear ON the night plane (both themes) */
+  --o-night-cobalt:#9DB0FF; --o-night-mint:#7CE1BB; --o-night-lime:#D7FF72; --o-night-coral:#E7A98A;
+  /* ── focus: 3px cobalt ring + paper halo so it reads on any plane ── */
+  --o-focus:#3149C4;
+  --o-focus-halo:#F5F3EB;
+  /* ── materials (3D family): satin faces, paper planes, frosted details ── */
+  --o-satin:linear-gradient(162deg,#FFFFFF 0%,#F1EEE5 46%,#DDD8CB 100%);
+  --o-satin-edge:#C4BEAF;      /* token thickness */
+  --o-satin-hi:rgba(255,255,255,.85);
+  --o-satin-cobalt:linear-gradient(162deg,#BCC9FF 0%,#8FA4FF 48%,#6D8AFF 100%);
+  --o-satin-cobalt-edge:#3E57C9;
+  --o-satin-mint:linear-gradient(162deg,#C9F3E2 0%,#8FE6C5 50%,#5FCBA2 100%);
+  --o-satin-mint-edge:#3C9B78;
+  --o-satin-lime:linear-gradient(162deg,#EDFFBE 0%,#DBFF7E 50%,#C3EC5A 100%);
+  --o-frost:rgba(245,243,235,.07);
+  --o-frost-line:rgba(245,243,235,.16);
+  --o-glow-cobalt:rgba(109,138,255,.34);
+  --o-glow-mint:rgba(124,225,187,.26);
+  --o-glow-lime:rgba(215,255,114,.22);
+  --o-link:rgba(157,176,255,.55);        /* constellation line on night */
+  --o-link-paper:rgba(49,73,196,.35);    /* constellation line on paper */
+  /* ── elevation: soft, layered, obsidian-tinted ── */
+  --o-shadow-1:0 1px 0 rgba(16,24,32,.04), 0 1px 2px rgba(16,24,32,.06), 0 10px 24px -14px rgba(16,24,32,.22);
+  --o-shadow-2:0 1px 0 rgba(16,24,32,.05), 0 4px 10px -4px rgba(16,24,32,.12), 0 26px 48px -24px rgba(16,24,32,.34);
+  --o-shadow-3:0 2px 0 rgba(16,24,32,.05), 0 12px 24px -10px rgba(16,24,32,.20), 0 44px 80px -36px rgba(16,24,32,.46);
+  --o-shadow-token:0 22px 30px -18px rgba(16,24,32,.50);
+  /* ── radius ── */
+  --o-r-xs:8px; --o-r-sm:12px; --o-r-md:18px; --o-r-lg:26px; --o-r-xl:34px; --o-r-pill:999px;
+  /* ── spacing (4px base) ── */
+  --o-s1:4px; --o-s2:8px; --o-s3:12px; --o-s4:16px; --o-s5:24px; --o-s6:32px; --o-s7:48px; --o-s8:64px;
+  /* ── typography ── */
+  --o-font-display:'Fraunces Variable','Fraunces',Georgia,'Times New Roman',serif; /* Dutch display */
+  --o-font-display-ar:'Tajawal',system-ui,sans-serif;                               /* Arabic display (800) */
+  --o-font-ui:var(--font-arabic);
+  --o-font-nl:var(--font-latin);
+  --o-font-mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  --o-fs-meta:.75rem; --o-fs-sm:.875rem; --o-fs-body:1rem; --o-fs-read:1.125rem;
+  --o-fs-h3:1.25rem; --o-fs-h2:clamp(1.45rem,2.6vw,1.9rem); --o-fs-display:clamp(2.1rem,5.4vw,3.6rem);
+  /* ── motion (AE-style curves; durations scaled by data-motion) ── */
+  --o-ease-out:cubic-bezier(.2,.8,.2,1);      /* "easy ease out" */
+  --o-ease-emph:cubic-bezier(.16,1,.3,1);     /* expo-out: settles, never bounces */
+  --o-ease-inout:cubic-bezier(.65,0,.35,1);
+  --o-dur-control:150ms; --o-dur-panel:280ms; --o-dur-screen:450ms; --o-dur-finale:700ms;
+  --o-travel:14px;                            /* default translate distance */
+  /* ── layout ── */
+  --o-bnav-h:0px;                             /* set when the mobile bottom nav shows */
+  --o-read-measure:62ch;
+}
+:root[data-theme="dark"] {
+  --o-page:#0C1319;
+  --o-paper:#17232B;
+  --o-paper-2:#1E2C36;
+  --o-paper-sunk:#101820;
+  --o-night:#101820;
+  --o-night-2:#17232B;
+  --o-night-3:#22323D;
+  --o-ink:#F5F3EB;
+  --o-ink-2:#C9CFC9;
+  --o-muted:#9DABA9;           /* 6.7:1 on paper, 6.0:1 on paper-2 */
+  --o-on-night:#F5F3EB;
+  --o-on-night-2:#B9C4C2;
+  --o-line:rgba(245,243,235,.11);
+  --o-line-2:#7E8F8C;          /* 4.7:1 on paper */
+  --o-line-night:rgba(245,243,235,.14);
+  --o-cobalt:#6D8AFF;  --o-cobalt-ink:#9DB0FF;  --o-cobalt-wash:#1F2B52;
+  --o-mint:#7CE1BB;    --o-mint-ink:#7CE1BB;    --o-mint-wash:#143A32;
+  --o-lime:#D7FF72;    --o-on-lime:#101820;     --o-lime-edge:#6E8A22;
+  --o-coral:#D58A65;   --o-coral-ink:#E7A98A;   --o-coral-wash:#3A2A24;
+  --o-warn:#FFD081;    --o-warn-ink:#FFD081;    --o-warn-wash:#3A3222;
+  --o-error:#FF8B8B;   --o-error-ink:#FF9B9B;   --o-error-wash:#3E2426;
+  --o-night-cobalt:#9DB0FF; --o-night-mint:#7CE1BB; --o-night-lime:#D7FF72; --o-night-coral:#E7A98A;
+  --o-focus:#D7FF72;
+  --o-focus-halo:#101820;
+  --o-satin:linear-gradient(162deg,#33434F 0%,#23323C 48%,#17232B 100%);
+  --o-satin-edge:#0A1015;
+  --o-satin-hi:rgba(245,243,235,.22);
+  --o-satin-cobalt:linear-gradient(162deg,#A9B9FF 0%,#8299FF 48%,#6D8AFF 100%);
+  --o-satin-cobalt-edge:#2C3F9E;
+  --o-satin-mint:linear-gradient(162deg,#A8EDD3 0%,#7CE1BB 50%,#4FB892 100%);
+  --o-satin-mint-edge:#2A7A5E;
+  --o-satin-lime:linear-gradient(162deg,#EDFFBE 0%,#D7FF72 50%,#B5DE4C 100%);
+  --o-frost:rgba(245,243,235,.06);
+  --o-frost-line:rgba(245,243,235,.14);
+  --o-glow-cobalt:rgba(109,138,255,.30);
+  --o-glow-mint:rgba(124,225,187,.20);
+  --o-glow-lime:rgba(215,255,114,.16);
+  --o-link:rgba(157,176,255,.5);
+  --o-link-paper:rgba(157,176,255,.4);
+  --o-shadow-1:0 1px 0 rgba(0,0,0,.2), 0 1px 2px rgba(0,0,0,.3), 0 10px 24px -14px rgba(0,0,0,.6);
+  --o-shadow-2:0 1px 0 rgba(0,0,0,.25), 0 4px 10px -4px rgba(0,0,0,.4), 0 26px 48px -24px rgba(0,0,0,.7);
+  --o-shadow-3:0 2px 0 rgba(0,0,0,.25), 0 12px 24px -10px rgba(0,0,0,.45), 0 44px 80px -36px rgba(0,0,0,.8);
+  --o-shadow-token:0 22px 30px -18px rgba(0,0,0,.75);
+}
+
+/* ── Skin: legacy tokens remapped onto the observatory palette ──
+   Keep the LIGHT and DARK skin blocks defining the same property set:
+   `:root[data-skin]` has the same specificity as `:root[data-theme="dark"]`
+   and comes later, so any property the dark skin block forgets would leak
+   the light value into dark mode. observatory-tokens.test.ts checks this. */
+:root[data-skin="observatory"] {
+  --bg:#ECE9DF;--surface:rgba(251,250,246,.86);--surface2:rgba(251,250,246,.62);--surface3:#F5F3EB;
+  --border:rgba(16,24,32,.12);--border2:rgba(16,24,32,.24);
+  --text:#101820;--text2:#2E3A42;--muted:#56625F;--muted2:#A7AFAB;
+  --orange:#4F6DF0;--orange-d:#3E5AD8;--orange-ink:#3149C4;--orange-l:#DFE4FA;--orange-m:#A9B8F5;
+  --blue:#3E5AD8;--blue-l:rgba(79,109,240,.12);
+  --green:#1F7A57;--green-l:rgba(124,225,187,.28);
+  --amber:#9A6400;--amber-l:rgba(255,208,129,.34);
+  --orange-text:#3149C4;--green-text:#17684A;--red-text:#B02A2A;--amber-text:#7A5000;
+  --purple:#B0603C;--purple-l:rgba(213,138,101,.18);
+  --red:#C23B3B;--red-l:rgba(255,139,139,.22);
+  --teal:var(--green);--teal-l:var(--green-l);
+  --c1:#C9D3FF;--c2:#A3B4FF;--c3:#6D8AFF;--c4:#4F6DF0;--c5:#3149C4;--c6:#1F2F85;
+  --shadow-sm:0 1px 2px rgba(16,24,32,.06), 0 2px 8px rgba(16,24,32,.05);
+  --shadow:0 6px 20px rgba(16,24,32,.10), 0 2px 6px rgba(16,24,32,.06);
+  --shadow-lg:0 24px 60px rgba(16,24,32,.20), 0 10px 24px rgba(16,24,32,.10);
+  --hero-bg:#101820;
+  --topbar-bg:rgba(245,243,235,.84);
+  --overlay-bg:rgba(16,24,32,.45);
+  --mesh1:hsla(228,100%,71%,.20);--mesh2:hsla(158,62%,68%,.16);--mesh3:hsla(76,100%,72%,.12);
+  --glass-bg:rgba(251,250,246,.66);--glass-bg-strong:rgba(251,250,246,.88);
+  --glass-border:rgba(16,24,32,.10);--glass-hi:rgba(255,255,255,.6);
+  --btn-bg:rgba(251,250,246,.82);--btn-border:rgba(16,24,32,.18);
+  --modal-bg:rgba(248,246,240,.96);--modal-border:rgba(16,24,32,.14);
+  --elev-1:0 8px 28px rgba(16,24,32,.08), 0 2px 8px rgba(16,24,32,.05);
+  --elev-2:0 8px 24px rgba(16,24,32,.12), 0 3px 8px rgba(16,24,32,.07);
+  --elev-3:0 28px 64px rgba(16,24,32,.22), 0 12px 28px rgba(16,24,32,.12);
+  --ring-primary:rgba(79,109,240,.30);
+  --grad-primary:linear-gradient(135deg,#3651D6 0%,#2A3FAE 100%);
+  --grad-hero:linear-gradient(140deg,#0C1319 0%,#101820 50%,#17232B 100%);
+  --blob-cool1:hsla(228,100%,71%,.45);--blob-cool2:hsla(158,62%,60%,.2);
+  --hero-dawn:linear-gradient(160deg,#141B2E 0%,#1C2338 55%,#1F2A33 100%);
+  --hero-day:linear-gradient(160deg,#101820 0%,#17232B 55%,#1C2B35 100%);
+  --hero-dusk:linear-gradient(160deg,#12171F 0%,#1D222B 55%,#23272C 100%);
+  --hero-night:linear-gradient(160deg,#080D12 0%,#0E151C 55%,#141E26 100%);
+  --sky-back:rgba(8,13,18,.55);
+  --sky-front:rgba(6,10,14,.85);
+  --ember-cool:hsla(76,100%,72%,.85);
+  --hero-ink:#F5F3EB;
+  --hero-ink2:rgba(201,211,208,.92);
+  --hero-veil:rgba(245,243,235,.08);
+  --hero-veil2:rgba(245,243,235,.12);
+  --hero-line:rgba(245,243,235,.14);
+  --hero-hi:rgba(245,243,235,.08);
+  --on-primary:#FFFFFF;
+  --font-display:var(--font-arabic);
+  --spot-color:rgba(109,138,255,.12);
+  --card-fg-hover:#0B1116;
+  --card-accent-hover:#3E5AD8;
+  --pass-bg:var(--green-l);--pass-border:rgba(31,122,87,.3);--pass-text:var(--green-text);
+  --pass-btn-bg:rgba(124,225,187,.3);--pass-btn-border:rgba(31,122,87,.45);
+  --countdown-bg:var(--glass-bg);--countdown-border:var(--glass-border);--countdown-text:var(--orange-ink);
+  --countdown-accent-bg:rgba(79,109,240,.12);--countdown-accent-border:rgba(79,109,240,.3);
+  --mascot-shadow:rgba(16,24,32,.32);
+}
+:root[data-skin="observatory"][data-theme="dark"] {
+  --bg:#101820;--surface:rgba(23,35,43,.8);--surface2:rgba(23,35,43,.56);--surface3:#1E2C36;
+  --border:rgba(245,243,235,.10);--border2:rgba(245,243,235,.20);
+  --text:#F5F3EB;--text2:#C9CFC9;--muted:#9DABA9;--muted2:#4A5A60;
+  --orange:#6D8AFF;--orange-d:#9DB0FF;--orange-ink:#3149C4;--orange-l:#1F2B52;--orange-m:#3B4F99;
+  --blue:#9DB0FF;--blue-l:rgba(109,138,255,.16);
+  --green:#7CE1BB;--green-l:rgba(124,225,187,.14);
+  --amber:#FFD081;--amber-l:rgba(255,208,129,.14);
+  --orange-text:#9DB0FF;--green-text:#7CE1BB;--red-text:#FF9B9B;--amber-text:#FFD081;
+  --purple:#E7A98A;--purple-l:rgba(213,138,101,.16);
+  --red:#FF8B8B;--red-l:rgba(255,139,139,.14);
+  --teal:var(--green);--teal-l:var(--green-l);
+  --c1:#1F2F85;--c2:#3149C4;--c3:#4F6DF0;--c4:#6D8AFF;--c5:#9DB0FF;--c6:#C9D3FF;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.5), 0 2px 10px rgba(0,0,0,.4);
+  --shadow:0 8px 24px rgba(0,0,0,.55), 0 3px 8px rgba(0,0,0,.4);
+  --shadow-lg:0 28px 64px rgba(0,0,0,.65), 0 12px 28px rgba(0,0,0,.5);
+  --hero-bg:#0C1319;
+  --topbar-bg:rgba(16,24,32,.86);
+  --overlay-bg:rgba(4,7,10,.62);
+  --mesh1:hsla(228,100%,71%,.14);--mesh2:hsla(158,62%,60%,.10);--mesh3:hsla(76,100%,72%,.06);
+  --glass-bg:rgba(23,35,43,.7);--glass-bg-strong:rgba(30,44,54,.9);
+  --glass-border:rgba(245,243,235,.10);--glass-hi:rgba(245,243,235,.08);
+  --btn-bg:rgba(30,44,54,.86);--btn-border:rgba(245,243,235,.18);
+  --modal-bg:rgba(23,35,43,.97);--modal-border:rgba(245,243,235,.14);
+  --elev-1:0 8px 32px rgba(0,0,0,.45), 0 2px 8px rgba(0,0,0,.3);
+  --elev-2:0 10px 28px rgba(0,0,0,.55), 0 4px 10px rgba(0,0,0,.4);
+  --elev-3:0 30px 70px rgba(0,0,0,.7), 0 12px 30px rgba(0,0,0,.55);
+  --ring-primary:rgba(109,138,255,.35);
+  --grad-primary:linear-gradient(135deg,#3651D6 0%,#2A3FAE 100%);
+  --grad-hero:linear-gradient(140deg,#080D12 0%,#0E151C 50%,#17232B 100%);
+  --blob-cool1:hsla(228,100%,71%,.4);--blob-cool2:hsla(158,62%,60%,.16);
+  --hero-dawn:linear-gradient(160deg,#10162A 0%,#171E31 55%,#1A242D 100%);
+  --hero-day:linear-gradient(160deg,#0C1319 0%,#131D24 55%,#18252E 100%);
+  --hero-dusk:linear-gradient(160deg,#0E1218 0%,#181C24 55%,#1E2126 100%);
+  --hero-night:linear-gradient(160deg,#05080C 0%,#0A1016 55%,#101820 100%);
+  --sky-back:rgba(6,10,14,.6);
+  --sky-front:rgba(4,7,10,.9);
+  --ember-cool:hsla(76,100%,72%,.8);
+  --hero-ink:#F5F3EB;
+  --hero-ink2:rgba(201,211,208,.92);
+  --hero-veil:rgba(245,243,235,.08);
+  --hero-veil2:rgba(245,243,235,.12);
+  --hero-line:rgba(245,243,235,.14);
+  --hero-hi:rgba(245,243,235,.08);
+  --on-primary:#FFFFFF;
+  --font-display:var(--font-arabic);
+  --spot-color:rgba(109,138,255,.16);
+  --card-fg-hover:#FFFFFF;
+  --card-accent-hover:#9DB0FF;
+  --pass-bg:var(--green-l);--pass-border:rgba(124,225,187,.4);--pass-text:var(--green-text);
+  --pass-btn-bg:rgba(124,225,187,.2);--pass-btn-border:rgba(124,225,187,.5);
+  --countdown-bg:var(--glass-bg);--countdown-border:var(--glass-border);--countdown-text:var(--orange-text);
+  --countdown-accent-bg:rgba(109,138,255,.14);--countdown-accent-border:rgba(109,138,255,.3);
+  --mascot-shadow:rgba(0,0,0,.55);
+}

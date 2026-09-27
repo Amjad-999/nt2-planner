@@ -1,3 +1,5 @@
+import type { ObsState } from '@/features/observatory/types'
+
 export type Level = 'A1' | 'A2' | 'B1' | 'B2' | 'C1'
 export type SkillKey = 'reading' | 'listening' | 'writing' | 'speaking'
 
@@ -77,7 +79,12 @@ export interface StudyProgramState {
 
 export type ThemeKey = 'light' | 'dark'
 export type TtsEngine = 'auto' | 'online' | 'browser'
-export type TabId = 'dashboard' | 'plan' | 'vocab' | 'books' | 'exam' | 'exercises' | 'situations' | 'grammar' | 'stats' | 'resources' | 'platform'
+/* today · practice · words · learning · settings are the observatory
+   workspaces (primary navigation); the rest are the original tools, still
+   reachable from «المزيد» and from the workspace that relates to them. */
+export type TabId =
+  | 'today' | 'practice' | 'words' | 'learning' | 'settings'
+  | 'dashboard' | 'plan' | 'vocab' | 'books' | 'exam' | 'exercises' | 'situations' | 'grammar' | 'stats' | 'resources' | 'platform'
 export type PlanHealthStatus = 'ok' | 'tight' | 'crit'
 
 export interface VocabWord {
@@ -194,6 +201,8 @@ export interface State {
   goalCelebratedOn: string   // dayKey ('YYYY-MM-DD') of the last daily-goal celebration; '' = never
   /** برنامج الكتب: حالة كل درس، ونافذة التواريخ، وجلسة اليوم الجارية. */
   studyProgram: StudyProgramState
+  /** طبقة التعلّم اليومي (المرصد): الجلسة الجارية، الأدلة، الملاحظات، الإعدادات. */
+  observatory: ObsState
   _v: number
   _savedAt: number
 }

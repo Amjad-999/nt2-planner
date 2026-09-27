@@ -54,7 +54,7 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
       {/* Logo */}
       <a
         href="#"
-        onClick={(e) => { e.preventDefault(); setActiveTab('dashboard') }}
+        onClick={(e) => { e.preventDefault(); setActiveTab('today') }}
         className="flex items-center gap-2 shrink-0 no-underline text-[var(--text)]"
         title="الصفحة الرئيسية"
         aria-label="الصفحة الرئيسية"
@@ -100,7 +100,7 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
         <span>يوم</span>
       </div>
 
-      {/* Font size */}
+      {/* Font size — phones get it in «الإعدادات» (the bar has no room at 360px) */}
       <div className="hidden sm:flex items-center gap-1">
         {/* axe: الاسم المسموع يجب أن يضم النص المرئي (A−/A+) حرفيًا */}
         <IconBtn onClick={() => changeFontSize(-1)} title="تصغير الخطّ" aria-label="A− تصغير الخطّ">A−</IconBtn>

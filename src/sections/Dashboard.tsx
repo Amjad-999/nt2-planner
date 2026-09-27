@@ -11,7 +11,7 @@ import { motion } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { pressSpring, pressTransition } from '@/lib/animations'
 
-interface Props { onOpenStudyTime?: () => void }
+interface Props { onOpenStudyTime?: () => void; onOpenSettings?: () => void }
 
 /**
  * الرئيسية — answers one question first: what do I do now?

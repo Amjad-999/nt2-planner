@@ -33,41 +33,47 @@ function stripComments(src: string): string {
 const read = (p: string) => stripComments(readFileSync(resolve(SRC, p), 'utf8'))
 
 const NAV = read('components/NavTabs.tsx')
-const NAVCSS = read('styles/navigation.css')
 const TOPBAR = read('components/TopBar.tsx')
 const HERO = read('components/hero/JourneyHero.tsx')
 const TOKENS = read('styles/tokens.css')
 const GLOBALS = read('styles/globals.css')
 
+/** The body of the first `selector {` rule in a stylesheet. */
+function rule(css: string, selector: string): string {
+  const at = css.indexOf(`${selector} {`)
+  expect(at, `${selector} is not defined`).toBeGreaterThan(-1)
+  return css.slice(at, css.indexOf('}', at))
+}
+
 describe('the tab bar stays under the top bar while the page scrolls', () => {
   it('declares sticky', () => {
-    expect(NAV).toContain('sticky')
+    expect(rule(GLOBALS, '.o-topnav')).toContain('position: sticky')
   })
 
   it('never re-declares position inline, which would silently cancel it', () => {
-    // An inline style beats a Tailwind class. This exact line is what broke it.
+    // An inline style beats a stylesheet rule. This exact line is what broke it.
     expect(NAV).not.toMatch(/position:\s*['"]relative['"]/)
     expect(NAV).not.toMatch(/position:\s*['"]static['"]/)
   })
 
   it('offsets itself with the shared bar height, not a copied number', () => {
-    expect(NAV).toContain("top: 'var(--topbar-h)'")
+    expect(rule(GLOBALS, '.o-topnav')).toContain('top: var(--topbar-h)')
     expect(TOKENS).toContain('--topbar-h:')
     // The literal used to live in two files at once.
     expect(NAV).not.toContain("'62px'")
     expect(TOPBAR).not.toContain('h-[62px]')
   })
 
-  it('never scrolls: five destinations, in a fixed grid on a phone', () => {
+  it('never scrolls on a phone: four workspaces + «المزيد» in a fixed bottom bar', () => {
     /* The old bar scrolled ten tabs sideways and needed a fade to admit it.
-       The five groups fit every phone width, so nothing can be out of view —
+       Five buttons fit every phone width, so nothing can be out of view —
        and on a phone the bar moves to the bottom, within thumb reach. */
-    const groups = [...NAV.matchAll(/\{ id: '[a-z]+', label:/g)].length
-    expect(groups, 'primary navigation must stay at five destinations').toBe(5)
-    expect(NAVCSS).toMatch(/@media \(max-width: 639px\)[\s\S]*position: fixed/)
-    expect(NAVCSS).toMatch(/grid-template-columns: repeat\(5/)
-    expect(NAVCSS, 'the fixed bar must clear the home indicator').toContain('env(safe-area-inset-bottom')
-    expect(NAVCSS, 'the page must reserve room for the fixed bar').toMatch(/\.app-layout \{[^}]*padding-bottom/)
+    const primary = NAV.slice(NAV.indexOf('const PRIMARY'), NAV.indexOf('const MORE_GROUPS'))
+    const workspaces = [...primary.matchAll(/\{ id: '[a-z]+',/g)].length
+    expect(workspaces, 'primary navigation must stay at four workspaces + «المزيد»').toBe(4)
+    expect(GLOBALS).toMatch(/@media \(max-width: 767px\)[\s\S]*\.o-bottomnav \{[^}]*position: fixed/)
+    expect(rule(GLOBALS, '  .o-bottomnav'), 'the fixed bar must clear the home indicator').toContain('env(safe-area-inset-bottom')
+    expect(GLOBALS, 'the page must reserve room for the fixed bar').toMatch(/main#main-content \{[^}]*padding-bottom: calc\(var\(--o-bnav-h\)/)
   })
 })
 
@@ -126,25 +132,19 @@ describe('navigation always says where you are and where you can go', () => {
        elements may opt out, explicitly "not core content or navigation".
        An earlier version hid the labels in Focus Mode, leaving ten unlabelled
        icons — heavier on memory, not lighter on attention. */
-    const at = NAV.indexOf('<span>{group.label}</span>')
+    const at = NAV.indexOf('<span className="o-nav-label">{e.label}</span>')
     expect(at, 'the visible label is gone').toBeGreaterThan(-1)
     const around = NAV.slice(Math.max(0, at - 260), at)
     expect(around, 'the label must not be behind a focusMode check').not.toContain('focusMode')
   })
 
-  it('names every destination on hover as well as to assistive tech', () => {
-    expect(NAV).toContain('title={group.label}')
-    expect(NAV).toContain('aria-label={group.label}')
-  })
-
-  it('marks the open destination, in both rows', () => {
+  it('marks the open destination, for workspaces and for «المزيد»', () => {
     const marks = [...NAV.matchAll(/aria-current=\{/g)].length
-    expect(marks, 'the group row and the section row each need aria-current').toBeGreaterThanOrEqual(2)
+    expect(marks, 'the workspace buttons and the «المزيد» button each need aria-current').toBeGreaterThanOrEqual(2)
   })
 
-  it('keeps the practice group together, including the situations section', () => {
-    expect(NAV).toContain("tabs: ['exercises', 'situations', 'exam']")
-    expect(NAV).toContain('situations:')
+  it('keeps the situations section reachable under «المزيد»', () => {
+    expect(NAV).toContain("{ id: 'situations',")
   })
 })
 

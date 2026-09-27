@@ -1,9 +1,9 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 /**
- * The whole shell, end to end: five primary destinations, and a home screen
- * that opens on one clear next step. Every piece of this is lazily loaded and
+ * The whole shell, end to end: four daily workspaces + «المزيد», a first
+ * screen that opens on today, and a dashboard with one clear next step. Every piece of this is lazily loaded and
  * composed at runtime, so a broken import or a missing section shows up here
  * and nowhere else in the suite.
  */
@@ -28,18 +28,26 @@ describe('the app shell', () => {
     vi.resetModules()
   })
 
-  it('offers five primary destinations, each named in words', async () => {
+  it('offers four workspaces and «المزيد», each named in words', async () => {
     const { AppShell } = await freshShell()
     render(<AppShell />)
-    const nav = screen.getByRole('navigation', { name: 'التنقّل الرئيسي' })
-    for (const label of ['الرئيسية', 'تعلّم', 'تدرّب', 'المفردات', 'تقدّمي']) {
-      expect(screen.getByRole('button', { name: label })).toBeInTheDocument()
+    const nav = screen.getByRole('navigation', { name: 'التنقل الرئيسي' })
+    for (const label of ['اليوم', 'تدريب', 'كلماتي', 'تعلّمي', 'المزيد']) {
+      expect(within(nav).getByRole('button', { name: label })).toBeInTheDocument()
     }
     expect(nav.querySelectorAll('button')).toHaveLength(5)
   })
 
-  it('opens home on a next step with a single primary action', async () => {
-    const { AppShell } = await freshShell()
+  it('opens on the today workspace', async () => {
+    const { AppShell, useAppStore } = await freshShell()
+    render(<AppShell />)
+    expect(useAppStore.getState().activeTab).toBe('today')
+    expect(await screen.findByRole('heading', { level: 1 }, { timeout: 8000 })).toBeInTheDocument()
+  }, 20000)
+
+  it('keeps the dashboard on a next step with a single primary action', async () => {
+    const { AppShell, useAppStore } = await freshShell()
+    useAppStore.setState({ activeTab: 'dashboard' })
     render(<AppShell />)
     expect(await screen.findByText(/خطوتك التالية|اكتملت مهام اليوم/, {}, { timeout: 8000 })).toBeInTheDocument()
     const primaries = document.querySelectorAll('.btn--primary')

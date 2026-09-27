@@ -639,3 +639,101 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
   .mascot-dancing .cat-arm-r,
   .mascot-dancing .cat-tail { animation: none; }
 }
+
+/* ── Motion level (data-motion on <html>, mirrored from the learner's setting by
+   initStore). «مخفّفة» mirrors the OS reduce-motion kill above, app-wide. ── */
+html[data-motion="expressive"] { --o-dur-panel: 350ms; --o-dur-screen: 560ms; --o-travel: 22px; }
+/* In-app «مخفّفة» applies to the whole app, like the OS setting does. */
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  animation-duration: .01ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important;
+  transition-duration: .01ms !important; transition-delay: 0ms !important;
+}
+
+/* ═══════════════ Observatory navigation (boot path — keep it small) ═══════════════
+   Desktop/tablet: .o-topnav sticky row. Phones: .o-bottomnav fixed bar.
+   --o-bnav-h tells anything pinned to the bottom (toasts, Katja) to sit above
+   the bar. During a lesson (html[data-lesson="open"]) the bar steps aside so
+   the keyboard and the answer field get the room. */
+.o-topnav {
+  position: sticky; top: var(--topbar-h); z-index: 190;
+  background: var(--topbar-bg);
+  backdrop-filter: blur(18px) saturate(1.6);
+  border-bottom: 1px solid var(--glass-border);
+}
+.o-topnav ul, .o-bottomnav ul { list-style: none; display: flex; margin: 0; padding: 0; }
+.o-topnav ul { gap: 4px; max-width: 1180px; margin: 0 auto; padding: 0 20px; overflow-x: auto; scrollbar-width: none; }
+.o-topnav ul::-webkit-scrollbar { display: none; }
+.o-nav-btn {
+  position: relative; display: inline-flex; align-items: center; gap: 8px;
+  min-height: 48px; padding: 0 16px; border: 0; background: none; cursor: pointer;
+  font: inherit; font-size: .92rem; font-weight: 600; color: var(--muted); white-space: nowrap;
+  border-radius: 12px 12px 0 0;
+  transition: color var(--o-dur-control) var(--o-ease-out), background-color var(--o-dur-control) var(--o-ease-out);
+}
+.o-nav-btn:hover { color: var(--text); }
+.o-nav-btn[aria-current="page"] { color: var(--text); }
+.o-topnav .o-nav-btn::after {
+  content: ''; position: absolute; inset-inline: 14px; bottom: 0; height: 3px; border-radius: 3px 3px 0 0;
+  background: var(--orange-text); transform: scaleX(0); transform-origin: center;
+  transition: transform var(--o-dur-panel) var(--o-ease-emph);
+}
+.o-topnav .o-nav-btn[aria-current="page"]::after { transform: scaleX(1); }
+.o-bottomnav { display: none; }
+
+@media (max-width: 767px) {
+  :root { --o-bnav-h: 64px; }
+  .o-topnav { display: none; }
+  .o-bottomnav {
+    display: block; position: fixed; inset-inline: 0; bottom: 0; z-index: 400;
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--topbar-bg);
+    backdrop-filter: blur(18px) saturate(1.6);
+    border-top: 1px solid var(--glass-border);
+    box-shadow: 0 -8px 24px -18px var(--overlay-bg);
+  }
+  .o-bottomnav ul { justify-content: space-around; }
+  .o-bottomnav li { flex: 1; }
+  .o-bottomnav .o-nav-btn {
+    width: 100%; min-height: 64px; flex-direction: column; justify-content: center; gap: 2px;
+    padding: 6px 2px; font-size: .74rem; border-radius: 0;
+  }
+  .o-bottomnav .o-nav-btn[aria-current="page"] { color: var(--orange-text); }
+  .o-bottomnav .o-nav-btn[aria-current="page"] svg { transform: translateY(-1px); }
+  main#main-content { padding-bottom: calc(var(--o-bnav-h) + env(safe-area-inset-bottom)); }
+  html[data-lesson="open"] { --o-bnav-h: 0px; }
+  html[data-lesson="open"] .o-bottomnav { display: none; }
+}
+
+.o-more-backdrop {
+  position: fixed; inset: 0; z-index: 950; background: var(--overlay-bg);
+  display: flex; align-items: flex-start; justify-content: flex-end;
+  padding: 118px 20px 20px; animation: fadeIn var(--o-dur-panel) var(--o-ease-out);
+}
+.o-more {
+  width: min(420px, 100%); max-height: calc(100dvh - 140px); overflow-y: auto;
+  background: var(--modal-bg); border: 1px solid var(--modal-border); border-radius: 22px;
+  box-shadow: var(--elev-3); padding: 16px 16px 20px; color: var(--text);
+  animation: popIn var(--o-dur-panel) var(--o-ease-emph) both;
+}
+.o-more-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.o-more-head h2 { font-size: 1.1rem; font-weight: 800; }
+.o-more-close {
+  width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--btn-bg);
+  color: var(--text); cursor: pointer; font-size: 1rem;
+}
+.o-more h3 { font-size: .78rem; font-weight: 700; color: var(--muted); margin: 14px 4px 6px; letter-spacing: 0; }
+.o-more ul { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.o-more li button {
+  width: 100%; min-height: 48px; display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  border-radius: 14px; border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font: inherit; font-size: .88rem; font-weight: 600; cursor: pointer; text-align: start;
+  transition: border-color var(--o-dur-control) var(--o-ease-out), background-color var(--o-dur-control) var(--o-ease-out);
+}
+.o-more li button:hover { border-color: var(--border2); }
+.o-more li button[aria-current="page"] { border-color: var(--orange-text); box-shadow: inset 0 0 0 1px var(--orange-text); }
+@media (max-width: 767px) {
+  .o-more-backdrop { align-items: flex-end; padding: 0; }
+  .o-more { width: 100%; max-height: 82dvh; border-radius: 26px 26px 0 0; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+}

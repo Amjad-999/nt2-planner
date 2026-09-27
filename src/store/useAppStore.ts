@@ -14,11 +14,27 @@ import { completionPct } from '@/features/exam/scoring'
 import { createSession, advance, isFinished } from '@/features/exam/mock'
 import { celebrate } from '@/lib/celebrate'
 import { toast } from '@/components/Toast'
+import type { ObsState } from '@/features/observatory/types'
+import { validateBackup } from '@/features/observatory/backup'
 
 /* ── localStorage keys (match original) ── */
 const SK6 = 'nt2planner_v6'
 const SK5 = 'nt2planner_v5'
 const SK_BACKUP = 'nt2planner_v6_backup'
+/* The state as it was right before the last import — lets the learner undo an
+   import that turned out to be the wrong file. Cleared by resetAll(). */
+const SK_PREIMPORT = 'nt2planner_v6_preimport'
+
+/* Save health: save() used to fail silently (quota, private mode). It now
+   announces failures and the first success after one, so the UI can show
+   «لم يُحفظ» instead of pretending. Listeners: window 'nt2:save' events. */
+let lastSaveOk = true
+function reportSave(ok: boolean) {
+  if (ok === lastSaveOk) return
+  lastSaveOk = ok
+  try { window.dispatchEvent(new CustomEvent('nt2:save', { detail: { ok } })) } catch { /* no window (tests) */ }
+}
+export function saveHealthy(): boolean { return lastSaveOk }
 /* Legacy key from the old standalone countdown card, which kept a SECOND copy
    of the exam date outside the store. The date is now a plain store field
    (State.examDate, persisted + cloud-merged like everything else); this key is
@@ -61,8 +77,11 @@ const customStorage = {
       localStorage.setItem(name, str)
       localStorage.setItem(SK_BACKUP, str)
       idbSet(str).catch(() => {})
+      reportSave(true)
     } catch {
-      // quota exceeded or storage blocked — persisting is best-effort
+      // quota exceeded or storage blocked — persisting is best-effort, but
+      // the learner is told (see reportSave)
+      reportSave(false)
     }
   },
   removeItem(name: string): void {
@@ -167,18 +186,28 @@ export interface AppStore extends State {
   resetAll: () => void
   importData: (raw: string) => boolean
 
+  /** Undo the last import (restores the pre-import snapshot). */
+  undoImport: () => boolean
+
   // Grammar exercises progress
   markGrammarDone: (topicId: string, exIndex: number) => void
+
+  // Observatory (daily learning layer) — every change goes through one pure
+  // reducer from features/observatory/*, then save() + cloud sync like the rest
+  updateObservatory: (fn: (o: ObsState) => ObsState) => void
 }
 
 /* Deep-link support: ?tab=exam opens the app on that tab (never persisted) */
-const VALID_TABS: TabId[] = ['dashboard', 'plan', 'vocab', 'books', 'exam', 'exercises', 'situations', 'grammar', 'stats', 'resources', 'platform']
+const VALID_TABS: TabId[] = [
+  'today', 'practice', 'words', 'learning', 'settings',
+  'dashboard', 'plan', 'vocab', 'books', 'exam', 'exercises', 'situations', 'grammar', 'stats', 'resources', 'platform',
+]
 function initialTab(): TabId {
   try {
     const t = new URLSearchParams(window.location.search).get('tab') as TabId | null
     if (t && VALID_TABS.includes(t)) return t
   } catch { /* no window (tests) — fall through */ }
-  return 'dashboard'
+  return 'today'
 }
 
 export const useAppStore = create<AppStore>()(
@@ -241,8 +270,10 @@ export const useAppStore = create<AppStore>()(
           localStorage.setItem(SK6, s)
           localStorage.setItem(SK_BACKUP, s)
           idbSet(s).catch(() => {})
+          reportSave(true)
         } catch {
-          // storage quota — silently ignore in save(); toast happens at call site
+          // storage quota / blocked storage — surfaced through reportSave
+          reportSave(false)
         }
       },
 
@@ -671,21 +702,29 @@ export const useAppStore = create<AppStore>()(
           localStorage.removeItem(SK6)
           localStorage.removeItem(SK5)
           localStorage.removeItem(SK_BACKUP)
+          localStorage.removeItem(SK_PREIMPORT)
           localStorage.removeItem(EXAM_COUNTDOWN_KEY)
         } catch {
           // storage blocked — still reset the in-memory state below
         }
         const fresh = defaultState()
-        set({ ...fresh, activeTab: 'dashboard' })
+        set({ ...fresh, activeTab: 'today' })
         document.documentElement.setAttribute('data-theme', 'light')
         document.documentElement.setAttribute('data-focus', 'off')
         get().save()
       },
 
       importData: (raw) => {
+        // Validate BEFORE touching anything: applyState() happily turns `{}`
+        // or an unrelated JSON file into a fresh default state, which used to
+        // wipe real progress on a wrong-file import.
+        const check = validateBackup(raw)
+        if (!check.ok) return false
         try {
-          const parsed = JSON.parse(raw)
-          const state = parsed?.state ? applyState(parsed.state) : applyState(parsed)
+          const { activeTab, ...current } = get()
+          void activeTab
+          try { localStorage.setItem(SK_PREIMPORT, JSON.stringify(current)) } catch { /* undo is best-effort */ }
+          const state = applyState(check.state)
           set({ ...state })
           document.documentElement.setAttribute('data-theme', state.theme)
           document.documentElement.setAttribute('data-focus', state.focusMode ? 'on' : 'off')
@@ -694,6 +733,29 @@ export const useAppStore = create<AppStore>()(
         } catch {
           return false
         }
+      },
+
+      undoImport: () => {
+        try {
+          const raw = localStorage.getItem(SK_PREIMPORT)
+          if (!raw) return false
+          const state = applyState(JSON.parse(raw))
+          set({ ...state })
+          document.documentElement.setAttribute('data-theme', state.theme)
+          document.documentElement.setAttribute('data-focus', state.focusMode ? 'on' : 'off')
+          localStorage.removeItem(SK_PREIMPORT)
+          get().save()
+          return true
+        } catch {
+          return false
+        }
+      },
+
+      updateObservatory: (fn) => {
+        const next = fn(get().observatory)
+        if (next === get().observatory) return
+        set({ observatory: next })
+        get().save()
       },
 
       markGrammarDone: (topicId, exIndex) => {
@@ -872,6 +934,17 @@ export function initStore() {
   document.documentElement.setAttribute('data-focus', state.focusMode ? 'on' : 'off')
   const fs = state.prefs.fontSize ?? 16
   document.documentElement.style.setProperty('--font-size-base', `${fs}px`)
+
+  // Observatory skin + motion level live in synced settings; mirror them onto
+  // <html> now and whenever they change (settings page, import, cloud merge).
+  const applyObsAttrs = (o: ObsState) => {
+    document.documentElement.setAttribute('data-skin', o.settings.skin)
+    document.documentElement.setAttribute('data-motion', o.settings.motion)
+  }
+  applyObsAttrs(state.observatory)
+  useAppStore.subscribe((s, prev) => {
+    if (s.observatory.settings !== prev.observatory.settings) applyObsAttrs(s.observatory)
+  })
 
   // IDB fallback restore
   idbRestoreIfNeeded((patch) => useAppStore.setState(patch as Partial<AppStore>))

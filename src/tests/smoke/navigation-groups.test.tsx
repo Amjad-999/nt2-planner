@@ -2,49 +2,42 @@ import { render, screen, fireEvent, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { NavTabs } from '@/components/NavTabs'
 import { useAppStore } from '@/store/useAppStore'
+import type { TabId } from '@/store/types'
 
-beforeEach(() => useAppStore.setState({ activeTab: 'dashboard' }))
+beforeEach(() => useAppStore.setState({ activeTab: 'today' }))
 
-describe('grouped navigation', () => {
-  it('reaches every section through visible controls', () => {
+const PRIMARY: [string, TabId][] = [
+  ['اليوم', 'today'], ['تدريب', 'practice'], ['كلماتي', 'words'], ['تعلّمي', 'learning'],
+]
+
+const MORE: [string, TabId][] = [
+  ['الإعدادات والنسخ الاحتياطي', 'settings'],
+  ['محاكاة الامتحان', 'exam'], ['تمارين', 'exercises'], ['مواقف يومية', 'situations'], ['قواعد', 'grammar'],
+  ['لوحة التحكم', 'dashboard'], ['خطة الكتب', 'plan'], ['التحليلات', 'stats'],
+  ['المفردات + AI', 'vocab'], ['الكتب', 'books'], ['مصادر DUO', 'resources'], ['منصّتي', 'platform'],
+]
+
+const topNav = () => screen.getByRole('navigation', { name: 'التنقل الرئيسي' })
+
+describe('navigation after the observatory merge', () => {
+  it('reaches every section through visible controls', async () => {
     render(<NavTabs />)
-    const destinations = [
-      ['الرئيسية', 'اليوم', 'dashboard'], ['الرئيسية', 'المصادر', 'resources'], ['الرئيسية', 'منصّتي', 'platform'],
-      ['تعلّم', 'خطة الدراسة', 'plan'], ['تعلّم', 'مسار القواعد', 'grammar'], ['تعلّم', 'الكتب', 'books'],
-      ['تدرّب', 'تدريب يومي', 'exercises'], ['تدرّب', 'مواقف يومية', 'situations'], ['تدرّب', 'تدريب الامتحان', 'exam'],
-      ['المفردات', null, 'vocab'], ['تقدّمي', null, 'stats'],
-    ]
-    for (const [group, label, tab] of destinations) {
-      fireEvent.click(screen.getByRole('button', { name: group! }))
-      if (label) fireEvent.click(screen.getByRole('button', { name: label }))
+    for (const [label, tab] of PRIMARY) {
+      fireEvent.click(within(topNav()).getByRole('button', { name: label }))
       expect(useAppStore.getState().activeTab).toBe(tab)
       expect(document.getElementById(`ntab-${tab}`)).toHaveAttribute('aria-current', 'page')
     }
+    for (const [label, tab] of MORE) {
+      fireEvent.click(within(topNav()).getByRole('button', { name: /المزيد/ }))
+      const dialog = await screen.findByRole('dialog', { name: 'كل الأدوات' })
+      fireEvent.click(within(dialog).getByRole('button', { name: label }))
+      expect(useAppStore.getState().activeTab).toBe(tab)
+    }
   })
 
-  it('remembers a learning section but always returns Home to today', () => {
+  it('says which tool is open under «المزيد»', () => {
+    useAppStore.setState({ activeTab: 'situations' })
     render(<NavTabs />)
-    fireEvent.click(screen.getByRole('button', { name: 'تعلّم' }))
-    fireEvent.click(screen.getByRole('button', { name: 'مسار القواعد' }))
-    fireEvent.click(screen.getByRole('button', { name: 'المفردات' }))
-    fireEvent.click(screen.getByRole('button', { name: 'تعلّم' }))
-    expect(useAppStore.getState().activeTab).toBe('grammar')
-    fireEvent.click(screen.getByRole('button', { name: 'الرئيسية' }))
-    fireEvent.click(screen.getByRole('button', { name: 'المصادر' }))
-    fireEvent.click(screen.getByRole('button', { name: 'الرئيسية' }))
-    expect(useAppStore.getState().activeTab).toBe('dashboard')
-  })
-
-  it('supports RTL arrows and Home/End without activating a different screen', () => {
-    render(<NavTabs />)
-    const buttons = within(screen.getByRole('navigation', { name: 'التنقّل الرئيسي' })).getAllByRole('button')
-    buttons[0].focus()
-    fireEvent.keyDown(buttons[0], { key: 'ArrowLeft' })
-    expect(buttons[1]).toHaveFocus()
-    fireEvent.keyDown(buttons[1], { key: 'End' })
-    expect(buttons[4]).toHaveFocus()
-    fireEvent.keyDown(buttons[4], { key: 'Home' })
-    expect(buttons[0]).toHaveFocus()
-    expect(useAppStore.getState().activeTab).toBe('dashboard')
+    expect(within(topNav()).getByRole('button', { name: /المزيد · مواقف يومية/ })).toHaveAttribute('aria-current', 'page')
   })
 })

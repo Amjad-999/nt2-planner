@@ -6,6 +6,7 @@ import { boxToFsrsFields } from '@/features/vocab/fsrs-lite'
 import { reconcileInburgeringExams } from '@/data/inburgering'
 import { isValidSession } from '@/features/exam/mock'
 import { isKnownLesson, CURRICULUM_BOOKS } from '@/data/curriculum'
+import { defaultObs, sanitizeObs } from '@/features/observatory/state'
 
 const TOTAL_PLAN_DAYS = 46
 const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'] as const
@@ -53,6 +54,7 @@ export function defaultState(): State {
     goalCelebratedOn: '',
     /* لا تواريخ مزروعة: البرنامج يبقى غير مفعَّل حتى يختار المستخدم نافذته. */
     studyProgram: { startKey: '', deadlineKey: '', lessons: {}, session: null, maxLessonsPerDay: 12, lessonMinutes: {}, order: 'sequential' },
+    observatory: defaultObs(),
     _v: 6,
     _savedAt: 0,
   }
@@ -320,6 +322,7 @@ export function applyState(parsed: any): State {
     })
 
   S.studyProgram = sanitizeStudyProgram(parsed.studyProgram)
+  S.observatory = sanitizeObs(parsed.observatory)
 
   S._v = 6
   // '' stays '' (never set); anything unparseable is downgraded to "not set"
