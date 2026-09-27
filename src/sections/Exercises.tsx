@@ -59,9 +59,9 @@ function chip(active = false, correct?: boolean, incorrect?: boolean): React.CSS
   if (incorrect) { bg = 'var(--red-l)';    bc = 'var(--red)';    color = 'var(--red)'    }
   return {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-    padding: '8px 14px', borderRadius: 10,
+    padding: '8px 14px', borderRadius: 'var(--r-sm)',
     border: `1px solid ${bc}`, background: bg, color,
-    fontFamily: 'inherit', fontSize: '.9rem', fontWeight: 600,
+    fontFamily: 'inherit', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)',
     cursor: 'pointer', userSelect: 'none', transition: 'none',
     boxShadow: active ? 'var(--elev-1)' : 'none',
     minWidth: 80, textAlign: 'center',
@@ -74,10 +74,10 @@ function ScoreBadge({ correct, total }: { correct: number; total: number }) {
   const color = pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)'
   return (
     <div style={{ textAlign: 'center', padding: '12px 0 4px' }}>
-      <span style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 700, color }}>
+      <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-3xl)', fontWeight: 'var(--fw-cta)', color }}>
         {correct}/{total}
       </span>
-      <div style={{ fontSize: '.85rem', color: 'var(--text2)', marginTop: 2 }}>
+      <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', marginTop: 'var(--sp-0)' }}>
         {pct >= 80 ? '🎉 ممتاز!' : pct >= 50 ? '👍 جيّد — حاول مجدّدًا' : '💪 تدرّب وحاول مجدّدًا'}
       </div>
     </div>
@@ -87,8 +87,8 @@ function ScoreBadge({ correct, total }: { correct: number; total: number }) {
 function ResetBtn({ onClick }: { onClick: () => void }) {
   return (
     <button onClick={onClick} className="btn-glass"
-      style={{ borderRadius: 12, color: 'var(--text)',
-        padding: '9px 22px', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer', fontFamily: 'inherit' }}>
+      style={{ borderRadius: 'var(--r-sm)', color: 'var(--text)',
+        padding: '9px 22px', fontWeight: 'var(--fw-cta)', fontSize: 'var(--text-sm)', cursor: 'pointer', fontFamily: 'inherit' }}>
       🔄 حاول مجدّدًا
     </button>
   )
@@ -131,17 +131,17 @@ function DroppableArSlot({ pair, placed, result, onTap }: {
       onClick={onTap}
       aria-label={`الهدف: ${pair.ar}${placed ? ' — موضوع: ' + placed.nl : ''}`}
       style={{
-        minHeight: 48, borderRadius: 10, padding: '8px 14px',
+        minHeight: 48, borderRadius: 'var(--r-sm)', padding: '8px 14px',
         border: `2px ${isOver ? 'solid' : 'dashed'} ${isOver ? 'var(--orange)' : hasResult ? (result ? 'var(--green)' : 'var(--red)') : 'var(--border2)'}`,
         background: isOver ? 'var(--orange-l)' : hasResult ? (result ? 'var(--green-l)' : 'var(--red-l)') : 'var(--glass-bg)',
         boxShadow: isOver ? '0 0 0 3px color-mix(in srgb, var(--orange) 30%, transparent)' : undefined,
-        display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center', justifyContent: 'center',
+        display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)', alignItems: 'center', justifyContent: 'center',
         cursor: 'pointer', transition: 'border-color .15s, background .15s',
       }}
     >
-      <span style={{ fontSize: '.88rem', color: 'var(--text2)', direction: 'rtl' }}>{pair.ar}</span>
+      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', direction: 'rtl' }}>{pair.ar}</span>
       {placed && (
-        <span style={{ fontSize: '.85rem', fontWeight: 700, color: result === false ? 'var(--red-text)' : result === true ? 'var(--green-text)' : 'var(--orange-text)' }}>
+        <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-cta)', color: result === false ? 'var(--red-text)' : result === true ? 'var(--green-text)' : 'var(--orange-text)' }}>
           {placed.nl}
         </span>
       )}
@@ -231,9 +231,9 @@ function MatchingExercise() {
 
   return (
     <div dir="rtl">
-      <p style={{ fontSize: '.88rem', color: 'var(--text2)', marginBottom: 14, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', marginBottom: 'var(--sp-3)', lineHeight: 'var(--lh-arabic)' }}>
         اسحب الكلمات الهولندية على معانيها العربية. على الهاتف: اضغط كلمة ثمّ اضغط المعنى.
-        <br /><span style={{ fontSize: '.78rem', color: 'var(--muted)' }}>للوحة المفاتيح: Space لبدء السحب، ثمّ الأسهم للتنقّل.</span>
+        <br /><span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>للوحة المفاتيح: Space لبدء السحب، ثمّ الأسهم للتنقّل.</span>
       </p>
 
       <DndContext
@@ -243,10 +243,10 @@ function MatchingExercise() {
         onDragEnd={onDragEnd}
         accessibility={{ announcements }}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-3)' }}>
           {/* NL column */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ fontSize: '.78rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 2 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
+            <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--fw-heading)', color: 'var(--muted)', marginBottom: 'var(--sp-0)' }}>
               🇳🇱 الكلمات الهولندية
             </div>
             {s.nlShuffled.map(p => (
@@ -260,8 +260,8 @@ function MatchingExercise() {
             ))}
           </div>
           {/* AR drop targets */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ fontSize: '.78rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 2 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
+            <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--fw-heading)', color: 'var(--muted)', marginBottom: 'var(--sp-0)' }}>
               🇸🇦 المعاني العربية
             </div>
             {s.arShuffled.map(p => {
@@ -299,7 +299,7 @@ function MatchingExercise() {
         )}
       </DndContext>
 
-      <div style={{ marginTop: 16, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ marginTop: 'var(--sp-4)', display: 'flex', gap: 'var(--sp-2)', alignItems: 'center', flexWrap: 'wrap' }}>
         {!results && (
           <button
             onClick={check}
@@ -310,8 +310,8 @@ function MatchingExercise() {
               background: placedCount < s.pairs.length ? 'var(--surface3)' : 'var(--btn-bg)',
               backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
               color: placedCount < s.pairs.length ? 'var(--muted)' : 'var(--text)',
-              border: '1px solid var(--btn-border)', borderRadius: 12, padding: '9px 22px',
-              fontWeight: 700, fontSize: '.88rem', cursor: placedCount < s.pairs.length ? 'not-allowed' : 'pointer',
+              border: '1px solid var(--btn-border)', borderRadius: 'var(--r-sm)', padding: '9px 22px',
+              fontWeight: 'var(--fw-cta)', fontSize: 'var(--text-sm)', cursor: placedCount < s.pairs.length ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit',
             }}
           >
@@ -417,7 +417,7 @@ function SortingExercise() {
   // All hooks called above — safe to return early now
   if (!s) {
     return (
-      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text2)', fontSize: '.9rem' }}>
+      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text2)', fontSize: 'var(--text-sm)' }}>
         📝 لا توجد جمل للتدريب حالياً — ستُضاف قريباً.
       </div>
     )
@@ -425,9 +425,9 @@ function SortingExercise() {
 
   return (
     <div dir="rtl">
-      <p style={{ fontSize: '.88rem', color: 'var(--text2)', marginBottom: 14, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', marginBottom: 'var(--sp-3)', lineHeight: 'var(--lh-arabic)' }}>
         رتّب الكلمات لتكوين الجملة الهولندية الصحيحة.
-        <br /><span style={{ fontSize: '.78rem', color: 'var(--muted)' }}>للوحة المفاتيح: Space لاختيار كلمة، ثمّ الأسهم لتحريكها، Enter للتأكيد.</span>
+        <br /><span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>للوحة المفاتيح: Space لاختيار كلمة، ثمّ الأسهم لتحريكها، Enter للتأكيد.</span>
       </p>
 
       <DndContext
@@ -441,7 +441,7 @@ function SortingExercise() {
           <div
             role="list"
             aria-label="كلمات الجملة — رتّبها بالسحب"
-            style={{ display: 'flex', flexDirection: 'column', gap: 8, direction: 'ltr' }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', direction: 'ltr' }}
           >
             {items.map(item => (
               <div key={item.id} role="listitem">
@@ -477,22 +477,22 @@ function SortingExercise() {
 
       {checked && (
         <div style={{
-          marginTop: 10, padding: '10px 14px', borderRadius: 10,
+          marginTop: 'var(--sp-3)', padding: '10px 14px', borderRadius: 'var(--r-sm)',
           background: correct ? 'var(--green-l)' : 'var(--red-l)',
           border: `1px solid ${correct ? 'var(--green)' : 'var(--red)'}`,
-          fontSize: '.88rem', color: 'var(--text)', direction: 'ltr',
+          fontSize: 'var(--text-sm)', color: 'var(--text)', direction: 'ltr',
         }}>
           {correct ? '✅ ممتاز! الجملة صحيحة.' : `❌ الترتيب الصحيح: "${s.sentence}"`}
         </div>
       )}
 
-      <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div style={{ marginTop: 'var(--sp-3)', display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap', alignItems: 'center' }}>
         {!checked && (
           <button
             onClick={() => setChecked(true)}
             className="btn-glass"
-            style={{ color: 'var(--text)', borderRadius: 12,
-              padding: '9px 22px', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer', fontFamily: 'inherit' }}>
+            style={{ color: 'var(--text)', borderRadius: 'var(--r-sm)',
+              padding: '9px 22px', fontWeight: 'var(--fw-cta)', fontSize: 'var(--text-sm)', cursor: 'pointer', fontFamily: 'inherit' }}>
             ✅ تحقّق
           </button>
         )}
@@ -544,12 +544,12 @@ function GapDropZone({ placed, isOver, result, onTap }: {
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTap() } }}
       style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        minWidth: 90, minHeight: 34, padding: '4px 12px',
-        borderRadius: 8, border: `2px dashed ${
+        minWidth: 90, minHeight: 'var(--tap-min)', padding: '4px 12px',
+        borderRadius: 'var(--r-xs)', border: `2px dashed ${
           isOver ? 'var(--orange)' : hasResult ? (result ? 'var(--green)' : 'var(--red)') : 'var(--border2)'
         }`,
         background: isOver ? 'var(--orange-l)' : hasResult ? (result ? 'var(--green-l)' : 'var(--red-l)') : 'var(--surface3)',
-        fontSize: '.9rem', fontWeight: 700,
+        fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-cta)',
         color: hasResult ? (result ? 'var(--green-text)' : 'var(--red-text)') : placed ? 'var(--orange-text)' : 'var(--muted)',
         cursor: 'pointer', verticalAlign: 'middle', margin: '0 4px',
         direction: 'ltr',
@@ -590,7 +590,7 @@ function FillGapExercise() {
 
   if (!ex) {
     return (
-      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text2)', fontSize: '.9rem' }}>
+      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text2)', fontSize: 'var(--text-sm)' }}>
         📚 أضف مفردات مع جمل أمثلة لتفعيل هذا التمرين.
       </div>
     )
@@ -641,7 +641,7 @@ function FillGapExercise() {
 
   return (
     <div dir="rtl">
-      <p style={{ fontSize: '.88rem', color: 'var(--text2)', marginBottom: 14, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', marginBottom: 'var(--sp-3)', lineHeight: 'var(--lh-arabic)' }}>
         اسحب الكلمة الصحيحة لملء الفراغ. على الهاتف: اضغط كلمة ثمّ اضغط الفراغ.
       </p>
 
@@ -650,7 +650,7 @@ function FillGapExercise() {
         <div style={{
           padding: '14px 18px', borderRadius: 'var(--r-sm)',
           background: 'var(--glass-bg)', border: '1px solid var(--glass-border)',
-          fontSize: '1rem', lineHeight: 2, marginBottom: 16, direction: 'ltr',
+          fontSize: 'var(--text-base)', lineHeight: 2, marginBottom: 'var(--sp-4)', direction: 'ltr',
         }}>
           <span>{ex.before}</span>
           <span ref={setBlankRef}>
@@ -660,7 +660,7 @@ function FillGapExercise() {
         </div>
 
         {/* Word chips */}
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', direction: 'ltr' }}>
+        <div style={{ display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap', direction: 'ltr' }}>
           {ex.chips.map(c => (
             <DraggableChip
               key={c.id}
@@ -694,7 +694,7 @@ function FillGapExercise() {
 
       {result !== null && (
         <div style={{
-          marginTop: 10, padding: '10px 14px', borderRadius: 10, fontSize: '.88rem',
+          marginTop: 'var(--sp-3)', padding: '10px 14px', borderRadius: 'var(--r-sm)', fontSize: 'var(--text-sm)',
           background: result ? 'var(--green-l)' : 'var(--red-l)',
           border: `1px solid ${result ? 'var(--green)' : 'var(--red)'}`,
           color: 'var(--text)',
@@ -703,7 +703,7 @@ function FillGapExercise() {
         </div>
       )}
 
-      <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <div style={{ marginTop: 'var(--sp-3)', display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
         {result === null && (
           <button
             onClick={check}
@@ -713,8 +713,8 @@ function FillGapExercise() {
               background: placed ? 'var(--btn-bg)' : 'var(--surface3)',
               backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
               color: placed ? 'var(--text)' : 'var(--muted)',
-              border: '1px solid var(--btn-border)', borderRadius: 12, padding: '9px 22px',
-              fontWeight: 700, fontSize: '.88rem',
+              border: '1px solid var(--btn-border)', borderRadius: 'var(--r-sm)', padding: '9px 22px',
+              fontWeight: 'var(--fw-cta)', fontSize: 'var(--text-sm)',
               cursor: placed ? 'pointer' : 'not-allowed', fontFamily: 'inherit',
             }}
           >
@@ -744,17 +744,17 @@ export default function Exercises() {
   const switchMode = (m: Mode) => { setMode(m); setKey(k => k + 1) }
 
   return (
-    <div dir="rtl" style={{ padding: '24px 28px 80px', maxWidth: 760, margin: '0 auto' }}>
-      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div dir="rtl" className="page page--narrow">
+      <h2 className="section-title" style={{ marginBottom: 'var(--sp-1)' }}>
         <span style={{ color: 'var(--orange-text)' }}>🎮</span> تمارين تفاعلية <span aria-hidden="true">🇳🇱</span>
       </h2>
-      <p style={{ fontSize: '.88rem', color: 'var(--text2)', marginBottom: 18, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', marginBottom: 'var(--sp-4)', lineHeight: 'var(--lh-arabic)' }}>
         تمارين مُولَّدة من مفرداتك. تدعم السحب والإفلات ولوحة المفاتيح واللمس.
       </p>
 
       {/* Mode selector */}
       <div role="tablist" aria-label="نوع التمرين"
-        style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+        style={{ display: 'flex', gap: 'var(--sp-2)', marginBottom: 'var(--sp-5)', flexWrap: 'wrap' }}>
         {MODES.map(m => (
           <button
             key={m.id}
@@ -766,11 +766,11 @@ export default function Exercises() {
             style={{
               flex: 1, minWidth: 120, padding: '10px 14px',
               border: `1px solid ${mode === m.id ? 'var(--orange)' : 'var(--glass-border)'}`,
-              borderRadius: 12,
+              borderRadius: 'var(--r-sm)',
               background: mode === m.id ? 'var(--orange-l)' : 'var(--glass-bg)',
               color: mode === m.id ? 'var(--orange-text)' : 'var(--text2)',
               fontWeight: mode === m.id ? 700 : 500,
-              cursor: 'pointer', fontFamily: 'inherit', fontSize: '.85rem',
+              cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--text-sm)',
               backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
             }}
           >
@@ -794,7 +794,7 @@ export default function Exercises() {
             border: '1px solid var(--glass-border)', borderRadius: 'var(--r)',
             padding: '20px 18px', boxShadow: 'var(--elev-1)',
           }}>
-            <div style={{ fontSize: '.82rem', color: 'var(--muted)', marginBottom: 12 }}>
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginBottom: 'var(--sp-3)' }}>
               {m.icon} {m.desc}
             </div>
             {mode === 'matching' && <MatchingExercise key={key} />}

@@ -50,12 +50,12 @@ export function LiveResult<T>({ load, children, emptyText }: Props<T>) {
   }, [attempt])
 
   if (phase === 'loading') {
-    return <p style={{ margin: 0, fontSize: '.84rem', color: 'var(--muted)' }}>لحظة، أسأل العالم… 🐱</p>
+    return <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>لحظة، أسأل العالم… 🐱</p>
   }
 
   if (phase === 'offline') {
     return (
-      <p style={{ margin: 0, fontSize: '.84rem', color: 'var(--text2)', lineHeight: 1.6 }}>
+      <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text2)', lineHeight: 'var(--lh-arabic)' }}>
         لا يوجد اتصال الآن. كل ما هو محفوظ في التطبيق يعمل كالمعتاد — هذا القسم وحده يحتاج الإنترنت.
       </p>
     )
@@ -63,13 +63,13 @@ export function LiveResult<T>({ load, children, emptyText }: Props<T>) {
 
   if (phase === 'empty' || data === null) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
-        <p style={{ margin: 0, fontSize: '.84rem', color: 'var(--text2)', lineHeight: 1.6 }}>{emptyText}</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', alignItems: 'flex-start' }}>
+        <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text2)', lineHeight: 'var(--lh-arabic)' }}>{emptyText}</p>
         <button
           onClick={() => { setPhase(offlineNow() ? 'offline' : 'loading'); setAttempt((n) => n + 1) }}
           style={{
-            background: 'var(--btn-bg)', border: '1px solid var(--glass-border)', borderRadius: 8,
-            padding: '4px 10px', cursor: 'pointer', color: 'var(--text)', fontSize: '.76rem', fontFamily: 'inherit',
+            background: 'var(--btn-bg)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r-xs)',
+            padding: '4px 10px', cursor: 'pointer', color: 'var(--text)', fontSize: 'var(--text-xs)', fontFamily: 'inherit',
           }}
         >
           أعِد المحاولة

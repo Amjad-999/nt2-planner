@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import { useAuth } from '@/hooks/useAuth'
 import { TopBar } from './TopBar'
@@ -31,6 +31,7 @@ const Vocab      = lazy(() => import('@/sections/Vocab'))
 const Books      = lazy(() => import('@/sections/Books'))
 const Exam       = lazy(() => import('@/sections/Exam'))
 const Exercises  = lazy(() => import('@/sections/Exercises'))
+const Situations = lazy(() => import('@/sections/Situations'))
 const Grammar    = lazy(() => import('@/sections/Grammar'))
 const Stats      = lazy(() => import('@/sections/Stats'))
 const Resources  = lazy(() => import('@/sections/Resources'))
@@ -44,16 +45,16 @@ interface BeforeInstallPromptEvent extends Event {
 const SECTION_MAP = {
   today: Today, practice: Practice, words: Words, learning: Learning, settings: LearnSettings,
   dashboard: Dashboard, plan: Plan, vocab: Vocab, books: Books,
-  exam: Exam, exercises: Exercises, grammar: Grammar, stats: Stats, resources: Resources, platform: Platform,
+  exam: Exam, exercises: Exercises, situations: Situations, grammar: Grammar, stats: Stats, resources: Resources, platform: Platform,
 } as const
 
 /* P6: هيكل عظمي زجاجي مع لمعان shimmer بدل نص التحميل الفارغ */
 const SectionLoader = () => (
-  <div style={{ padding: '24px 28px 60px', maxWidth: 1100, margin: '0 auto' }} aria-busy="true" aria-label="جاري التحميل">
+  <div className="page" aria-busy="true" aria-label="جاري التحميل">
     {/* يطابق ارتفاع البطل بعد ضمّ شريط التقدّم إلى عمود التحيّة (~230px)
         فلا ينزاح المحتوى عند تبديل التبويب */}
-    <div className="skel" style={{ height: 230, borderRadius: 'var(--r)', marginBottom: 16 }} />
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(165px,1fr))', gap: 12, marginBottom: 16 }}>
+    <div className="skel" style={{ height: 230, borderRadius: 'var(--r)', marginBottom: 'var(--sp-4)' }} />
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(165px, 100%),1fr))', gap: 'var(--sp-3)', marginBottom: 'var(--sp-4)' }}>
       {[0, 1, 2, 3].map((i) => <div key={i} className="skel" style={{ height: 96, borderRadius: 'var(--r)' }} />)}
     </div>
     <div className="skel" style={{ height: 220, borderRadius: 'var(--r)' }} />
@@ -64,6 +65,13 @@ export function AppShell() {
   const activeTab = useAppStore((s) => s.activeTab)
   const setActiveTab = useAppStore((s) => s.setActiveTab)
   const onboarded = useAppStore((s) => s.onboarded)
+
+  // Navigation from inside a section (e.g. «تدرّب على موقف يومي») does not go
+  // through NavTabs, so the new section would otherwise open mid-page.
+  const mainRef = useRef<HTMLElement>(null)
+  useEffect(() => {
+    mainRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' })
+  }, [activeTab])
   const { isAuthenticated, guestMode, resolved, user } = useAuth()
 
   const [showSettings, setShowSettings] = useState(false)
@@ -85,7 +93,9 @@ export function AppShell() {
   // Show onboarding on first load — deferred behind the auth gate above.
   useEffect(() => {
     if (needsAuthGate || !resolved) return
-    if (!onboarded) setTimeout(() => setShowOnboard(true), 300)
+    if (onboarded) return
+    const t = window.setTimeout(() => setShowOnboard(true), 300)
+    return () => window.clearTimeout(t)
   }, [onboarded, needsAuthGate, resolved])
 
   // Previously this only ran for *returning* signed-in users (detected via a
@@ -102,10 +112,16 @@ export function AppShell() {
 
   // PWA install prompt
   useEffect(() => {
-    const handler = (e: Event) => { e.preventDefault(); setDeferredInstall(e as BeforeInstallPromptEvent); setShowInstall(true) }
-    window.addEventListener('beforeinstallprompt', handler)
-    window.addEventListener('appinstalled', () => setShowInstall(false))
-    return () => window.removeEventListener('beforeinstallprompt', handler)
+    const onPrompt = (e: Event) => { e.preventDefault(); setDeferredInstall(e as BeforeInstallPromptEvent); setShowInstall(true) }
+    // Was registered inline and never removed, so StrictMode's double-mount in
+    // development left a second copy bound for the life of the page.
+    const onInstalled = () => setShowInstall(false)
+    window.addEventListener('beforeinstallprompt', onPrompt)
+    window.addEventListener('appinstalled', onInstalled)
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onPrompt)
+      window.removeEventListener('appinstalled', onInstalled)
+    }
   }, [])
 
   const handleInstall = () => {
@@ -122,7 +138,7 @@ export function AppShell() {
   const ActiveSection = SECTION_MAP[activeTab] ?? Today
 
   return (
-    <div className="min-h-dvh flex flex-col">
+    <div className="app-layout min-h-dvh flex flex-col">
       {/* رابط تخطٍّ لأول عنصر قابل للتركيز — يقفز فوق الشريط والتبويبات
           مباشرةً إلى المحتوى (مخفيّ حتى يُركَّز عليه بلوحة المفاتيح) */}
       <a href="#main-content" className="skip-link">تخطَّ إلى المحتوى</a>
@@ -138,7 +154,7 @@ export function AppShell() {
 
       {/* <main> هو معلم الصفحة؛ التنقل صار أزرارًا بـ aria-current (لا tablist)
           فكل قسم يحمل عنوانه h1 الخاص */}
-      <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
+      <main ref={mainRef} id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
         {/* key يعيد التركيب عند تبديل التبويب فتعمل حركة الدخول CSS
             (fade + انزلاق .3s) — بلا framer في مسار الإقلاع */}
         <div key={activeTab} id={`tab-${activeTab}`} className="tab-in">

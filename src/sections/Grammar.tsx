@@ -1,19 +1,18 @@
-import { useState, useEffect, Suspense, lazy } from 'react'
+import { useState, useEffect, Suspense, lazy, useRef } from 'react'
 import { LESSONS } from '@/data/lessons'
 import { GrammarExercises } from '@/components/GrammarExercises'
+import { Callout } from '@/components/ui/Callout'
+import { useAppStore } from '@/store/useAppStore'
+import { grammarLessonProgress, recommendedGrammarLesson } from '@/features/grammar/progress'
 import type { Level } from '@/store/types'
 
-// Lazy-load the heavy Markdown renderer so it stays out of the initial bundle
-const Lesson = lazy(() =>
-  import('@/components/Lesson').then(m => ({ default: m.Lesson }))
-)
+const Lesson = lazy(() => import('@/components/Lesson').then(m => ({ default: m.Lesson })))
 
-// المستويات — كل مستوى في قسمه الخاصّ
-const LEVELS: { key: Level; label: string; sub: string }[] = [
-  { key: 'A1', label: 'A1', sub: 'المبتدئون' },
-  { key: 'A2', label: 'A2', sub: 'متوسّط' },
-  { key: 'B1', label: 'B1', sub: 'متقدّم' },
-  { key: 'B2', label: 'B2', sub: 'Staatsexamen' },
+const LEVELS: { key: Level; sub: string }[] = [
+  { key: 'A1', sub: 'الأساسيات' },
+  { key: 'A2', sub: 'الحياة اليومية' },
+  { key: 'B1', sub: 'التعبير المستقل' },
+  { key: 'B2', sub: 'للتوسّع' },
 ]
 
 function lessonsOf(level: Level) {
@@ -21,143 +20,126 @@ function lessonsOf(level: Level) {
 }
 
 function LessonLoader() {
-  return (
-    <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--muted)', fontSize: '.9rem' }}>
-      ⏳ جارٍ التحميل…
-    </div>
-  )
+  return <p role="status" style={{ padding: 'var(--sp-8) 0', textAlign: 'center', color: 'var(--text2)' }}>جارٍ تحميل الدرس…</p>
 }
 
 export default function Grammar() {
-  const [level, setLevel] = useState<Level>('A1')
-  const [activeId, setActiveId] = useState(lessonsOf('A1')[0].id)
-  const [markdown, setMarkdown] = useState<string | null>(null)
-  const [loading, setLoading]   = useState(false)
-
-  const levelLessons = lessonsOf(level)
+  const progress = useAppStore(s => s.grammarProgress)
+  const [activeId, setActiveId] = useState(() => recommendedGrammarLesson(progress).id)
+  const [content, setContent] = useState<{ id: string; markdown: string | null; failed: boolean } | null>(null)
+  const [retry, setRetry] = useState(0)
+  const [catalogOpen, setCatalogOpen] = useState(false)
+  const lessonPanel = useRef<HTMLElement>(null)
   const activeMeta = LESSONS.find(l => l.id === activeId) ?? LESSONS[0]
+  const level = activeMeta.level ?? 'B1'
+  const levelLessons = lessonsOf(level)
+  const activeProgress = grammarLessonProgress(activeId, progress)
+  const completed = levelLessons.filter(lesson => grammarLessonProgress(lesson.id, progress).complete).length
+  const next = LESSONS.slice(LESSONS.findIndex(lesson => lesson.id === activeId) + 1)
+    .find(lesson => !grammarLessonProgress(lesson.id, progress).complete)
+  const loading = content?.id !== activeId
 
-  function pickLevel(lv: Level) {
-    setLevel(lv)
-    const first = lessonsOf(lv)[0]
-    if (first) setActiveId(first.id)
+  function pickLesson(id: string, focus = false) {
+    setActiveId(id)
+    setCatalogOpen(false)
+    if (focus) requestAnimationFrame(() => {
+      lessonPanel.current?.focus({ preventScroll: true })
+      lessonPanel.current?.scrollIntoView({ block: 'start' })
+    })
   }
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- مؤثّر تحميل غير متزامن للدرس
-    setLoading(true)
-    setMarkdown(null)
+    let cancelled = false
     activeMeta.file()
-      .then(m => { setMarkdown(m.default); setLoading(false) })
-      .catch(() => { setMarkdown('⚠️ تعذّر تحميل الدرس.'); setLoading(false) })
-  }, [activeId, activeMeta])
+      .then(m => { if (!cancelled) setContent({ id: activeMeta.id, markdown: m.default, failed: false }) })
+      .catch(() => { if (!cancelled) setContent({ id: activeMeta.id, markdown: null, failed: true }) })
+    return () => { cancelled = true }
+  }, [activeMeta, retry])
 
   return (
-    <div dir="rtl" style={{ padding: '24px 28px 80px', maxWidth: 820, margin: '0 auto' }}>
-      {/* Header */}
-      <h2 style={{
-        fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 'var(--fw-heading)',
-        color: 'var(--text)', margin: '0 0 4px',
-        display: 'flex', alignItems: 'center', gap: 10,
-      }}>
-        <span style={{ color: 'var(--orange-text)' }}>📖</span> قواعد ونصائح <span aria-hidden="true">🇳🇱</span>
-      </h2>
-      <p style={{ fontSize: '.88rem', color: 'var(--text2)', marginBottom: 18, lineHeight: 1.6 }}>
-        كل المستويات A1 · A2 · B1 · B2 — اختر مستوًى ثمّ درسًا، وبعد كل درس تمارين تفاعلية.
+    <div dir="rtl" className="page page--narrow">
+      <h2 className="section-title" style={{ marginBottom: 'var(--sp-1)' }}>مسار القواعد</h2>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', marginBottom: 'var(--sp-4)', lineHeight: 'var(--lh-arabic)' }}>
+        اقرأ القاعدة، جرّب الأمثلة، ثم حلّ التمارين. يُحفظ تقدّمك مع كل إجابة صحيحة.
       </p>
 
-      {/* Level selector — كل مستوى قسم مستقلّ */}
-      <div role="tablist" aria-label="اختر المستوى"
-        style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+      <div role="group" aria-label="مستوى محتوى القواعد"
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 'var(--sp-2)', marginBottom: 'var(--sp-4)' }}>
         {LEVELS.map(lv => {
-          const on = lv.key === level
-          const count = lessonsOf(lv.key).length
+          const selected = lv.key === level
           return (
-            <button key={lv.key} role="tab" aria-selected={on}
-              onClick={() => pickLevel(lv.key)}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
-                padding: '8px 16px', minWidth: 92,
-                border: `1px solid ${on ? 'var(--orange)' : 'var(--glass-border)'}`,
-                borderRadius: 12,
-                background: on ? 'var(--orange-ink)' : 'var(--glass-bg)',
-                color: on ? '#fff' : 'var(--text2)',
-                fontFamily: 'inherit', cursor: 'pointer',
-                fontWeight: on ? 700 : 600,
-                transition: 'border-color .15s, background .15s',
-              }}>
-              <span style={{ fontSize: '.95rem', fontWeight: 800 }}>{lv.label}</span>
-              <span style={{ fontSize: '.66rem', opacity: on ? 0.9 : 0.7 }}>{lv.sub} · {count}</span>
+            <button key={lv.key} type="button" aria-pressed={selected}
+              onClick={() => pickLesson(recommendedGrammarLesson(progress, lessonsOf(lv.key)).id)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--sp-1)', padding: 'var(--sp-3) var(--sp-1)', minHeight: 64,
+                border: `1px solid ${selected ? 'var(--orange)' : 'var(--glass-border)'}`, borderRadius: 'var(--r-sm)',
+                background: selected ? 'var(--orange-l)' : 'var(--glass-bg)', color: selected ? 'var(--orange-text)' : 'var(--text2)',
+                fontFamily: 'inherit', cursor: 'pointer' }}>
+              <span dir="ltr" style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--fw-cta)' }}>{lv.key}</span>
+              <span style={{ fontSize: 'var(--text-xs)' }}>{lv.sub}</span>
+              {selected && <span className="sr-only">المستوى المعروض</span>}
             </button>
           )
         })}
       </div>
 
-      {/* Lesson selector — دروس المستوى المختار فقط */}
-      <div role="tablist" aria-label="اختر درسًا"
-        style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
-        {levelLessons.map(lesson => {
-          const active = lesson.id === activeId
-          return (
-            <button
-              key={lesson.id}
-              role="tab"
-              aria-selected={active}
-              aria-controls={`lesson-panel-${lesson.id}`}
-              id={`lesson-tab-${lesson.id}`}
-              onClick={() => setActiveId(lesson.id)}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
-                gap: 2, padding: '10px 14px',
-                border: `1px solid ${active ? 'var(--orange)' : 'var(--glass-border)'}`,
-                borderRadius: 12,
-                background: active ? 'var(--orange-l)' : 'var(--glass-bg)',
-                backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-                color: active ? 'var(--orange-text)' : 'var(--text2)',
-                fontFamily: 'inherit', cursor: 'pointer',
-                fontWeight: active ? 700 : 500,
-                transition: 'border-color .15s, background .15s',
-                minWidth: 140,
-              }}
-            >
-              <span style={{ fontSize: '1.1rem' }} aria-hidden="true">{lesson.icon}</span>
-              <span style={{ fontSize: '.85rem', fontWeight: active ? 700 : 600, lineHeight: 1.3 }}>
-                {lesson.title}
-              </span>
-              <span style={{ fontSize: '.72rem', color: active ? 'var(--orange-d)' : 'var(--muted)', direction: 'ltr' }}>
-                {lesson.subtitle}
-              </span>
-            </button>
-          )
-        })}
-      </div>
+      <Callout tone={completed === levelLessons.length ? 'success' : 'info'} icon={completed === levelLessons.length ? '✓' : '📖'} style={{ marginBottom: 'var(--sp-4)' }}>
+        <strong style={{ color: 'var(--text)' }}>{completed} من {levelLessons.length} دروس مكتملة التمارين</strong>
+        <p style={{ margin: 0 }}>هذه مستويات المحتوى؛ إكمالها لا يُعدّ اختبارًا لتحديد مستواك اللغوي. يمكنك فتح أي درس أو العودة لمراجعته.</p>
+      </Callout>
 
-      {/* Lesson content panel */}
-      <div
-        role="tabpanel"
-        id={`lesson-panel-${activeId}`}
-        aria-labelledby={`lesson-tab-${activeId}`}
-        style={{
-          background: 'var(--glass-bg)',
-          backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-          border: '1px solid var(--glass-border)',
-          borderRadius: 'var(--r)',
-          padding: '24px 22px',
-          boxShadow: 'var(--elev-1)',
-          minHeight: 300,
-        }}
-      >
-        {loading || markdown === null ? (
-          <LessonLoader />
+      <details open={catalogOpen} onToggle={event => setCatalogOpen(event.currentTarget.open)} style={{ marginBottom: 'var(--sp-4)' }}>
+        <summary style={{ padding: 'var(--sp-3)', minHeight: 44, color: 'var(--text)', cursor: 'pointer', fontWeight: 'var(--fw-heading)' }}>
+          فهرس دروس هذا المستوى
+        </summary>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(210px, 100%), 1fr))', gap: 'var(--sp-2)', paddingTop: 'var(--sp-2)' }}>
+          {levelLessons.map((lesson, index) => {
+            const result = grammarLessonProgress(lesson.id, progress)
+            const active = lesson.id === activeId
+            return (
+              <button key={lesson.id} type="button" aria-pressed={active} onClick={() => pickLesson(lesson.id, true)}
+                style={{ textAlign: 'start', display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)', padding: 'var(--sp-3)', minWidth: 0,
+                  border: `1px solid ${active ? 'var(--orange)' : 'var(--glass-border)'}`, borderRadius: 'var(--r-sm)',
+                  background: active ? 'var(--orange-l)' : 'var(--glass-bg)', color: 'var(--text)', cursor: 'pointer', fontFamily: 'inherit' }}>
+                <span dir="auto" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)' }}>{index + 1}. {lesson.title}</span>
+                <span dir="ltr" lang="nl" style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>{lesson.subtitle}</span>
+                <span style={{ fontSize: 'var(--text-xs)', color: result.complete ? 'var(--green-text)' : 'var(--text2)' }}>
+                  {result.complete ? '✓ مكتمل · متاح للمراجعة' : active ? '● الدرس الحالي' : result.correct > 0 ? '◐ قيد التعلّم' : '○ متاح'}
+                  {result.total > 0 && ` · ${result.correct}/${result.total}`}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </details>
+
+      <section ref={lessonPanel} tabIndex={-1} aria-labelledby="current-grammar-title" aria-busy={loading}
+        style={{ scrollMarginTop: 'var(--sp-6)', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r)', padding: 'var(--sp-5)', boxShadow: 'var(--elev-1)', minHeight: 240 }}>
+        <p style={{ margin: '0 0 var(--sp-1)', color: 'var(--text2)', fontSize: 'var(--text-sm)' }}>الدرس {levelLessons.findIndex(lesson => lesson.id === activeId) + 1} من {levelLessons.length}</p>
+        <h3 id="current-grammar-title" dir="auto" style={{ margin: '0 0 var(--sp-2)', fontSize: 'var(--text-lg)', color: 'var(--text)' }}>{activeMeta.title}</h3>
+        <p dir="ltr" lang="nl" style={{ margin: '0 0 var(--sp-4)', color: 'var(--text2)' }}>{activeMeta.subtitle}</p>
+        {loading ? <LessonLoader /> : content?.failed ? (
+          <Callout tone="danger" role="alert">
+            <p style={{ margin: '0 0 var(--sp-2)' }}>تعذّر تحميل الدرس. تحقّق من الاتصال ثم حاول مجددًا.</p>
+            <button type="button" className="btn-glass" onClick={() => { setContent(null); setRetry(value => value + 1) }}>إعادة المحاولة</button>
+          </Callout>
         ) : (
-          <Suspense fallback={<LessonLoader />}>
-            <Lesson markdown={markdown} />
-          </Suspense>
+          <Suspense fallback={<LessonLoader />}><Lesson markdown={content?.markdown ?? ''} /></Suspense>
         )}
-      </div>
+      </section>
 
-      {/* تمارين تفاعلية مرتبطة بالدرس الحالي — key يعيد الضبط عند تبديل الدرس */}
-      <GrammarExercises key={activeId} lessonId={activeId} />
+      {!loading && !content?.failed && <GrammarExercises key={activeId} lessonId={activeId} />}
+
+      <div style={{ marginTop: 'var(--sp-4)', display: 'grid', gap: 'var(--sp-3)' }}>
+        {activeProgress.complete && <Callout tone="success" role="status">أكملت تمارين هذا الدرس. يمكنك إعادة التدريب لتثبيت القاعدة أو متابعة المسار.</Callout>}
+        {next ? (
+          <button type="button" className="btn-glass" onClick={() => pickLesson(next.id, true)}
+            style={{ minHeight: 48, padding: 'var(--sp-3) var(--sp-4)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--sp-1)', color: 'var(--text)' }}>
+            <strong>{activeProgress.complete ? 'متابعة إلى الدرس التالي' : 'استعراض الدرس التالي'}</strong>
+            <span dir="auto" style={{ fontSize: 'var(--text-sm)' }}>{next.title}</span>
+            {next.level !== level && <span dir="ltr" style={{ fontSize: 'var(--text-sm)' }}>{next.level}</span>}
+          </button>
+        ) : <Callout tone="info" icon="✓">هذا آخر درس في المسار. راجع الدروس السابقة أو طبّق ما تعلّمته في قسم التدريب.</Callout>}
+      </div>
     </div>
   )
 }

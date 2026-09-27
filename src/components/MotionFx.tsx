@@ -9,8 +9,14 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 const EASE = [0.2, 0.7, 0.2, 1] as const
 
 /** Fade-up once when scrolled into view (scroll-reveal for cards/headings). */
-export function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
+export function Reveal({ children, delay = 0, stretch = false }: {
+  children: ReactNode
+  delay?: number
+  /** Pass through a grid/flex row's stretch to the child (equal-height cards). */
+  stretch?: boolean
+}) {
   const reduced = useReducedMotion()
+  // Without the wrapper the child IS the grid item and already stretches.
   if (reduced) return <>{children}</>
   return (
     <motion.div
@@ -18,6 +24,7 @@ export function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: n
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px 0px' }}
       transition={{ duration: 0.5, delay, ease: EASE }}
+      style={stretch ? { display: 'flex' } : undefined}
     >
       {children}
     </motion.div>

@@ -37,36 +37,36 @@ export function UserProfile({ onClose }: Props) {
 
   return (
     <Overlay onClose={onClose} label="الملف الشخصي">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)', marginBottom: 'var(--sp-4)' }}>
         {avatarUrl ? (
-          <img src={avatarUrl} alt="" width={56} height={56} style={{ borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--glass-border)' }} />
+          <img src={avatarUrl} alt="" width={56} height={56} style={{ borderRadius: 'var(--r-full)', objectFit: 'cover', border: '1px solid var(--glass-border)' }} />
         ) : (
           <div
             aria-hidden="true"
-            style={{ width: 56, height: 56, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--grad-primary)', color: '#fff', fontWeight: 700, fontSize: '1.2rem', flexShrink: 0 }}
+            style={{ width: 56, height: 56, borderRadius: 'var(--r-full)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--grad-primary)', color: '#fff', fontWeight: 'var(--fw-cta)', fontSize: 'var(--text-lg)', flexShrink: 0 }}
           >
             {initials(displayName)}
           </div>
         )}
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', fontWeight: 'var(--fw-heading)', color: 'var(--text)' }}>{displayName}</div>
-          <div style={{ fontSize: '.82rem', color: 'var(--muted)', direction: 'ltr', textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-lg)', fontWeight: 'var(--fw-heading)', color: 'var(--text)' }}>{displayName}</div>
+          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', direction: 'ltr', textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {user?.email ?? 'وضع الضيف — بلا حساب سحابي'}
           </div>
         </div>
       </div>
 
       {/* إحصاءات التقدّم */}
-      <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 18 }}>
+      <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--sp-2)', marginBottom: 'var(--sp-4)' }}>
         {[
           { icon: '🔥', value: String(s.streak.count), label: 'مواظبة' },
           { icon: '📚', value: `${totW.learned}/${totW.all}`, label: 'كلمات' },
           { icon: '🎯', value: `${best}%`, label: 'أفضل نتيجة' },
         ].map((k) => (
           <div key={k.label} style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r-sm)', padding: '10px 6px', textAlign: 'center' }}>
-            <div style={{ fontSize: '1.1rem' }}>{k.icon}</div>
+            <div style={{ fontSize: 'var(--text-lg)' }}>{k.icon}</div>
             <div style={{ fontFamily: 'var(--font-display)', fontWeight: 'var(--fw-heading)', color: 'var(--text)' }}>{k.value}</div>
-            <div style={{ fontSize: '.68rem', color: 'var(--muted)' }}>{k.label}</div>
+            <div style={{ fontSize: 'var(--text-2xs)', color: 'var(--muted)' }}>{k.label}</div>
           </div>
         ))}
       </div>
@@ -79,13 +79,13 @@ export function UserProfile({ onClose }: Props) {
         <input className="form-in" type="number" min={15} max={480} value={studyDayMinutes} onChange={(e) => setStudyDayMinutes(e.target.value)} />
       </Field>
 
-      <div style={{ display: 'flex', gap: 10, justifyContent: 'space-between', marginTop: 18, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 'var(--sp-3)', justifyContent: 'space-between', marginTop: 'var(--sp-4)', flexWrap: 'wrap' }}>
         {user && (
           <button type="button" onClick={() => { signOut(); onClose() }} className="btn-shine" style={btnStyle('danger')}>
             🚪 تسجيل الخروج
           </button>
         )}
-        <div style={{ display: 'flex', gap: 10, marginInlineStart: 'auto' }}>
+        <div style={{ display: 'flex', gap: 'var(--sp-3)', marginInlineStart: 'auto' }}>
           <button type="button" onClick={onClose} className="btn-shine" style={btnStyle('ghost')}>إلغاء</button>
           <button type="button" onClick={save} className="btn-shine" style={btnStyle('primary')}>💾 حفظ</button>
         </div>

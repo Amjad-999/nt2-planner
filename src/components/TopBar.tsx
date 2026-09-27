@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import { getDaysLeft } from '@/store/useAppStore'
 import { AppIcon } from './AppIcon'
@@ -30,22 +30,19 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
   const setActiveTab = useAppStore((s) => s.setActiveTab)
   const daysLeft = getDaysLeft(examDate)
 
-  const [fontSize, setFontSize] = useState(prefs.fontSize ?? 15)
-
   const changeFontSize = (delta: number) => {
-    const next = Math.min(19, Math.max(13, fontSize + delta))
-    setFontSize(next)
+    const next = Math.min(19, Math.max(13, (prefs.fontSize ?? 16) + delta))
     document.documentElement.style.setProperty('--font-size-base', `${next}px`)
     saveSettings({ prefs: { fontSize: next } })
   }
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--font-size-base', `${prefs.fontSize ?? 15}px`)
+    document.documentElement.style.setProperty('--font-size-base', `${prefs.fontSize ?? 16}px`)
   }, [prefs.fontSize])
 
   return (
     <header
-      className="sticky top-0 z-[200] flex items-center gap-2 sm:gap-3 px-3 sm:px-7 h-[62px] border-b"
+      className="app-bar sticky top-0 z-[200] flex items-center gap-1 sm:gap-3 border-b"
       style={{
         background: 'var(--topbar-bg)',
         backdropFilter: 'blur(20px) saturate(1.8)',
@@ -60,13 +57,14 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
         onClick={(e) => { e.preventDefault(); setActiveTab('today') }}
         className="flex items-center gap-2 shrink-0 no-underline text-[var(--text)]"
         title="الصفحة الرئيسية"
+        aria-label="الصفحة الرئيسية"
       >
         <div
-          className="w-[34px] h-[34px] rounded-lg flex items-center justify-center text-[1rem] text-white font-bold shrink-0"
-          style={{ background: 'var(--grad-primary)', boxShadow: 'var(--elev-2), inset 0 1px 0 rgba(255,255,255,.5)', border: '1px solid rgba(255,255,255,.18)' }}
+          className="w-[34px] h-[34px] rounded-lg flex items-center justify-center text-[var(--text-base)] font-bold shrink-0"
+          style={{ background: 'var(--grad-primary)', color: 'var(--on-primary)', boxShadow: 'var(--elev-2)', border: '1px solid var(--btn-border)' }}
           aria-hidden="true"
         >NT</div>
-        <div aria-hidden="true" className="font-display text-[1.25rem] font-bold text-[var(--text)] tracking-tight leading-none">
+        <div aria-hidden="true" dir="ltr" className="hidden lg:block font-display text-[var(--text-lg)] font-bold text-[var(--text)] tracking-tight leading-none">
           NT2<span style={{ color: 'var(--orange-text)' }}>·</span>Planner
         </div>
       </a>
@@ -80,25 +78,25 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
           would just be chrome that asks nothing and answers nothing. */}
       {daysLeft != null && (
         <div
-          className="decor-flourish hidden sm:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[.8rem] text-[var(--muted)] whitespace-nowrap"
+          className="decor-flourish hidden lg:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[var(--text-xs)] text-[var(--muted)] whitespace-nowrap"
           style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
           title="الأيام المتبقية حتى الامتحان"
         >
           <AppIcon icon={CalendarDots} size={15} style={{ color: 'var(--orange-text)' }} />
           {/* لون النص الأساسي يضمن ≥4.5:1 — الأيقونة البرتقالية تحمل الهوية */}
-          <strong style={{ color: 'var(--text)', fontWeight: 600 }}>{daysLeft}</strong>
+          <strong style={{ color: 'var(--text)', fontWeight: 'var(--fw-heading)' }}>{daysLeft}</strong>
           <span>يومًا للامتحان</span>
         </div>
       )}
 
       {/* Streak pill — hidden on phones (shown in the hero + KPIs); Focus Mode hides it too */}
       <div
-        className="decor-flourish hidden sm:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[.8rem] text-[var(--muted)] whitespace-nowrap"
+        className="decor-flourish hidden lg:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[var(--text-xs)] text-[var(--muted)] whitespace-nowrap"
         style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
         title="عدد أيام المواظبة المتتالية"
       >
         <AppIcon icon={Fire} size={15} style={{ color: 'var(--orange-text)' }} />
-        <strong style={{ color: 'var(--text)', fontWeight: 600 }}>{streak.count}</strong>
+        <strong style={{ color: 'var(--text)', fontWeight: 'var(--fw-heading)' }}>{streak.count}</strong>
         <span>يوم</span>
       </div>
 
@@ -114,7 +112,7 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
         <Magnetic>
           <button
             onClick={onInstall}
-            className="btn-glass flex items-center gap-1.5 rounded-lg px-3.5 text-[.82rem] font-bold text-[var(--text)] h-9 cursor-pointer"
+            className="btn-glass flex items-center gap-1.5 rounded-lg px-3.5 text-[var(--text-sm)] font-bold text-[var(--text)] h-9 cursor-pointer"
             style={{ boxShadow: 'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}
             aria-label="تثبيت التطبيق"
           >
@@ -133,8 +131,8 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
           <button
             onClick={onOpenProfile}
             aria-label="الملف الشخصي" title={userEmail ?? (name || 'الملف الشخصي')}
-            className="btn-shine w-9 h-9 rounded-lg flex items-center justify-center text-[.78rem] font-bold cursor-pointer font-[inherit]"
-            style={{ background: 'var(--grad-primary)', color: '#fff', border: '1px solid var(--btn-border)', boxShadow: 'var(--elev-1)' }}
+            className="btn-shine icon-btn rounded-lg flex items-center justify-center text-[var(--text-xs)] font-bold cursor-pointer font-[inherit]"
+            style={{ background: 'var(--grad-primary)', color: 'var(--on-primary)', border: '1px solid var(--btn-border)', boxShadow: 'var(--elev-1)' }}
           >
             {initials(name || userEmail || 'ضيف')}
           </button>
@@ -158,7 +156,7 @@ export function IconBtn({ children, onClick, title, 'aria-label': ariaLabel }: {
         onClick={onClick}
         title={title}
         aria-label={ariaLabel}
-        className="btn-shine w-9 h-9 rounded-lg flex items-center justify-center text-[1rem] text-[var(--muted)] cursor-pointer font-[inherit] transition-all hover:-translate-y-0.5"
+        className="btn-shine icon-btn rounded-lg flex items-center justify-center text-[var(--text-base)] text-[var(--muted)] cursor-pointer font-[inherit] transition-all hover:-translate-y-0.5"
         style={{ background: 'var(--btn-bg)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1px solid var(--btn-border)', boxShadow: 'var(--elev-1)' }}
       >
         {children}

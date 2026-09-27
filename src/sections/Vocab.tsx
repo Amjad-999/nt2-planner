@@ -1,17 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import { AiLookup } from '@/components/AiLookup'
 import { WordCard } from '@/components/WordCard'
 import { FlashCard } from '@/components/FlashCard'
 import { B1_THEMAS } from '@/data/themas'
-import { LEARNED_BOX } from '@/data/phases'
-import { isFsrsLearned } from '@/features/vocab/fsrs'
 import { useFuzzySearch, getMatchIndices } from '@/hooks/useFuzzySearch'
 import { useNow } from '@/hooks/useNow'
+import { dueWords as queueOf } from '@/features/vocab/queue'
+import { peekNavIntent, clearNavIntent } from '@/lib/navIntent'
 import type { VocabWord } from '@/store/types'
 import type { IFuseOptions } from 'fuse.js'
+import { Callout } from '@/components/ui/Callout'
+import { Button } from '@/components/ui/Button'
+import { Segmented } from '@/components/ui/Segmented'
+import { VocabOverview } from '@/components/vocab/VocabOverview'
 
-type View = 'bank' | 'due' | 'review' | 'themas'
+type View = 'bank' | 'due' | 'themas'
 
 const FUSE_OPTIONS: IFuseOptions<VocabWord> = {
   keys: [
@@ -28,15 +32,19 @@ const FUSE_OPTIONS: IFuseOptions<VocabWord> = {
 
 export default function Vocab() {
   const { vocab, removeVocab, gradeFlash, vocabAdd } = useAppStore()
-  const [view, setView]               = useState<View>('bank')
+  // "راجع الآن" on the home screen lands directly in the session.
+  const [intent] = useState(() => peekNavIntent('vocab'))
+  const [view, setView]               = useState<View>(intent?.view === 'themas' ? 'themas' : 'bank')
+  const [reviewing, setReviewing]     = useState(intent?.view === 'review')
   const [search, setSearch]           = useState('')
   const [levelFilter, setLevelFilter] = useState('')
   const [selectedThema, setSelectedThema] = useState(0)
+  useEffect(() => { clearNavIntent('vocab') }, [])
 
   const now = useNow()
-  const isLearned = (w: VocabWord) =>
-    w.fsrs_state !== undefined ? isFsrsLearned(w) : w.box >= LEARNED_BOX
-  const dueWords = vocab.filter((w) => (w.due ?? 0) <= now && !isLearned(w))
+  // The exact queue the session opens — see features/vocab/queue.
+  const dueWords = queueOf(vocab, now)
+  const savedWords = new Set(vocab.map((word) => word.dutch.trim().toLowerCase()))
 
   // Level-filtered list is the base for fuzzy search
   const levelFiltered = levelFilter
@@ -54,50 +62,77 @@ export default function Vocab() {
   // Map itemId → FuseResult for highlight lookup (O(1) per card)
   const resultMap = new Map(fuseResults?.map(r => [r.item.id, r]) ?? [])
 
-  const SEG: { id: View; label: string }[] = [
-    { id:'bank',   label:'🗂️ بنك المفردات' },
-    { id:'due',    label:`⏰ مستحقّة (${dueWords.length})` },
-    { id:'review', label:'🎴 جلسة مراجعة (SRS)' },
-    { id:'themas', label:'🎨 مواضيع B1' },
-  ]
+  /* جلسة المراجعة وضع مركّز: لا مفاتيح عرض ولا بحث حولها، فلا يخرج المتعلّم
+     منها بنقرة خاطئة في منتصفها. «إنهاء الجلسة» داخل البطاقة يعيده. */
+  if (reviewing) {
+    return (
+      <div className="page page--narrow">
+        <div className="vocab-session-heading">
+          <p className="eyebrow">مراجعة مركّزة</p>
+          <h1>جلسة المراجعة</h1>
+          <p>أظهر الإجابة بعد أن تستحضر المعنى، ثم اختر مستوى تذكّرك.</p>
+        </div>
+        <FlashCard
+          queue={dueWords}
+          onGrade={(id, q) => gradeFlash(id, q)}
+          onDone={() => setReviewing(false)}
+        />
+      </div>
+    )
+  }
 
   return (
-    <div style={{ padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto' }}>
-      <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
-        <span style={{ color: 'var(--orange-text)' }}>📚</span> منصّة المفردات + AI <span aria-hidden="true">🇳🇱</span>
-      </h2>
+    <div className="page">
+      <VocabOverview />
+      <p style={{ color: 'var(--text2)', fontSize: 'var(--text-base)', margin: '0 0 var(--sp-4)' }}>تعلّم كلمة في سياقها، وراجعها عندما يحين موعدها.</p>
 
-      <AiLookup />
+      {dueWords.length > 0 ? (
+        <Callout icon="⏰" style={{ marginBottom: 'var(--sp-4)' }}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div><strong style={{ display: 'block', color: 'var(--text)', fontSize: 'var(--text-lg)' }}>{dueWords.length} كلمة بانتظار المراجعة</strong><span>تذكّر المعنى أوّلًا، ثم قيّم تذكّرك ليُحدَّد الموعد التالي.</span></div>
+            <Button variant="primary" size="lg" onClick={() => setReviewing(true)}>ابدأ المراجعة</Button>
+          </div>
+        </Callout>
+      ) : vocab.length > 0 && (
+        <Callout tone="success" style={{ marginBottom: 'var(--sp-4)' }}>لا كلمات مستحقّة الآن. ستظهر هنا عندما يحين موعد مراجعتها.</Callout>
+      )}
 
-      {/* Segmented switch */}
-      <div style={{ display:'flex', gap:4, background:'var(--glass-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--glass-border)', borderRadius:14, padding:4, marginBottom:16, overflowX:'auto', scrollbarWidth:'none' }} role="tablist">
-        {SEG.map((s) => (
-          <button key={s.id} role="tab" aria-selected={view === s.id} onClick={() => setView(s.id)}
-            style={{ flex:1, minWidth:'max-content', background: view===s.id ? 'var(--glass-bg-strong)' : 'transparent', color: view===s.id ? 'var(--orange-text)' : 'var(--muted)', fontWeight: view===s.id ? 600 : 500, border:'none', padding:'9px 14px', borderRadius:10, fontSize:'.85rem', cursor:'pointer', fontFamily:'inherit', boxShadow: view===s.id ? 'var(--elev-1), inset 0 1px 0 rgba(255,255,255,.5)' : 'none', transition:'.15s', whiteSpace:'nowrap' }}>
-            {s.label}
-          </button>
-        ))}
-      </div>
+      <details open={vocab.length === 0} style={{ marginBottom: 'var(--sp-4)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r-sm)', background: 'var(--glass-bg)', padding: 'var(--sp-3)' }}>
+        <summary style={{ minHeight: 44, cursor: 'pointer', color: 'var(--text)', fontWeight: 'var(--fw-heading)', lineHeight: 'var(--lh-arabic)' }}>إضافة كلمة أو البحث عن معناها</summary>
+        <AiLookup />
+      </details>
+
+      <Segmented
+        label="عرض المفردات"
+        value={view}
+        onChange={setView}
+        options={[
+          { id: 'bank', label: `كلماتي (${vocab.length})` },
+          { id: 'due', label: `للمراجعة (${dueWords.length})` },
+          { id: 'themas', label: 'مواضيع الحياة اليومية' },
+        ]}
+      />
 
       {/* Bank view */}
       {view === 'bank' && (
         <>
-          <div style={{ display:'flex', gap:10, alignItems:'center', marginBottom:14, flexWrap:'wrap' }}>
+          <div style={{ display:'flex', gap:'var(--sp-3)', alignItems:'center', marginBottom:'var(--sp-3)', flexWrap:'wrap' }}>
             <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
               <input
-                type="text"
+                type="search"
+                dir="auto"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="🔍 ابحث بالهولندية أو العربية أو جملة المثال..."
+                placeholder="ابحث بالهولندية أو العربية"
                 autoComplete="off"
                 aria-label="بحث مرن في المفردات"
-                style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', backdropFilter:'blur(6px)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)', boxSizing: 'border-box' }}
+                style={{ minHeight:44, width:'100%', padding:'10px 12px', paddingInlineEnd:52, border:'1px solid var(--border2)', borderRadius:'var(--r-sm)', background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'var(--text-base)', color:'var(--text)', boxSizing: 'border-box' }}
               />
               {search && (
                 <button
                   onClick={() => setSearch('')}
                   aria-label="مسح البحث"
-                  style={{ position:'absolute', insetInlineEnd:10, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'var(--muted)', fontSize:'1rem', lineHeight:1 }}
+                  style={{ minHeight:44, minWidth:44, position:'absolute', insetInlineEnd:0, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'var(--muted)', fontSize:'var(--text-base)', lineHeight:'var(--lh-none)' }}
                 >✕</button>
               )}
             </div>
@@ -105,7 +140,7 @@ export default function Vocab() {
               value={levelFilter}
               onChange={(e) => setLevelFilter(e.target.value)}
               aria-label="تصفية حسب المستوى"
-              style={{ padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)', maxWidth:140 }}
+              style={{ minHeight:44, padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:'var(--r-sm)', background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'var(--text-sm)', color:'var(--text)', maxWidth:160 }}
             >
               <option value="">كل المستويات</option>
               {['A1','A2','B1','B2','C1'].map((l) => <option key={l} value={l}>{l}</option>)}
@@ -114,7 +149,7 @@ export default function Vocab() {
 
           {/* Result count when searching */}
           {search.trim() && (
-            <div style={{ fontSize:'.8rem', color:'var(--muted)', marginBottom:8 }} aria-live="polite" aria-atomic="true">
+            <div style={{ fontSize:'var(--text-xs)', color:'var(--text2)', marginBottom:'var(--sp-2)' }} aria-live="polite" aria-atomic="true">
               {filteredBank.length > 0
                 ? `${filteredBank.length} نتيجة`
                 : 'لا توجد نتائج'}
@@ -122,10 +157,16 @@ export default function Vocab() {
           )}
 
           {filteredBank.length === 0 ? (
-            <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r-sm)', padding:'14px 18px', fontSize:'.9rem', color:'var(--text2)' }}>
-              {vocab.length === 0
-                ? '📚 بنك مفرداتك فارغ — استخدم خانة AI أعلاه لإضافة كلمات هولندية.'
-                : '🔍 لا توجد كلمات تطابق بحثك.'}
+            <div className="card" style={{ fontSize:'var(--text-sm)', color:'var(--text2)' }}>
+              <p style={{ margin: '0 0 var(--sp-3)' }}>
+                {vocab.length === 0
+                  ? 'ابدأ بكلمات تحتاجها في حياتك اليومية. اختر من المواضيع الجاهزة أو ابحث عن كلمة وأضفها.'
+                  : 'لا توجد كلمات تطابق بحثك.'}
+              </p>
+              <Button variant={vocab.length === 0 ? 'primary' : 'secondary'} onClick={() => {
+                if (vocab.length === 0) setView('themas')
+                else { setSearch(''); setLevelFilter('') }
+              }}>{vocab.length === 0 ? 'اكتشف كلمات حسب الموضوع' : 'مسح البحث والتصفية'}</Button>
             </div>
           ) : (
           <div className="stagger">
@@ -150,41 +191,36 @@ export default function Vocab() {
       {/* Due view */}
       {view === 'due' && (
         dueWords.length === 0
-          ? <div style={{ background:'var(--green-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--green)', borderRadius:'var(--r-sm)', padding:'14px 18px', fontSize:'.9rem', color:'var(--text2)' }}>✅ لا توجد كلمات مستحقّة للمراجعة الآن — أحسنت! عُد لاحقًا.</div>
+          ? <Callout tone="success">لا توجد كلمات مستحقّة للمراجعة الآن. يمكنك إضافة كلمات من المواضيع أو العودة عند موعد المراجعة التالي.</Callout>
           : <div>
-              <div style={{ background:'var(--orange-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--orange)', borderRadius:'var(--r-sm)', padding:'14px 18px', marginBottom:12, fontSize:'.9rem', color:'var(--text2)' }}>⏰ <strong style={{ color:'var(--text)' }}>{dueWords.length} كلمة</strong> مستحقّة للمراجعة الآن.</div>
-              <button onClick={() => setView('review')} className="btn-glass" style={{ borderRadius:14, padding:'10px 20px', fontWeight:700, color:'var(--text)', cursor:'pointer', fontSize:'.9rem', fontFamily:'inherit', boxShadow:'var(--elev-1)' }}>🎴 ابدأ المراجعة</button>
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--sp-3)', marginBottom: 'var(--sp-3)' }}>
+                <p style={{ color: 'var(--text2)', margin: 0 }}>مرتّبة حسب موعد المراجعة، الأقدم أوّلًا.</p>
+                <Button variant="primary" onClick={() => setReviewing(true)}>ابدأ جلسة المراجعة</Button>
+              </div>
+              {dueWords.map((word) => <WordCard key={word.id} word={word} onDelete={removeVocab} />)}
             </div>
-      )}
-
-      {/* Review view */}
-      {view === 'review' && (
-        <FlashCard
-          queue={dueWords}
-          onGrade={(id, q) => gradeFlash(id, q)}
-          onDone={() => setView('bank')}
-        />
       )}
 
       {/* Themas view */}
       {view === 'themas' && (
         <div>
-          <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:12 }}>
+          <div style={{ display:'flex', gap:'var(--sp-2)', flexWrap:'wrap', marginBottom:'var(--sp-3)' }}>
             {B1_THEMAS.map((t, i) => (
-              <button key={i} onClick={() => setSelectedThema(i)}
-                style={{ background: i===selectedThema ? 'var(--grad-primary)' : 'var(--btn-bg)', color: i===selectedThema ? '#fff' : 'var(--text2)', border:'1px solid var(--btn-border)', borderRadius:10, padding:'7px 12px', fontSize:'.85rem', cursor:'pointer', fontFamily:'inherit', fontWeight: i===selectedThema ? 600 : 500 }}>
-                {t.nl} <span style={{ opacity:.7 }}>({t.ar})</span>
+              <button key={i} onClick={() => setSelectedThema(i)} aria-pressed={i === selectedThema}
+                style={{ minHeight:44, background: i===selectedThema ? 'var(--orange-l)' : 'var(--btn-bg)', color: i===selectedThema ? 'var(--orange-text)' : 'var(--text2)', border:`1px solid ${i===selectedThema ? 'var(--orange)' : 'var(--btn-border)'}`, borderRadius:'var(--r-sm)', padding:'7px 12px', fontSize:'var(--text-sm)', cursor:'pointer', fontFamily:'inherit', fontWeight: i===selectedThema ? 'var(--fw-heading)' : 'var(--fw-body)' }}>
+                <span dir="ltr" lang="nl" style={{ display: 'block', fontFamily: 'var(--font-latin)' }}>{t.nl}</span><span dir="rtl" lang="ar" style={{ display: 'block' }}>{t.ar}</span>
               </button>
             ))}
           </div>
           {B1_THEMAS[selectedThema] && (
             <>
-              <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'0 0 10px' }}>
-                📌 {B1_THEMAS[selectedThema].nl} — {B1_THEMAS[selectedThema].ar} <span style={{ fontSize:'.78rem', color:'var(--muted)', fontWeight:400 }}>({B1_THEMAS[selectedThema].words.length} كلمة)</span>
+              <h3 style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 10px' }}>
+                <span dir="ltr" lang="nl" style={{ display: 'block', fontFamily: 'var(--font-latin)' }}>{B1_THEMAS[selectedThema].nl}</span>
+                <span dir="rtl" lang="ar" style={{ display: 'block' }}>{B1_THEMAS[selectedThema].ar} <span style={{ fontSize:'var(--text-sm)', color:'var(--text2)', fontWeight:'var(--fw-body)' }}>({B1_THEMAS[selectedThema].words.length} كلمة)</span></span>
               </h3>
               {B1_THEMAS[selectedThema].words.map((w, i) => {
                 const fakeWord: VocabWord = { id: `thema_${selectedThema}_${i}`, dutch: w.nl, arabic: w.ar, example: w.ex ?? '', level: (w.level as VocabWord['level']) ?? 'B1', box: 0, due: 0, reps: 0 }
-                return <WordCard key={i} word={fakeWord} showAdd onAdd={() => vocabAdd(w.nl, w.ar, w.ex ?? '', w.level ?? 'B1')} />
+                return <WordCard key={i} word={fakeWord} meaningVisual={{ sentence: w.ex ?? '', meaning: w.ar }} showAdd saved={savedWords.has(w.nl.trim().toLowerCase())} onAdd={() => vocabAdd(w.nl, w.ar, w.ex ?? '', w.level ?? 'B1')} />
               })}
             </>
           )}

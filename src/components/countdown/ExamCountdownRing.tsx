@@ -80,7 +80,7 @@ export function ExamCountdownRing() {
         transition={pressTransition}
         style={{
           position: 'relative', width: SIZE, height: SIZE, flexShrink: 0,
-          borderRadius: '50%', padding: 0, cursor: 'pointer',
+          borderRadius: 'var(--r-full)', padding: 0, cursor: 'pointer',
           background: 'var(--hero-veil)', fontFamily: 'inherit',
           border: phase === 'unset' ? '1px dashed var(--orange-m)' : '1px solid var(--hero-line)',
         }}
@@ -103,13 +103,13 @@ export function ExamCountdownRing() {
         <span
           style={{
             position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center', gap: 1, pointerEvents: 'none',
+            alignItems: 'center', justifyContent: 'center', gap: 'var(--sp-0)', pointerEvents: 'none',
           }}
         >
           {phase === 'unset' ? (
             <>
-              <span aria-hidden="true" style={{ fontSize: '1.4rem' }}>📅</span>
-              <span style={{ fontSize: '.7rem', fontWeight: 700, color: 'var(--hero-ink)', lineHeight: 1.3 }}>
+              <span aria-hidden="true" style={{ fontSize: 'var(--glyph-sm)' }}>📅</span>
+              <span style={{ fontSize: 'var(--text-2xs)', fontWeight: 'var(--fw-cta)', color: 'var(--hero-ink)', lineHeight: 'var(--lh-heading)' }}>
                 حدّد موعدك
               </span>
             </>
@@ -117,19 +117,19 @@ export function ExamCountdownRing() {
             <>
               <span
                 style={{
-                  fontFamily: 'var(--font-display)', fontSize: '1.85rem', fontWeight: 700,
-                  color: 'var(--hero-ink)', lineHeight: 1, fontVariantNumeric: 'tabular-nums',
+                  fontFamily: 'var(--font-display)', fontSize: 'var(--text-3xl)', fontWeight: 'var(--fw-cta)',
+                  color: 'var(--hero-ink)', lineHeight: 'var(--lh-none)', fontVariantNumeric: 'tabular-nums',
                 }}
               >
                 {daysLeft}
               </span>
-              <span style={{ fontSize: '.72rem', color: 'var(--hero-ink2)' }}>يوم</span>
-              <span style={{ fontSize: '.62rem', color: 'var(--hero-ink2)' }}>حتى الامتحان</span>
+              <span style={{ fontSize: 'var(--text-2xs)', color: 'var(--hero-ink2)' }}>يوم</span>
+              <span style={{ fontSize: 'var(--text-2xs)', color: 'var(--hero-ink2)' }}>حتى الامتحان</span>
             </>
           ) : (
             <>
-              <span aria-hidden="true" style={{ fontSize: '1.4rem' }}>🎉</span>
-              <span style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--hero-ink)', lineHeight: 1.3 }}>
+              <span aria-hidden="true" style={{ fontSize: 'var(--glyph-sm)' }}>🎉</span>
+              <span style={{ fontSize: 'var(--text-2xs)', fontWeight: 'var(--fw-cta)', color: 'var(--hero-ink)', lineHeight: 'var(--lh-heading)' }}>
                 {phase === 'today' ? 'اليوم موعدك' : 'موعد جديد؟'}
               </span>
             </>

@@ -39,6 +39,20 @@ export function wordToCard(w: FsrsFields & { due: number; reps: number }): Card 
   return createEmptyCard(new Date())
 }
 
+/**
+ * When the card would come back for each of the four ratings, in ms from
+ * `now` — computed with the same engine and parameters as scheduleCard, so
+ * the label on a button is what pressing it does (fuzz aside).
+ */
+export function previewWaits(
+  w: FsrsFields & { due: number; reps: number },
+  now: Date = new Date(),
+): Record<FsrsQuality, number> {
+  const log = f.repeat(wordToCard(w), now)
+  const wait = (q: FsrsQuality) => Math.max(0, log[QUALITY_TO_RATING[q]].card.due.getTime() - now.getTime())
+  return { 0: wait(0), 1: wait(1), 2: wait(2), 3: wait(3) }
+}
+
 export function scheduleCard(
   w: FsrsFields & { due: number; reps: number },
   quality: FsrsQuality,

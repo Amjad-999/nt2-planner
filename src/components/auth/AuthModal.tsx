@@ -38,26 +38,26 @@ export function AuthModal({ onClose }: Props) {
 
   return (
     <Overlay onClose={onClose ?? (() => {})} label={mode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب'}>
-      <div style={{ textAlign: 'center', marginBottom: 16 }}>
-        <div style={{ fontSize: '2.4rem' }}>🇳🇱</div>
-        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: '6px 0 4px' }}>
+      <div style={{ textAlign: 'center', marginBottom: 'var(--sp-4)' }}>
+        <div style={{ fontSize: 'var(--glyph-lg)' }}>🇳🇱</div>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-xl)', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: '6px 0 4px' }}>
           أهلًا بك في NT2 Planner
         </h3>
-        <p style={{ color: 'var(--muted)', fontSize: '.88rem', margin: 0 }}>
+        <p style={{ color: 'var(--muted)', fontSize: 'var(--text-sm)', margin: 0 }}>
           سجّل الدخول لحفظ تقدّمك ومزامنته بين أجهزتك — أو تابع كضيف.
         </p>
       </div>
 
-      <div role="tablist" aria-label="طريقة الدخول" style={{ display: 'flex', gap: 8, marginBottom: 16, background: 'var(--glass-bg)', borderRadius: 12, padding: 4 }}>
+      <div role="tablist" aria-label="طريقة الدخول" style={{ display: 'flex', gap: 'var(--sp-2)', marginBottom: 'var(--sp-4)', background: 'var(--glass-bg)', borderRadius: 'var(--r-sm)', padding: 4 }}>
         <button
           role="tab" aria-selected={mode === 'login'} onClick={() => setMode('login')}
-          style={{ flex: 1, padding: '8px 12px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '.88rem', fontWeight: 600, background: mode === 'login' ? 'var(--grad-primary)' : 'transparent', color: mode === 'login' ? '#fff' : 'var(--text2)' }}
+          style={{ flex: 1, padding: '8px 12px', borderRadius: 'var(--r-xs)', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)', background: mode === 'login' ? 'var(--grad-primary)' : 'transparent', color: mode === 'login' ? '#fff' : 'var(--text2)' }}
         >
           تسجيل الدخول
         </button>
         <button
           role="tab" aria-selected={mode === 'signup'} onClick={() => setMode('signup')}
-          style={{ flex: 1, padding: '8px 12px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '.88rem', fontWeight: 600, background: mode === 'signup' ? 'var(--grad-primary)' : 'transparent', color: mode === 'signup' ? '#fff' : 'var(--text2)' }}
+          style={{ flex: 1, padding: '8px 12px', borderRadius: 'var(--r-xs)', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)', background: mode === 'signup' ? 'var(--grad-primary)' : 'transparent', color: mode === 'signup' ? '#fff' : 'var(--text2)' }}
         >
           إنشاء حساب
         </button>
@@ -67,15 +67,15 @@ export function AuthModal({ onClose }: Props) {
         ? <LoginForm onSwitchToSignup={() => setMode('signup')} />
         : <SignupForm onSwitchToLogin={() => setMode('login')} />}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '18px 0' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)', margin: '18px 0' }}>
         <div style={{ flex: 1, height: 1, background: 'var(--border2)' }} />
-        <span style={{ fontSize: '.78rem', color: 'var(--muted)' }}>أو</span>
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>أو</span>
         <div style={{ flex: 1, height: 1, background: 'var(--border2)' }} />
       </div>
 
       <button
         type="button" disabled={status === 'syncing'} onClick={() => signInGoogle()}
-        className="btn-shine" style={{ ...btnStyle('ghost'), width: '100%', marginBottom: 10 }}
+        className="btn-shine" style={{ ...btnStyle('ghost'), width: '100%', marginBottom: 'var(--sp-3)' }}
       >
         🇬 المتابعة بحساب Google
       </button>
@@ -86,7 +86,7 @@ export function AuthModal({ onClose }: Props) {
       >
         {dismissable ? 'ليس الآن' : 'المتابعة بلا حساب (ضيف)'}
       </button>
-      <p style={{ fontSize: '.76rem', color: 'var(--muted)', textAlign: 'center', marginTop: 8 }}>
+      <p style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', textAlign: 'center', marginTop: 'var(--sp-2)' }}>
         تُحفظ بياناتك محليًّا على هذا الجهاز فقط. يمكنك إنشاء حساب لاحقًا لمزامنتها بين أجهزتك.
       </p>
     </Overlay>

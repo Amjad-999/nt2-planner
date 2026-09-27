@@ -12,7 +12,7 @@ const BORDER: Record<string, string> = {
 export function InsightCard({ kind, icon, title, desc }: Props) {
   return (
     <div
-      className="flex gap-3 items-start rounded-card p-[14px_16px] relative overflow-hidden glow-card"
+      className="flex gap-3 items-start rounded-card p-[14px_16px] relative overflow-hidden glow-card w-full"
       style={{
         background: 'var(--glass-bg)',
         backdropFilter: 'blur(16px)',
@@ -24,8 +24,8 @@ export function InsightCard({ kind, icon, title, desc }: Props) {
     >
       <div className="text-xl shrink-0 mt-[1px] card-icon" aria-hidden="true">{icon}</div>
       <div className="flex-1">
-        <div className="font-semibold text-[var(--text)] text-[.92rem] mb-[3px] card-value">{title}</div>
-        <div className="text-[.83rem] text-[var(--text2)] leading-[1.55]">{desc}</div>
+        <div className="font-semibold text-[var(--text)] text-[var(--text-sm)] mb-[3px] card-value">{title}</div>
+        <div className="text-[var(--text-sm)] text-[var(--text2)] leading-[1.55]">{desc}</div>
       </div>
     </div>
   )

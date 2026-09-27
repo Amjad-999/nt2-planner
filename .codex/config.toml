@@ -1,0 +1,7 @@
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+BASH_DEFAULT_TIMEOUT_MS = "300000"
+BASH_MAX_TIMEOUT_MS = "900000"
+CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR = "1"

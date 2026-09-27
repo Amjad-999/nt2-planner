@@ -41,9 +41,10 @@ export function ToastHost() {
   const list = useToasts((s) => s.list)
   return (
     <div
+      className="toast-host"
       aria-live="polite"
       style={{ position: 'fixed', bottom: 'calc(18px + var(--o-bnav-h, 0px) + env(safe-area-inset-bottom, 0px))', insetInlineStart: '50%', transform: 'translateX(50%)',
-        zIndex: 950, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center', pointerEvents: 'none' }}
+        zIndex: 950, display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', alignItems: 'center', pointerEvents: 'none' }}
     >
       {/* الإعلان لقارئ الشاشة يأتي من aria-live على الحاوية أعلاه، فلا حاجة
           إلى role="status" على كل عنصر (يسبّب إعلانًا مزدوجًا). الإغلاق عبر
@@ -54,14 +55,14 @@ export function ToastHost() {
           className={t.leaving ? 'toast-out' : 'toast-in'}
           style={{
             pointerEvents: 'auto',
-            display: 'flex', alignItems: 'center', gap: 8,
-            padding: '10px 10px 10px 16px', borderRadius: 14,
+            display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
+            padding: '10px 10px 10px 16px', borderRadius: 'var(--r-sm)',
             background: 'var(--glass-bg-strong)',
             backdropFilter: 'blur(16px) saturate(1.5)', WebkitBackdropFilter: 'blur(16px) saturate(1.5)',
             border: '1px solid var(--glass-border)',
             borderInlineStart: `3px solid ${EDGE[t.kind]}`,
             boxShadow: 'var(--elev-2), inset 0 1px 0 var(--glass-hi)',
-            color: 'var(--text)', fontSize: '.88rem', fontWeight: 600, maxWidth: 'min(90vw, 420px)',
+            color: 'var(--text)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)', maxWidth: 'min(90vw, 420px)',
           }}
         >
           <span aria-hidden="true">{ICONS[t.kind]}</span>
@@ -71,9 +72,9 @@ export function ToastHost() {
             onClick={() => dismiss(t.id)}
             aria-label="إغلاق التنبيه"
             style={{
-              marginInlineStart: 4, padding: '2px 6px', borderRadius: 8, flexShrink: 0,
+              marginInlineStart: 'var(--sp-1)', padding: '2px 6px', borderRadius: 'var(--r-xs)', flexShrink: 0,
               background: 'transparent', border: 'none', cursor: 'pointer',
-              color: 'var(--muted)', fontSize: '.95rem', lineHeight: 1, fontFamily: 'inherit',
+              color: 'var(--muted)', fontSize: 'var(--text-base)', lineHeight: 'var(--lh-none)', fontFamily: 'inherit',
             }}
           >
             ✕

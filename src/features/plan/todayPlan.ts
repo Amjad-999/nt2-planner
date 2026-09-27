@@ -1,5 +1,5 @@
 import type { State, TabId, SkillKey } from '@/store/types'
-import { isFsrsLearned } from '@/features/vocab/fsrs-lite'
+import { dueCount as queueDueCount } from '@/features/vocab/queue'
 
 /**
  * الحلقة اليومية — ماذا يفعل المستخدم اليوم، بالأرقام.
@@ -43,12 +43,13 @@ export const SKILL_AR_SHORT: Record<SkillKey, string> = {
   speaking: 'التحدّث',
 }
 
-/** Words whose review time has arrived and that are not yet counted as learned. */
-export function dueCount(vocab: State['vocab'], now: number, learnedBox: number): number {
-  return vocab.filter((w) => {
-    const learned = w.fsrs_state !== undefined ? isFsrsLearned(w) : (w.box ?? 0) >= learnedBox
-    return !learned && (w.due ?? 0) <= now
-  }).length
+/**
+ * Words whose review time has arrived — the exact size of the review session.
+ * Mastered words count too: see features/vocab/queue for why skipping them
+ * made the dashboard disagree with the session it opened.
+ */
+export function dueCount(vocab: State['vocab'], now: number): number {
+  return queueDueCount(vocab, now)
 }
 
 /** The weakest of the four skills by best score; ties resolve to the first. */
@@ -69,14 +70,23 @@ function skillsTodayFrom(state: Pick<State, 'dailyHistory'>, todayKey: string): 
   return new Set((row?.examTaken ?? []).map((e) => e.skill))
 }
 
+/** Today's lessons from the study programme, when one is active. */
+export interface ProgramToday {
+  total: number
+  done: number
+}
+
 export interface PlanInput {
   now: number
   todayKey: string
-  learnedBox: number
   /** How many words a single review sitting should cover. */
   reviewBatch: number
   /** Total grammar lessons available, to know whether one is left. */
   totalLessons: number
+  /** Fully solved lessons; opening or partly solving a lesson does not count. */
+  completedLessons?: number
+  /** null / absent = no programme, or no lessons scheduled today. */
+  program?: ProgramToday | null
 }
 
 export function buildTodayPlan(
@@ -102,7 +112,7 @@ export function buildTodayPlan(
   }
 
   /* 2 — spaced repetition is time-critical: a word reviewed late loses value. */
-  const due = dueCount(state.vocab, input.now, input.learnedBox)
+  const due = dueCount(state.vocab, input.now)
   tasks.push({
     id: 'vocab',
     ar: due > 0 ? 'راجع المفردات المستحقّة' : 'المراجعة مكتملة',
@@ -114,25 +124,44 @@ export function buildTodayPlan(
     urgent: due >= input.reviewBatch,
   })
 
-  /* 3 — the weakest skill, named, so the day has one clear direction. */
+  /* 3 — today's new lessons from the book programme: the main learning of
+     the day, but only when a programme is active and schedules some today. */
+  const program = input.program
+  if (program && program.total > 0) {
+    const left = Math.max(0, program.total - program.done)
+    tasks.push({
+      id: 'program',
+      ar: 'ادرس دروس اليوم من برنامجك',
+      detailAr: left === 0
+        ? `أنجزت دروس اليوم كلّها (${program.total}).`
+        : `أنجزت ${program.done} من ${program.total}. بقي ${left}.`,
+      tab: 'plan',
+      done: left === 0,
+      urgent: false,
+    })
+  }
+
+  /* 4 — the weakest skill, named, so the day has one clear direction. */
   const focus = weakest(state.skill)
   tasks.push({
     id: 'focus',
     ar: `تدرّب على ${SKILL_AR_SHORT[focus]}`,
     detailAr: practised.has(focus)
       ? 'أنجزتها اليوم.'
-      : `أضعف مهاراتك حاليًّا: ${state.skill[focus]?.best ?? 0} من 100.`,
+      : state.skill[focus]?.attempts || state.skill[focus]?.best
+        ? `أقل نتيجة تدريبية لديك: ${state.skill[focus]?.best ?? 0} من 100.`
+        : 'لم تجرّب هذه المهارة بعد. ابدأ بمحاولة قصيرة لتحديد نقطة البداية.',
     tab: 'exam',
     done: practised.has(focus),
     urgent: false,
   })
 
-  /* 4 — one grammar lesson, only while there is one left to open. */
-  const lessonsDone = Object.keys(state.grammarProgress ?? {}).length
+  /* 5 — one grammar lesson, only while there is one left to open. */
+  const lessonsDone = input.completedLessons ?? Object.keys(state.grammarProgress ?? {}).length
   if (lessonsDone < input.totalLessons) {
     tasks.push({
       id: 'grammar',
-      ar: 'ادرس درس قواعد واحدًا',
+      ar: 'تابع مسار القواعد',
       detailAr: `أنجزت ${lessonsDone} من ${input.totalLessons} درسًا.`,
       tab: 'grammar',
       done: false,
@@ -140,7 +169,7 @@ export function buildTodayPlan(
     })
   }
 
-  /* 5 — the minute goal, only if the user actually set one. */
+  /* 6 — the minute goal, only if the user actually set one. */
   if (minutesTarget > 0) {
     tasks.push({
       id: 'minutes',
@@ -163,6 +192,16 @@ export function buildTodayPlan(
   else headlineAr = `أنجزت ${doneCount} من ${tasks.length}. بقيت ${tasks.length - doneCount}.`
 
   return { tasks, doneCount, pct, minutesDone, minutesTarget, headlineAr }
+}
+
+/**
+ * The one thing to do now: the first unfinished task. The list is already
+ * ordered by urgency (running exam → due reviews → today's lessons → weakest
+ * skill → grammar → minutes), so no second ranking is needed — and the home
+ * screen can never recommend something the checklist below it disagrees with.
+ */
+export function nextTask(plan: TodayPlan): DailyTask | null {
+  return plan.tasks.find((t) => !t.done) ?? null
 }
 
 /**

@@ -1,303 +1,146 @@
-import { useEffect, useRef, useState } from 'react'
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
-import { speakScore, scoreLabel } from '@/features/speaking/similarity'
-import { stopSpeak } from '@/features/tts/speakDutch'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { normalise, wordFeedback } from '@/features/speaking/similarity'
+import { speakDutch, stopSpeak } from '@/features/tts/speakDutch'
+import { Callout } from '@/components/ui/Callout'
+import { useSpeakingPractice } from '@/components/speaking/useSpeakingPractice'
 
 interface Props {
-  /** The Dutch sentence the learner should repeat */
+  /** The Dutch sentence the learner should repeat. */
   targetNl: string
-  /** Optional heading label (Arabic) */
   label?: string
 }
 
-type Phase = 'idle' | 'listening' | 'scored' | 'error'
+export function SpeakAndCheck(props: Props) {
+  // Changing cards ends the old microphone session and clears its feedback.
+  return <SpeakingPractice key={props.targetNl} {...props} />
+}
 
-const UNSUPPORTED_MSG =
-  '🌐 متصفّحك لا يدعم التعرّف على الكلام. استخدم Google Chrome للحصول على أفضل تجربة.'
-const NO_MIC_MSG =
-  '🎤 لم يُمنح إذن الميكروفون. اسمح بالوصول في إعدادات متصفّحك ثمّ حاول مجدّدًا.'
-const OFFLINE_MSG =
-  '📶 التعرّف على الكلام يحتاج اتّصال بالإنترنت. تحقّق من الاتّصال وحاول مجدّدًا.'
+function SpeakingPractice({ targetNl, label = 'تدرّب على النطق' }: Props) {
+  const practice = useSpeakingPractice()
+  const [playing, setPlaying] = useState(false)
+  const [audioError, setAudioError] = useState(false)
+  const audioRequest = useRef(0)
+  const audioActive = useRef(false)
+  const active = practice.phase === 'starting' || practice.phase === 'listening'
+  const matches = practice.result !== null && normalise(practice.result) === normalise(targetNl)
+  const feedback = practice.result === null ? [] : wordFeedback(targetNl, practice.result)
+  const missing = feedback.filter((w) => w.state === 'missing').map((w) => w.word)
 
-export function SpeakAndCheck({ targetNl, label }: Props) {
-  const {
-    transcript,
-    interimTranscript,
-    listening,
-    isMicrophoneAvailable,
-    browserSupportsSpeechRecognition,
-    resetTranscript,
-  } = useSpeechRecognition()
+  useEffect(() => () => {
+    audioRequest.current += 1
+    if (audioActive.current) stopSpeak()
+  }, [])
 
-  const [phase, setPhase] = useState<Phase>('idle')
-  const [score, setScore] = useState<number | null>(null)
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const reducedMotion = useReducedMotion()
-  // Track whether we initiated this listening session so auto-stop fires correctly
-  const ours = useRef(false)
-
-  // Compute score once listening stops (auto-stop or manual).
-  // setState runs on a cancellable 0 ms timer — never synchronously in the
-  // effect body — while ours.current flips synchronously to keep the
-  // cross-effect session guard race-free
-  useEffect(() => {
-    if (!ours.current) return
-    if (!listening && transcript) {
-      ours.current = false
-      const pct = speakScore(transcript, targetNl)
-      const t = setTimeout(() => {
-        setScore(pct)
-        setPhase('scored')
-      }, 0)
-      return () => clearTimeout(t)
-    } else if (!listening && !transcript && phase === 'listening') {
-      // recognition ended without a result (e.g. silence timeout)
-      ours.current = false
-      const t = setTimeout(() => setPhase('idle'), 0)
-      return () => clearTimeout(t)
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listening])
-
-  // React to mic permission being revoked after start
-  useEffect(() => {
-    if (!isMicrophoneAvailable && phase === 'listening') {
-      ours.current = false
-      const t = setTimeout(() => {
-        setErrorMsg(NO_MIC_MSG)
-        setPhase('error')
-      }, 0)
-      return () => clearTimeout(t)
-    }
-  }, [isMicrophoneAvailable, phase])
-
-  if (!browserSupportsSpeechRecognition) {
-    return (
-      <div role="status" style={infoStyle('var(--amber-l)', 'var(--amber)')}>
-        {UNSUPPORTED_MSG}
-      </div>
-    )
-  }
-
-  const start = async () => {
-    if (!navigator.onLine) {
-      setErrorMsg(OFFLINE_MSG)
-      setPhase('error')
+  async function playExample() {
+    const request = ++audioRequest.current
+    if (playing) {
+      stopSpeak()
+      audioActive.current = false
+      setPlaying(false)
       return
     }
-    // Stop TTS so it doesn't interfere with the mic
-    stopSpeak()
-    resetTranscript()
-    setScore(null)
-    setErrorMsg(null)
-    ours.current = true
-    setPhase('listening')
-    try {
-      await SpeechRecognition.startListening({ language: 'nl-NL', continuous: false })
-    } catch {
-      ours.current = false
-      if (!isMicrophoneAvailable) {
-        setErrorMsg(NO_MIC_MSG)
-      } else {
-        setErrorMsg('حدث خطأ — حاول مجدّدًا.')
-      }
-      setPhase('error')
+    setAudioError(false)
+    setPlaying(true)
+    audioActive.current = true
+    await speakDutch(targetNl, undefined, {
+      onError: () => { if (audioRequest.current === request) setAudioError(true) },
+    })
+    if (audioRequest.current === request) {
+      audioActive.current = false
+      setPlaying(false)
     }
   }
 
-  const stop = async () => {
-    await SpeechRecognition.stopListening()
-    // score will be set by the useEffect above when listening → false
-  }
-
-  const reset = () => {
-    SpeechRecognition.abortListening().catch(() => {})
-    resetTranscript()
-    ours.current = false
-    setPhase('idle')
-    setScore(null)
-    setErrorMsg(null)
-  }
-
-  const lbl = score !== null ? scoreLabel(score) : null
-  const displayTranscript = listening ? (transcript + (interimTranscript ? ' ' + interimTranscript : '')) : transcript
-
   return (
-    <div
-      dir="rtl"
-      style={{
-        marginTop: 10,
-        padding: '12px 14px',
-        background: 'var(--glass-bg)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        border: '1px solid var(--glass-border)',
-        borderRadius: 'var(--r-sm)',
-        boxShadow: 'var(--elev-1)',
-      }}
-    >
-      {label && (
-        <div style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 8 }}>
-          🎙️ {label}
-        </div>
-      )}
+    <section dir="rtl" aria-label={label} style={{
+      marginTop: 'var(--sp-3)', padding: 'var(--sp-4)',
+      background: 'var(--surface2)', border: '1px solid var(--border)',
+      borderRadius: 'var(--r-sm)',
+    }}>
+      <h4 style={{ margin: 0, color: 'var(--text)', fontSize: 'var(--text-base)', fontWeight: 'var(--fw-heading)' }}>{label}</h4>
+      <p style={{ color: 'var(--text2)', fontSize: 'var(--text-sm)', lineHeight: 'var(--lh-arabic)' }}>
+        استمع إلى المثال، ثم قل الجملة بصوت واضح وقارن الكلمات التي التقطها المتصفّح.
+      </p>
+      <p dir="ltr" lang="nl" style={{
+        color: 'var(--text)', fontFamily: 'var(--font-latin)', fontSize: 'var(--text-lg)',
+        lineHeight: 'var(--lh-ui)', overflowWrap: 'anywhere', textAlign: 'start',
+      }}>{targetNl}</p>
 
-      {/* Control buttons */}
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        {phase !== 'listening' ? (
-          <MicButton
-            onPress={start}
-            reducedMotion={reducedMotion}
-            label="ابدأ النطق — اضغط للتسجيل بالهولندية"
-          />
+      <div style={{ display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
+        <button type="button" disabled={active} onClick={playExample} style={buttonStyle}>
+          <span aria-hidden="true">{playing ? '⏹' : '🔊'}</span>
+          {playing ? 'إيقاف المثال' : 'استمع إلى المثال'}
+        </button>
+        {practice.supported && (active ? (
+          <button type="button" onClick={practice.stop} style={{ ...buttonStyle, color: 'var(--red-text)', background: 'var(--red-l)' }}>
+            <span aria-hidden="true">⏹</span> إيقاف الميكروفون
+          </button>
         ) : (
-          <button
-            onClick={stop}
-            aria-label="أوقف التسجيل"
-            style={{ ...btnBase, background: 'var(--red-l)', color: 'var(--red-text)', borderColor: 'var(--red)' }}
-          >
-            ⏹ إيقاف
+          <button type="button" onClick={() => {
+            audioRequest.current += 1
+            audioActive.current = false
+            setPlaying(false)
+            void practice.start()
+          }} style={{ ...buttonStyle, color: 'var(--orange-text)', background: 'var(--orange-l)', borderColor: 'var(--orange)' }}>
+            <span aria-hidden="true">🎙️</span>
+            {practice.result !== null || practice.phase === 'error' ? 'حاول النطق مجدّدًا' : 'ابدأ النطق'}
           </button>
-        )}
-        {(phase === 'scored' || phase === 'error') && (
-          <button onClick={reset} aria-label="أعِد المحاولة" style={btnBase}>
-            🔄 حاول مجدّدًا
-          </button>
-        )}
+        ))}
       </div>
 
-      {/* Live transcript (aria-live) */}
-      {(phase === 'listening' || (phase === 'scored' && displayTranscript)) && (
-        <div
-          role="status"
-          aria-live="polite"
-          aria-atomic="false"
-          style={{
-            marginTop: 8,
-            padding: '7px 10px',
-            background: 'var(--glass-bg)',
-            border: '1px solid var(--glass-border)',
-            borderRadius: 8,
-            fontSize: '.88rem',
-            color: phase === 'listening' ? 'var(--text)' : 'var(--text2)',
-            minHeight: 34,
-            direction: 'ltr',
-            textAlign: 'left',
-            fontStyle: phase === 'listening' ? 'normal' : 'italic',
-          }}
-        >
-          {displayTranscript || (phase === 'listening' ? '…' : '')}
+      {!practice.supported && (
+        <Callout tone="warn" role="status" density="compact" style={{ marginTop: 'var(--sp-3)' }}>
+          متصفّحك لا يدعم التعرّف على الكلام. يمكنك الاستماع إلى المثال وتكراره بنفسك، أو تجربة متصفّح يدعم الميكروفون.
+        </Callout>
+      )}
+      {active && (
+        <div role="status" style={{ marginTop: 'var(--sp-3)', color: 'var(--text2)', fontSize: 'var(--text-sm)' }}>
+          <p>{practice.phase === 'starting' ? 'جارٍ طلب الميكروفون… اسمح بالوصول إذا طلب المتصفّح ذلك.' : 'الميكروفون يعمل… قل الجملة ثم اضغط إيقاف.'}</p>
+          {practice.liveTranscript && <p dir="ltr" lang="nl" style={{ fontFamily: 'var(--font-latin)', overflowWrap: 'anywhere' }}>{practice.liveTranscript}</p>}
         </div>
       )}
+      {practice.result !== null && (
+        <Callout tone={matches ? 'success' : 'warn'} role="status" density="compact" style={{ marginTop: 'var(--sp-3)' }}>
+          <strong>{matches ? 'التقط المتصفّح كل الكلمات كما في المثال.' : 'بعض الكلمات لم تصل كما في المثال.'}</strong>
 
-      {/* Score bar */}
-      {phase === 'scored' && score !== null && lbl && (
-        <div style={{ marginTop: 10 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-            <span style={{ fontSize: '.82rem', color: lbl.color, fontWeight: 600 }}>{lbl.text}</span>
-            <span style={{ fontSize: '.88rem', fontWeight: 700, color: lbl.color }}>{score}%</span>
-          </div>
-          <div
-            role="progressbar"
-            aria-valuenow={score}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label={`نتيجة النطق: ${score} بالمئة`}
-            style={{
-              height: 7,
-              background: 'var(--surface3)',
-              borderRadius: 4,
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              className="progress-wave"
-              style={{
-                height: '100%',
-                width: `${score}%`,
-                backgroundColor: lbl.color,
-                transition: reducedMotion ? 'none' : 'width .8s ease',
-                borderRadius: 4,
-              }}
-            />
-          </div>
-        </div>
-      )}
+          {/* تغذية راجعة على مستوى الكلمة: ما وصل وما لم يصل. ليست درجة نطق —
+              التعرّف الآلي يقول ما سمعه فقط. */}
+          <p style={{ margin: 'var(--sp-2) 0 var(--sp-1)' }}>كلمة كلمة:</p>
+          <p dir="ltr" lang="nl" style={{ margin: 0, fontFamily: 'var(--font-latin)', display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-2)', textAlign: 'start' }}>
+            {feedback.map((w, i) => (
+              <span key={i} style={{
+                color: w.state === 'missing' ? 'var(--red-text)' : 'var(--text)',
+                textDecoration: w.state === 'heard' ? 'none' : 'underline',
+                textDecorationStyle: w.state === 'close' ? 'dotted' : 'solid',
+              }}>
+                <span aria-hidden="true">{w.state === 'heard' ? '✓' : w.state === 'close' ? '≈' : '✗'}</span> {w.word}
+                <span className="sr-only">{w.state === 'heard' ? ' وصلت' : w.state === 'close' ? ' وصلت قريبة' : ' لم تصل'}</span>
+              </span>
+            ))}
+          </p>
 
-      {/* Error message */}
-      {phase === 'error' && errorMsg && (
-        <div role="alert" style={{ ...infoStyle('var(--red-l)', 'var(--red)'), marginTop: 8 }}>
-          {errorMsg}
-        </div>
+          {missing.length > 0 && (
+            <p style={{ margin: 'var(--sp-2) 0' }}>
+              أعد هذه الكلمات ببطء بعد المثال: <span dir="ltr" lang="nl" style={{ fontFamily: 'var(--font-latin)' }}>{missing.join(' · ')}</span>
+            </p>
+          )}
+          <details style={{ marginTop: 'var(--sp-2)' }}>
+            <summary style={{ cursor: 'pointer', minHeight: 44, display: 'flex', alignItems: 'center' }}>ما التقطه المتصفّح كاملًا</summary>
+            <p dir="ltr" lang="nl" style={{ margin: 'var(--sp-2) 0', fontFamily: 'var(--font-latin)', color: 'var(--text)', overflowWrap: 'anywhere', textAlign: 'start' }}>{practice.result}</p>
+          </details>
+          <p style={{ margin: 'var(--sp-2) 0 0' }}>هذه مقارنة للكلمات وليست تقييمًا لدقّة النطق. قد يخطئ التعرّف الآلي.</p>
+        </Callout>
       )}
-    </div>
+      {practice.error && <Callout tone="warn" role="alert" density="compact" style={{ marginTop: 'var(--sp-3)' }}>{practice.error}</Callout>}
+      {audioError && <Callout tone="warn" role="alert" density="compact" style={{ marginTop: 'var(--sp-3)' }}>تعذّر تشغيل المثال. تحقّق من الاتصال أو من توفر صوت هولندي على جهازك، ثم أعد المحاولة.</Callout>}
+    </section>
   )
 }
 
-/* ── Mic button with pulsing ring when idle ── */
-function MicButton({
-  onPress,
-  reducedMotion,
-  label,
-}: {
-  onPress: () => void
-  reducedMotion: boolean
-  label: string
-}) {
-  return (
-    <button
-      onClick={onPress}
-      aria-label={label}
-      style={{
-        ...btnBase,
-        background: 'var(--orange-l)',
-        borderColor: 'var(--orange)',
-        color: 'var(--orange-text)',
-        animation: reducedMotion ? 'none' : 'mic-pulse 2s ease-in-out infinite',
-      }}
-    >
-      🎙️ ابدأ النطق
-      <style>{`
-        @keyframes mic-pulse {
-          0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--orange) 30%, transparent); }
-          50%       { box-shadow: 0 0 0 6px transparent; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          button[aria-label="${label}"] { animation: none !important; }
-        }
-      `}</style>
-    </button>
-  )
-}
-
-const btnBase: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 5,
-  padding: '7px 14px',
-  border: '1px solid var(--btn-border)',
-  borderRadius: 10,
-  cursor: 'pointer',
-  fontSize: '.83rem',
-  fontFamily: 'inherit',
-  fontWeight: 600,
-  background: 'var(--btn-bg)',
-  backdropFilter: 'blur(10px)',
-  WebkitBackdropFilter: 'blur(10px)',
-  color: 'var(--text2)',
-  transition: 'background .15s, border-color .15s',
-}
-
-function infoStyle(bg: string, border: string): React.CSSProperties {
-  return {
-    background: bg,
-    border: `1px solid ${border}`,
-    borderInlineStart: `3px solid ${border}`,
-    borderRadius: 'var(--r-sm)',
-    padding: '10px 12px',
-    fontSize: '.85rem',
-    color: 'var(--text2)',
-    lineHeight: 1.55,
-  }
+const buttonStyle: CSSProperties = {
+  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--sp-2)',
+  minHeight: 'var(--tap-min)', padding: 'var(--sp-2) var(--sp-3)',
+  border: '1px solid var(--btn-border)', borderRadius: 'var(--r-sm)',
+  cursor: 'pointer', fontSize: 'var(--text-sm)', fontFamily: 'inherit',
+  fontWeight: 'var(--fw-heading)', background: 'var(--btn-bg)', color: 'var(--text)',
 }

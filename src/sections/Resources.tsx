@@ -10,6 +10,7 @@ import { EXAMS, SKILL_ICON } from '@/data/examPdfs'
 import type { ExamEntry } from '@/data/examPdfs'
 import { EXAM_AUDIO } from '@/data/examAudio'
 import type { AudioTrack } from '@/data/examAudio'
+import { Callout } from '@/components/ui/Callout'
 
 // Check which files actually exist on the server (HEAD request)
 async function checkAvail(filename: string): Promise<boolean> {
@@ -56,30 +57,30 @@ function PdfModal({ state, onClose }: { state: ModalState; onClose: () => void }
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '12px 16px', borderBottom: '1px solid var(--glass-border)',
-          gap: 12,
+          gap: 'var(--sp-3)',
         }}>
-          <span style={{ fontWeight: 600, fontSize: '.9rem', color: 'var(--text)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <span style={{ fontWeight: 'var(--fw-heading)', fontSize: 'var(--text-sm)', color: 'var(--text)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {state.title}
           </span>
-          <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: 'var(--sp-2)', flexShrink: 0 }}>
             <a
               href={state.src}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ fontSize: '.8rem', padding: '5px 12px', borderRadius: 8, border: '1px solid var(--blue)', color: 'var(--blue)', background: 'transparent', textDecoration: 'none', fontFamily: 'inherit', cursor: 'pointer' }}
+              style={{ fontSize: 'var(--text-xs)', padding: '5px 12px', borderRadius: 'var(--r-xs)', border: '1px solid var(--blue)', color: 'var(--blue-text)', background: 'transparent', textDecoration: 'none', fontFamily: 'inherit', cursor: 'pointer' }}
             >
               ↗ فتح في نافذة جديدة
             </a>
             <a
               href={state.src}
               download
-              style={{ fontSize: '.8rem', padding: '5px 12px', borderRadius: 8, border: '1px solid var(--green, #965D3B)', color: 'var(--green, #965D3B)', background: 'transparent', textDecoration: 'none', fontFamily: 'inherit', cursor: 'pointer' }}
+              style={{ fontSize: 'var(--text-xs)', padding: '5px 12px', borderRadius: 'var(--r-xs)', border: '1px solid var(--green, #965D3B)', color: 'var(--green, #965D3B)', background: 'transparent', textDecoration: 'none', fontFamily: 'inherit', cursor: 'pointer' }}
             >
               ⬇ تنزيل
             </a>
             <button
               onClick={onClose}
-              style={{ fontSize: '.8rem', padding: '5px 10px', borderRadius: 8, border: '1px solid var(--border2)', color: 'var(--text2)', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit' }}
+              style={{ fontSize: 'var(--text-xs)', padding: '5px 10px', borderRadius: 'var(--r-xs)', border: '1px solid var(--border2)', color: 'var(--text2)', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit' }}
             >
               ✕
             </button>
@@ -123,22 +124,22 @@ export default function Resources() {
   }
 
   return (
-    <div style={{ padding: '24px 28px 60px', maxWidth: 1100, margin: '0 auto' }}>
-      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div className="page">
+      <h2 className="section-title">
         <span style={{ color: 'var(--orange-text)' }}>🔗</span> مصادر رسمية وعلى الإنترنت <span aria-hidden="true">🌍</span>
       </h2>
 
-      <div style={{ background: 'var(--blue-l)', border: '1px solid var(--glass-border)', borderInlineStart: '3px solid var(--blue)', borderRadius: 'var(--r-sm)', padding: '14px 18px', marginBottom: 18, fontSize: '.9rem', color: 'var(--text2)', lineHeight: 1.65 }}>
+      <Callout tone="info" icon="💡" style={{ marginBottom: 'var(--sp-4)' }}>
         <strong style={{ color: 'var(--text)' }}>أهم نصيحة:</strong> ملفّات الامتحانات الرسمية (Lezen / Luisteren / Schrijven / Spreken لسنوات 2023 و2024 و2025) محفوظة لديك في مجلّد <em>NT</em>. استخدمها كمعيار حقيقي للصعوبة بعد أن تُكمل المحاكاة هنا.
-      </div>
+      </Callout>
 
       {/* ─── DUO PDF exam panel ─── */}
       <section aria-labelledby="pdf-heading">
-        <h3 id="pdf-heading" style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--text)', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <h3 id="pdf-heading" style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
           📄 نماذج امتحانات DUO (PDF)
         </h3>
 
-        <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12, marginBottom: 24 }}>
+        <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(240px, 100%), 1fr))', gap: 'var(--sp-3)', marginBottom: 'var(--sp-6)' }}>
           {EXAMS.map((exam) => (
             <ExamCard
               key={exam.id}
@@ -156,8 +157,8 @@ export default function Resources() {
       {/* ─── Link groups ─── */}
       {RESOURCE_GROUPS.map((group) => (
         <div key={group.title}>
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--text)', margin: '18px 0 10px' }}>{group.title}</h3>
-          <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 12 }}>
+          <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: '18px 0 10px' }}>{group.title}</h3>
+          <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(220px, 100%),1fr))', gap: 'var(--sp-3)' }}>
             {group.links.map((link) => (
               <ResourceLinkCard key={link.href} link={link} />
             ))}
@@ -197,20 +198,20 @@ function ExamCard({
         padding: '14px 14px 12px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 10,
+        gap: 'var(--sp-3)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span className="card-icon" style={{ fontSize: '1.25rem' }}>{icon}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
+        <span className="card-icon" style={{ fontSize: 'var(--text-lg)' }}>{icon}</span>
         <div>
-          <div className="card-value" style={{ fontWeight: 600, fontSize: '.88rem', color: 'var(--text)' }}>
+          <div className="card-value" style={{ fontWeight: 'var(--fw-heading)', fontSize: 'var(--text-sm)', color: 'var(--text)' }}>
             {exam.skillAr} — {exam.year}
           </div>
-          <div style={{ fontSize: '.75rem', color: 'var(--muted)' }}>{exam.skill}</div>
+          <div style={{ fontSize: 'var(--text-2xs)', color: 'var(--muted)' }}>{exam.skill}</div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
         <ExamActionButton
           label="الأسئلة"
           sublabel="Opgaven"
@@ -260,8 +261,8 @@ function ResourceLinkCard({ link }: { link: ResourceLink }) {
         opacity: link.warn ? 0.65 : 1,
       }}
     >
-      <div className="card-value" style={{ fontWeight: 600, color: link.highlight ? 'var(--orange-text)' : 'var(--text)', marginBottom: 4 }}>{link.title}</div>
-      <div style={{ fontSize: '.8rem', color: 'var(--text2)', lineHeight: 1.5 }}>{link.desc}</div>
+      <div className="card-value" style={{ fontWeight: 'var(--fw-heading)', color: link.highlight ? 'var(--orange-text)' : 'var(--text)', marginBottom: 'var(--sp-1)' }}>{link.title}</div>
+      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text2)', lineHeight: 'var(--lh-ui)' }}>{link.desc}</div>
     </a>
   )
 }
@@ -284,8 +285,8 @@ function ExamAudioPanel({
       <button
         onClick={onToggle}
         style={{
-          width: '100%', textAlign: 'start', fontSize: '.8rem', fontWeight: 500,
-          padding: '7px 10px', borderRadius: 6,
+          width: '100%', textAlign: 'start', fontSize: 'var(--text-xs)', fontWeight: 'var(--fw-medium)',
+          padding: '7px 10px', borderRadius: 'var(--r-xs)',
           border: '1px solid var(--glass-border)', color: 'var(--text2)',
           background: open ? 'var(--surface3)' : 'transparent',
           cursor: 'pointer', fontFamily: 'inherit', transition: 'background .12s',
@@ -293,13 +294,13 @@ function ExamAudioPanel({
         }}
       >
         <span>🎵 مقاطع الصوت ({audioCount}{videoCount > 0 ? ` + ${videoCount} فيديو` : ''})</span>
-        <span style={{ fontSize: '.7rem' }}>{open ? '▲' : '▼'}</span>
+        <span style={{ fontSize: 'var(--text-2xs)' }}>{open ? '▲' : '▼'}</span>
       </button>
 
       {open && (
         <div style={{
-          marginTop: 6, maxHeight: 340, overflowY: 'auto',
-          border: '1px solid var(--glass-border)', borderRadius: 6,
+          marginTop: 'var(--sp-2)', maxHeight: 340, overflowY: 'auto',
+          border: '1px solid var(--glass-border)', borderRadius: 'var(--r-xs)',
           background: 'var(--surface2)',
         }}>
           {tracks.map((track) => {
@@ -312,7 +313,7 @@ function ExamAudioPanel({
                   borderBottom: '1px solid var(--glass-border)',
                 }}
               >
-                <div style={{ fontSize: '.75rem', color: 'var(--muted)', marginBottom: 4 }}>
+                <div style={{ fontSize: 'var(--text-2xs)', color: 'var(--muted)', marginBottom: 'var(--sp-1)' }}>
                   {track.isVideo ? '🎬' : '🔊'} {track.label}
                 </div>
                 {track.isVideo ? (
@@ -320,7 +321,7 @@ function ExamAudioPanel({
                     controls
                     preload="none"
                     src={src}
-                    style={{ width: '100%', maxHeight: 180, borderRadius: 4, background: '#000' }}
+                    style={{ width: '100%', maxHeight: 180, borderRadius: 'var(--r-2xs)', background: '#000' }}
                   />
                 ) : (
                   <audio
@@ -351,7 +352,7 @@ function ExamActionButton({
 }) {
   if (checking) {
     return (
-      <div style={{ fontSize: '.78rem', color: 'var(--muted)', padding: '6px 10px', borderRadius: 6, border: '1px solid var(--glass-border)', opacity: 0.6 }}>
+      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', padding: '6px 10px', borderRadius: 'var(--r-xs)', border: '1px solid var(--glass-border)', opacity: 0.6 }}>
         ⏳ {label}
       </div>
     )
@@ -361,21 +362,21 @@ function ExamActionButton({
     return (
       <div
         title={`المسار المتوقع: /exams/${filename}`}
-        style={{ fontSize: '.78rem', color: 'var(--muted)', padding: '6px 10px', borderRadius: 6, border: '1px dashed var(--glass-border)', display: 'flex', flexDirection: 'column', gap: 2 }}
+        style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', padding: '6px 10px', borderRadius: 'var(--r-xs)', border: '1px dashed var(--glass-border)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-0)' }}
       >
         <span>⛔ {label} — غير متوفر</span>
-        <code style={{ fontSize: '.7rem', opacity: .7, fontFamily: 'monospace' }}>{filename}</code>
+        <code style={{ fontSize: 'var(--text-2xs)', opacity: .7, fontFamily: 'monospace' }}>{filename}</code>
       </div>
     )
   }
 
   return (
-    <div style={{ display: 'flex', gap: 6 }}>
+    <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
       <button
         onClick={onOpen}
         style={{
-          flex: 1, fontSize: '.8rem', fontWeight: 500,
-          padding: '7px 10px', borderRadius: 6,
+          flex: 1, fontSize: 'var(--text-xs)', fontWeight: 'var(--fw-medium)',
+          padding: '7px 10px', borderRadius: 'var(--r-xs)',
           border: '1px solid var(--orange)', color: 'var(--orange-text)',
           background: 'transparent', cursor: 'pointer', fontFamily: 'inherit',
           textAlign: 'start', transition: 'background .12s',
@@ -384,14 +385,14 @@ function ExamActionButton({
         onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
       >
         📄 {label}
-        <span style={{ display: 'block', fontSize: '.7rem', color: 'var(--muted)', fontWeight: 400 }}>{sublabel}</span>
+        <span style={{ display: 'block', fontSize: 'var(--text-2xs)', color: 'var(--muted)', fontWeight: 'var(--fw-body)' }}>{sublabel}</span>
       </button>
       <a
         href={`/exams/${filename}`}
         target="_blank"
         rel="noopener noreferrer"
         title="فتح في نافذة جديدة"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, borderRadius: 6, border: '1px solid var(--glass-border)', color: 'var(--text2)', textDecoration: 'none', fontSize: '.85rem', flexShrink: 0, transition: 'border-color .12s' }}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, borderRadius: 'var(--r-xs)', border: '1px solid var(--glass-border)', color: 'var(--text2)', textDecoration: 'none', fontSize: 'var(--text-sm)', flexShrink: 0, transition: 'border-color .12s' }}
         onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--blue)' }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--glass-border)' }}
       >
@@ -401,7 +402,7 @@ function ExamActionButton({
         href={`/exams/${filename}`}
         download
         title="تنزيل"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, borderRadius: 6, border: '1px solid var(--glass-border)', color: 'var(--text2)', textDecoration: 'none', fontSize: '.85rem', flexShrink: 0, transition: 'border-color .12s' }}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, borderRadius: 'var(--r-xs)', border: '1px solid var(--glass-border)', color: 'var(--text2)', textDecoration: 'none', fontSize: 'var(--text-sm)', flexShrink: 0, transition: 'border-color .12s' }}
         onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--green, #965D3B)' }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--glass-border)' }}
       >

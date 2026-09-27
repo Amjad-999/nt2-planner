@@ -35,7 +35,7 @@ export function SignupForm({ onSwitchToLogin }: Props) {
           value={email} onChange={(e) => setEmail(e.target.value)} onBlur={() => setTouched(true)}
           placeholder="name@example.com" aria-invalid={!!emailError} aria-describedby={emailError ? 'signup-email-err' : undefined}
         />
-        {emailError && <span id="signup-email-err" role="alert" style={{ color: 'var(--red-text)', fontSize: '.78rem', display: 'block', marginTop: 4 }}>{emailError}</span>}
+        {emailError && <span id="signup-email-err" role="alert" style={{ color: 'var(--red-text)', fontSize: 'var(--text-xs)', display: 'block', marginTop: 'var(--sp-1)' }}>{emailError}</span>}
       </Field>
 
       <Field label="كلمة المرور">
@@ -44,7 +44,7 @@ export function SignupForm({ onSwitchToLogin }: Props) {
           value={password} onChange={(e) => setPassword(e.target.value)} onBlur={() => setTouched(true)}
           placeholder="8 أحرف على الأقل، حرف ورقم" aria-invalid={!!pwError} aria-describedby={pwError ? 'signup-pw-err' : undefined}
         />
-        {pwError && <span id="signup-pw-err" role="alert" style={{ color: 'var(--red-text)', fontSize: '.78rem', display: 'block', marginTop: 4 }}>{pwError}</span>}
+        {pwError && <span id="signup-pw-err" role="alert" style={{ color: 'var(--red-text)', fontSize: 'var(--text-xs)', display: 'block', marginTop: 'var(--sp-1)' }}>{pwError}</span>}
       </Field>
 
       <Field label="تأكيد كلمة المرور">
@@ -53,11 +53,11 @@ export function SignupForm({ onSwitchToLogin }: Props) {
           value={confirm} onChange={(e) => setConfirm(e.target.value)} onBlur={() => setTouched(true)}
           aria-invalid={!!confirmError} aria-describedby={confirmError ? 'signup-confirm-err' : undefined}
         />
-        {confirmError && <span id="signup-confirm-err" role="alert" style={{ color: 'var(--red-text)', fontSize: '.78rem', display: 'block', marginTop: 4 }}>{confirmError}</span>}
+        {confirmError && <span id="signup-confirm-err" role="alert" style={{ color: 'var(--red-text)', fontSize: 'var(--text-xs)', display: 'block', marginTop: 'var(--sp-1)' }}>{confirmError}</span>}
       </Field>
 
       {message && (
-        <p role={status === 'error' ? 'alert' : undefined} style={{ color: status === 'error' ? 'var(--red-text)' : 'var(--green-text)', fontSize: '.82rem', margin: '0 0 10px' }}>
+        <p role={status === 'error' ? 'alert' : undefined} style={{ color: status === 'error' ? 'var(--red-text)' : 'var(--green-text)', fontSize: 'var(--text-sm)', margin: '0 0 10px' }}>
           {message}
         </p>
       )}
@@ -66,9 +66,9 @@ export function SignupForm({ onSwitchToLogin }: Props) {
         {busy ? 'جارٍ الإنشاء…' : '🚀 إنشاء حساب'}
       </button>
 
-      <p style={{ fontSize: '.82rem', color: 'var(--muted)', textAlign: 'center', marginTop: 14 }}>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', textAlign: 'center', marginTop: 'var(--sp-3)' }}>
         لديك حساب بالفعل؟{' '}
-        <button type="button" onClick={onSwitchToLogin} style={{ background: 'none', border: 'none', color: 'var(--orange-ink)', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>
+        <button type="button" onClick={onSwitchToLogin} style={{ background: 'none', border: 'none', color: 'var(--orange-text)', fontWeight: 'var(--fw-heading)', cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>
           سجّل الدخول
         </button>
       </p>

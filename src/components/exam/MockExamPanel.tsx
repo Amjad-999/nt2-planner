@@ -23,9 +23,9 @@ import type { SkillKey } from '@/store/types'
 const box: React.CSSProperties = {
   background: 'var(--glass-bg)',
   border: '1px solid var(--glass-border)',
-  borderRadius: 14,
+  borderRadius: 'var(--r-sm)',
   padding: '16px 18px',
-  marginBottom: 12,
+  marginBottom: 'var(--sp-3)',
 }
 
 function Btn({ children, onClick, tone = 'ghost', disabled }: {
@@ -37,8 +37,8 @@ function Btn({ children, onClick, tone = 'ghost', disabled }: {
   const bc = tone === 'primary' ? 'var(--orange)' : tone === 'danger' ? 'var(--red)' : 'var(--border2)'
   return (
     <button type="button" onClick={onClick} disabled={disabled}
-      style={{ padding: '9px 16px', borderRadius: 10, border: `1px solid ${bc}`, background: bg, color: fg,
-        fontSize: 'var(--text-sm)', fontWeight: 600, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1 }}>
+      style={{ padding: '9px 16px', borderRadius: 'var(--r-sm)', border: `1px solid ${bc}`, background: bg, color: fg,
+        fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1 }}>
       {children}
     </button>
   )
@@ -74,19 +74,19 @@ export function MockExamPanel({ onGoToSkill }: { onGoToSkill?: (skill: SkillKey)
     return (
       <div>
         <div style={box}>
-          <h3 style={{ margin: '0 0 8px', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)' }}>
+          <h3 style={{ margin: '0 0 8px', fontSize: 'var(--text-lg)', fontWeight: 'var(--fw-cta)', color: 'var(--text)' }}>
             الامتحان الكامل
           </h3>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', margin: '0 0 10px', lineHeight: 1.7 }}>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', margin: '0 0 10px', lineHeight: 'var(--lh-arabic)' }}>
             أربع مهارات بالترتيب، لكلٍّ منها مؤقّت خاص. تُجيب في تبويب المهارة كالعادة، وهذه اللوحة تُدير الوقت وتحسب النتيجة.
             إجاباتك تُحفَظ لحظة بلحظة، فإن أغلقت التطبيق أو انقطع الاتصال تُكمل من حيث توقّفت.
           </p>
-          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginBottom: 10 }}>
+          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginBottom: 'var(--sp-3)' }}>
             هذه المدد للتدريب، وليست المدد الرسمية المعلنة. تختلف الأخيرة بين الدورات.
           </div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
+          <div style={{ display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap', marginBottom: 'var(--sp-3)' }}>
             {SKILL_ORDER.map((k) => (
-              <div key={k} style={{ border: '1px solid var(--border)', borderRadius: 10, padding: '6px 12px', fontSize: 'var(--text-sm)' }}>
+              <div key={k} style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', padding: '6px 12px', fontSize: 'var(--text-sm)' }}>
                 <span style={{ color: 'var(--text)' }}>{SKILL_AR[k]}</span>
                 <span style={{ color: 'var(--muted)' }}> — {MOCK_MINUTES[k]} د</span>
               </div>
@@ -97,9 +97,9 @@ export function MockExamPanel({ onGoToSkill }: { onGoToSkill?: (skill: SkillKey)
 
         {lastRun && (
           <div style={box}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
-              <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text)' }}>آخر محاولة مكتملة</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: lastRun.total >= PASS_THRESHOLD ? 'var(--green-text)' : 'var(--orange-text)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 'var(--sp-2)' }}>
+              <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)', color: 'var(--text)' }}>آخر محاولة مكتملة</div>
+              <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--fw-cta)', color: lastRun.total >= PASS_THRESHOLD ? 'var(--green-text)' : 'var(--orange-text)' }}>
                 {lastRun.total}
               </div>
             </div>
@@ -109,7 +109,7 @@ export function MockExamPanel({ onGoToSkill }: { onGoToSkill?: (skill: SkillKey)
                 <span>{lastRun.scores[k] ?? '—'}</span>
               </div>
             ))}
-            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginTop: 8 }}>
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', marginTop: 'var(--sp-2)' }}>
               عدد المحاولات المسجّلة: {s.mockRuns.length}
             </div>
           </div>
@@ -128,10 +128,10 @@ export function MockExamPanel({ onGoToSkill }: { onGoToSkill?: (skill: SkillKey)
   return (
     <div>
       <div style={{ ...box, borderColor: expired ? 'var(--red)' : 'var(--orange)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 'var(--sp-2)' }}>
           <div>
             <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>المهارة الحالية</div>
-            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text)' }}>{SKILL_AR[session.skill]}</div>
+            <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--fw-cta)', color: 'var(--text)' }}>{SKILL_AR[session.skill]}</div>
             <div dir="ltr" lang="nl" style={{ fontFamily: 'var(--font-latin)', fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>
               {SKILL_NL[session.skill]}
             </div>
@@ -140,14 +140,14 @@ export function MockExamPanel({ onGoToSkill }: { onGoToSkill?: (skill: SkillKey)
             <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>
               <span aria-hidden>{expired ? '✕ ' : '⏱ '}</span>{expired ? 'انتهى الوقت' : 'الوقت المتبقّي'}
             </div>
-            <div dir="ltr" style={{ fontFamily: 'var(--font-latin)', fontSize: '2rem', fontWeight: 700, lineHeight: 1.2,
+            <div dir="ltr" style={{ fontFamily: 'var(--font-latin)', fontSize: 'var(--text-3xl)', fontWeight: 'var(--fw-cta)', lineHeight: 'var(--lh-heading)',
               color: expired ? 'var(--red-text)' : left < 120_000 ? 'var(--orange-text)' : 'var(--text)' }}>
               {formatClock(left)}
             </div>
           </div>
         </div>
 
-        <div style={{ height: 6, borderRadius: 6, background: 'var(--border)', overflow: 'hidden', margin: '12px 0 6px' }}>
+        <div style={{ height: 6, borderRadius: 'var(--r-xs)', background: 'var(--border)', overflow: 'hidden', margin: '12px 0 6px' }}>
           <div style={{ width: `${progressPct(session)}%`, height: '100%', background: 'var(--orange)', transition: 'width .3s' }} />
         </div>
         <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>
@@ -155,22 +155,22 @@ export function MockExamPanel({ onGoToSkill }: { onGoToSkill?: (skill: SkillKey)
         </div>
 
         {expired && (
-          <div style={{ marginTop: 10, padding: '9px 12px', borderRadius: 10, border: '1px solid var(--red)', background: 'var(--red-l)', fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
+          <div style={{ marginTop: 'var(--sp-3)', padding: '9px 12px', borderRadius: 'var(--r-sm)', border: '1px solid var(--red)', background: 'var(--red-l)', fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
             انتهى وقت هذه المهارة. سلّمها للمتابعة. لن يُحسب ما تكتبه بعد الآن في الامتحان الحقيقي.
           </div>
         )}
       </div>
 
       <div style={box}>
-        <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>الدرجة المحسوبة الآن</div>
+        <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)', color: 'var(--text)', marginBottom: 'var(--sp-2)' }}>الدرجة المحسوبة الآن</div>
         {live === null ? (
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', margin: 0, lineHeight: 1.7 }}>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', margin: 0, lineHeight: 'var(--lh-arabic)' }}>
             لا توجد إجابات بعد في هذه المهارة. اذهب إلى تبويبها وأجِب، ثم عُد إلى هنا وسلّم.
           </p>
         ) : (
-          <div style={{ fontSize: '1.6rem', fontWeight: 700, color: live >= PASS_THRESHOLD ? 'var(--green-text)' : 'var(--orange-text)' }}>{live}</div>
+          <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--fw-cta)', color: live >= PASS_THRESHOLD ? 'var(--green-text)' : 'var(--orange-text)' }}>{live}</div>
         )}
-        <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--sp-2)', marginTop: 'var(--sp-3)', flexWrap: 'wrap' }}>
           {onGoToSkill && (
             <Btn onClick={() => onGoToSkill(session.skill)}>اذهب إلى {SKILL_AR[session.skill]}</Btn>
           )}
@@ -185,7 +185,7 @@ export function MockExamPanel({ onGoToSkill }: { onGoToSkill?: (skill: SkillKey)
 
       {report.rows.length > 0 && (
         <div style={box}>
-          <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>ما سلّمته حتى الآن</div>
+          <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)', color: 'var(--text)', marginBottom: 'var(--sp-2)' }}>ما سلّمته حتى الآن</div>
           {report.rows.map((r) => (
             <div key={r.skill} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--text-sm)', margin: '5px 0' }}>
               <span style={{ color: 'var(--text2)' }}>

@@ -1,9 +1,15 @@
 import { useEffect, useRef } from 'react'
-import { useAppStore, totalLearnedWords, sumLastNDays, sumPrevNDays } from '@/store/useAppStore'
+import { useAppStore, sumLastNDays, sumPrevNDays } from '@/store/useAppStore'
 import { PASS_THRESHOLD, SKILL_AR } from '@/data/phases'
 import { dayKeyOffset, hexA } from '@/lib/utils'
 import { InsightCard } from '@/components/InsightCard'
 import { useCountUp } from '@/hooks/useCountUp'
+import { Callout } from '@/components/ui/Callout'
+import { ProgressOverview } from '@/components/ProgressOverview'
+import { StudyKpis } from '@/components/progress/StudyKpis'
+import { SmartInsights } from '@/components/progress/SmartInsights'
+import { AchievementsPanel } from '@/components/AchievementsPanel'
+import { weeklyChange } from '@/features/progress/insights'
 
 /* Chart.js generics make Chart<'bar'> unassignable to Chart[] — all the
    leak fix needs is destroy(), so track instances by that shape alone */
@@ -19,23 +25,23 @@ function destroyCharts(charts: DestroyableChart[]) {
 function SkillRing({ label, icon, v, att }: {
   label: string; icon: string; v: number; att: number
 }) {
-  const n = useCountUp(v, 2000)
+  const n = useCountUp(att > 0 ? v : 0, 600)
   const C = 2 * Math.PI * 42
   const offset = C - (C * n) / 100
   // P5: اللون حسب القيمة — أحمر < 50، كهرماني 50–75، أخضر > 75
-  const col = v < 50 ? 'var(--red)' : v <= 75 ? 'var(--amber)' : 'var(--green)'
+  const col = att === 0 ? 'var(--border)' : v >= PASS_THRESHOLD ? 'var(--green)' : 'var(--amber)'
   return (
     <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, textAlign:'center', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
-      <svg viewBox="0 0 100 100" style={{ width:96, height:96, display:'block', margin:'0 auto 8px' }} role="img" aria-label={`${label}: ${v}%`}>
+      <svg viewBox="0 0 100 100" style={{ width:96, height:96, display:'block', margin:'0 auto 8px' }} role="img" aria-label={att ? `${label}: أفضل نتيجة مسجّلة ${v}%` : `${label}: لا توجد محاولات بعد`}>
         <circle cx="50" cy="50" r="42" fill="none" stroke="var(--surface3)" strokeWidth="8"/>
         <circle cx="50" cy="50" r="42" fill="none" stroke={col} strokeWidth="8" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={offset} transform="rotate(-90 50 50)"/>
-        <text x="50" y="56" textAnchor="middle" style={{ fontFamily:'var(--font-display)', fontSize:'1.4rem', fontWeight:700, fill:'var(--text)' }}>{Math.round(n)}%</text>
+        <text x="50" y="56" textAnchor="middle" style={{ fontFamily:'var(--font-display)', fontSize:'var(--text-xl)', fontWeight:'var(--fw-cta)', fill:'var(--text)' }}>{att ? `${Math.round(n)}%` : '—'}</text>
       </svg>
-      <div style={{ fontSize:'.85rem', color:'var(--text2)', fontWeight:600 }}>
+      <div style={{ fontSize:'var(--text-sm)', color:'var(--text2)', fontWeight:'var(--fw-heading)' }}>
         {icon} {label}
       </div>
-      <div style={{ fontSize:'.74rem', color:'var(--muted)', marginTop:2 }}>
-        {att} محاولة • {v>=PASS_THRESHOLD?'✓ ناجح':'لم تصل العتبة'}
+      <div style={{ fontSize:'var(--text-sm)', color:'var(--text2)', marginTop:'var(--sp-1)' }}>
+        {att ? `${att} محاولة · ${v >= PASS_THRESHOLD ? '✓ بلغت هدف التدريب' : '◐ تحتاج إلى تدريب'}` : 'لم تُجرّب هذه المهارة بعد'}
       </div>
     </div>
   )
@@ -43,11 +49,9 @@ function SkillRing({ label, icon, v, att }: {
 
 export default function Stats() {
   const skill        = useAppStore((s) => s.skill)
-  const vocab        = useAppStore((s) => s.vocab)
   const streak       = useAppStore((s) => s.streak)
   const dailyHistory = useAppStore((s) => s.dailyHistory)
   const theme        = useAppStore((s) => s.theme)
-  const mountKey     = useRef(0)
   // Live Chart instances — each holds a canvas ref + ResizeObserver, so they
   // must be destroyed on unmount or every visit to this tab leaks all six
   const chartsRef    = useRef<DestroyableChart[]>([])
@@ -58,21 +62,15 @@ export default function Stats() {
   const lastWT = sumPrevNDays(dailyHistory, 'tasks',      7, 7)
   const weekW  = sumLastNDays(dailyHistory, 'wordsAdded', 7)
   const lastWW = sumPrevNDays(dailyHistory, 'wordsAdded', 7, 7)
-  const totW   = totalLearnedWords(vocab)
-
-  const pctChg = (now: number, prev: number) =>
-    prev ? Math.round(((now - prev) / prev) * 100) : (now > 0 ? 100 : 0)
 
   const weekInsights: { kind:'good'|'warn'; icon:string; title:string; desc:string }[] = [
-    { kind: weekM>=lastWM?'good':'warn', icon:'⏱️', title:'دقائق الدراسة', desc:`${weekM} د هذا الأسبوع مقابل ${lastWM} د سابقًا (${pctChg(weekM,lastWM)>=0?'+':''}${pctChg(weekM,lastWM)}%)` },
-    { kind: weekT>=lastWT?'good':'warn', icon:'✅', title:'المهام المنجزة', desc:`${weekT} مهمّة هذا الأسبوع مقابل ${lastWT} سابقًا (${pctChg(weekT,lastWT)>=0?'+':''}${pctChg(weekT,lastWT)}%)` },
-    { kind: weekW>=lastWW?'good':'warn', icon:'📚', title:'كلمات جديدة مُضافة', desc:`${weekW} كلمة هذا الأسبوع مقابل ${lastWW} سابقًا (${pctChg(weekW,lastWW)>=0?'+':''}${pctChg(weekW,lastWW)}%)` },
+    { kind: weekM>=lastWM?'good':'warn', icon:'⏱️', title:'دقائق الدراسة', desc:`${weekM} د في آخر 7 أيام مقابل ${lastWM} د في الأيام السبعة السابقة (${weeklyChange(weekM,lastWM)})` },
+    { kind: weekT>=lastWT?'good':'warn', icon:'✅', title:'المهام المنجزة', desc:`${weekT} مهمّة في آخر 7 أيام مقابل ${lastWT} سابقًا (${weeklyChange(weekT,lastWT)})` },
+    { kind: weekW>=lastWW?'good':'warn', icon:'📚', title:'كلمات جديدة مُضافة', desc:`${weekW} كلمة في آخر 7 أيام مقابل ${lastWW} سابقًا (${weeklyChange(weekW,lastWW)})` },
   ]
 
   // Chart rendering — re-runs on theme change
   useEffect(() => {
-    mountKey.current += 1
-    const key = mountKey.current
     let cancelled = false
     // Stable array identity — captured once so the cleanup below sees the
     // same list the render pass pushed into (and eslint's ref rule is happy)
@@ -84,19 +82,21 @@ export default function Stats() {
       Chart.register(...registerables)
 
       const cs = getComputedStyle(document.documentElement)
-      const color = (v: string, fb: string) => cs.getPropertyValue(v).trim() || fb
+      const color = (v: string) => cs.getPropertyValue(v).trim()
       const c = {
-        txt:    color('--text2',   '#47433E'),
-        grid:   color('--border',  'rgba(45,42,38,.13)'),
-        orange: color('--orange',  '#E07A3E'),
-        blue:   color('--blue',    '#7B675C'),
-        green:  color('--green',   '#965D3B'),
-        purple: color('--purple',  '#A05845'),
-        amber:  color('--amber',   '#B4551D'),
+        txt:    color('--text2'),
+        grid:   color('--border'),
+        orange: color('--orange'),
+        blue:   color('--blue'),
+        green:  color('--green'),
+        purple: color('--purple'),
+        amber:  color('--amber'),
+        tooltipBg: color('--surface'),
+        tooltipText: color('--text'),
       }
       Chart.defaults.color = c.txt
       Chart.defaults.borderColor = c.grid
-      Chart.defaults.font.family = "'Cairo','Readex Pro',sans-serif"
+      Chart.defaults.font.family = cs.getPropertyValue('--font-body').trim() || 'sans-serif'
 
       // Destroy every chart this component created before building the new
       // set — Chart.getChart(byId) can't find charts whose canvas was
@@ -110,11 +110,9 @@ export default function Stats() {
         const k = dayKeyOffset(-i); const h = dailyHistory[k] ?? {}
         days14.push(k.slice(5)); studyD.push(h.mins ?? 0); taskD.push(h.tasks ?? 0)
       }
-      let cumW = Math.max(0, totW.learned - 14)
       const wordsD = days14.map((_, i) => {
         const h = dailyHistory[dayKeyOffset(-(13 - i))] ?? {}
-        cumW += (h.wordsAdded ?? 0)
-        return Math.min(totW.learned, Math.max(0, cumW))
+        return h.wordsAdded ?? 0
       })
 
       // P5: ظهور تدريجي من اليسار (تأخير متدرج لكل نقطة) + ارتداد نقاط hover.
@@ -187,7 +185,6 @@ export default function Stats() {
       const ce = document.getElementById('chExamTrend') as HTMLCanvasElement|null
       if (ce) track(new Chart(ce, { type:'line', data:{ datasets: sk.map((k,i)=>({ label:SKILL_AR[k], data:(skill[k].history??[]).map((h)=>({x:h.date,y:h.score})), borderColor:cols[i], backgroundColor:hexA(cols[i],.1), tension:.3, pointRadius:4, fill:false })) }, options:{ responsive:true, maintainAspectRatio:false, scales:{ x:{type:'category',ticks:{color:c.txt+'aa'}}, y:{min:0,max:100,grid:{color:c.grid},ticks:{color:c.txt+'aa',callback:(v)=>v+'%'}} }, plugins:{ legend:{position:'bottom',labels:{color:c.txt}}, tooltip:{callbacks:{label:(ctx)=>ctx.dataset.label+': '+ctx.parsed.y+'%'}} } } }))
 
-      void key
     }
 
     render().catch(console.error)
@@ -196,8 +193,7 @@ export default function Stats() {
       // Unmount / theme switch: release the canvases and their ResizeObservers
       destroyCharts(charts)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme])
+  }, [theme, dailyHistory, skill])
 
   const streakCount = streak.count
   const avgAttempts = skill.reading.attempts + skill.listening.attempts + skill.writing.attempts + skill.speaking.attempts
@@ -206,88 +202,96 @@ export default function Stats() {
   const peakIdx = act56Data.lastIndexOf(peakVal)
   const peakDay = peakVal > 0 ? dayKeyOffset(-(55 - peakIdx)).slice(5) : null
   const act56Sum = act56Data.reduce((a, b) => a + b, 0)
-  const flameClass = streakCount>=30?'blaze':streakCount>=7?'hot':streakCount>=1?'alive':''
 
   return (
-    <div style={{ padding:'24px 28px 60px', maxWidth:1100, margin:'0 auto' }}>
-      <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
-        <span style={{ color: 'var(--orange-text)' }}>📈</span> لوحة التحليلات الاستراتيجية <span aria-hidden="true">📍</span>
+    <div className="page">
+      <h2 className="section-title">
+        تقدّمك في التعلّم
       </h2>
-      <div style={{ background:'var(--purple-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--purple)', borderRadius:'var(--r-sm)', padding:'14px 18px', marginBottom:18, fontSize:'.9rem', color:'var(--text2)', lineHeight:1.65 }}>
-        <strong style={{ color:'var(--text)' }}>تتبّع يومي وأسبوعي شامل:</strong> كلّ الرسوم البيانية تستخدم بياناتك الحقيقية من سجلّ التطبيق.
-      </div>
+      <p style={{ color: 'var(--text2)', marginBottom: 'var(--sp-4)', lineHeight: 'var(--lh-arabic)' }}>راجع ما تعلّمته، ثم اختر خطوة صغيرة تواصل بها. النتائج هنا تصف تدريبك المسجّل؛ ولا تحدّد مستواك اللغوي رسميًا.</p>
+      <ProgressOverview />
 
       {/* P6: حالة فارغة ودّية عندما لا توجد بيانات بعد */}
       {Object.keys(dailyHistory).length === 0 && avgAttempts === 0 && (
-        <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:'32px 24px', marginBottom:18, textAlign:'center', boxShadow:'var(--elev-1)' }}>
-          <div style={{ fontSize:'2.6rem', marginBottom:8 }} aria-hidden="true">📊</div>
-          <div style={{ fontSize:'1.05rem', fontWeight:700, color:'var(--text)', marginBottom:6 }}>لا توجد بيانات بعد</div>
-          <div style={{ fontSize:'.88rem', color:'var(--muted)', marginBottom:14, lineHeight:1.7 }}>
+        <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:'var(--sp-8) 24px', marginBottom:'var(--sp-4)', textAlign:'center', boxShadow:'var(--elev-1)' }}>
+          <div style={{ fontSize:'var(--glyph-lg)', marginBottom:'var(--sp-2)' }} aria-hidden="true">📊</div>
+          <div style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-cta)', color:'var(--text)', marginBottom:'var(--sp-2)' }}>ابدأ سجلّ نشاطك</div>
+          <div style={{ fontSize:'var(--text-sm)', color:'var(--muted)', marginBottom:'var(--sp-3)', lineHeight:'var(--lh-arabic)' }}>
             أكمل أول مهمة دراسة أو سجّل دقائق اليوم وستمتلئ هذه اللوحة برسومك الحقيقية.
           </div>
           <button onClick={() => useAppStore.getState().setActiveTab('dashboard')} className="btn-glass"
-            style={{ borderRadius:12, padding:'10px 22px', fontWeight:700, color:'var(--text)', cursor:'pointer', fontSize:'.9rem', fontFamily:'inherit' }}>
-            🚀 ابدأ الآن
+            style={{ borderRadius:'var(--r-sm)', padding:'10px 22px', fontWeight:'var(--fw-cta)', color:'var(--text)', cursor:'pointer', fontSize:'var(--text-sm)', fontFamily:'inherit' }}>
+            فتح خطة اليوم
           </button>
         </div>
       )}
 
+      <h3 style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 var(--sp-3)' }}>مؤشّرات الدراسة</h3>
+      <StudyKpis />
+
       {/* Progress rings */}
-      <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'0 0 10px' }}>🎯 مؤشّرات الأداء الرئيسية</h3>
-      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:14, marginBottom:18 }}>
+      <h3 style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 var(--sp-2)' }}>أفضل نتيجة مسجّلة لكل مهارة</h3>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', marginBottom: 'var(--sp-3)' }}>هدف التدريب داخل التطبيق {PASS_THRESHOLD}%. هذه النتائج لا تعني اجتياز الامتحان الرسمي.</p>
+      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(150px, 100%),1fr))', gap:'var(--sp-3)', marginBottom:'var(--sp-4)' }}>
         {(['reading','listening','writing','speaking'] as const).map((k, i) => (
           <SkillRing key={k} label={SKILL_AR[k]} icon={['📖','🎧','✍️','🗣️'][i]}
             v={skill[k].best} att={skill[k].attempts} />
         ))}
       </div>
 
+      <h3 style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 var(--sp-3)' }}>رؤى ذكية</h3>
+      <SmartInsights />
+
       {/* Charts 2×2 */}
-      <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'18px 0 10px' }}>📊 الاتّجاهات الأسبوعية</h3>
-      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))', gap:14, marginBottom:18 }}>
+      <h3 style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'18px 0 10px' }}>📊 الاتّجاهات الأسبوعية</h3>
+      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(300px, 100%),1fr))', gap:'var(--sp-3)', marginBottom:'var(--sp-4)' }}>
         {[
           { id:'chStudy',  title:'دقائق الدراسة اليومية (آخر 14 يوم)' },
           { id:'chTasks',  title:'المهام المنجزة يوميًا' },
-          { id:'chWords',  title:'الكلمات المُكتسبة (تراكمي)' },
-          { id:'chSkills', title:'المهارات مقابل عتبة النجاح' },
+          { id:'chWords',  title:'الكلمات المُضافة يوميًا' },
+          { id:'chSkills', title:'المهارات مقابل هدف التدريب' },
         ].map(({ id, title }) => (
           <div key={id} style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
-            <div style={{ fontSize:'.95rem', fontWeight:600, color:'var(--text)', marginBottom:12 }}>{title}</div>
-            <div style={{ position:'relative', height:230 }}><canvas id={id} /></div>
+            <div style={{ fontSize:'var(--text-base)', fontWeight:'var(--fw-heading)', color:'var(--text)', marginBottom:'var(--sp-3)' }}>{title}</div>
+            <div style={{ position:'relative', height:230 }}><canvas id={id} role="img" aria-label={title} aria-describedby="stats-data-note" /></div>
           </div>
         ))}
       </div>
 
       {/* Streak + sparkline */}
-      <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'18px 0 10px', display:'flex', alignItems:'center', gap:8 }}>
-        <span aria-hidden="true" style={{ fontSize:'1em', display:'inline-block', animation:flameClass?'flame-flicker 2.6s ease-in-out infinite':'none' }}>
+      <h3 style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'18px 0 10px', display:'flex', alignItems:'center', gap:'var(--sp-2)' }}>
+        <span aria-hidden="true" style={{ fontSize:'1em', display:'inline-block' }}>
           {streakCount>=1?'🔥':'🕯️'}
         </span>
-        موجة النشاط
-        <span style={{ display:'inline-flex', alignItems:'center', borderRadius:999, padding:'2px 10px', fontSize:'.78rem', fontWeight:600, background:streakCount===0?'var(--surface3)':'var(--orange-l)', color:streakCount===0?'var(--muted)':'var(--orange-text)' }} aria-label="عدد أيام السلسلة">
+        الاستمرارية
+        <span style={{ display:'inline-flex', alignItems:'center', borderRadius:'var(--r-pill)', padding:'2px 10px', fontSize:'var(--text-xs)', fontWeight:'var(--fw-heading)', background:streakCount===0?'var(--surface3)':'var(--orange-l)', color:streakCount===0?'var(--muted)':'var(--orange-text)' }} aria-label="عدد أيام السلسلة">
           {streakCount} يوم متتالٍ
         </span>
       </h3>
-      <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1)', marginBottom:18 }}>
-        <div style={{ fontSize:'.78rem', color:'var(--muted)', marginBottom:12 }}>آخر 56 يوم — مجموع {act56Sum} دقيقة</div>
-        <div style={{ position:'relative', height:260 }}><canvas id="chActivity" /></div>
-        <div style={{ marginTop:10, fontSize:'.78rem', color:'var(--muted)', display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:8 }}>
+      <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1)', marginBottom:'var(--sp-4)' }}>
+        <div style={{ fontSize:'var(--text-xs)', color:'var(--muted)', marginBottom:'var(--sp-3)' }}>آخر 56 يوم — مجموع {act56Sum} دقيقة</div>
+        <div style={{ position:'relative', height:260 }}><canvas id="chActivity" role="img" aria-label={`نشاط آخر 56 يومًا: ${act56Sum} دقيقة، وأعلى يوم ${peakVal} دقيقة`} /></div>
+        <div style={{ marginTop:'var(--sp-3)', fontSize:'var(--text-xs)', color:'var(--muted)', display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:'var(--sp-2)' }}>
           {peakDay ? <span>🌊 ذروتك: <strong style={{ color:'var(--text2)' }}>{peakVal} د</strong> ({peakDay})</span>
             : <span>ابدأ جلستك الأولى لترى موجة نشاطك تكبر هنا</span>}
         </div>
       </div>
 
       {/* Exam trend */}
-      <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'18px 0 10px' }}>📈 تقدّم نتائج الامتحان</h3>
-      <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1)', marginBottom:18 }}>
-        <div style={{ fontSize:'.78rem', color:'var(--muted)', marginBottom:12 }}>آخر محاولات لكلّ مهارة — الخطّ الأخضر هو عتبة النجاح في NT2 (65%)</div>
-        <div style={{ position:'relative', height:300 }}><canvas id="chExamTrend" /></div>
+      <h3 style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'18px 0 10px' }}>📈 تقدّم نتائج الامتحان</h3>
+      <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1)', marginBottom:'var(--sp-4)' }}>
+        <div style={{ fontSize:'var(--text-sm)', color:'var(--text2)', marginBottom:'var(--sp-3)' }}>المحاولات المسجّلة حسب التاريخ. قارن نتائجك داخل المهارة نفسها لتختار ما ستراجعه.</div>
+        {avgAttempts > 0 ? <div style={{ position:'relative', height:300 }}><canvas id="chExamTrend" role="img" aria-label="نتائج محاولات التدريب حسب التاريخ" aria-describedby="stats-data-note" /></div> : <Callout tone="info" icon="○">ستظهر النتائج بعد تسجيل أول محاولة تدريب.</Callout>}
       </div>
 
       {/* Week insights */}
-      <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'var(--text)', margin:'18px 0 10px' }}>💡 رؤى مقارنة (هذا الأسبوع مقابل الأسبوع الماضي)</h3>
-      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:12 }}>
+      <h3 style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'18px 0 10px' }}>💡 رؤى مقارنة (هذا الأسبوع مقابل الأسبوع الماضي)</h3>
+      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(240px, 100%),1fr))', gap:'var(--sp-3)' }}>
         {weekInsights.map((ins, i) => <InsightCard key={i} kind={ins.kind} icon={ins.icon} title={ins.title} desc={ins.desc} />)}
       </div>
+
+      <h3 style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'var(--sp-6) 0 var(--sp-3)' }}>إنجازاتي</h3>
+      <AchievementsPanel />
     </div>
   )
 }

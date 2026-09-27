@@ -1,0 +1,8 @@
+/* The navigation itself lives in globals.css (.o-topnav / .o-bottomnav — boot
+   path). What stays here is the scroll offset: anchors and focused elements
+   must land below the sticky top bar + nav row, and above the phone's bottom
+   bar (--o-bnav-h). Toasts and Katja offset themselves inline by --o-bnav-h. */
+html { scroll-padding-block-start: calc(var(--topbar-h) + 56px); }
+@media (max-width: 767px) {
+  html { scroll-padding-block: calc(var(--topbar-h) + var(--sp-2)) calc(var(--o-bnav-h) + var(--sp-6)); }
+}

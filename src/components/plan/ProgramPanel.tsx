@@ -23,15 +23,15 @@ import { ProgramSections } from './ProgramSections'
  */
 
 const CARD: React.CSSProperties = {
-  padding: '18px 22px 20px', marginBottom: 18,
+  padding: '18px 22px 20px', marginBottom: 'var(--sp-4)',
   background: 'var(--surface)', border: '1px solid var(--border)',
   borderRadius: 'var(--r)', boxShadow: 'var(--elev-1)',
 }
 
 const INPUT: React.CSSProperties = {
-  minHeight: 44, padding: '8px 12px', borderRadius: 11,
+  minHeight: 44, padding: '8px 12px', borderRadius: 'var(--r-sm)',
   border: '1px solid var(--border2)', background: 'var(--bg)', color: 'var(--text)',
-  fontFamily: 'inherit', fontSize: '.9rem',
+  fontFamily: 'inherit', fontSize: 'var(--text-sm)',
 }
 
 function SetupCard() {
@@ -49,17 +49,17 @@ function SetupCard() {
 
   return (
     <section aria-label="تفعيل البرنامج" style={{ ...CARD, borderInlineStart: '4px solid var(--orange)' }}>
-      <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)' }}>برنامج المنهج الكامل</h3>
-      <p style={{ margin: '8px 0 14px', fontSize: '.88rem', color: 'var(--text2)', lineHeight: 1.75 }}>
+      <h3 style={{ margin: 0, fontSize: 'var(--text-md)', fontWeight: 'var(--fw-cta)', color: 'var(--text)' }}>برنامج المنهج الكامل</h3>
+      <p style={{ margin: '8px 0 14px', fontSize: 'var(--text-sm)', color: 'var(--text2)', lineHeight: 'var(--lh-arabic)' }}>
         ثلاثة كتب، {countAr(TOTAL_LESSONS, AR_LESSON)}، {formatMinutes(TOTAL_LESSON_MINUTES)} من المحتوى الجديد وحده.
         اختر نافذتك الزمنية، ويُبنى الجدول كاملًا بالمراجعة والاستراحات والمؤقّتات.
       </p>
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-        <label style={{ display: 'flex', flexDirection: 'column', gap: 5, fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
+      <div style={{ display: 'flex', gap: 'var(--sp-3)', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)', fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
           تاريخ البداية
           <input type="date" value={start} onChange={(e) => setStart(e.target.value)} style={INPUT} />
         </label>
-        <label style={{ display: 'flex', flexDirection: 'column', gap: 5, fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
+        <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)', fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
           الموعد النهائي
           <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} style={INPUT} />
         </label>
@@ -68,9 +68,9 @@ function SetupCard() {
           disabled={!valid}
           onClick={() => activateStudyProgram(start, deadline)}
           style={{
-            minHeight: 44, padding: '10px 18px', borderRadius: 12,
+            minHeight: 44, padding: '10px 18px', borderRadius: 'var(--r-sm)',
             cursor: valid ? 'pointer' : 'not-allowed', opacity: valid ? 1 : 0.55,
-            fontFamily: 'inherit', fontSize: '.9rem', fontWeight: 600,
+            fontFamily: 'inherit', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-heading)',
             background: 'var(--orange)', border: '1px solid var(--orange)', color: '#fff',
           }}
         >
@@ -127,14 +127,14 @@ export function ProgramPanel() {
       <ProgramSections />
 
       <section aria-label="إعدادات البرنامج" style={CARD}>
-        <h3 style={{ margin: 0, fontSize: '1.02rem', fontWeight: 700, color: 'var(--text)' }}>حدود البرنامج</h3>
-        <p style={{ margin: '8px 0 12px', fontSize: '.86rem', color: 'var(--text2)', lineHeight: 1.75 }}>
+        <h3 style={{ margin: 0, fontSize: 'var(--text-md)', fontWeight: 'var(--fw-cta)', color: 'var(--text)' }}>حدود البرنامج</h3>
+        <p style={{ margin: '8px 0 12px', fontSize: 'var(--text-sm)', color: 'var(--text2)', lineHeight: 'var(--lh-arabic)' }}>
           سقف الدروس اليومي هو صمّام الأمان: إذا تأخّرت، يوزّع النظام المتبقّي دون أن يتجاوز هذا السقف،
           وإن عجز قال ذلك صراحةً بدل أن يبني جدولًا مستحيلًا.
           وترتيب الدراسة يقرّر ما يسقط أوّلًا إن ضاق الوقت: بأولوية الامتحان تُدرَس دروس B1 قبل بقيّة A2.
         </p>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 5, fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
+        <div style={{ display: 'flex', gap: 'var(--sp-3)', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)', fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
             أقصى دروس في اليوم
             <input
               type="number" min={4} max={20} value={program.maxLessonsPerDay}
@@ -145,7 +145,7 @@ export function ProgramPanel() {
               style={{ ...INPUT, width: 90 }}
             />
           </label>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 5, fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)', fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
             الموعد النهائي
             <input
               type="date" value={program.deadlineKey}
@@ -153,7 +153,7 @@ export function ProgramPanel() {
               style={INPUT}
             />
           </label>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 5, fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)', fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
             ترتيب الدراسة
             <select
               value={program.order}

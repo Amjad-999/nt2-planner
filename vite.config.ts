@@ -73,6 +73,19 @@ export default defineConfig({
             handler: 'NetworkFirst',
             options: { cacheName: 'news-cache', networkTimeoutSeconds: 6, expiration: { maxEntries: 8, maxAgeSeconds: 1800 } },
           },
+          /* صور معاني كلمات مواضيع B1 (Pixabay). كل كلمة تُبحث مرة واحدة
+             (يخزّنها src/features/vocab/images.ts في IndexedDB)، فهذا
+             تخزين ثانٍ يبقي الصور نفسها متاحة دون اتصال بعد أول عرض. */
+          {
+            urlPattern: /pixabay\.com\/api/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'pixabay-api-cache', expiration: { maxEntries: 1500, maxAgeSeconds: 2592000 } },
+          },
+          {
+            urlPattern: /cdn\.pixabay\.com/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'pixabay-img-cache', expiration: { maxEntries: 1500, maxAgeSeconds: 2592000 } },
+          },
         ],
       },
     }),

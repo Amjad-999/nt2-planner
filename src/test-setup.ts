@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom'
 
-// Mock localStorage
+// Mock localStorage.
+// Implements the full Storage interface, including length and key(): code that
+// enumerates storage (RootErrorBoundary's crash backup) silently found nothing
+// when those two were missing, which reads as "no data to rescue" rather than
+// as a broken mock.
 const localStorageMock = (() => {
   let store: Record<string, string> = {}
   return {
@@ -8,6 +12,8 @@ const localStorageMock = (() => {
     setItem: (key: string, val: string) => { store[key] = val },
     removeItem: (key: string) => { delete store[key] },
     clear: () => { store = {} },
+    key: (i: number) => Object.keys(store)[i] ?? null,
+    get length() { return Object.keys(store).length },
   }
 })()
 Object.defineProperty(window, 'localStorage', { value: localStorageMock })

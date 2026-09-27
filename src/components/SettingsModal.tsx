@@ -12,6 +12,7 @@ export function SettingsModal({ onClose }: Props) {
   const [name, setName] = useState(s.name)
   const [examDate, setExamDate] = useState(() => { try { return new Date(s.examDate).toISOString().slice(0,10) } catch { return '' } })
   const [rate, setRate] = useState(String(s.prefs.rate))
+  const [fontSize, setFontSize] = useState(String(s.prefs.fontSize ?? 16))
   const [ttsEngine, setTtsEngine] = useState(s.prefs.ttsEngine)
   const [voiceURI, setVoiceURI] = useState(s.prefs.voiceURI)
   // FIX 3: study capacity prefs
@@ -27,6 +28,7 @@ export function SettingsModal({ onClose }: Props) {
       name: name.trim(),
       examDate: examDate ? new Date(examDate + 'T09:00:00').toISOString() : s.examDate,
       prefs: {
+        fontSize: Math.min(19, Math.max(13, Number(fontSize) || 16)),
         rate: parseFloat(rate) || 0.9,
         ttsEngine, voiceURI,
         studyDayMinutes: Math.min(480, Math.max(15, parseInt(studyDayMinutes) || 60)),
@@ -64,25 +66,20 @@ export function SettingsModal({ onClose }: Props) {
 
   return (
     <Overlay onClose={onClose} label="الإعدادات">
-      <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.35rem', fontWeight:'var(--fw-heading)', color:'var(--text)', marginBottom:8 }}>⚙️ الإعدادات</h3>
-      <p style={{ color:'var(--muted)', fontSize:'.88rem', marginBottom:14 }}>اضبط بياناتك واستهدافك للامتحان.</p>
+      <h3 style={{ fontFamily:'var(--font-display)', fontSize:'var(--text-xl)', fontWeight:'var(--fw-heading)', color:'var(--text)', marginBottom:'var(--sp-2)' }}>⚙️ الإعدادات</h3>
+      <p style={{ color:'var(--muted)', fontSize:'var(--text-sm)', marginBottom:'var(--sp-3)' }}>اضبط بياناتك واستهدافك للامتحان.</p>
 
       <CloudPanel />
 
-      <Field label="كاتيا 🐱">
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '.88rem', color: 'var(--text2)', cursor: 'pointer' }}>
-          <input type="checkbox" checked={!s.mascotDismissed} onChange={() => s.toggleMascot()} />
-          إظهار كاتيا (المرشدة التفاعلية) في زاوية الشاشة
-        </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '.88rem', color: 'var(--text2)', cursor: 'pointer', marginTop: 6 }}>
-          <input type="checkbox" checked={s.botWordReminders} onChange={() => s.toggleBotWordReminders()} />
-          تذكير بكلمات المهام المكتملة كل دقيقتين
-        </label>
-      </Field>
-
+      <Group>التعلّم</Group>
       <Field label="اسمك (اختياري)"><input className="form-in" value={name} onChange={(e)=>setName(e.target.value)} placeholder="اسمك" /></Field>
+      <Field label="حجم خط الواجهة">
+        <select className="form-in" value={fontSize} onChange={(e) => setFontSize(e.target.value)}>
+          {[13, 14, 15, 16, 17, 18, 19].map(size => <option key={size} value={size}>{size === 16 ? `${size} — افتراضي` : size}</option>)}
+        </select>
+      </Field>
       <Field label="تاريخ الامتحان"><input className="form-in" type="date" value={examDate} onChange={(e)=>setExamDate(e.target.value)} /></Field>
-      <Field label="مدّة الخطّة"><div style={{ fontSize:'.85rem', color:'var(--muted)', padding:'4px 0' }}>تُحسب تلقائيًا من تاريخ الامتحان — يومك الحالي في الخطّة يتقدّم وحده مع الأيام.</div></Field>
+      <Field label="مدّة الخطّة"><div style={{ fontSize:'var(--text-sm)', color:'var(--text2)', padding:'4px 0' }}>تُحسب تلقائيًا من تاريخ الامتحان — يومك الحالي في الخطّة يتقدّم وحده مع الأيام.</div></Field>
       {/* FIX 3 — study capacity inputs */}
       <Field label="دقائق الدراسة المتاحة يوميًا">
         <input
@@ -91,7 +88,7 @@ export function SettingsModal({ onClose }: Props) {
           value={studyDayMinutes}
           onChange={(e) => setStudyDayMinutes(e.target.value)}
           min={15} max={480}
-          style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)' }}
+          style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:'var(--r-sm)', background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'var(--text-sm)', color:'var(--text)' }}
         />
       </Field>
       <Field label="متوسّط دقائق التمرين الواحد">
@@ -101,9 +98,10 @@ export function SettingsModal({ onClose }: Props) {
           value={minutesPerTask}
           onChange={(e) => setMinutesPerTask(e.target.value)}
           min={5} max={120}
-          style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:12, background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'.92rem', color:'var(--text)' }}
+          style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:'var(--r-sm)', background:'var(--glass-bg-strong)', fontFamily:'inherit', fontSize:'var(--text-sm)', color:'var(--text)' }}
         />
       </Field>
+      <Group>الصوت والنطق</Group>
       <Field label="سرعة النطق الهولندي">
         <select className="form-in" value={rate} onChange={(e)=>setRate(e.target.value)}>
           <option value="0.8">بطيئة (0.8×)</option>
@@ -125,15 +123,28 @@ export function SettingsModal({ onClose }: Props) {
           <option value="browser">متصفّح فقط — يتطلّب صوتًا هولنديًّا مثبَّتًا على جهازك</option>
         </select>
       </Field>
-      <div style={{ marginBottom:14 }}>
+      <div style={{ marginBottom:'var(--sp-3)' }}>
         <button onClick={handleTest} className="btn-shine" style={btnStyle('primary')}>🔊 اختبر الصوت الآن</button>
         {/* testAudio يعيد نصًّا عاديًّا — العرض كنصّ يمنع حقن أي HTML قادم من رسالة خطأ */}
-        {testResult && <div style={{ marginTop:8, fontSize:'.84rem', color:'var(--muted)' }}>{testResult}</div>}
+        {testResult && <div style={{ marginTop:'var(--sp-2)', fontSize:'var(--text-sm)', color:'var(--muted)' }}>{testResult}</div>}
       </div>
 
-      <details style={{ marginBottom:14 }}>
-        <summary style={{ cursor:'pointer', color:'var(--text2)', fontSize:'.88rem' }}>إجراءات متقدّمة</summary>
-        <div style={{ marginTop:10, display:'flex', gap:8, flexWrap:'wrap' }}>
+      <Group>المرشدة كاتيا</Group>
+      <Field label="كاتيا 🐱">
+        <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', fontSize: 'var(--text-sm)', color: 'var(--text2)', cursor: 'pointer' }}>
+          <input type="checkbox" checked={!s.mascotDismissed} onChange={() => s.toggleMascot()} />
+          إظهار كاتيا (المرشدة التفاعلية) في زاوية الشاشة
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', fontSize: 'var(--text-sm)', color: 'var(--text2)', cursor: 'pointer', marginTop: 'var(--sp-2)' }}>
+          <input type="checkbox" checked={s.botWordReminders} onChange={() => s.toggleBotWordReminders()} />
+          تذكير بكلمات المهام المكتملة كل دقيقتين
+        </label>
+      </Field>
+
+      <Group>بياناتك</Group>
+      <details style={{ marginBottom:'var(--sp-3)' }}>
+        <summary style={{ minHeight: 44, display: 'flex', alignItems: 'center', cursor:'pointer', color:'var(--text2)', fontSize:'var(--text-sm)' }}>نسخة احتياطية، استيراد، أو إعادة تعيين</summary>
+        <div style={{ marginTop:'var(--sp-3)', display:'flex', gap:'var(--sp-2)', flexWrap:'wrap' }}>
           <button onClick={handleExport} className="btn-shine" style={btnStyle('ghost')}>📥 تصدير بياناتي (JSON)</button>
           <button onClick={()=>fileRef.current?.click()} className="btn-shine" style={btnStyle('ghost')}>📤 استيراد</button>
           <input ref={fileRef} type="file" accept=".json" style={{ display:'none' }} onChange={handleImport} />
@@ -141,14 +152,14 @@ export function SettingsModal({ onClose }: Props) {
         </div>
       </details>
 
-      <div style={{ marginTop:16, textAlign:'center' }}>
+      <div style={{ marginTop:'var(--sp-4)', textAlign:'center' }}>
         <a href="/privacy.html" target="_blank" rel="noopener noreferrer"
-          style={{ fontSize:'.8rem', color:'var(--muted)', textDecoration:'underline' }}>
+          style={{ fontSize:'var(--text-xs)', color:'var(--muted)', textDecoration:'underline' }}>
           سياسة الخصوصية
         </a>
       </div>
 
-      <div style={{ display:'flex', gap:10, justifyContent:'flex-end', marginTop:14, flexWrap:'wrap' }}>
+      <div style={{ display:'flex', gap:'var(--sp-3)', justifyContent:'flex-end', marginTop:'var(--sp-3)', flexWrap:'wrap' }}>
         <button onClick={onClose} className="btn-shine" style={btnStyle('ghost')}>إلغاء</button>
         <button onClick={save} className="btn-shine" style={btnStyle('primary')}>حفظ</button>
       </div>
@@ -213,11 +224,24 @@ export function Overlay({ children, onClose, label }: { children: React.ReactNod
   )
 }
 
+/* عنوان مجموعة داخل الإعدادات: الحقول المتقاربة تُقرأ معًا بدل قائمة طويلة
+   واحدة. Heading, not a styled div, so screen-reader users can jump between
+   the groups. */
+export function Group({ children }: { children: React.ReactNode }) {
+  return (
+    <h4 style={{
+      margin: 'var(--sp-5) 0 var(--sp-3)', paddingBottom: 'var(--sp-2)',
+      borderBottom: '1px solid var(--border)',
+      fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-cta)', color: 'var(--text)',
+    }}>{children}</h4>
+  )
+}
+
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
   // الحقل داخل <label> نفسها → ربط ضمني بلا حاجة إلى id/htmlFor (a11y: label)
   return (
-    <label style={{ display:'block', marginBottom:10 }}>
-      <span style={{ display:'block', fontSize:'.85rem', fontWeight:500, color:'var(--text2)', marginBottom:6 }}>{label}</span>
+    <label style={{ display:'block', marginBottom:'var(--sp-3)' }}>
+      <span style={{ display:'block', fontSize:'var(--text-sm)', fontWeight:'var(--fw-medium)', color:'var(--text2)', marginBottom:'var(--sp-2)' }}>{label}</span>
       {children}
     </label>
   )
@@ -225,8 +249,8 @@ export function Field({ label, children }: { label: string; children: React.Reac
 
 // eslint-disable-next-line react-refresh/only-export-components -- مساعد أنماط (ليس مكوّنًا)
 export function btnStyle(variant: 'primary'|'ghost'|'danger') {
-  const base = { display:'inline-flex', alignItems:'center', justifyContent:'center', gap:6, padding:'10px 18px', borderRadius:14, fontFamily:'inherit', fontSize:'.9rem', fontWeight:600, cursor:'pointer', border:'1px solid transparent', transition:'.18s' } as const
-  if (variant==='primary') return { ...base, background:'var(--btn-bg)', backdropFilter:'blur(10px)' as const, WebkitBackdropFilter:'blur(10px)' as const, color:'var(--text)', fontWeight:700, borderColor:'var(--btn-border)', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }
+  const base = { display:'inline-flex', alignItems:'center', justifyContent:'center', gap:'var(--sp-2)', padding:'10px 18px', borderRadius:'var(--r-sm)', fontFamily:'inherit', fontSize:'var(--text-sm)', fontWeight:'var(--fw-heading)', cursor:'pointer', border:'1px solid transparent', transition:'.18s' } as const
+  if (variant==='primary') return { ...base, background:'var(--btn-bg)', backdropFilter:'blur(10px)' as const, WebkitBackdropFilter:'blur(10px)' as const, color:'var(--text)', fontWeight:'var(--fw-cta)', borderColor:'var(--btn-border)', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }
   if (variant==='danger') return { ...base, background:'transparent', color: 'var(--red-text)', borderColor:'var(--red)' }
   return { ...base, background:'var(--btn-bg)', backdropFilter:'blur(10px)' as const, WebkitBackdropFilter:'blur(10px)' as const, color:'var(--text2)', borderColor:'var(--btn-border)', boxShadow:'var(--elev-1)' }
 }

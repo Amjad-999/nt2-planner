@@ -36,7 +36,7 @@ export function PlanHealth() {
       </div>
       <div className="flex-1 min-w-0">
         <div className="font-semibold text-[var(--text)] mb-[3px]">{ph.title}</div>
-        <div className="text-[.85rem] text-[var(--text2)] leading-[1.55]">{ph.why}</div>
+        <div className="text-[var(--text-sm)] text-[var(--text2)] leading-[1.55]">{ph.why}</div>
       </div>
     </div>
   )

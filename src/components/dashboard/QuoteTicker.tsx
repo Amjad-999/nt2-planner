@@ -36,14 +36,15 @@ export function QuoteTicker() {
       initial={reduced ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={springCard}
+      className="decor-flourish"
       style={{
-        display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18,
+        display: 'flex', alignItems: 'center', gap: 'var(--sp-3)', marginBottom: 'var(--sp-4)',
         padding: '14px 18px', borderRadius: 'var(--r)',
         background: 'var(--surface2)', border: '1px solid var(--border)',
         borderInlineStart: '3px solid var(--orange)',
       }}
     >
-      <span aria-hidden="true" style={{ fontSize: '1.3rem', flexShrink: 0 }}>💬</span>
+      <span aria-hidden="true" style={{ fontSize: 'var(--glyph-sm)', flexShrink: 0 }}>💬</span>
 
       <div style={{ flex: 1, minWidth: 0 }}>
         {/* aria-live so a screen reader hears the new quote instead of it
@@ -62,12 +63,12 @@ export function QuoteTicker() {
                 dir="ltr"
                 style={{
                   margin: 0, fontFamily: 'var(--font-latin)', fontStyle: 'italic',
-                  fontSize: '.98rem', color: 'var(--text)', lineHeight: 1.5, textAlign: 'start',
+                  fontSize: 'var(--text-base)', color: 'var(--text)', lineHeight: 'var(--lh-ui)', textAlign: 'start',
                 }}
               >
                 “{quote.nl}”
               </p>
-              <p style={{ margin: '3px 0 0', fontSize: '.82rem', color: 'var(--muted)' }}>
+              <p style={{ margin: '3px 0 0', fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>
                 {quote.ar}
               </p>
             </motion.div>
@@ -82,10 +83,10 @@ export function QuoteTicker() {
         transition={pressTransition}
         aria-label="اعرض الحكمة التالية"
         style={{
-          width: 44, height: 44, flexShrink: 0, borderRadius: 12,
+          width: 44, height: 44, flexShrink: 0, borderRadius: 'var(--r-sm)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: 'var(--btn-bg)', border: '1px solid var(--btn-border)',
-          color: 'var(--text2)', cursor: 'pointer', fontSize: '1rem', fontFamily: 'inherit',
+          color: 'var(--text2)', cursor: 'pointer', fontSize: 'var(--text-base)', fontFamily: 'inherit',
         }}
       >
         {/* الشيفرون يشير إلى "التالي" — يُقلب تلقائيًّا في RTL */}

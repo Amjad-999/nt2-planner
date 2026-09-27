@@ -1,18 +1,19 @@
 import { useAppStore } from '@/store/useAppStore'
 import { BOOKS } from '@/data/books'
 import type { BookUnit } from '@/store/types'
+import { Callout } from '@/components/ui/Callout'
 
 export default function Books() {
   const { bookUnits, toggleBookUnit } = useAppStore()
 
   return (
-    <div style={{ padding: '24px 28px 60px', maxWidth: 1100, margin: '0 auto' }}>
-      <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.5rem', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 12px', display:'flex', alignItems:'center', gap:10 }}>
+    <div className="page">
+      <h2 className="section-title">
         <span style={{ color: 'var(--orange-text)' }}>📖</span> الكتب والوحدات <span aria-hidden="true">🇳🇱</span>
       </h2>
-      <div style={{ background:'var(--amber-l)', border:'1px solid var(--glass-border)', borderInlineStart:'3px solid var(--amber)', borderRadius:'var(--r-sm)', padding:'14px 18px', marginBottom:18, fontSize:'.9rem', color:'var(--text2)', lineHeight:1.65 }}>
-        📚 <strong style={{ color:'var(--text)' }}>تتبّع تقدّمك في الكتب الرسمية</strong> — حدّد الوحدات التي أتممت مراجعتها. يُضاف إنجازك تلقائيًا إلى لوحة التحليلات.
-      </div>
+      <Callout tone="warn" icon="📚" style={{ marginBottom: 'var(--sp-4)' }}>
+        <strong style={{ color:'var(--text)' }}>تتبّع تقدّمك في الكتب الرسمية</strong> — حدّد الوحدات التي أتممت مراجعتها. يُضاف إنجازك تلقائيًا إلى لوحة التحليلات.
+      </Callout>
 
       {BOOKS.map((b) => (
         <BookCard
@@ -41,30 +42,30 @@ function BookCard({ book: b, doneUnits, onToggle }: { book: BookUnit; doneUnits:
         borderRadius:'var(--r)',
         padding:18,
         boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)',
-        marginBottom:14,
+        marginBottom:'var(--sp-3)',
       }}
     >
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:10, marginBottom:8 }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:'var(--sp-3)', marginBottom:'var(--sp-2)' }}>
         <div>
-          <div style={{ display:'flex', alignItems:'center', gap:8, fontWeight:600, color:'var(--text)', fontSize:'1.02rem' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'var(--sp-2)', fontWeight:'var(--fw-heading)', color:'var(--text)', fontSize:'var(--text-md)' }}>
             <span
               className="card-icon"
-              style={{ width:32, height:32, background:b.bg, color:b.ic, borderRadius:8, display:'inline-flex', alignItems:'center', justifyContent:'center' }}
+              style={{ width:32, height:32, background:b.bg, color:b.ic, borderRadius:'var(--r-xs)', display:'inline-flex', alignItems:'center', justifyContent:'center' }}
             >
               {b.icon}
             </span>
             <span className="card-value">{b.title}</span>
           </div>
-          <div style={{ fontSize:'.82rem', color:'var(--muted)', marginTop:3 }}>{b.desc}</div>
+          <div style={{ fontSize:'var(--text-sm)', color:'var(--muted)', marginTop:'var(--sp-1)' }}>{b.desc}</div>
         </div>
-        <div style={{ fontWeight:700, color:b.ic }}>{pct}% <span style={{ fontSize:'.78rem', color:'var(--muted)', fontWeight:400 }}>({doneUnits.length}/{b.units.length})</span></div>
+        <div style={{ fontWeight:'var(--fw-cta)', color:b.ic }}>{pct}% <span style={{ fontSize:'var(--text-xs)', color:'var(--muted)', fontWeight:'var(--fw-body)' }}>({doneUnits.length}/{b.units.length})</span></div>
       </div>
-      <div style={{ background:'var(--surface3)', height:5, borderRadius:3, overflow:'hidden', marginBottom:10 }}>
+      <div style={{ background:'var(--surface3)', height:5, borderRadius:'var(--r-2xs)', overflow:'hidden', marginBottom:'var(--sp-3)' }}>
         <div className="progress-wave" style={{ height:'100%', backgroundColor:b.ic, width:`${pct}%`, transition:'width .8s ease' }} />
       </div>
-      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'1fr', gap:5 }}>
+      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'1fr', gap:'var(--sp-1)' }}>
         {b.units.map((u, i) => (
-          <label key={i} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 9px', background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:6, cursor:'pointer', fontSize:'.86rem', color:'var(--text)' }}>
+          <label key={i} style={{ display:'flex', alignItems:'center', gap:'var(--sp-2)', padding:'7px 9px', background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:'var(--r-xs)', cursor:'pointer', fontSize:'var(--text-sm)', color:'var(--text)' }}>
             <input type="checkbox" checked={doneUnits.includes(i)} onChange={() => onToggle(i)} style={{ accentColor: b.ic }} aria-label={u} />
             <span>{u}</span>
           </label>

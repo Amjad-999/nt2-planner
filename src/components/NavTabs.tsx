@@ -11,7 +11,7 @@ import {
 /* ── Navigation: four daily workspaces + «المزيد» ─────────────────────────
    The brief's rule: primary navigation answers "what do I do today", and
    everything else lives inside the workspace it belongs to or under «More».
-   The ten original tools are all still here — one tap further — so nothing
+   The eleven original tools are all still here — one tap further — so nothing
    the learner relied on disappeared.
    Desktop/tablet: a sticky row under the top bar. Phones (<768px): a bottom
    bar (thumb reach, safe-area aware) that hides during a lesson so the
@@ -34,6 +34,7 @@ const MORE_GROUPS: { title: string; items: Entry[] }[] = [
     items: [
       { id: 'exam', Icon: ClipboardText, label: 'محاكاة الامتحان' },
       { id: 'exercises', Icon: GameController, label: 'تمارين' },
+      { id: 'situations', Icon: ChatsCircle, label: 'مواقف يومية' },
       { id: 'grammar', Icon: TextAa, label: 'قواعد' },
     ],
   },
