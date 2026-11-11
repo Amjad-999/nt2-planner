@@ -60,7 +60,7 @@ export function DrillView({ rule, onBack }: { rule: BuildRule; onBack: () => voi
       </div>
       <h2 className="o-h2" style={{ margin: '6px 0 12px' }}>{ex.promptAr}</h2>
       <TileBuilder ex={ex} order={order} onChange={(o) => { setOrder(o); if (checked) setChecked(null) }} result={result} locked={solved || shown} solvedRight={solved} />
-      <div aria-live="polite" style={{ marginTop: 12 }}>
+      <div aria-live="polite" style={{ marginTop: 'var(--sp-3)' }}>
         {solved && <Feedback tone="right" title="صحيحة."><p className="o-small">{ex.ruleAr}</p></Feedback>}
         {result && !solved && !shown && <Feedback tone="wrong" title="ليست بعد."><p className="o-small">{ex.ruleAr}</p></Feedback>}
         {shown && <Feedback tone="info" title="الجملة الصحيحة:"><p className="o-nl" lang="nl">{correct}</p></Feedback>}

@@ -54,7 +54,7 @@ export function RecallQuick({ items, onDone }: { items: ExpressionRecord[]; onDo
   }
 
   return (
-    <form className="o-step-plane" onSubmit={check} noValidate style={{ display: 'grid', gap: 12 }}>
+    <form className="o-step-plane" onSubmit={check} noValidate style={{ display: 'grid', gap: 'var(--sp-3)' }}>
       <Meta>{`HERHALEN · ${k + 1}/${items.length}`}</Meta>
       <h2 className="o-h2">ما الهولندية لـ «{rec.ar}»؟</h2>
       {cue && <p className="o-nl o-example" lang="nl">{cue}</p>}

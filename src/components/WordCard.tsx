@@ -9,6 +9,7 @@ import { isFsrsLearned } from '@/features/vocab/fsrs-lite'
 import { splitArticle } from '@/features/vocab/article'
 import type { VocabWord, ExamWord } from '@/store/types'
 import { WordMeaningVisual } from '@/components/vocab/WordMeaningVisual'
+import { ITrash } from '@/components/obs/icons'
 
 type Word = VocabWord | ExamWord
 
@@ -100,7 +101,7 @@ export function WordCard({ word, onDelete, onAdd, showAdd, saved, learnedBox = 4
               style={{ minWidth: 44, minHeight: 44, flexShrink: 0 }}
             >{audioState === 'playing' ? '⏳' : '🔊'}</button>
           </div>
-          {audioState === 'error' && <p role="alert" style={{ color: 'var(--red-text)', fontSize: 'var(--text-sm)', margin: 'var(--sp-1) 0' }}>⚠ تعذّر تشغيل الصوت. حاول مجددًا عند توفر الاتصال أو صوت هولندي على الجهاز.</p>}
+          {audioState === 'error' && <p role="alert" style={{ color: 'var(--red-text)', fontSize: 'var(--text-sm)', margin: 'var(--sp-1) 0' }}>⚠️ تعذّر تشغيل الصوت. حاول مجددًا عند توفر الاتصال أو صوت هولندي على الجهاز.</p>}
           <div dir="rtl" lang="ar" className="text-[var(--text2)] text-[var(--text-base)] mt-0.5"><HighlightText text={ar} indices={hlAr} /></div>
           {ex && (
             <div className="flex items-start gap-1.5 mt-2" dir="ltr">
@@ -147,7 +148,7 @@ export function WordCard({ word, onDelete, onAdd, showAdd, saved, learnedBox = 4
               className="text-[var(--text-xs)] px-2.5 py-1.5 rounded-[var(--r-xs)] border cursor-pointer"
               style={{ minHeight: 44, minWidth: 44, borderColor: 'var(--border2)', color: 'var(--muted)', background: 'transparent' }}
               aria-label={`حذف ${nl}`}
-            >🗑</button>
+            ><ITrash size={18} aria-hidden /></button>
           )}
         </div>
       </div>

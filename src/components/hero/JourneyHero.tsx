@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { motion } from 'framer-motion'
 import { useAppStore, getPlanTotal, getCurrentDay, avgBestScore } from '@/store/useAppStore'
-import { todayKey } from '@/lib/utils'
+import { todayKey, pct } from '@/lib/utils'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useNow } from '@/hooks/useNow'
 import { springFill } from '@/lib/animations'
@@ -183,7 +183,7 @@ export function JourneyHero() {
     { icon: '🔥', value: String(streak.count), label: 'مواظبة' },
     { icon: '⏱️', value: `${todayMins}د`, label: 'درست' },
     { icon: '📍', value: `${planDayNow}/${planTotal}`, label: 'اليوم' },
-    { icon: '🎯', value: Object.values(skill).some(s => s.attempts > 0 || s.best > 0) ? `${readiness}%` : '—', label: 'متوسط التدريب' },
+    { icon: '🎯', value: Object.values(skill).some(s => s.attempts > 0 || s.best > 0) ? pct(readiness) : '—', label: 'متوسط التدريب' },
   ]
 
   /* The daily summary follows the learning action and checklist. */
@@ -273,7 +273,7 @@ export function JourneyHero() {
                     تقدمك اليومي
                   </span>
                   <span style={{ fontSize: 'var(--text-sm)', color: 'var(--hero-ink)', fontWeight: 'var(--fw-cta)' }}>
-                    {progress}%
+                    {pct(progress)}
                   </span>
                 </div>
                 <div
@@ -313,7 +313,7 @@ export function JourneyHero() {
                 key={s.label}
                 style={{
                   background: 'var(--hero-veil)',
-                  backdropFilter: 'blur(12px)',
+                  backdropFilter: 'var(--glass-fx-panel)',
                   borderRadius: 'var(--r-sm)',
                   padding: '12px 8px',
                   textAlign: 'center',

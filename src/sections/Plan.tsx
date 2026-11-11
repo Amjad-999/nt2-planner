@@ -12,7 +12,7 @@ export default function Plan() {
   return (
     <div className="page">
       <h2 className="section-title">
-        <span style={{ color: 'var(--orange-text)' }}>🗓️</span> خطة الدراسة الذكية ({planTotal} يومًا) <span aria-hidden="true">📍</span>
+        <span aria-hidden="true">🗓️</span> خطة الدراسة الذكية ({planTotal} يومًا)
       </h2>
 
       <Callout icon="🧠" style={{ marginBottom: 'var(--sp-4)' }}>
@@ -23,7 +23,7 @@ export default function Plan() {
       <ProgramPanel />
 
       {/* Today's tasks */}
-      <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:18, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)', marginBottom:'var(--sp-4)' }}>
+      <div style={{ background:'var(--glass-bg)', backdropFilter:'var(--glass-fx-panel)', WebkitBackdropFilter:'var(--glass-fx-panel)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:18, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)', marginBottom:'var(--sp-4)' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'var(--sp-3)', marginBottom:'var(--sp-3)' }}>
           <div>
             <div style={{ fontWeight:'var(--fw-heading)', color:'var(--text)' }}>خطة اليوم — اليوم <strong style={{ color: 'var(--orange-text)' }}>{planDayNow}</strong> من {planTotal}</div>
@@ -79,7 +79,7 @@ export default function Plan() {
         }
         const pct = pTotal ? Math.round((pDone.length / pTotal) * 100) : 0
         return (
-          <div key={ph.id} style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:18, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)', marginBottom:'var(--sp-3)' }}>
+          <div key={ph.id} style={{ background:'var(--glass-bg)', backdropFilter:'var(--glass-fx-panel)', WebkitBackdropFilter:'var(--glass-fx-panel)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:18, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)', marginBottom:'var(--sp-3)' }}>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'var(--sp-2)' }}>
               <div><strong style={{ color:'var(--text)' }}>{ph.title}</strong> <span style={{ fontSize:'var(--text-xs)', color:'var(--muted)' }}>(أيام {ph.days})</span></div>
               <div style={{ fontSize:'var(--text-sm)', color: 'var(--orange-text)', fontWeight:'var(--fw-heading)' }}>{pct}% — {pDone.length}/{pTotal}</div>

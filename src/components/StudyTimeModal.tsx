@@ -28,13 +28,13 @@ export function StudyTimeModal({ onClose }: Props) {
       <div style={{ display:'flex', gap:'var(--sp-2)', flexWrap:'wrap', marginBottom:'var(--sp-4)' }}>
         {[15,30,45,60].map((n)=>(
           <button key={n} onClick={()=>setMins(String(n))} className="btn-shine"
-            style={{ background:'var(--btn-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--btn-border)', borderRadius:'var(--r-xs)', padding:'7px 12px', cursor:'pointer', fontSize:'var(--text-xs)', color:'var(--text2)', fontFamily:'inherit' }}>
+            style={{ background:'var(--btn-bg)', backdropFilter:'var(--glass-fx-control)', WebkitBackdropFilter:'var(--glass-fx-control)', border:'1px solid var(--btn-border)', borderRadius:'var(--r-xs)', padding:'7px 12px', cursor:'pointer', fontSize:'var(--text-xs)', color:'var(--text2)', fontFamily:'inherit' }}>
             + {n}
           </button>
         ))}
       </div>
       <div style={{ display:'flex', gap:'var(--sp-3)', justifyContent:'flex-end' }}>
-        <button onClick={onClose} className="btn-shine" style={{ background:'var(--btn-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--btn-border)', borderRadius:'var(--r-sm)', padding:'10px 18px', cursor:'pointer', fontSize:'var(--text-sm)', color:'var(--text2)', fontFamily:'inherit' }}>إلغاء</button>
+        <button onClick={onClose} className="btn-shine" style={{ background:'var(--btn-bg)', backdropFilter:'var(--glass-fx-control)', WebkitBackdropFilter:'var(--glass-fx-control)', border:'1px solid var(--btn-border)', borderRadius:'var(--r-sm)', padding:'10px 18px', cursor:'pointer', fontSize:'var(--text-sm)', color:'var(--text2)', fontFamily:'inherit' }}>إلغاء</button>
         <button onClick={add} className="btn-glass" style={{ borderRadius:'var(--r-sm)', padding:'10px 18px', fontWeight:'var(--fw-cta)', color:'var(--text)', cursor:'pointer', fontSize:'var(--text-sm)', fontFamily:'inherit' }}>إضافة</button>
       </div>
     </Overlay>

@@ -87,7 +87,7 @@ export function WordDetail({ rec, onClose }: { rec: ExpressionRecord; onClose: (
         {ev.stage === 'active' ? ' تحققت.' : ` الباقي: ${[ev.missing.uses && `${ev.missing.uses} استخدام`, ev.missing.contexts && `${ev.missing.contexts} سياق`, ev.missing.days && `${ev.missing.days} يوم`].filter(Boolean).join('، ')}.`}
       </p>
       {rec.uses.length === 0 ? <p className="o-small">لا دليل بعد: فتح الكلمة أو حفظها لا يُحسب تعلّمًا.</p> : (
-        <ul className="o-list" style={{ marginTop: 8 }}>
+        <ul className="o-list" style={{ marginTop: 'var(--sp-2)' }}>
           {[...rec.uses].reverse().map((u) => (
             <li key={u.id} className="o-card" style={{ padding: 12 }}>
               <span className="o-row" style={{ justifyContent: 'space-between' }}>
@@ -100,21 +100,21 @@ export function WordDetail({ rec, onClose }: { rec: ExpressionRecord; onClose: (
         </ul>
       )}
       {removed && (
-        <div className="o-notice o-notice--info" role="status" style={{ marginTop: 8 }}>
+        <div className="o-notice o-notice--info" role="status" style={{ marginTop: 'var(--sp-2)' }}>
           <span className="o-grow">حُذف دليل واحد.</span>
           <Button size="sm" variant="secondary" icon={IArrowCounterClockwise} onClick={undo}>تراجع</Button>
         </div>
       )}
 
       {found && (
-        <div className="o-part" style={{ marginTop: 16 }}>
+        <div className="o-part" style={{ marginTop: 'var(--sp-4)' }}>
           <h3 className="o-h3">استخدمها الآن</h3>
           <label className="o-field">
             <span className="o-label">جملة جديدة من حياتك (أو صف أين استخدمتها)</span>
             <textarea className="o-textarea" lang="nl" dir="ltr" rows={2} value={text} onChange={(e) => { setText(e.target.value); setRes('') }} />
           </label>
           <fieldset className="o-ctx-pick">
-            <legend className="o-small" style={{ marginBottom: 6 }}>السياق</legend>
+            <legend className="o-small" style={{ marginBottom: 'var(--sp-2)' }}>السياق</legend>
             {CONTEXTS.map((c) => <label key={c}><input type="radio" name={`d-ctx-${rec.id}`} checked={ctx === c} onChange={() => setCtx(c)} /><span>{CONTEXT_AR[c]}</span></label>)}
           </fieldset>
           <div aria-live="polite">

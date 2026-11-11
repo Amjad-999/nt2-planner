@@ -43,7 +43,7 @@ export function BackupPanel() {
   }
 
   return (
-    <div className="o-stack" style={{ gap: 12 }}>
+    <div className="o-stack" style={{ gap: 'var(--sp-3)' }}>
       <p className="o-small">النسخة تشمل كل شيء: الجلسات، الأدلة، الملاحظات، الإعدادات، والكلمات. التسجيلات الصوتية لا تُضمَّن (تبقى على هذا الجهاز).</p>
       <div className="o-row">
         <Button variant="secondary" icon={IDownloadSimple} onClick={exportBackup}>نزّل نسخة احتياطية (JSON)</Button>
@@ -55,14 +55,14 @@ export function BackupPanel() {
 
       {pending && (
         <div className="o-plane o-plane--raised" role="group" aria-labelledby="import-title">
-          <h3 className="o-h3 o-row" id="import-title" style={{ gap: 8 }}><IShieldCheck size={20} />الملف صالح: {pending.name}</h3>
-          <ul className="o-small" style={{ margin: '8px 0', paddingInlineStart: 18, lineHeight: 1.9 }}>
+          <h3 className="o-h3 o-row" id="import-title" style={{ gap: 'var(--sp-2)' }}><IShieldCheck size={20} />الملف صالح: {pending.name}</h3>
+          <ul className="o-small" style={{ margin: '8px 0', paddingInlineStart: 18, lineHeight: 'var(--lh-arabic)' }}>
             <li>{pending.summary.sessions} جلسات · {pending.summary.expressions} تعابير · {pending.summary.notes} ملاحظات</li>
             <li>{pending.summary.vocab} كلمة في قائمة المفردات · {pending.summary.days} يومًا من السجل اليومي</li>
             {pending.summary.savedAt > 0 && <li>حُفظت في: {new Date(pending.summary.savedAt).toLocaleString('ar-u-nu-latn')}</li>}
           </ul>
           <Notice tone="warn" title="سيحلّ هذا محلّ بياناتك الحالية.">يمكنك التراجع مباشرة بعد الاستيراد.</Notice>
-          <div className="o-row" style={{ marginTop: 10 }}>
+          <div className="o-row" style={{ marginTop: 'var(--sp-3)' }}>
             <Button variant="primary" onClick={confirm}>استبدل بياناتي بهذا الملف</Button>
             <Button variant="ghost" onClick={() => setPending(null)}>إلغاء</Button>
           </div>

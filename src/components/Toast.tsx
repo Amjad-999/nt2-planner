@@ -44,7 +44,7 @@ export function ToastHost() {
       className="toast-host"
       aria-live="polite"
       style={{ position: 'fixed', bottom: 'calc(18px + var(--o-bnav-h, 0px) + env(safe-area-inset-bottom, 0px))', insetInlineStart: '50%', transform: 'translateX(50%)',
-        zIndex: 950, display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', alignItems: 'center', pointerEvents: 'none' }}
+        zIndex: 'var(--z-toast)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', alignItems: 'center', pointerEvents: 'none' }}
     >
       {/* الإعلان لقارئ الشاشة يأتي من aria-live على الحاوية أعلاه، فلا حاجة
           إلى role="status" على كل عنصر (يسبّب إعلانًا مزدوجًا). الإغلاق عبر
@@ -58,7 +58,7 @@ export function ToastHost() {
             display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
             padding: '10px 10px 10px 16px', borderRadius: 'var(--r-sm)',
             background: 'var(--glass-bg-strong)',
-            backdropFilter: 'blur(16px) saturate(1.5)', WebkitBackdropFilter: 'blur(16px) saturate(1.5)',
+            backdropFilter: 'var(--glass-fx-panel)', WebkitBackdropFilter: 'var(--glass-fx-panel)',
             border: '1px solid var(--glass-border)',
             borderInlineStart: `3px solid ${EDGE[t.kind]}`,
             boxShadow: 'var(--elev-2), inset 0 1px 0 var(--glass-hi)',

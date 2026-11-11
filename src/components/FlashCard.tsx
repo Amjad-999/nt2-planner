@@ -259,7 +259,7 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
             style={{
               position: 'absolute', top: 84, insetInlineEnd: 0, zIndex: 20,
               background: 'var(--modal-bg)',
-              backdropFilter: 'blur(30px) saturate(2)', WebkitBackdropFilter: 'blur(30px) saturate(2)',
+              backdropFilter: 'var(--glass-fx-float)', WebkitBackdropFilter: 'var(--glass-fx-float)',
               border: '1px solid var(--modal-border)',
               borderRadius: 'var(--r-sm)',
               padding: '14px 16px',
@@ -368,7 +368,7 @@ export function FlashCard({ queue, onGrade, onDone }: Props) {
               : detail?.examples[0] && (
                 <div
                   dir="ltr" lang="nl"
-                  className="mt-2.5 text-[var(--text-sm)] text-[var(--text2)] italic"
+                  className="mt-2.5 text-[var(--text-sm)] text-[var(--text2)]"
                   style={{ fontFamily: 'var(--font-latin)' }}
                 >
                   "{detail.examples[0]}"

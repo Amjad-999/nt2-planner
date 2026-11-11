@@ -4,6 +4,7 @@ import { useMotionLevel, useMedia } from '@/hooks/useObs'
 import { layoutTransition } from '@/features/observatory/motion'
 import { CONTEXT_NL, nlDate, pad2, mins } from '@/features/observatory/format'
 import { Constellation } from '../Constellation'
+import { NeuralField } from '../NeuralField'
 import { Button, Meta, Nl, Chip } from '../ui'
 import { IArrowRight, IClock, IWarningCircle, ICheckCircle } from '../icons'
 
@@ -47,18 +48,22 @@ export function TodayHero(p: Props) {
     variant === 'done' || variant === 'missing' ? '' : `≈ ${p.estMin} MIN`,
   ].filter(Boolean).join(' · ')
 
+  const contexts = item ? Array.from(new Set([CONTEXT_NL[item.context], ...item.expressions.flatMap((x) => x.contexts.map((c) => CONTEXT_NL[c]))])) : []
+  // Each word is linked to the contexts IT belongs to, looked up by label. The
+  // old code assumed "index 1 is the telephone", which pointed at whichever
+  // label happened to be second in the list.
   const nodes = item ? item.expressions.slice(0, 4).map((x) => ({
     id: x.id, nl: x.nl, gloss: x.ar,
-    contexts: [0, ...(x.contexts.includes('telefoon') ? [1] : [])],
+    contexts: Array.from(new Set([0, ...x.contexts.map((c) => contexts.indexOf(CONTEXT_NL[c]))])).filter((i) => i >= 0),
   })) : []
-  const contexts = item ? Array.from(new Set([CONTEXT_NL[item.context], ...item.expressions.flatMap((x) => x.contexts.map((c) => CONTEXT_NL[c]))])) : []
 
   return (
     <section className="o-night o-hero" aria-labelledby="today-title">
+      {item && variant !== 'missing' && <NeuralField animate={level !== 'reduced'} />}
       <div className="o-hero__text">
         <Meta>{meta}</Meta>
         <h1 id="today-title" className="o-display" tabIndex={-1} style={{ outline: 'none' }}>{TITLES[variant](p)}</h1>
-        {item && variant !== 'missing' && <Nl display as="p" className="o-hero__nl is-italic">{item.titleNl}</Nl>}
+        {item && variant !== 'missing' && <Nl display as="p" className="o-hero__nl">{item.titleNl}</Nl>}
         <p className="o-lede">
           {variant === 'first' && <>{item?.intentionAr} كل جلسة تمرّ بخطوات قصيرة: تفهم، تحاول، ترى ملاحظات واضحة، ثم تستخدم الكلمات بجملك أنت.</>}
           {variant === 'start' && item?.intentionAr}
@@ -100,6 +105,7 @@ export function TodayHero(p: Props) {
             contexts={contexts}
             compact={compact}
             animate={level !== 'reduced'}
+            links="field"
             summary={`تعابير هذا الموضوع: ${item.expressions.slice(0, 4).map((x) => `${x.nl} (${x.ar})`).join('، ')}. السياقات: ${contexts.join('، ')}.`}
           />
         </div>

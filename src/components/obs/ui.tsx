@@ -79,7 +79,7 @@ export function Notice({ tone = 'info', title, children, actions, live }: {
       <div className="o-grow">
         {title && <strong>{title} </strong>}
         {children}
-        {actions && <div className="o-row" style={{ marginTop: 8 }}>{actions}</div>}
+        {actions && <div className="o-row" style={{ marginTop: 'var(--sp-2)' }}>{actions}</div>}
       </div>
     </div>
   )
@@ -111,7 +111,7 @@ export function WorkspaceHead({ kicker, title, nl, lede, aside }: {
       <div className="o-head__row">
         <div>
           <h1 className="o-display" style={{ fontSize: 'var(--o-fs-h2)' }}>{title}</h1>
-          {nl && <Nl display className="is-italic" as="p"><span style={{ fontSize: '1.35rem', color: 'var(--o-ink-2)' }}>{nl}</span></Nl>}
+          {nl && <Nl display as="p"><span style={{ fontSize: 'var(--text-xl)', color: 'var(--o-ink-2)' }}>{nl}</span></Nl>}
         </div>
         {aside}
       </div>

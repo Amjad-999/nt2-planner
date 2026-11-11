@@ -19,8 +19,8 @@ export function PlanHealth() {
       className="flex items-center gap-3.5 p-[14px_18px] rounded-card mb-[18px]"
       style={{
         background: 'var(--glass-bg)',
-        backdropFilter: 'blur(16px) saturate(1.3)',
-        WebkitBackdropFilter: 'blur(16px) saturate(1.3)',
+        backdropFilter: 'var(--glass-fx-panel)',
+        WebkitBackdropFilter: 'var(--glass-fx-panel)',
         border: `1px solid var(--glass-border)`,
         borderInlineStart: `3px solid ${borderColor}`,
         boxShadow: 'var(--elev-2), inset 0 1px 0 var(--glass-hi)',

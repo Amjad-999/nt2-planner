@@ -53,11 +53,11 @@ export default function Practice() {
   const [browsing, setBrowsing] = useState(false)
 
   if (view.kind === 'drill') {
-    return <div className="o-root"><div className="o-page"><DrillView rule={view.rule} onBack={() => setView({ kind: 'list' })} /></div></div>
+    return <div className="o-root"><div className="page page--wide"><DrillView rule={view.rule} onBack={() => setView({ kind: 'list' })} /></div></div>
   }
   if (run && sc && !browsing) {
     return (
-      <div className="o-root"><div className="o-page">
+      <div className="o-root"><div className="page page--wide">
         <StatusStrip />
         {run.done
           ? <RoleplayReview sc={sc} run={run} onRestart={() => update((x) => startRoleplay(closeRoleplay(x, Date.now()), sc.id, Date.now()))} onBack={() => { back(); setBrowsing(false) }} />
@@ -72,7 +72,7 @@ export default function Practice() {
 
   return (
     <div className="o-root">
-      <motion.div className="o-page" variants={container} initial="hidden" animate="show">
+      <motion.div className="page page--wide" variants={container} initial="hidden" animate="show">
         <StatusStrip />
         <motion.div variants={item}>
           <WorkspaceHead kicker="OEFENEN · ECHTE SITUATIES" title="تدرّب على موقف حقيقي" nl="Wat gaat u binnenkort doen?"
@@ -80,11 +80,11 @@ export default function Practice() {
         </motion.div>
 
         {run && !run.done && sc && (
-          <motion.div variants={item} className="o-notice o-notice--info" style={{ marginBottom: 16 }}>
+          <motion.div variants={item} className="o-notice o-notice--info" style={{ marginBottom: 'var(--sp-4)' }}>
             <span className="o-notice__icon"><IChatsCircle size={20} /></span>
             <div className="o-grow">
               <strong>حوار غير مكتمل: {sc.titleAr}. </strong>{run.turns.length} من {sc.turns.length} ردود محفوظة.
-              <div className="o-row" style={{ marginTop: 8 }}><Button size="sm" variant="secondary" onClick={() => setBrowsing(false)}>تابِع الحوار</Button></div>
+              <div className="o-row" style={{ marginTop: 'var(--sp-2)' }}><Button size="sm" variant="secondary" onClick={() => setBrowsing(false)}>تابِع الحوار</Button></div>
             </div>
           </motion.div>
         )}
@@ -100,11 +100,11 @@ export default function Practice() {
                     <Meta>{`${r.turns.length} BEURTEN · ≈ ${r.turns.length * 2} MIN`}</Meta>
                   </span>
                   <strong className="o-h3">{r.titleAr}</strong>
-                  <span className="o-nl-display is-italic" lang="nl" style={{ fontSize: '1.1rem', color: 'var(--o-cobalt-ink)' }}>{r.titleNl}</span>
+                  <span className="o-nl-display" lang="nl" style={{ fontSize: 'var(--text-lg)', color: 'var(--o-cobalt-ink)' }}>{r.titleNl}</span>
                   <span className="o-small">{r.situationAr}</span>
-                  <span className="o-row o-small" style={{ justifyContent: 'space-between', marginTop: 4 }}>
+                  <span className="o-row o-small" style={{ justifyContent: 'space-between', marginTop: 'var(--sp-1)' }}>
                     <span>{t ? `آخر مرة: ${shortDate(t)}` : 'لم تجرّبه بعد'}</span>
-                    <span className="o-link o-row" style={{ gap: 4 }}>ابدأ <IArrowRight size={16} flip /></span>
+                    <span className="o-link o-row" style={{ gap: 'var(--sp-1)' }}>ابدأ <IArrowRight size={16} flip /></span>
                   </span>
                 </button>
               </li>
@@ -112,22 +112,22 @@ export default function Practice() {
           })}
         </motion.ul>
 
-        <motion.section variants={item} style={{ marginTop: 32 }} aria-labelledby="drills-title">
+        <motion.section variants={item} style={{ marginTop: 'var(--sp-8)' }} aria-labelledby="drills-title">
           <h2 className="o-h3" id="drills-title">تمارين مركّزة</h2>
-          <p className="o-small" style={{ marginBottom: 10 }}>لقواعد تتكرّر فيها الأخطاء. العدد بين القوسين = مرات تعثّرك المسجّلة.</p>
+          <p className="o-small" style={{ marginBottom: 'var(--sp-3)' }}>لقواعد تتكرّر فيها الأخطاء. العدد بين القوسين = مرات تعثّرك المسجّلة.</p>
           <div className="o-grid-2">
             {rules.map((r) => (
               <button key={r} type="button" className="o-card o-card--button" onClick={() => setView({ kind: 'drill', rule: r })}>
-                <span className="o-row" style={{ gap: 8 }}><ITarget size={20} /><strong>{DRILL_TITLE[r]}</strong></span>
+                <span className="o-row" style={{ gap: 'var(--sp-2)' }}><ITarget size={20} /><strong>{DRILL_TITLE[r]}</strong></span>
                 <span className="o-small">{count(r)} جمل · {weak(r) ? `تعثّرت ${weak(r)} مرات` : 'لا تعثّر مسجّل بعد'}</span>
               </button>
             ))}
           </div>
         </motion.section>
 
-        <motion.section variants={item} style={{ marginTop: 32 }} aria-labelledby="more-practice">
+        <motion.section variants={item} style={{ marginTop: 'var(--sp-8)' }} aria-labelledby="more-practice">
           <h2 className="o-h3" id="more-practice">تدريب أوسع</h2>
-          <div className="o-row" style={{ marginTop: 8 }}>
+          <div className="o-row" style={{ marginTop: 'var(--sp-2)' }}>
             <Button variant="secondary" icon={IArrowSquareOut} onClick={() => setActiveTab('exam')}>محاكاة الامتحان (القراءة، الاستماع، الكتابة، التحدث)</Button>
             <Button variant="secondary" icon={IArrowSquareOut} onClick={() => setActiveTab('exercises')}>تمارين القواعد والمفردات</Button>
           </div>

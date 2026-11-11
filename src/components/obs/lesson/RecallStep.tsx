@@ -78,7 +78,7 @@ function RecallCard({ t, index, total, run, update, item, onNext }: StepProps & 
 
   return (
     <StepFrame kicker={`STAP 06 · HERHALEN · ${index + 1}/${total}`} title="تذكّر من الذاكرة، بلا نظر">
-      <form onSubmit={check} noValidate className="o-plane o-plane--raised" style={{ display: 'grid', gap: 12 }}>
+      <form onSubmit={check} noValidate className="o-plane o-plane--raised" style={{ display: 'grid', gap: 'var(--sp-3)' }}>
         <div className="o-row"><Chip tone="cobalt">{SOURCE_AR[t.source]}</Chip></div>
         <p className="o-h3">ما التعبير الهولندي لـ «{t.ar}»؟</p>
         {t.cue && <p className="o-nl o-example" lang="nl">{t.cue}</p>}

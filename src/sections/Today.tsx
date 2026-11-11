@@ -27,7 +27,7 @@ export default function Today() {
       <LayoutGroup id="today">
         {inLesson
           ? <LessonView item={item!} run={run!} onExit={() => { setMode('home'); requestAnimationFrame(() => document.getElementById('today-title')?.focus({ preventScroll: true })) }} />
-          : <TodayHome onOpenLesson={() => setMode('lesson')} />}
+          : <TodayHome className="page page--wide" onOpenLesson={() => setMode('lesson')} />}
       </LayoutGroup>
     </div>
   )

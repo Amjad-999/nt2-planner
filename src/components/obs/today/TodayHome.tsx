@@ -25,7 +25,7 @@ import { ILightbulb, IArrowRight } from '../icons'
    work, then two quiet cards (help, evidence). Scheduled time and actual time
    are always labelled as such and never summed together. */
 
-export function TodayHome({ onOpenLesson }: { onOpenLesson: () => void }) {
+export function TodayHome({ onOpenLesson, className }: { onOpenLesson: () => void; className: string }) {
   const [o, update] = useObs()
   const vocab = useAppStore((s) => s.vocab)
   const setActiveTab = useAppStore((s) => s.setActiveTab)
@@ -89,7 +89,7 @@ export function TodayHome({ onOpenLesson }: { onOpenLesson: () => void }) {
   const rpLive = o.roleplay && !o.roleplay.done ? findRoleplay(o.roleplay.scenarioId) : undefined
 
   return (
-    <motion.div className="o-page" variants={container} initial="hidden" animate="show">
+    <motion.div className={className} variants={container} initial="hidden" animate="show">
       <StatusStrip />
       <motion.div variants={itemV}>
         <TodayHero
@@ -112,7 +112,7 @@ export function TodayHome({ onOpenLesson }: { onOpenLesson: () => void }) {
               <hr className="o-divider" />
               <h2 className="o-h3" id="unfinished-title">أعمال غير مكتملة</h2>
               <p className="o-small">محفوظة كما تركتها — بلا مواعيد نهائية.</p>
-              <ul className="o-list" style={{ marginTop: 10 }} aria-labelledby="unfinished-title">
+              <ul className="o-list" style={{ marginTop: 'var(--sp-3)' }} aria-labelledby="unfinished-title">
                 {o.deferred.map((d) => {
                   const it = findItem(d.itemId)
                   return (
@@ -140,14 +140,14 @@ export function TodayHome({ onOpenLesson }: { onOpenLesson: () => void }) {
 
         <div className="o-stack">
           <motion.section variants={itemV} className="o-plane o-plane--quiet" style={{ border: '1px solid var(--o-line)' }} aria-labelledby="help-title">
-            <h2 className="o-h3 o-row" id="help-title" style={{ gap: 8 }}><ILightbulb size={20} />إن تعثّرت</h2>
+            <h2 className="o-h3 o-row" id="help-title" style={{ gap: 'var(--sp-2)' }}><ILightbulb size={20} />إن تعثّرت</h2>
             <p className="o-small">في كل سؤال مساعدة على ثلاث درجات، تفتحها أنت عند الحاجة:</p>
             <ol className="o-ladder">
               <li><span className="o-help__n">1</span>تلميح: الكلمة المفتاحية ومكان البحث</li>
               <li><span className="o-help__n">2</span>السؤال نفسه بهولندية أبسط</li>
               <li><span className="o-help__n">3</span>{o.settings.assistLang === 'ar' ? 'شرح المطلوب بالعربية' : 'الشرح بالعربية (مُطفأ في الإعدادات)'}</li>
             </ol>
-            <p className="o-small" style={{ marginTop: 8 }}>لا تُكشف الإجابة قبل أن تحاول. النص والمفردات متاحة في «لوحة السياق» داخل الدرس.</p>
+            <p className="o-small" style={{ marginTop: 'var(--sp-2)' }}>لا تُكشف الإجابة قبل أن تحاول. النص والمفردات متاحة في «لوحة السياق» داخل الدرس.</p>
           </motion.section>
 
           <motion.section variants={itemV} className="o-plane o-plane--quiet" style={{ border: '1px solid var(--o-line)' }} aria-labelledby="ev-title">

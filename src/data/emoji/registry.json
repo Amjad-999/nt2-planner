@@ -1,0 +1,1851 @@
+{
+ "$comment": "Every emoji the interface uses. Source of truth for scripts/build-emoji.py and src/tests/unit/emoji-registry.test.ts. `label` is the Arabic meaning, used as the accessible name when the emoji carries meaning on its own.",
+ "set": "Twemoji 15 (graphics CC-BY 4.0, font OFL 1.1)",
+ "emoji": [
+  {
+   "id": "alarm",
+   "char": "🚨",
+   "sequence": "U+1F6A8",
+   "role": "status",
+   "label": "تنبيه عاجل",
+   "asset": "src/assets/emoji/svg/1f6a8.svg",
+   "usedIn": [
+    "src/components/RootErrorBoundary.tsx",
+    "src/components/progress/SmartInsights.tsx",
+    "src/components/ui/Callout.tsx",
+    "src/store/useAppStore.ts",
+    "src/styles/tokens.css"
+   ]
+  },
+  {
+   "id": "check",
+   "char": "✅",
+   "sequence": "U+2705",
+   "role": "status",
+   "label": "صحيح / مكتمل",
+   "asset": "src/assets/emoji/svg/2705.svg",
+   "usedIn": [
+    "src/components/AiLookup.tsx",
+    "src/components/ExamCountdowns.tsx",
+    "src/components/FlashCard.tsx",
+    "src/components/GrammarExercises.tsx",
+    "src/components/Toast.tsx",
+    "src/components/progress/SmartInsights.tsx",
+    "src/components/ui/Callout.tsx",
+    "src/data/mascotDialogs.ts",
+    "src/features/achievements/badges.ts",
+    "src/features/tts/speakDutch.ts",
+    "src/sections/Exam.tsx",
+    "src/sections/Exercises.tsx",
+    "src/sections/Plan.tsx",
+    "src/sections/Stats.tsx",
+    "src/store/useAppStore.ts",
+    "src/styles/tokens.css"
+   ]
+  },
+  {
+   "id": "cross",
+   "char": "❌",
+   "sequence": "U+274C",
+   "role": "status",
+   "label": "خطأ / لم ينجح",
+   "asset": "src/assets/emoji/svg/274c.svg",
+   "usedIn": [
+    "src/components/AiLookup.tsx",
+    "src/components/FlashCard.tsx",
+    "src/components/SettingsModal.tsx",
+    "src/components/Toast.tsx",
+    "src/sections/Exam.tsx",
+    "src/sections/Exercises.tsx",
+    "src/styles/tokens.css"
+   ]
+  },
+  {
+   "id": "green-dot",
+   "char": "🟢",
+   "sequence": "U+1F7E2",
+   "role": "status",
+   "label": "درس: المضارع",
+   "asset": "src/assets/emoji/svg/1f7e2.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "hourglass",
+   "char": "⏳",
+   "sequence": "U+23F3",
+   "role": "status",
+   "label": "جارٍ التحميل",
+   "asset": "src/assets/emoji/svg/23f3.svg",
+   "usedIn": [
+    "src/components/AiLookup.tsx",
+    "src/components/ExamPdfViewer.tsx",
+    "src/components/FlashCard.tsx",
+    "src/components/WordCard.tsx",
+    "src/features/tts/speakDutch.ts",
+    "src/sections/Resources.tsx"
+   ]
+  },
+  {
+   "id": "lock",
+   "char": "🔒",
+   "sequence": "U+1F512",
+   "role": "status",
+   "label": "مقفل",
+   "asset": "src/assets/emoji/svg/1f512.svg",
+   "usedIn": [
+    "src/components/exam/ListeningAudio.tsx"
+   ]
+  },
+  {
+   "id": "new",
+   "char": "🆕",
+   "sequence": "U+1F195",
+   "role": "status",
+   "label": "جديد",
+   "asset": "src/assets/emoji/svg/1f195.svg",
+   "usedIn": [
+    "src/sections/Exam.tsx"
+   ]
+  },
+  {
+   "id": "no-entry",
+   "char": "⛔",
+   "sequence": "U+26D4",
+   "role": "status",
+   "label": "غير متوفر",
+   "asset": "src/assets/emoji/svg/26d4.svg",
+   "usedIn": [
+    "src/sections/Resources.tsx"
+   ]
+  },
+  {
+   "id": "prohibited",
+   "char": "🚫",
+   "sequence": "U+1F6AB",
+   "role": "status",
+   "label": "درس: النفي",
+   "asset": "src/assets/emoji/svg/1f6ab.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "question",
+   "char": "❓",
+   "sequence": "U+2753",
+   "role": "status",
+   "label": "درس: أدوات الاستفهام",
+   "asset": "src/assets/emoji/svg/2753.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "warning",
+   "char": "⚠️",
+   "sequence": "U+26A0 U+FE0F",
+   "role": "status",
+   "label": "تنبيه",
+   "asset": "src/assets/emoji/svg/26a0-fe0f.svg",
+   "usedIn": [
+    "src/components/AiLookup.tsx",
+    "src/components/TabErrorBoundary.tsx",
+    "src/components/Toast.tsx",
+    "src/components/WordCard.tsx",
+    "src/components/auth/AuthBar.tsx",
+    "src/components/exam/WritingFeedbackPanel.tsx",
+    "src/components/practice/ListenButton.tsx",
+    "src/components/progress/SmartInsights.tsx",
+    "src/components/ui/Callout.tsx",
+    "src/data/resources.ts",
+    "src/store/useAppStore.ts",
+    "src/styles/tokens.css"
+   ]
+  },
+  {
+   "id": "arrow-down",
+   "char": "⬇️",
+   "sequence": "U+2B07 U+FE0F",
+   "role": "action",
+   "label": "تنزيل",
+   "asset": "src/assets/emoji/svg/2b07-fe0f.svg",
+   "usedIn": [
+    "src/components/RootErrorBoundary.tsx"
+   ]
+  },
+  {
+   "id": "arrow-up",
+   "char": "⬆️",
+   "sequence": "U+2B06 U+FE0F",
+   "role": "action",
+   "label": "مشاركة / إلى الأعلى",
+   "asset": "src/assets/emoji/svg/2b06-fe0f.svg",
+   "usedIn": [
+    "src/components/AppShell.tsx"
+   ]
+  },
+  {
+   "id": "dice",
+   "char": "🎲",
+   "sequence": "U+1F3B2",
+   "role": "action",
+   "label": "عشوائي",
+   "asset": "src/assets/emoji/svg/1f3b2.svg",
+   "usedIn": [
+    "src/components/mascot/MascotPanel.tsx"
+   ]
+  },
+  {
+   "id": "door",
+   "char": "🚪",
+   "sequence": "U+1F6AA",
+   "role": "action",
+   "label": "تسجيل الخروج",
+   "asset": "src/assets/emoji/svg/1f6aa.svg",
+   "usedIn": [
+    "src/components/auth/UserProfile.tsx"
+   ]
+  },
+  {
+   "id": "gear",
+   "char": "⚙️",
+   "sequence": "U+2699 U+FE0F",
+   "role": "action",
+   "label": "الإعدادات",
+   "asset": "src/assets/emoji/svg/2699-fe0f.svg",
+   "usedIn": [
+    "src/components/SettingsModal.tsx",
+    "src/store/useAppStore.ts"
+   ]
+  },
+  {
+   "id": "inbox-in",
+   "char": "📥",
+   "sequence": "U+1F4E5",
+   "role": "action",
+   "label": "استيراد",
+   "asset": "src/assets/emoji/svg/1f4e5.svg",
+   "usedIn": [
+    "src/components/SettingsModal.tsx"
+   ]
+  },
+  {
+   "id": "key",
+   "char": "🔑",
+   "sequence": "U+1F511",
+   "role": "action",
+   "label": "كلمة المرور / درس: hebben و zijn",
+   "asset": "src/assets/emoji/svg/1f511.svg",
+   "usedIn": [
+    "src/components/auth/LoginForm.tsx",
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "keyboard",
+   "char": "⌨️",
+   "sequence": "U+2328 U+FE0F",
+   "role": "action",
+   "label": "اختصارات لوحة المفاتيح",
+   "asset": "src/assets/emoji/svg/2328-fe0f.svg",
+   "usedIn": [
+    "src/components/FlashCard.tsx"
+   ]
+  },
+  {
+   "id": "outbox",
+   "char": "📤",
+   "sequence": "U+1F4E4",
+   "role": "action",
+   "label": "تصدير",
+   "asset": "src/assets/emoji/svg/1f4e4.svg",
+   "usedIn": [
+    "src/components/SettingsModal.tsx"
+   ]
+  },
+  {
+   "id": "plus",
+   "char": "➕",
+   "sequence": "U+2795",
+   "role": "action",
+   "label": "إضافة",
+   "asset": "src/assets/emoji/svg/2795.svg",
+   "usedIn": [
+    "src/components/AiLookup.tsx",
+    "src/sections/Exam.tsx"
+   ]
+  },
+  {
+   "id": "point",
+   "char": "👉",
+   "sequence": "U+1F449",
+   "role": "action",
+   "label": "انظر هنا / درس: أسماء الإشارة",
+   "asset": "src/assets/emoji/svg/1f449.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts",
+    "src/hooks/useMascot.ts"
+   ]
+  },
+  {
+   "id": "previous",
+   "char": "⏮️",
+   "sequence": "U+23EE U+FE0F",
+   "role": "action",
+   "label": "درس: الماضي الأسبق",
+   "asset": "src/assets/emoji/svg/23ee-fe0f.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "refresh",
+   "char": "🔄",
+   "sequence": "U+1F504",
+   "role": "action",
+   "label": "إعادة المحاولة / درس: القلب",
+   "asset": "src/assets/emoji/svg/1f504.svg",
+   "usedIn": [
+    "src/components/RootErrorBoundary.tsx",
+    "src/components/TabErrorBoundary.tsx",
+    "src/data/lessons/index.ts",
+    "src/sections/Exam.tsx",
+    "src/sections/Exercises.tsx"
+   ]
+  },
+  {
+   "id": "repeat",
+   "char": "🔁",
+   "sequence": "U+1F501",
+   "role": "action",
+   "label": "تكرار / درس: المبني للمجهول (موسّع)",
+   "asset": "src/assets/emoji/svg/1f501.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "return",
+   "char": "↩️",
+   "sequence": "U+21A9 U+FE0F",
+   "role": "action",
+   "label": "درس: كلمات الإحالة",
+   "asset": "src/assets/emoji/svg/21a9-fe0f.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "rewind",
+   "char": "⏪",
+   "sequence": "U+23EA",
+   "role": "action",
+   "label": "درس: الماضي التام (B1)",
+   "asset": "src/assets/emoji/svg/23ea.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "robot",
+   "char": "🤖",
+   "sequence": "U+1F916",
+   "role": "action",
+   "label": "مساعد الذكاء الاصطناعي",
+   "asset": "src/assets/emoji/svg/1f916.svg",
+   "usedIn": [
+    "src/components/AiLookup.tsx"
+   ]
+  },
+  {
+   "id": "rocket",
+   "char": "🚀",
+   "sequence": "U+1F680",
+   "role": "action",
+   "label": "ابدأ",
+   "asset": "src/assets/emoji/svg/1f680.svg",
+   "usedIn": [
+    "src/components/OnboardModal.tsx",
+    "src/components/auth/SignupForm.tsx",
+    "src/sections/Platform.tsx"
+   ]
+  },
+  {
+   "id": "save",
+   "char": "💾",
+   "sequence": "U+1F4BE",
+   "role": "action",
+   "label": "حفظ",
+   "asset": "src/assets/emoji/svg/1f4be.svg",
+   "usedIn": [
+    "src/components/auth/UserProfile.tsx",
+    "src/components/countdown/ExamDateModal.tsx"
+   ]
+  },
+  {
+   "id": "search",
+   "char": "🔍",
+   "sequence": "U+1F50D",
+   "role": "action",
+   "label": "بحث",
+   "asset": "src/assets/emoji/svg/1f50d.svg",
+   "usedIn": [
+    "src/components/AiLookup.tsx",
+    "src/components/mascot/MascotPanel.tsx",
+    "src/sections/Exam.tsx"
+   ]
+  },
+  {
+   "id": "shuffle",
+   "char": "🔀",
+   "sequence": "U+1F500",
+   "role": "action",
+   "label": "ترتيب الجمل / درس: جمل الشرط",
+   "asset": "src/assets/emoji/svg/1f500.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts",
+    "src/sections/Exercises.tsx"
+   ]
+  },
+  {
+   "id": "speaker",
+   "char": "🔊",
+   "sequence": "U+1F50A",
+   "role": "action",
+   "label": "استمع إلى النطق",
+   "asset": "src/assets/emoji/svg/1f50a.svg",
+   "usedIn": [
+    "src/components/AiLookup.tsx",
+    "src/components/FlashCard.tsx",
+    "src/components/SettingsModal.tsx",
+    "src/components/WordCard.tsx",
+    "src/features/tts/speakDutch.ts",
+    "src/sections/Exam.tsx",
+    "src/sections/Resources.tsx"
+   ]
+  },
+  {
+   "id": "stop",
+   "char": "⏹️",
+   "sequence": "U+23F9 U+FE0F",
+   "role": "action",
+   "label": "إيقاف",
+   "asset": "src/assets/emoji/svg/23f9-fe0f.svg",
+   "usedIn": [
+    "src/sections/Exam.tsx"
+   ]
+  },
+  {
+   "id": "studio-mic",
+   "char": "🎙️",
+   "sequence": "U+1F399 U+FE0F",
+   "role": "action",
+   "label": "سجّل صوتك",
+   "asset": "src/assets/emoji/svg/1f399-fe0f.svg",
+   "usedIn": [
+    "src/components/SpeakAndCheck.tsx",
+    "src/components/WordCard.tsx",
+    "src/components/practice/SituationDialogue.tsx"
+   ]
+  },
+  {
+   "id": "trash",
+   "char": "🗑️",
+   "sequence": "U+1F5D1 U+FE0F",
+   "role": "action",
+   "label": "حذف",
+   "asset": "src/assets/emoji/svg/1f5d1-fe0f.svg",
+   "usedIn": [
+    "src/components/SettingsModal.tsx"
+   ]
+  },
+  {
+   "id": "abc",
+   "char": "🔤",
+   "sequence": "U+1F524",
+   "role": "topic",
+   "label": "المفردات / درس: ترتيب الكلمات",
+   "asset": "src/assets/emoji/svg/1f524.svg",
+   "usedIn": [
+    "src/components/mascot/MascotPanel.tsx",
+    "src/data/lessons/index.ts",
+    "src/sections/Exam.tsx"
+   ]
+  },
+  {
+   "id": "book-blue",
+   "char": "📘",
+   "sequence": "U+1F4D8",
+   "role": "topic",
+   "label": "كتاب (أزرق)",
+   "asset": "src/assets/emoji/svg/1f4d8.svg",
+   "usedIn": [
+    "src/data/books.ts"
+   ]
+  },
+  {
+   "id": "book-green",
+   "char": "📗",
+   "sequence": "U+1F4D7",
+   "role": "topic",
+   "label": "كتاب (أخضر)",
+   "asset": "src/assets/emoji/svg/1f4d7.svg",
+   "usedIn": [
+    "src/data/books.ts"
+   ]
+  },
+  {
+   "id": "book-orange",
+   "char": "📙",
+   "sequence": "U+1F4D9",
+   "role": "topic",
+   "label": "كتاب (برتقالي)",
+   "asset": "src/assets/emoji/svg/1f4d9.svg",
+   "usedIn": [
+    "src/data/books.ts"
+   ]
+  },
+  {
+   "id": "book-red",
+   "char": "📕",
+   "sequence": "U+1F4D5",
+   "role": "topic",
+   "label": "كتاب (أحمر)",
+   "asset": "src/assets/emoji/svg/1f4d5.svg",
+   "usedIn": [
+    "src/data/books.ts"
+   ]
+  },
+  {
+   "id": "books",
+   "char": "📚",
+   "sequence": "U+1F4DA",
+   "role": "topic",
+   "label": "الكتب والوحدات",
+   "asset": "src/assets/emoji/svg/1f4da.svg",
+   "usedIn": [
+    "src/components/auth/UserProfile.tsx",
+    "src/components/progress/StudyKpis.tsx",
+    "src/components/vocab/WordMeaningVisual.tsx",
+    "src/data/botHelp.ts",
+    "src/features/achievements/badges.ts",
+    "src/sections/Books.tsx",
+    "src/sections/Exercises.tsx",
+    "src/sections/Stats.tsx"
+   ]
+  },
+  {
+   "id": "bulb",
+   "char": "💡",
+   "sequence": "U+1F4A1",
+   "role": "topic",
+   "label": "نصيحة",
+   "asset": "src/assets/emoji/svg/1f4a1.svg",
+   "usedIn": [
+    "src/components/vocab/WordMeaningVisual.tsx",
+    "src/sections/Resources.tsx",
+    "src/sections/Stats.tsx"
+   ]
+  },
+  {
+   "id": "clapper",
+   "char": "🎬",
+   "sequence": "U+1F3AC",
+   "role": "topic",
+   "label": "فيديو",
+   "asset": "src/assets/emoji/svg/1f3ac.svg",
+   "usedIn": [
+    "src/sections/Resources.tsx"
+   ]
+  },
+  {
+   "id": "clipboard",
+   "char": "📋",
+   "sequence": "U+1F4CB",
+   "role": "topic",
+   "label": "قائمة المهام",
+   "asset": "src/assets/emoji/svg/1f4cb.svg",
+   "usedIn": [
+    "src/components/mascot/MascotPanel.tsx",
+    "src/sections/Resources.tsx"
+   ]
+  },
+  {
+   "id": "compass",
+   "char": "🧭",
+   "sequence": "U+1F9ED",
+   "role": "topic",
+   "label": "التوجيه / الخطوة التالية",
+   "asset": "src/assets/emoji/svg/1f9ed.svg",
+   "usedIn": [
+    "src/components/mascot/MascotPanel.tsx",
+    "src/components/progress/SmartInsights.tsx",
+    "src/data/botHelp.ts"
+   ]
+  },
+  {
+   "id": "dividers",
+   "char": "🗂️",
+   "sequence": "U+1F5C2 U+FE0F",
+   "role": "topic",
+   "label": "بطاقات المراجعة",
+   "asset": "src/assets/emoji/svg/1f5c2-fe0f.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts",
+    "src/sections/Exam.tsx"
+   ]
+  },
+  {
+   "id": "flag-nl",
+   "char": "🇳🇱",
+   "sequence": "U+1F1F3 U+1F1F1",
+   "role": "topic",
+   "label": "الهولندية",
+   "asset": "src/assets/emoji/svg/1f1f3-1f1f1.svg",
+   "usedIn": [
+    "src/components/auth/AuthModal.tsx",
+    "src/components/mascot/MascotPanel.tsx",
+    "src/data/dutchCulture.ts",
+    "src/sections/Exercises.tsx"
+   ]
+  },
+  {
+   "id": "game",
+   "char": "🎮",
+   "sequence": "U+1F3AE",
+   "role": "topic",
+   "label": "تمارين تفاعلية",
+   "asset": "src/assets/emoji/svg/1f3ae.svg",
+   "usedIn": [
+    "src/data/botHelp.ts",
+    "src/sections/Exercises.tsx"
+   ]
+  },
+  {
+   "id": "globe",
+   "char": "🌍",
+   "sequence": "U+1F30D",
+   "role": "topic",
+   "label": "مصادر على الإنترنت",
+   "asset": "src/assets/emoji/svg/1f30d.svg",
+   "usedIn": [
+    "src/data/botHelp.ts",
+    "src/sections/Resources.tsx"
+   ]
+  },
+  {
+   "id": "graduation",
+   "char": "🎓",
+   "sequence": "U+1F393",
+   "role": "topic",
+   "label": "الامتحان / الاندماج",
+   "asset": "src/assets/emoji/svg/1f393.svg",
+   "usedIn": [
+    "src/components/ExamCountdowns.tsx",
+    "src/data/resources.ts",
+    "src/features/achievements/badges.ts",
+    "src/features/mascot/appInsight.ts"
+   ]
+  },
+  {
+   "id": "headphones",
+   "char": "🎧",
+   "sequence": "U+1F3A7",
+   "role": "topic",
+   "label": "الاستماع",
+   "asset": "src/assets/emoji/svg/1f3a7.svg",
+   "usedIn": [
+    "src/data/examPdfs.ts",
+    "src/sections/Exam.tsx",
+    "src/sections/Stats.tsx"
+   ]
+  },
+  {
+   "id": "institution",
+   "char": "🏛️",
+   "sequence": "U+1F3DB U+FE0F",
+   "role": "topic",
+   "label": "البلدية والمؤسسات / درس: الأسلوب الاسمي",
+   "asset": "src/assets/emoji/svg/1f3db-fe0f.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts",
+    "src/data/mascotDialogs.ts",
+    "src/data/situations.ts"
+   ]
+  },
+  {
+   "id": "link",
+   "char": "🔗",
+   "sequence": "U+1F517",
+   "role": "topic",
+   "label": "مطابقة / رابط / درس: أدوات الربط",
+   "asset": "src/assets/emoji/svg/1f517.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts",
+    "src/data/resources.ts",
+    "src/sections/Exercises.tsx",
+    "src/sections/Platform.tsx"
+   ]
+  },
+  {
+   "id": "memo",
+   "char": "📝",
+   "sequence": "U+1F4DD",
+   "role": "topic",
+   "label": "ملاحظات / درس: الأفعال مع te",
+   "asset": "src/assets/emoji/svg/1f4dd.svg",
+   "usedIn": [
+    "src/components/AiLookup.tsx",
+    "src/data/lessons/index.ts",
+    "src/features/achievements/badges.ts",
+    "src/sections/Exam.tsx",
+    "src/sections/Exercises.tsx"
+   ]
+  },
+  {
+   "id": "newspaper",
+   "char": "📰",
+   "sequence": "U+1F4F0",
+   "role": "topic",
+   "label": "الأخبار",
+   "asset": "src/assets/emoji/svg/1f4f0.svg",
+   "usedIn": [
+    "src/components/mascot/MascotPanel.tsx"
+   ]
+  },
+  {
+   "id": "note",
+   "char": "🎵",
+   "sequence": "U+1F3B5",
+   "role": "topic",
+   "label": "مقاطع صوتية",
+   "asset": "src/assets/emoji/svg/1f3b5.svg",
+   "usedIn": [
+    "src/data/mascotDialogs.ts",
+    "src/sections/Resources.tsx"
+   ]
+  },
+  {
+   "id": "open-book",
+   "char": "📖",
+   "sequence": "U+1F4D6",
+   "role": "topic",
+   "label": "القراءة / درس",
+   "asset": "src/assets/emoji/svg/1f4d6.svg",
+   "usedIn": [
+    "src/components/AiLookup.tsx",
+    "src/components/mascot/MascotPanel.tsx",
+    "src/data/examPdfs.ts",
+    "src/data/mascotDialogs.ts",
+    "src/data/resources.ts",
+    "src/features/achievements/badges.ts",
+    "src/features/mascot/appInsight.ts",
+    "src/hooks/useMascot.ts",
+    "src/sections/Exam.tsx",
+    "src/sections/Grammar.tsx",
+    "src/sections/Platform.tsx",
+    "src/sections/Stats.tsx"
+   ]
+  },
+  {
+   "id": "page",
+   "char": "📄",
+   "sequence": "U+1F4C4",
+   "role": "topic",
+   "label": "ملف PDF",
+   "asset": "src/assets/emoji/svg/1f4c4.svg",
+   "usedIn": [
+    "src/sections/Resources.tsx"
+   ]
+  },
+  {
+   "id": "pencil",
+   "char": "✏️",
+   "sequence": "U+270F U+FE0F",
+   "role": "topic",
+   "label": "تمارين / تعديل",
+   "asset": "src/assets/emoji/svg/270f-fe0f.svg",
+   "usedIn": [
+    "src/components/AiLookup.tsx",
+    "src/components/GrammarExercises.tsx",
+    "src/data/botHelp.ts",
+    "src/sections/Platform.tsx"
+   ]
+  },
+  {
+   "id": "pin",
+   "char": "📍",
+   "sequence": "U+1F4CD",
+   "role": "topic",
+   "label": "السياق / موقعك في الخطة / درس: حروف الجرّ",
+   "asset": "src/assets/emoji/svg/1f4cd.svg",
+   "usedIn": [
+    "src/components/hero/JourneyHero.tsx",
+    "src/components/practice/SituationDialogue.tsx",
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "puzzle",
+   "char": "🧩",
+   "sequence": "U+1F9E9",
+   "role": "topic",
+   "label": "ملء الفراغ / درس: الأفعال المساعدة",
+   "asset": "src/assets/emoji/svg/1f9e9.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts",
+    "src/sections/Exercises.tsx"
+   ]
+  },
+  {
+   "id": "scroll",
+   "char": "📜",
+   "sequence": "U+1F4DC",
+   "role": "topic",
+   "label": "وثيقة رسمية / نموذج",
+   "asset": "src/assets/emoji/svg/1f4dc.svg",
+   "usedIn": [
+    "src/data/resources.ts",
+    "src/sections/Exam.tsx"
+   ]
+  },
+  {
+   "id": "speaking-head",
+   "char": "🗣️",
+   "sequence": "U+1F5E3 U+FE0F",
+   "role": "topic",
+   "label": "التحدّث",
+   "asset": "src/assets/emoji/svg/1f5e3-fe0f.svg",
+   "usedIn": [
+    "src/data/examPdfs.ts",
+    "src/sections/Exam.tsx",
+    "src/sections/Stats.tsx"
+   ]
+  },
+  {
+   "id": "speech",
+   "char": "💬",
+   "sequence": "U+1F4AC",
+   "role": "topic",
+   "label": "حوار / اقتباس / درس: الكلام غير المباشر",
+   "asset": "src/assets/emoji/svg/1f4ac.svg",
+   "usedIn": [
+    "src/components/dashboard/QuoteTicker.tsx",
+    "src/components/dashboard/TodayFocus.tsx",
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "star",
+   "char": "⭐",
+   "sequence": "U+2B50",
+   "role": "topic",
+   "label": "مميّز",
+   "asset": "src/assets/emoji/svg/2b50.svg",
+   "usedIn": [
+    "src/data/botHelp.ts",
+    "src/data/resources.ts",
+    "src/sections/Platform.tsx"
+   ]
+  },
+  {
+   "id": "writing-hand",
+   "char": "✍️",
+   "sequence": "U+270D U+FE0F",
+   "role": "topic",
+   "label": "الكتابة",
+   "asset": "src/assets/emoji/svg/270d-fe0f.svg",
+   "usedIn": [
+    "src/data/examPdfs.ts",
+    "src/sections/Exam.tsx",
+    "src/sections/Stats.tsx"
+   ]
+  },
+  {
+   "id": "alarm-clock",
+   "char": "⏰",
+   "sequence": "U+23F0",
+   "role": "time",
+   "label": "مستحقّ للمراجعة",
+   "asset": "src/assets/emoji/svg/23f0.svg",
+   "usedIn": [
+    "src/components/WordCard.tsx",
+    "src/components/progress/SmartInsights.tsx",
+    "src/sections/Vocab.tsx"
+   ]
+  },
+  {
+   "id": "calendar",
+   "char": "📅",
+   "sequence": "U+1F4C5",
+   "role": "time",
+   "label": "تاريخ الامتحان",
+   "asset": "src/assets/emoji/svg/1f4c5.svg",
+   "usedIn": [
+    "src/components/countdown/ExamCountdownRing.tsx",
+    "src/components/countdown/ExamDateModal.tsx",
+    "src/components/progress/SmartInsights.tsx"
+   ]
+  },
+  {
+   "id": "mantel-clock",
+   "char": "🕰️",
+   "sequence": "U+1F570 U+FE0F",
+   "role": "time",
+   "label": "درس: الماضي التام",
+   "asset": "src/assets/emoji/svg/1f570-fe0f.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "planner",
+   "char": "🗓️",
+   "sequence": "U+1F5D3 U+FE0F",
+   "role": "time",
+   "label": "خطة الدراسة",
+   "asset": "src/assets/emoji/svg/1f5d3-fe0f.svg",
+   "usedIn": [
+    "src/data/botHelp.ts",
+    "src/sections/Plan.tsx"
+   ]
+  },
+  {
+   "id": "stopwatch",
+   "char": "⏱️",
+   "sequence": "U+23F1 U+FE0F",
+   "role": "time",
+   "label": "وقت الدراسة / المؤقّت",
+   "asset": "src/assets/emoji/svg/23f1-fe0f.svg",
+   "usedIn": [
+    "src/components/StudyTimeModal.tsx",
+    "src/components/exam/MockExamPanel.tsx",
+    "src/components/hero/JourneyHero.tsx",
+    "src/components/progress/StudyKpis.tsx",
+    "src/features/mascot/appInsight.ts",
+    "src/sections/Dashboard.tsx",
+    "src/sections/Exam.tsx",
+    "src/sections/Platform.tsx",
+    "src/sections/Stats.tsx"
+   ]
+  },
+  {
+   "id": "bar-chart",
+   "char": "📊",
+   "sequence": "U+1F4CA",
+   "role": "progress",
+   "label": "التحليلات",
+   "asset": "src/assets/emoji/svg/1f4ca.svg",
+   "usedIn": [
+    "src/components/mascot/MascotPanel.tsx",
+    "src/components/progress/StudyKpis.tsx",
+    "src/features/mascot/appInsight.ts",
+    "src/sections/Stats.tsx"
+   ]
+  },
+  {
+   "id": "brain",
+   "char": "🧠",
+   "sequence": "U+1F9E0",
+   "role": "progress",
+   "label": "الذاكرة / المراجعة المتباعدة",
+   "asset": "src/assets/emoji/svg/1f9e0.svg",
+   "usedIn": [
+    "src/data/botHelp.ts",
+    "src/features/achievements/badges.ts",
+    "src/features/mascot/appInsight.ts",
+    "src/sections/Plan.tsx"
+   ]
+  },
+  {
+   "id": "chart-down",
+   "char": "📉",
+   "sequence": "U+1F4C9",
+   "role": "progress",
+   "label": "تراجع",
+   "asset": "src/assets/emoji/svg/1f4c9.svg",
+   "usedIn": [
+    "src/components/progress/SmartInsights.tsx"
+   ]
+  },
+  {
+   "id": "chart-up",
+   "char": "📈",
+   "sequence": "U+1F4C8",
+   "role": "progress",
+   "label": "تقدّم صاعد / ذروة",
+   "asset": "src/assets/emoji/svg/1f4c8.svg",
+   "usedIn": [
+    "src/components/progress/SmartInsights.tsx",
+    "src/data/botHelp.ts",
+    "src/features/mascot/appInsight.ts",
+    "src/sections/Dashboard.tsx",
+    "src/sections/Stats.tsx"
+   ]
+  },
+  {
+   "id": "fire",
+   "char": "🔥",
+   "sequence": "U+1F525",
+   "role": "progress",
+   "label": "أيام المواظبة",
+   "asset": "src/assets/emoji/svg/1f525.svg",
+   "usedIn": [
+    "src/components/auth/UserProfile.tsx",
+    "src/components/hero/JourneyHero.tsx",
+    "src/components/progress/StudyKpis.tsx",
+    "src/data/mascotDialogs.ts",
+    "src/features/achievements/badges.ts",
+    "src/features/mascot/appInsight.ts",
+    "src/sections/Stats.tsx"
+   ]
+  },
+  {
+   "id": "muscle",
+   "char": "💪",
+   "sequence": "U+1F4AA",
+   "role": "progress",
+   "label": "استمر",
+   "asset": "src/assets/emoji/svg/1f4aa.svg",
+   "usedIn": [
+    "src/hooks/useMascot.ts",
+    "src/sections/Exercises.tsx"
+   ]
+  },
+  {
+   "id": "seedling",
+   "char": "🌱",
+   "sequence": "U+1F331",
+   "role": "progress",
+   "label": "بداية",
+   "asset": "src/assets/emoji/svg/1f331.svg",
+   "usedIn": [
+    "src/features/achievements/badges.ts",
+    "src/features/mascot/appInsight.ts",
+    "src/sections/Stats.tsx"
+   ]
+  },
+  {
+   "id": "target",
+   "char": "🎯",
+   "sequence": "U+1F3AF",
+   "role": "progress",
+   "label": "الهدف / درس: جمل الغرض",
+   "asset": "src/assets/emoji/svg/1f3af.svg",
+   "usedIn": [
+    "src/components/auth/UserProfile.tsx",
+    "src/components/hero/JourneyHero.tsx",
+    "src/components/progress/SmartInsights.tsx",
+    "src/components/progress/StudyKpis.tsx",
+    "src/data/botHelp.ts",
+    "src/data/lessons/index.ts",
+    "src/data/mascotDialogs.ts",
+    "src/features/mascot/appInsight.ts",
+    "src/styles/tokens.css"
+   ]
+  },
+  {
+   "id": "thinking",
+   "char": "🤔",
+   "sequence": "U+1F914",
+   "role": "progress",
+   "label": "صعب / غير متأكد",
+   "asset": "src/assets/emoji/svg/1f914.svg",
+   "usedIn": [
+    "src/components/FlashCard.tsx",
+    "src/data/mascotDialogs.ts"
+   ]
+  },
+  {
+   "id": "thumbs-up",
+   "char": "👍",
+   "sequence": "U+1F44D",
+   "role": "progress",
+   "label": "جيد",
+   "asset": "src/assets/emoji/svg/1f44d.svg",
+   "usedIn": [
+    "src/components/FlashCard.tsx",
+    "src/features/speaking/similarity.ts",
+    "src/sections/Exercises.tsx"
+   ]
+  },
+  {
+   "id": "bolt",
+   "char": "⚡",
+   "sequence": "U+26A1",
+   "role": "celebration",
+   "label": "سرعة",
+   "asset": "src/assets/emoji/svg/26a1.svg",
+   "usedIn": [
+    "src/features/achievements/badges.ts"
+   ]
+  },
+  {
+   "id": "confetti",
+   "char": "🎊",
+   "sequence": "U+1F38A",
+   "role": "celebration",
+   "label": "احتفال كبير",
+   "asset": "src/assets/emoji/svg/1f38a.svg",
+   "usedIn": [
+    "src/data/mascotDialogs.ts"
+   ]
+  },
+  {
+   "id": "crown",
+   "char": "👑",
+   "sequence": "U+1F451",
+   "role": "celebration",
+   "label": "إتقان",
+   "asset": "src/assets/emoji/svg/1f451.svg",
+   "usedIn": [
+    "src/features/achievements/badges.ts"
+   ]
+  },
+  {
+   "id": "gem",
+   "char": "💎",
+   "sequence": "U+1F48E",
+   "role": "celebration",
+   "label": "إنجاز نادر",
+   "asset": "src/assets/emoji/svg/1f48e.svg",
+   "usedIn": [
+    "src/features/achievements/badges.ts"
+   ]
+  },
+  {
+   "id": "gold",
+   "char": "🥇",
+   "sequence": "U+1F947",
+   "role": "celebration",
+   "label": "المركز الأول",
+   "asset": "src/assets/emoji/svg/1f947.svg",
+   "usedIn": [
+    "src/data/mascotDialogs.ts"
+   ]
+  },
+  {
+   "id": "medal",
+   "char": "🏅",
+   "sequence": "U+1F3C5",
+   "role": "celebration",
+   "label": "وسام",
+   "asset": "src/assets/emoji/svg/1f3c5.svg",
+   "usedIn": [
+    "src/components/AchievementsPanel.tsx",
+    "src/data/mascotDialogs.ts"
+   ]
+  },
+  {
+   "id": "party",
+   "char": "🎉",
+   "sequence": "U+1F389",
+   "role": "celebration",
+   "label": "احتفال",
+   "asset": "src/assets/emoji/svg/1f389.svg",
+   "usedIn": [
+    "src/components/SmartGreeting.tsx",
+    "src/components/countdown/ExamCountdownRing.tsx",
+    "src/components/mascot/MascotPanel.tsx",
+    "src/data/mascotDialogs.ts",
+    "src/features/speaking/similarity.ts",
+    "src/sections/Exercises.tsx",
+    "src/store/useAppStore.ts"
+   ]
+  },
+  {
+   "id": "sparkles",
+   "char": "✨",
+   "sequence": "U+2728",
+   "role": "celebration",
+   "label": "إنجاز جديد",
+   "asset": "src/assets/emoji/svg/2728.svg",
+   "usedIn": [
+    "src/components/auth/LoginForm.tsx",
+    "src/data/mascotDialogs.ts",
+    "src/features/achievements/badges.ts"
+   ]
+  },
+  {
+   "id": "trophy",
+   "char": "🏆",
+   "sequence": "U+1F3C6",
+   "role": "celebration",
+   "label": "كأس",
+   "asset": "src/assets/emoji/svg/1f3c6.svg",
+   "usedIn": [
+    "src/features/achievements/badges.ts"
+   ]
+  },
+  {
+   "id": "bicycle",
+   "char": "🚲",
+   "sequence": "U+1F6B2",
+   "role": "mascot",
+   "label": "الدرّاجة",
+   "asset": "src/assets/emoji/svg/1f6b2.svg",
+   "usedIn": [
+    "src/components/vocab/WordMeaningVisual.tsx",
+    "src/data/mascotDialogs.ts"
+   ]
+  },
+  {
+   "id": "cat",
+   "char": "🐱",
+   "sequence": "U+1F431",
+   "role": "mascot",
+   "label": "كاتيا",
+   "asset": "src/assets/emoji/svg/1f431.svg",
+   "usedIn": [
+    "src/components/SettingsModal.tsx",
+    "src/components/mascot/LiveResult.tsx",
+    "src/components/mascot/MascotBubble.tsx",
+    "src/components/mascot/MascotPanel.tsx",
+    "src/data/dutchJokes.ts",
+    "src/data/mascotDialogs.ts",
+    "src/styles/globals.css"
+   ]
+  },
+  {
+   "id": "cat-joy",
+   "char": "😹",
+   "sequence": "U+1F639",
+   "role": "mascot",
+   "label": "نكتة",
+   "asset": "src/assets/emoji/svg/1f639.svg",
+   "usedIn": [
+    "src/components/mascot/MascotPanel.tsx",
+    "src/data/dutchJokes.ts",
+    "src/data/mascotDialogs.ts",
+    "src/hooks/useMascot.ts"
+   ]
+  },
+  {
+   "id": "cyclist",
+   "char": "🚴",
+   "sequence": "U+1F6B4",
+   "role": "mascot",
+   "label": "ركوب الدرّاجة",
+   "asset": "src/assets/emoji/svg/1f6b4.svg",
+   "usedIn": [
+    "src/data/mascotDialogs.ts"
+   ]
+  },
+  {
+   "id": "dancer",
+   "char": "💃",
+   "sequence": "U+1F483",
+   "role": "mascot",
+   "label": "رقصة كاتيا",
+   "asset": "src/assets/emoji/svg/1f483.svg",
+   "usedIn": [
+    "src/components/mascot/MascotPanel.tsx",
+    "src/data/mascotDialogs.ts"
+   ]
+  },
+  {
+   "id": "happy-tear",
+   "char": "🥲",
+   "sequence": "U+1F972",
+   "role": "mascot",
+   "label": "تأثّر",
+   "asset": "src/assets/emoji/svg/1f972.svg",
+   "usedIn": [
+    "src/data/mascotDialogs.ts"
+   ]
+  },
+  {
+   "id": "paws",
+   "char": "🐾",
+   "sequence": "U+1F43E",
+   "role": "mascot",
+   "label": "كاتيا",
+   "asset": "src/assets/emoji/svg/1f43e.svg",
+   "usedIn": [
+    "src/data/mascotDialogs.ts"
+   ]
+  },
+  {
+   "id": "sleepy",
+   "char": "😴",
+   "sequence": "U+1F634",
+   "role": "mascot",
+   "label": "كاتيا نعسانة",
+   "asset": "src/assets/emoji/svg/1f634.svg",
+   "usedIn": [
+    "src/data/mascotDialogs.ts"
+   ]
+  },
+  {
+   "id": "smile",
+   "char": "😊",
+   "sequence": "U+1F60A",
+   "role": "mascot",
+   "label": "سعادة",
+   "asset": "src/assets/emoji/svg/1f60a.svg",
+   "usedIn": [
+    "src/data/mascotDialogs.ts"
+   ]
+  },
+  {
+   "id": "tulip",
+   "char": "🌷",
+   "sequence": "U+1F337",
+   "role": "mascot",
+   "label": "ثقافة هولندية",
+   "asset": "src/assets/emoji/svg/1f337.svg",
+   "usedIn": [
+    "src/data/dutchCulture.ts"
+   ]
+  },
+  {
+   "id": "wave",
+   "char": "🌊",
+   "sequence": "U+1F30A",
+   "role": "mascot",
+   "label": "البحر والقنوات",
+   "asset": "src/assets/emoji/svg/1f30a.svg",
+   "usedIn": [
+    "src/data/mascotDialogs.ts"
+   ]
+  },
+  {
+   "id": "cloud",
+   "char": "☁️",
+   "sequence": "U+2601 U+FE0F",
+   "role": "weather",
+   "label": "غائم / الحفظ السحابي",
+   "asset": "src/assets/emoji/svg/2601-fe0f.svg",
+   "usedIn": [
+    "src/components/CloudPanel.tsx",
+    "src/features/world/weather.ts"
+   ]
+  },
+  {
+   "id": "fog",
+   "char": "🌫️",
+   "sequence": "U+1F32B U+FE0F",
+   "role": "weather",
+   "label": "ضباب",
+   "asset": "src/assets/emoji/svg/1f32b-fe0f.svg",
+   "usedIn": [
+    "src/features/world/weather.ts"
+   ]
+  },
+  {
+   "id": "mostly-cloudy",
+   "char": "🌥️",
+   "sequence": "U+1F325 U+FE0F",
+   "role": "weather",
+   "label": "غائم غالبًا",
+   "asset": "src/assets/emoji/svg/1f325-fe0f.svg",
+   "usedIn": [
+    "src/features/world/weather.ts"
+   ]
+  },
+  {
+   "id": "mostly-sunny",
+   "char": "🌤️",
+   "sequence": "U+1F324 U+FE0F",
+   "role": "weather",
+   "label": "مشمس غالبًا",
+   "asset": "src/assets/emoji/svg/1f324-fe0f.svg",
+   "usedIn": [
+    "src/components/mascot/MascotPanel.tsx",
+    "src/features/world/weather.ts"
+   ]
+  },
+  {
+   "id": "partly-cloudy",
+   "char": "⛅",
+   "sequence": "U+26C5",
+   "role": "weather",
+   "label": "غائم جزئيًا",
+   "asset": "src/assets/emoji/svg/26c5.svg",
+   "usedIn": [
+    "src/features/world/weather.ts"
+   ]
+  },
+  {
+   "id": "rain",
+   "char": "🌧️",
+   "sequence": "U+1F327 U+FE0F",
+   "role": "weather",
+   "label": "مطر",
+   "asset": "src/assets/emoji/svg/1f327-fe0f.svg",
+   "usedIn": [
+    "src/features/world/weather.ts"
+   ]
+  },
+  {
+   "id": "snow-cloud",
+   "char": "🌨️",
+   "sequence": "U+1F328 U+FE0F",
+   "role": "weather",
+   "label": "ثلج",
+   "asset": "src/assets/emoji/svg/1f328-fe0f.svg",
+   "usedIn": [
+    "src/features/world/weather.ts"
+   ]
+  },
+  {
+   "id": "snowflake",
+   "char": "❄️",
+   "sequence": "U+2744 U+FE0F",
+   "role": "weather",
+   "label": "صقيع",
+   "asset": "src/assets/emoji/svg/2744-fe0f.svg",
+   "usedIn": [
+    "src/features/world/weather.ts"
+   ]
+  },
+  {
+   "id": "storm",
+   "char": "⛈️",
+   "sequence": "U+26C8 U+FE0F",
+   "role": "weather",
+   "label": "عاصفة رعدية",
+   "asset": "src/assets/emoji/svg/26c8-fe0f.svg",
+   "usedIn": [
+    "src/features/world/weather.ts"
+   ]
+  },
+  {
+   "id": "sun",
+   "char": "☀️",
+   "sequence": "U+2600 U+FE0F",
+   "role": "weather",
+   "label": "مشمس",
+   "asset": "src/assets/emoji/svg/2600-fe0f.svg",
+   "usedIn": [
+    "src/data/mascotDialogs.ts",
+    "src/features/world/weather.ts"
+   ]
+  },
+  {
+   "id": "sun-rain",
+   "char": "🌦️",
+   "sequence": "U+1F326 U+FE0F",
+   "role": "weather",
+   "label": "زخّات",
+   "asset": "src/assets/emoji/svg/1f326-fe0f.svg",
+   "usedIn": [
+    "src/features/world/weather.ts"
+   ]
+  },
+  {
+   "id": "briefcase",
+   "char": "💼",
+   "sequence": "U+1F4BC",
+   "role": "situation",
+   "label": "العمل",
+   "asset": "src/assets/emoji/svg/1f4bc.svg",
+   "usedIn": [
+    "src/components/vocab/WordMeaningVisual.tsx",
+    "src/data/situations.ts"
+   ]
+  },
+  {
+   "id": "card",
+   "char": "💳",
+   "sequence": "U+1F4B3",
+   "role": "situation",
+   "label": "المال والدفع",
+   "asset": "src/assets/emoji/svg/1f4b3.svg",
+   "usedIn": [
+    "src/components/vocab/WordMeaningVisual.tsx"
+   ]
+  },
+  {
+   "id": "cart",
+   "char": "🛒",
+   "sequence": "U+1F6D2",
+   "role": "situation",
+   "label": "التسوّق",
+   "asset": "src/assets/emoji/svg/1f6d2.svg",
+   "usedIn": [
+    "src/data/situations.ts"
+   ]
+  },
+  {
+   "id": "herb",
+   "char": "🌿",
+   "sequence": "U+1F33F",
+   "role": "situation",
+   "label": "الطبيعة",
+   "asset": "src/assets/emoji/svg/1f33f.svg",
+   "usedIn": [
+    "src/components/vocab/WordMeaningVisual.tsx"
+   ]
+  },
+  {
+   "id": "house",
+   "char": "🏠",
+   "sequence": "U+1F3E0",
+   "role": "situation",
+   "label": "السكن",
+   "asset": "src/assets/emoji/svg/1f3e0.svg",
+   "usedIn": [
+    "src/components/vocab/WordMeaningVisual.tsx",
+    "src/data/botHelp.ts",
+    "src/data/situations.ts"
+   ]
+  },
+  {
+   "id": "masks",
+   "char": "🎭",
+   "sequence": "U+1F3AD",
+   "role": "situation",
+   "label": "الثقافة والترفيه",
+   "asset": "src/assets/emoji/svg/1f3ad.svg",
+   "usedIn": [
+    "src/components/vocab/WordMeaningVisual.tsx"
+   ]
+  },
+  {
+   "id": "office",
+   "char": "🏢",
+   "sequence": "U+1F3E2",
+   "role": "situation",
+   "label": "المكتب",
+   "asset": "src/assets/emoji/svg/1f3e2.svg",
+   "usedIn": [
+    "src/data/situations.ts"
+   ]
+  },
+  {
+   "id": "people",
+   "char": "👥",
+   "sequence": "U+1F465",
+   "role": "situation",
+   "label": "الناس والعلاقات",
+   "asset": "src/assets/emoji/svg/1f465.svg",
+   "usedIn": [
+    "src/components/vocab/WordMeaningVisual.tsx"
+   ]
+  },
+  {
+   "id": "plate",
+   "char": "🍽️",
+   "sequence": "U+1F37D U+FE0F",
+   "role": "situation",
+   "label": "الطعام",
+   "asset": "src/assets/emoji/svg/1f37d-fe0f.svg",
+   "usedIn": [
+    "src/components/vocab/WordMeaningVisual.tsx"
+   ]
+  },
+  {
+   "id": "runner",
+   "char": "🏃",
+   "sequence": "U+1F3C3",
+   "role": "situation",
+   "label": "الرياضة والحركة",
+   "asset": "src/assets/emoji/svg/1f3c3.svg",
+   "usedIn": [
+    "src/components/vocab/WordMeaningVisual.tsx"
+   ]
+  },
+  {
+   "id": "school",
+   "char": "🏫",
+   "sequence": "U+1F3EB",
+   "role": "situation",
+   "label": "المدرسة",
+   "asset": "src/assets/emoji/svg/1f3eb.svg",
+   "usedIn": [
+    "src/data/situations.ts"
+   ]
+  },
+  {
+   "id": "stethoscope",
+   "char": "🩺",
+   "sequence": "U+1FA7A",
+   "role": "situation",
+   "label": "الطبيب والصحة",
+   "asset": "src/assets/emoji/svg/1fa7a.svg",
+   "usedIn": [
+    "src/components/vocab/WordMeaningVisual.tsx",
+    "src/data/situations.ts"
+   ]
+  },
+  {
+   "id": "thought",
+   "char": "💭",
+   "sequence": "U+1F4AD",
+   "role": "situation",
+   "label": "المشاعر والأفكار",
+   "asset": "src/assets/emoji/svg/1f4ad.svg",
+   "usedIn": [
+    "src/components/vocab/WordMeaningVisual.tsx"
+   ]
+  },
+  {
+   "id": "train",
+   "char": "🚆",
+   "sequence": "U+1F686",
+   "role": "situation",
+   "label": "المواصلات",
+   "asset": "src/assets/emoji/svg/1f686.svg",
+   "usedIn": [
+    "src/data/situations.ts"
+   ]
+  },
+  {
+   "id": "ballot-check",
+   "char": "☑️",
+   "sequence": "U+2611 U+FE0F",
+   "role": "grammar",
+   "label": "درس: الأسئلة المغلقة",
+   "asset": "src/assets/emoji/svg/2611-fe0f.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "bookmark",
+   "char": "🔖",
+   "sequence": "U+1F516",
+   "role": "grammar",
+   "label": "درس: ضمائر الملكية",
+   "asset": "src/assets/emoji/svg/1f516.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "brick",
+   "char": "🧱",
+   "sequence": "U+1F9F1",
+   "role": "grammar",
+   "label": "بناء الجملة / درس: الجملة الرئيسية والثانوية",
+   "asset": "src/assets/emoji/svg/1f9f1.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts",
+    "src/data/mascotDialogs.ts"
+   ]
+  },
+  {
+   "id": "crystal-ball",
+   "char": "🔮",
+   "sequence": "U+1F52E",
+   "role": "grammar",
+   "label": "درس: zullen و zouden",
+   "asset": "src/assets/emoji/svg/1f52e.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "cyclone",
+   "char": "🌀",
+   "sequence": "U+1F300",
+   "role": "grammar",
+   "label": "درس: الشرط غير الواقعي",
+   "asset": "src/assets/emoji/svg/1f300.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "envelope-in",
+   "char": "📨",
+   "sequence": "U+1F4E8",
+   "role": "grammar",
+   "label": "درس: المبني للمجهول",
+   "asset": "src/assets/emoji/svg/1f4e8.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "hourglass-done",
+   "char": "⌛",
+   "sequence": "U+231B",
+   "role": "grammar",
+   "label": "درس: الماضي البسيط",
+   "asset": "src/assets/emoji/svg/231b.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "knobs",
+   "char": "🎛️",
+   "sequence": "U+1F39B U+FE0F",
+   "role": "grammar",
+   "label": "درس: er و daar",
+   "asset": "src/assets/emoji/svg/1f39b-fe0f.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "knot",
+   "char": "🪢",
+   "sequence": "U+1FAA2",
+   "role": "grammar",
+   "label": "درس: ضمائر الوصل",
+   "asset": "src/assets/emoji/svg/1faa2.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "label",
+   "char": "🏷️",
+   "sequence": "U+1F3F7 U+FE0F",
+   "role": "grammar",
+   "label": "درس: الاشتقاق الوصفي",
+   "asset": "src/assets/emoji/svg/1f3f7-fe0f.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "ladder",
+   "char": "🪜",
+   "sequence": "U+1FA9C",
+   "role": "grammar",
+   "label": "درس: المقارنة والتفضيل (B1)",
+   "asset": "src/assets/emoji/svg/1fa9c.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "magnet",
+   "char": "🧲",
+   "sequence": "U+1F9F2",
+   "role": "grammar",
+   "label": "درس: مفعول حرف الجرّ",
+   "asset": "src/assets/emoji/svg/1f9f2.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "mirror",
+   "char": "🪞",
+   "sequence": "U+1FA9E",
+   "role": "grammar",
+   "label": "درس: الأفعال الانعكاسية",
+   "asset": "src/assets/emoji/svg/1fa9e.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "needle",
+   "char": "🪡",
+   "sequence": "U+1FAA1",
+   "role": "grammar",
+   "label": "درس: أدوات الربط المتقدّمة",
+   "asset": "src/assets/emoji/svg/1faa1.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "package",
+   "char": "📦",
+   "sequence": "U+1F4E6",
+   "role": "grammar",
+   "label": "درس: التعريف والجمع",
+   "asset": "src/assets/emoji/svg/1f4e6.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "palette",
+   "char": "🎨",
+   "sequence": "U+1F3A8",
+   "role": "grammar",
+   "label": "درس: الصفة",
+   "asset": "src/assets/emoji/svg/1f3a8.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "person",
+   "char": "🧍",
+   "sequence": "U+1F9CD",
+   "role": "grammar",
+   "label": "درس: أفعال الوضعية",
+   "asset": "src/assets/emoji/svg/1f9cd.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "pushpin",
+   "char": "📌",
+   "sequence": "U+1F4CC",
+   "role": "grammar",
+   "label": "درس: de / het",
+   "asset": "src/assets/emoji/svg/1f4cc.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "raised-hand",
+   "char": "🙋",
+   "sequence": "U+1F64B",
+   "role": "grammar",
+   "label": "درس: الضمائر الشخصية",
+   "asset": "src/assets/emoji/svg/1f64b.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "safety-pin",
+   "char": "🧷",
+   "sequence": "U+1F9F7",
+   "role": "grammar",
+   "label": "درس: حروف الجرّ الثابتة",
+   "asset": "src/assets/emoji/svg/1f9f7.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "scale",
+   "char": "⚖️",
+   "sequence": "U+2696 U+FE0F",
+   "role": "grammar",
+   "label": "درس: المقارنة والتفضيل",
+   "asset": "src/assets/emoji/svg/2696-fe0f.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "scissors",
+   "char": "✂️",
+   "sequence": "U+2702 U+FE0F",
+   "role": "grammar",
+   "label": "درس: الأفعال المنفصلة",
+   "asset": "src/assets/emoji/svg/2702-fe0f.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  },
+  {
+   "id": "thread",
+   "char": "🧵",
+   "sequence": "U+1F9F5",
+   "role": "grammar",
+   "label": "درس: جمل الوصل",
+   "asset": "src/assets/emoji/svg/1f9f5.svg",
+   "usedIn": [
+    "src/data/lessons/index.ts"
+   ]
+  }
+ ]
+}

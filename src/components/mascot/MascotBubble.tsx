@@ -5,6 +5,11 @@ import { bubbleTransition } from './MascotAnimations'
 import { MASCOT_NAME_AR, type MascotLine } from '@/data/mascotDialogs'
 
 const TYPE_SPEED_MS = 22
+/* A greeting is a passing remark, not a dialog: it steps aside on its own so it
+   cannot sit on top of the page's content until someone hunts for the ✕. The
+   countdown starts when the line has finished typing and holds while the
+   bubble is hovered or focused. Everything in it stays reachable from Katja's panel. */
+const AUTO_CLOSE_MS = 9000
 
 interface Props {
   line: MascotLine
@@ -36,19 +41,30 @@ export function MascotBubble({ line, onClose, onOpenPanel, onDismissForever }: P
 
   const displayText = reduced ? line.ar : shown
 
+  const [held, setHeld] = useState(false)
+  const typed = reduced || shown.length >= line.ar.length
+  useEffect(() => {
+    if (!typed || held) return
+    const id = setTimeout(onClose, AUTO_CLOSE_MS)
+    return () => clearTimeout(id)
+  }, [typed, held, onClose])
+
   return (
     <AnimatePresence>
       <motion.div
         role="status" aria-live="polite" dir="rtl"
+        onPointerEnter={() => setHeld(true)} onPointerLeave={() => setHeld(false)}
+        onFocus={() => setHeld(true)} onBlur={() => setHeld(false)}
         variants={reduced ? undefined : bubbleTransition}
         initial={reduced ? undefined : 'initial'}
         animate={reduced ? { opacity: 1 } : 'animate'}
         exit={reduced ? { opacity: 0 } : 'exit'}
         style={{
-          maxWidth: 280,
+          maxWidth: 'min(280px, calc(100vw - 36px))',
+          pointerEvents: 'auto',
           background: 'var(--modal-bg)',
-          backdropFilter: 'blur(24px) saturate(1.8)',
-          WebkitBackdropFilter: 'blur(24px) saturate(1.8)',
+          backdropFilter: 'var(--glass-fx-float)',
+          WebkitBackdropFilter: 'var(--glass-fx-float)',
           border: '1px solid var(--modal-border)',
           borderRadius: 'var(--r)',
           boxShadow: 'var(--elev-2), inset 0 1px 0 var(--glass-hi)',
@@ -61,7 +77,8 @@ export function MascotBubble({ line, onClose, onOpenPanel, onDismissForever }: P
           </span>
           <button
             onClick={onClose} aria-label="إغلاق"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: 'var(--text-base)', lineHeight: 'var(--lh-none)', padding: 2 }}
+            className="icon-btn"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text2)', fontSize: 'var(--text-base)', lineHeight: 'var(--lh-none)', padding: 0, marginBlock: -8, marginInlineEnd: -8, display: 'grid', placeItems: 'center', borderRadius: 'var(--r-xs)' }}
           >
             ✕
           </button>
@@ -84,7 +101,7 @@ export function MascotBubble({ line, onClose, onOpenPanel, onDismissForever }: P
         <button
           onClick={onOpenPanel}
           style={{
-            display: 'block', width: '100%', marginTop: 'var(--sp-3)', padding: '7px 10px',
+            display: 'block', width: '100%', marginTop: 'var(--sp-3)', padding: '7px 10px', minBlockSize: 'var(--tap-min)',
             background: 'var(--btn-bg)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r-sm)',
             cursor: 'pointer', color: 'var(--text)', fontSize: 'var(--text-xs)', fontFamily: 'inherit',
           }}
@@ -94,7 +111,7 @@ export function MascotBubble({ line, onClose, onOpenPanel, onDismissForever }: P
 
         <button
           onClick={onDismissForever}
-          style={{ display: 'block', marginTop: 'var(--sp-2)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: 'var(--text-2xs)', textDecoration: 'underline', padding: 0, fontFamily: 'inherit' }}
+          style={{ display: 'block', marginTop: 'var(--sp-1)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: 'var(--text-xs)', textDecoration: 'underline', padding: '8px 0', minBlockSize: 'var(--tap-min)', fontFamily: 'inherit' }}
         >
           إخفاء {MASCOT_NAME_AR} نهائيًّا
         </button>

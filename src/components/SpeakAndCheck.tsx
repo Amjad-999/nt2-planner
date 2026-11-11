@@ -3,6 +3,7 @@ import { normalise, wordFeedback } from '@/features/speaking/similarity'
 import { speakDutch, stopSpeak } from '@/features/tts/speakDutch'
 import { Callout } from '@/components/ui/Callout'
 import { useSpeakingPractice } from '@/components/speaking/useSpeakingPractice'
+import { IStop, ISpeakerHigh } from '@/components/obs/icons'
 
 interface Props {
   /** The Dutch sentence the learner should repeat. */
@@ -68,12 +69,12 @@ function SpeakingPractice({ targetNl, label = 'تدرّب على النطق' }: 
 
       <div style={{ display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
         <button type="button" disabled={active} onClick={playExample} style={buttonStyle}>
-          <span aria-hidden="true">{playing ? '⏹' : '🔊'}</span>
+          <span aria-hidden="true" className="glyph">{playing ? <IStop size={18} /> : <ISpeakerHigh size={18} />}</span>
           {playing ? 'إيقاف المثال' : 'استمع إلى المثال'}
         </button>
         {practice.supported && (active ? (
           <button type="button" onClick={practice.stop} style={{ ...buttonStyle, color: 'var(--red-text)', background: 'var(--red-l)' }}>
-            <span aria-hidden="true">⏹</span> إيقاف الميكروفون
+            <span aria-hidden="true" className="glyph"><IStop size={18} /></span> إيقاف الميكروفون
           </button>
         ) : (
           <button type="button" onClick={() => {

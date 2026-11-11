@@ -330,3 +330,42 @@
 }
 .reading-text p { margin: 0 0 var(--sp-3); }
 .reading-text p:last-child { margin-block-end: 0; }
+
+/* ── Brand mark ──────────────────────────────────────────────────────────
+   The mark's colours are tokens, so one inline SVG serves both themes: a
+   deep cobalt body with a paper link on light, a brighter body with an
+   obsidian link on dark. The lime point is the constant. */
+.brand-logo__a { stop-color: var(--orange); }
+.brand-logo__b { stop-color: var(--orange-ink); }
+.brand-logo__link { stroke: var(--o-on-night); }
+.brand-logo__from { fill: var(--o-on-night); }
+.brand-logo__to { fill: var(--o-lime); }
+:root[data-theme="dark"] .brand-logo__a { stop-color: var(--o-night-cobalt); }
+:root[data-theme="dark"] .brand-logo__b { stop-color: var(--o-cobalt); }
+:root[data-theme="dark"] .brand-logo__link { stroke: var(--o-night); }
+:root[data-theme="dark"] .brand-logo__from { fill: var(--o-night); }
+.brand-wordmark {
+  font-family: var(--font-latin);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: var(--lh-none);
+  color: var(--text);
+  white-space: nowrap;
+}
+.brand-wordmark span { font-weight: 500; color: var(--text2); }
+
+/* ── Emoji + inline glyphs ───────────────────────────────────────────────
+   An emoji is artwork on the text line: square, never stretched, never
+   tinted by `color`, and aligned so it does not push the line apart. */
+.emoji {
+  display: inline-block;
+  font-family: 'NT2 Emoji', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  vertical-align: -0.12em;
+  text-indent: 0;
+}
+/* Functional icon sitting inside a line of text (play, stop, speaker). */
+.glyph { display: inline-flex; vertical-align: -0.2em; }

@@ -243,8 +243,13 @@ export function Mascot() {
     <div
       className="floating-assistant"
       style={{
-        position: 'fixed', insetBlockEnd: 'calc(18px + var(--o-bnav-h, 0px) + env(safe-area-inset-bottom, 0px))', insetInlineEnd: 18, zIndex: 850,
+        position: 'fixed', insetBlockEnd: 'calc(18px + var(--o-bnav-h, 0px) + env(safe-area-inset-bottom, 0px))', insetInlineEnd: 18, zIndex: 'var(--z-mascot)',
         display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 'var(--sp-3)',
+        // The wrapper is as wide as the bubble, so the empty strip beside the
+        // launcher used to swallow taps meant for the page underneath (on a
+        // phone: most of the Today screen's primary button). Only the bubble,
+        // the panel and the launcher themselves take pointer input.
+        pointerEvents: 'none',
       }}
     >
       {panelOpen && (
@@ -266,7 +271,7 @@ export function Mascot() {
         ref={stageRef}
         className="mascot-stage mascot-enter"
         data-testid="mascot-stage"
-        style={{ perspective: '1000px', lineHeight: 0 }}
+        style={{ perspective: '1000px', lineHeight: 0, pointerEvents: 'auto' }}
       >
         <motion.div
           className="mascot-3d"

@@ -1,4 +1,5 @@
 @import './tokens.css';
+@import './emoji.css';
 @import './navigation.css';
 @import './components.css';
 
@@ -35,7 +36,18 @@ html {
   font-size: var(--font-size-base, 16px);
   scroll-behavior: smooth;
   direction: rtl;
+  /* Upright type only. No italic face is loaded for any family in this app,
+     so every `italic` used to be the browser slanting the upright outlines
+     (a synthetic oblique) — worst of all on joined Arabic. Synthesis is off,
+     and emphasis is carried by weight and colour instead (see `em` below). */
+  font-synthesis-style: none;
+  /* Counters, timers and statistics keep a stable width as their digits change. */
+  font-variant-numeric: var(--num-features);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
+em, i, cite, dfn, address, var { font-style: normal; }
+em { font-weight: var(--fw-medium); }
 
 body {
   background: var(--bg);
@@ -97,8 +109,6 @@ body::before {
    and phones pay it on every scroll frame. */
 @media (pointer: coarse) {
   body::before { animation: none; }
-  .btn-glass { backdrop-filter: blur(6px); }
-  .form-in   { backdrop-filter: blur(4px); }
 }
 
 /* ── Focus ── */
@@ -130,6 +140,8 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
   padding-inline: var(--page-pad-x);
 }
 .page--narrow { max-inline-size: var(--page-max-narrow); }
+/* The daily workspaces carry a two-column hero, so they take a wider measure. */
+.page--wide { max-inline-size: var(--page-max-wide); }
 
 /* ── Touch targets ──────────────────────────────────────────────────────
    A coarse pointer is a fingertip, and a fingertip does not land inside a
@@ -226,10 +238,14 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { scrollbar-width: none; }
 
-/* ── Backdrop filter fallback ── */
+/* ── Backdrop filter fallback ──
+   Without backdrop-filter a translucent surface is just see-through, so every
+   material falls back to a near-solid plane. The skin selectors are listed
+   explicitly: the old fallback targeted a bare `:root`, which the skin block
+   outranks, so under the observatory skin it never applied at all. */
 @supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
-  :root { --glass-bg: rgba(250,244,237,.92); --glass-bg-strong: rgba(250,244,237,.97); --topbar-bg: rgba(250,244,237,.96); --btn-bg: rgba(250,244,237,.92); --modal-bg: rgba(250,244,237,.97); }
-  :root[data-theme="dark"] { --glass-bg: rgba(42,34,27,.94); --glass-bg-strong: rgba(42,34,27,.98); --topbar-bg: rgba(26,22,18,.97); --btn-bg: rgba(50,40,32,.94); --modal-bg: rgba(34,28,22,.97); }
+  :root, :root[data-skin="observatory"] { --glass-bg: rgba(251,250,246,.94); --glass-bg-strong: rgba(251,250,246,.98); --topbar-bg: rgba(245,243,235,.97); --btn-bg: rgba(251,250,246,.95); --modal-bg: rgba(248,246,240,.98); }
+  :root[data-theme="dark"], :root[data-skin="observatory"][data-theme="dark"] { --glass-bg: rgba(23,35,43,.95); --glass-bg-strong: rgba(30,44,54,.98); --topbar-bg: rgba(16,24,32,.97); --btn-bg: rgba(30,44,54,.95); --modal-bg: rgba(23,35,43,.98); }
 }
 
 /* ── Glass form controls ─────────────────────────────────────────────────
@@ -244,7 +260,7 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
   background: var(--glass-bg-strong);
   /* standard property only — autoprefixer emits the -webkit- twin; writing
      both by hand made the minifier keep only the prefixed one */
-  backdrop-filter: blur(8px);
+  backdrop-filter: var(--glass-fx-control);
   color: var(--text);
   font-family: inherit;
   font-size: var(--text-sm);
@@ -262,10 +278,30 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
    --btn-bg / --btn-border so each theme supplies its own alpha.
    .btn-shine = only the hover shine sweep — for primary gradient buttons
    (and glass ones, which get it automatically). */
+/* The class used to carry only the material (background, blur, border), so a
+   bare `<button class="btn-glass">` rendered as a raw box: no padding, square
+   corners, no minimum height. These are its shape defaults. `:where()` keeps
+   them at zero specificity, so a utility class or an inline style on a call
+   site that already shaped its button still wins. */
+:where(.btn-glass) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-block-size: var(--tap-min);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--fw-heading);
+  line-height: var(--lh-ui);
+  cursor: pointer;
+}
 .btn-glass {
   background: var(--btn-bg);
   /* standard property only — autoprefixer emits the -webkit- twin */
-  backdrop-filter: blur(10px);
+  backdrop-filter: var(--glass-fx-control);
   border: 1px solid var(--btn-border);
 }
 .btn-glass, .btn-shine {
@@ -527,7 +563,7 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
   border-radius: 50%;
   overflow: hidden;               /* clips the portrait to the disc */
   background: var(--glass-bg-strong);
-  backdrop-filter: blur(12px) saturate(1.6);
+  backdrop-filter: var(--glass-fx-panel);
   border: 2px solid var(--orange);
   box-shadow: var(--elev-3), inset 0 1px 0 var(--glass-hi);
 }
@@ -554,6 +590,14 @@ html[data-focus="on"] .decor-flourish { display: none !important; }
   top: var(--katya-y, -14%);
   user-select: none;
   -webkit-user-drag: none;
+}
+
+/* Phones: the launcher is a corner control, not a second hero. At 96px it sat
+   on top of the Today screen's primary button; 64px keeps the face readable
+   and well over the 44px touch minimum. */
+@media (max-width: 767px) {
+  .mascot-orb { inline-size: 64px; block-size: 64px; }
+  .mascot-shadow { inline-size: 52px; margin-inline-start: -26px; block-size: 10px; inset-block-end: -9px; }
 }
 
 /* الظلّ الأرضي — يضيق كلّما استدارت الأيقونة (scaleX من rotateY في Mascot.tsx) */
@@ -657,9 +701,9 @@ html[data-motion="reduced"] *::after {
    the bar. During a lesson (html[data-lesson="open"]) the bar steps aside so
    the keyboard and the answer field get the room. */
 .o-topnav {
-  position: sticky; top: var(--topbar-h); z-index: 190;
+  position: sticky; top: var(--topbar-h); z-index: var(--z-nav);
   background: var(--topbar-bg);
-  backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: var(--glass-fx-bar);
   border-bottom: 1px solid var(--glass-border);
 }
 .o-topnav ul, .o-bottomnav ul { list-style: none; display: flex; margin: 0; padding: 0; }
@@ -668,7 +712,7 @@ html[data-motion="reduced"] *::after {
 .o-nav-btn {
   position: relative; display: inline-flex; align-items: center; gap: 8px;
   min-height: 48px; padding: 0 16px; border: 0; background: none; cursor: pointer;
-  font: inherit; font-size: .92rem; font-weight: 600; color: var(--muted); white-space: nowrap;
+  font: inherit; font-size: .92rem; font-weight: 600; color: var(--text2); white-space: nowrap;
   border-radius: 12px 12px 0 0;
   transition: color var(--o-dur-control) var(--o-ease-out), background-color var(--o-dur-control) var(--o-ease-out);
 }
@@ -686,10 +730,10 @@ html[data-motion="reduced"] *::after {
   :root { --o-bnav-h: 64px; }
   .o-topnav { display: none; }
   .o-bottomnav {
-    display: block; position: fixed; inset-inline: 0; bottom: 0; z-index: 400;
+    display: block; position: fixed; inset-inline: 0; bottom: 0; z-index: var(--z-bottomnav);
     padding-bottom: env(safe-area-inset-bottom);
     background: var(--topbar-bg);
-    backdrop-filter: blur(18px) saturate(1.6);
+    backdrop-filter: var(--glass-fx-bar);
     border-top: 1px solid var(--glass-border);
     box-shadow: 0 -8px 24px -18px var(--overlay-bg);
   }
@@ -707,7 +751,7 @@ html[data-motion="reduced"] *::after {
 }
 
 .o-more-backdrop {
-  position: fixed; inset: 0; z-index: 950; background: var(--overlay-bg);
+  position: fixed; inset: 0; z-index: var(--z-overlay); background: var(--overlay-bg);
   display: flex; align-items: flex-start; justify-content: flex-end;
   padding: 118px 20px 20px; animation: fadeIn var(--o-dur-panel) var(--o-ease-out);
 }

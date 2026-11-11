@@ -56,7 +56,7 @@ export function Sheet({ title, onClose, children, placement = 'side', pinned }: 
           <h2 id="o-sheet-title" className="o-h3">{title}</h2>
           <button type="button" className="o-btn o-btn--ghost o-btn--icon" onClick={onClose} aria-label={`إغلاق: ${title}`}><IX size={20} /></button>
         </div>
-        {pinned && <div style={{ marginBottom: 12 }}>{pinned}</div>}
+        {pinned && <div style={{ marginBottom: 'var(--sp-3)' }}>{pinned}</div>}
         {children}
       </div>
     </div>,

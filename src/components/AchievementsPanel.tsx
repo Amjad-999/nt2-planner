@@ -14,8 +14,8 @@ export function AchievementsPanel() {
       aria-labelledby="ach-heading"
       style={{
         background: 'var(--glass-bg)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
+        backdropFilter: 'var(--glass-fx-control)',
+        WebkitBackdropFilter: 'var(--glass-fx-control)',
         border: '1px solid var(--glass-border)',
         borderRadius: 'var(--r)',
         padding: '14px 18px',

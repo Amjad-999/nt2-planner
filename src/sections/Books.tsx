@@ -9,7 +9,7 @@ export default function Books() {
   return (
     <div className="page">
       <h2 className="section-title">
-        <span style={{ color: 'var(--orange-text)' }}>📖</span> الكتب والوحدات <span aria-hidden="true">🇳🇱</span>
+        <span aria-hidden="true">📚</span> الكتب والوحدات
       </h2>
       <Callout tone="warn" icon="📚" style={{ marginBottom: 'var(--sp-4)' }}>
         <strong style={{ color:'var(--text)' }}>تتبّع تقدّمك في الكتب الرسمية</strong> — حدّد الوحدات التي أتممت مراجعتها. يُضاف إنجازك تلقائيًا إلى لوحة التحليلات.
@@ -35,8 +35,8 @@ function BookCard({ book: b, doneUnits, onToggle }: { book: BookUnit; doneUnits:
       className="relative overflow-hidden glow-card"
       style={{
         background:'var(--glass-bg)',
-        backdropFilter:'blur(16px)',
-        WebkitBackdropFilter:'blur(16px)',
+        backdropFilter:'var(--glass-fx-panel)',
+        WebkitBackdropFilter:'var(--glass-fx-panel)',
         border:'1px solid var(--glass-border)',
         borderInlineStart:`4px solid ${b.ic}`,
         borderRadius:'var(--r)',

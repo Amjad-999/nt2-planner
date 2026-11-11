@@ -1,10 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="116" fill="#F58F20"/>
-  <g fill="#ffffff">
-    <rect x="150" y="250" width="58" height="112" rx="16"/>
-    <rect x="232" y="198" width="58" height="164" rx="16"/>
-    <rect x="314" y="146" width="58" height="216" rx="16"/>
-    <rect x="138" y="372" width="246" height="16" rx="8"/>
+<!-- App icon: obsidian tile, rounded. Source for icon-192/512 and the apple touch icon. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="NT2 Planner">
+  <title>NT2 Planner</title>
+  <rect width="512" height="512" rx="112" fill="#101820"/>
+  <g transform="translate(81.9 87.9) scale(0.68)">
+  <defs>
+    <linearGradient id="g" x1="56" y1="64" x2="456" y2="450" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8EA4FF"/><stop offset="1" stop-color="#5A77F5"/>
+    </linearGradient>
+  </defs>
+  <path d="M148 64H364A92 92 0 0 1 456 156V276A92 92 0 0 1 364 368H240L132 450Q116 461 120 442L140 368H148A92 92 0 0 1 56 276V156A92 92 0 0 1 148 64Z" fill="url(#g)"/>
+  <path d="M184 268L328 168" fill="none" stroke="#101820" stroke-width="26" stroke-linecap="round"/>
+  <circle cx="184" cy="268" r="31" fill="#101820"/>
+  <circle cx="328" cy="168" r="45" fill="#D7FF72"/>
   </g>
-  <circle cx="343" cy="118" r="22" fill="#467434"/>
 </svg>

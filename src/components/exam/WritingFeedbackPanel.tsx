@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { checkWriting } from '@/features/exam/writingCheck'
 import { requestWritingFeedback, aiConfigured, type AiWritingFeedback } from '@/features/ai/writingFeedback'
 import type { ExamWritingItem } from '@/store/types'
+import { pct as percent } from '@/lib/utils'
 
 /**
  * لوحة تقييم الكتابة.
@@ -33,11 +34,11 @@ function Bar({ pct, label, weight }: { pct: number; label: string; weight: numbe
      accent, while the number and the icon are text and must clear 4.5:1. */
   const fill = pct >= 70 ? 'var(--green)' : pct >= 45 ? 'var(--orange)' : 'var(--red)'
   const ink = pct >= 70 ? 'var(--green-text)' : pct >= 45 ? 'var(--orange-text)' : 'var(--red-text)'
-  const icon = pct >= 70 ? '✔' : pct >= 45 ? '•' : '✕'
+  const icon = pct >= 70 ? '✓' : pct >= 45 ? '•' : '✕'
   return (
     <div style={{ margin: '8px 0' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
-        <span><span style={{ color: ink }}>{icon}</span> {label} <span style={{ color: 'var(--muted)' }}>({weight}%)</span></span>
+        <span><span style={{ color: ink }}>{icon}</span> {label} <span style={{ color: 'var(--muted)' }}>({percent(weight)})</span></span>
         <strong style={{ color: ink }}>{pct}</strong>
       </div>
       <div style={{ height: 6, borderRadius: 'var(--r-xs)', background: 'var(--border)', overflow: 'hidden', marginTop: 'var(--sp-1)' }}>
@@ -97,7 +98,7 @@ export function WritingFeedbackPanel({ task, text, onRecord }: Props) {
           const done = !report.missingPointsAr.includes(p.ar)
           return (
             <div key={p.ar} style={{ display: 'flex', gap: 'var(--sp-2)', alignItems: 'flex-start', fontSize: 'var(--text-sm)', margin: '4px 0', color: done ? 'var(--green-text)' : 'var(--muted)' }}>
-              <span aria-hidden>{done ? '✔' : '○'}</span>
+              <span aria-hidden>{done ? '✓' : '○'}</span>
               <span>{p.ar}</span>
             </div>
           )
@@ -159,7 +160,7 @@ export function WritingFeedbackPanel({ task, text, onRecord }: Props) {
 
       {aiError && (
         <div style={{ ...box, borderColor: 'var(--orange)', color: 'var(--text2)', fontSize: 'var(--text-sm)' }}>
-          <span aria-hidden>⚠ </span>{aiError}
+          <span aria-hidden>⚠️ </span>{aiError}
         </div>
       )}
 

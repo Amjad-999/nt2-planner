@@ -1,0 +1,14 @@
+<!-- Horizontal lockup. The wordmark is live text (Inter 700) so it stays editable; outline it before sending to print. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1640 512" width="1640" height="512" role="img" aria-label="NT2 Planner">
+  <title>NT2 Planner</title>
+  <g><defs>
+    <linearGradient id="g" x1="56" y1="64" x2="456" y2="450" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9DB0FF"/><stop offset="1" stop-color="#6D8AFF"/>
+    </linearGradient>
+  </defs>
+  <path d="M148 64H364A92 92 0 0 1 456 156V276A92 92 0 0 1 364 368H240L132 450Q116 461 120 442L140 368H148A92 92 0 0 1 56 276V156A92 92 0 0 1 148 64Z" fill="url(#g)"/>
+  <path d="M184 268L328 168" fill="none" stroke="#101820" stroke-width="26" stroke-linecap="round"/>
+  <circle cx="184" cy="268" r="31" fill="#101820"/>
+  <circle cx="328" cy="168" r="45" fill="#D7FF72"/></g>
+  <text x="540" y="318" font-family="Inter, system-ui, sans-serif" font-size="176" font-weight="700" letter-spacing="-5" fill="#F5F3EB">NT2 Planner</text>
+</svg>

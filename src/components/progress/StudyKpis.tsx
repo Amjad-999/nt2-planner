@@ -4,7 +4,7 @@ import { useAppStore, totalLearnedWords, avgBestScore, sumLastNDays, sumPrevNDay
 import { PASS_THRESHOLD } from '@/data/phases'
 import { weeklyChange } from '@/features/progress/insights'
 import { KpiCard } from '@/components/KpiCard'
-import { todayKey, dayKeyOffset } from '@/lib/utils'
+import { todayKey, dayKeyOffset, pct } from '@/lib/utils'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { springCardAt } from '@/lib/animations'
 
@@ -45,7 +45,7 @@ export function StudyKpis() {
     { cls: 'k3', icon: '📊', label: 'دقائق الأسبوع', value: weekM, delta: `${weeklyChange(weekM, lastWM)}${lastWM ? ' مقابل الأسبوع الماضي' : ''}`, dCls: dWeek > 0 ? 'up' : dWeek < 0 ? 'down' : 'flat',
       editable: true, onEditClick: () => setWeekEdit((o) => !o) },
     { cls: 'k4', icon: '📚', label: 'كلمات متقنة', value: `${totW.learned}/${totW.all}`, delta: totW.learned ? `${Math.round((totW.learned / Math.max(1, totW.all)) * 100)}% نسبة الإتقان` : 'ابدأ المراجعة', dCls: 'flat' },
-    { cls: 'k5', icon: '🎯', label: 'متوسط أفضل نتائج التدريب', value: hasAttempts ? `${bestNT2}%` : '—', delta: !hasAttempts ? 'ابدأ بمحاولة تدريب' : bestNT2 >= PASS_THRESHOLD ? '✓ بلغت هدف التدريب' : '◐ واصل التدريب وراجع الأخطاء', dCls: hasAttempts && bestNT2 >= PASS_THRESHOLD ? 'up' : 'flat' },
+    { cls: 'k5', icon: '🎯', label: 'متوسط أفضل نتائج التدريب', value: hasAttempts ? pct(bestNT2) : '—', delta: !hasAttempts ? 'ابدأ بمحاولة تدريب' : bestNT2 >= PASS_THRESHOLD ? '✓ بلغت هدف التدريب' : '◐ واصل التدريب وراجع الأخطاء', dCls: hasAttempts && bestNT2 >= PASS_THRESHOLD ? 'up' : 'flat' },
     { cls: 'k6', icon: '🔥', label: 'مواظبة', value: `${streak.count} يوم`, delta: 'أيام الدراسة المتتالية', dCls: 'flat' },
   ]
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { speakDutch, stopSpeak } from '@/features/tts/speakDutch'
+import { IStop, ISpeakerHigh } from '@/components/obs/icons'
 
 interface Props {
   /** The Dutch text to read aloud. */
@@ -52,12 +53,12 @@ export function ListenButton({ text, label = 'استمع', compact }: Props) {
         aria-label={compact ? `${state === 'playing' ? 'إيقاف' : label}: ${text}` : undefined}
         style={compact ? { minWidth: 44, minHeight: 44, padding: 'var(--sp-1)' } : undefined}
       >
-        <span aria-hidden="true">{state === 'playing' ? '⏹' : '🔊'}</span>
+        <span aria-hidden="true" className="glyph">{state === 'playing' ? <IStop size={18} /> : <ISpeakerHigh size={18} />}</span>
         {!compact && (state === 'playing' ? 'إيقاف' : label)}
       </button>
       {state === 'error' && (
         <span role="alert" style={{ color: 'var(--red-text)', fontSize: 'var(--text-xs)' }}>
-          <span aria-hidden="true">⚠ </span>تعذّر تشغيل الصوت. تحقّق من الاتصال ثم أعد المحاولة.
+          <span aria-hidden="true">⚠️ </span>تعذّر تشغيل الصوت. تحقّق من الاتصال ثم أعد المحاولة.
         </span>
       )}
     </span>

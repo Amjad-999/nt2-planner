@@ -59,12 +59,12 @@ export default function Words() {
   const open = openId ? o.expressions[openId] : undefined
 
   if (recalling && recallSet.length) {
-    return <div className="o-root"><div className="o-page"><RecallQuick items={recallSet} onDone={() => setRecalling(false)} /></div></div>
+    return <div className="o-root"><div className="page page--wide"><RecallQuick items={recallSet} onDone={() => setRecalling(false)} /></div></div>
   }
 
   return (
     <div className="o-root">
-      <motion.div className="o-page" variants={container} initial="hidden" animate="show">
+      <motion.div className="page page--wide" variants={container} initial="hidden" animate="show">
         <StatusStrip />
         <motion.div variants={item}>
           <WorkspaceHead kicker="WOORDEN · UW EIGEN VOORRAAD" title="كلماتي" nl="Woorden die u echt gebruikt"
@@ -142,7 +142,7 @@ export default function Words() {
           </>
         )}
 
-        <motion.div variants={item} className="o-plane o-plane--quiet" style={{ marginTop: 24, border: '1px solid var(--o-line)' }}>
+        <motion.div variants={item} className="o-plane o-plane--quiet" style={{ marginTop: 'var(--sp-6)', border: '1px solid var(--o-line)' }}>
           <strong>قائمة كلماتك الأخرى (بطاقات المراجعة)</strong>
           <p className="o-small">{vocab.length} كلمة · {due} مستحقة الآن. هذه تُراجع بنظام التكرار المتباعد في قسم «المفردات».</p>
           <Button size="sm" variant="secondary" icon={IArrowSquareOut} onClick={() => setActiveTab('vocab')}>افتح المفردات + AI</Button>

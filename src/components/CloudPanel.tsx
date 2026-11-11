@@ -16,7 +16,7 @@ const inp: React.CSSProperties = {
 const btn = (primary = false): React.CSSProperties => ({
   background: 'var(--btn-bg)', color: primary ? 'var(--text)' : 'var(--text2)',
   border: '1px solid var(--btn-border)', borderRadius: 'var(--r-xs)', padding: '9px 16px',
-  backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+  backdropFilter: 'var(--glass-fx-control)', WebkitBackdropFilter: 'var(--glass-fx-control)',
   fontWeight: primary ? 700 : 600, fontSize: 'var(--text-sm)', fontFamily: 'inherit', cursor: 'pointer',
 })
 
@@ -32,7 +32,7 @@ export function CloudPanel() {
   return (
     <div dir="rtl" style={card}>
       <h3 style={{ margin: '0 0 4px', fontSize: 'var(--text-base)', fontWeight: 'var(--fw-heading)', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
-        <span style={{ color: 'var(--orange-text)' }}>☁️</span> الحفظ السحابي
+        <span aria-hidden="true">☁️</span> الحفظ السحابي
       </h3>
 
       {!configured ? (

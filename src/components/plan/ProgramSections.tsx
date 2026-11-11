@@ -41,7 +41,7 @@ function SectionRow({ sectionId, title, lessonIds, lessons, minutesOf }: {
     }}>
       {/* الحالة مقرونة برمز دائمًا، فلا يحملها اللون وحده */}
       <span aria-hidden style={{ color: all ? 'var(--green-text)' : done > 0 ? 'var(--amber-text)' : 'var(--text2)' }}>
-        {all ? '✔' : done > 0 ? '◐' : '○'}
+        {all ? '✓' : done > 0 ? '◐' : '○'}
       </span>
       <span style={{ flex: '1 1 200px', fontSize: 'var(--text-sm)', color: 'var(--text)' }}>{title}</span>
       <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', whiteSpace: 'nowrap' }}>

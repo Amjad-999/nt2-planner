@@ -79,8 +79,8 @@ export function KpiCard({ cls, icon, label, value, delta, deltaClass, editable, 
       className="relative overflow-hidden rounded-card p-[14px_16px] glow-card w-full flex flex-col"
       style={{
         background: 'var(--glass-bg)',
-        backdropFilter: 'blur(16px) saturate(1.3)',
-        WebkitBackdropFilter: 'blur(16px) saturate(1.3)',
+        backdropFilter: 'var(--glass-fx-panel)',
+        WebkitBackdropFilter: 'var(--glass-fx-panel)',
         border: '1px solid var(--glass-border)',
         boxShadow: 'var(--elev-1), inset 0 1px 0 var(--glass-hi)',
       }}

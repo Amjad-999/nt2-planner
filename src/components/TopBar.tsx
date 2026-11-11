@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import { getDaysLeft } from '@/store/useAppStore'
 import { AppIcon } from './AppIcon'
+import { Logo } from './brand/Logo'
 import { Magnetic } from './Magnetic'
 import { ThemeToggle } from './themes/ThemeToggle'
 import { CalendarDots, Fire, DownloadSimple, GearSix } from './icons'
@@ -42,13 +43,14 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
 
   return (
     <header
-      className="app-bar sticky top-0 z-[200] flex items-center gap-1 sm:gap-3 border-b"
+      className="app-bar sticky top-0 flex items-center gap-1 sm:gap-3 border-b"
       style={{
+        zIndex: 'var(--z-bar)',
         background: 'var(--topbar-bg)',
-        backdropFilter: 'blur(20px) saturate(1.8)',
-        WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+        backdropFilter: 'var(--glass-fx-bar)',
+        WebkitBackdropFilter: 'var(--glass-fx-bar)',
         borderColor: 'var(--glass-border)',
-        boxShadow: 'var(--elev-1), inset 0 1px 0 var(--glass-hi)',
+        boxShadow: 'var(--o-shadow-1), var(--glass-bevel)',
       }}
     >
       {/* Logo */}
@@ -59,13 +61,9 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
         title="الصفحة الرئيسية"
         aria-label="الصفحة الرئيسية"
       >
-        <div
-          className="w-[34px] h-[34px] rounded-lg flex items-center justify-center text-[var(--text-base)] font-bold shrink-0"
-          style={{ background: 'var(--grad-primary)', color: 'var(--on-primary)', boxShadow: 'var(--elev-2)', border: '1px solid var(--btn-border)' }}
-          aria-hidden="true"
-        >NT</div>
-        <div aria-hidden="true" dir="ltr" className="hidden lg:block font-display text-[var(--text-lg)] font-bold text-[var(--text)] tracking-tight leading-none">
-          NT2<span style={{ color: 'var(--orange-text)' }}>·</span>Planner
+        <Logo size={36} />
+        <div aria-hidden="true" dir="ltr" lang="nl" className="brand-wordmark hidden sm:block">
+          NT2 <span>Planner</span>
         </div>
       </a>
 
@@ -79,7 +77,7 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
       {daysLeft != null && (
         <div
           className="decor-flourish hidden lg:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[var(--text-xs)] text-[var(--muted)] whitespace-nowrap"
-          style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
+          style={{ background: 'var(--glass-bg)', backdropFilter: 'var(--glass-fx-control)', borderColor: 'var(--glass-border)' }}
           title="الأيام المتبقية حتى الامتحان"
         >
           <AppIcon icon={CalendarDots} size={15} style={{ color: 'var(--orange-text)' }} />
@@ -92,7 +90,7 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
       {/* Streak pill — hidden on phones (shown in the hero + KPIs); Focus Mode hides it too */}
       <div
         className="decor-flourish hidden lg:flex items-center gap-1.5 border rounded-full px-3.5 py-[5px] text-[var(--text-xs)] text-[var(--muted)] whitespace-nowrap"
-        style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', borderColor: 'var(--glass-border)' }}
+        style={{ background: 'var(--glass-bg)', backdropFilter: 'var(--glass-fx-control)', borderColor: 'var(--glass-border)' }}
         title="عدد أيام المواظبة المتتالية"
       >
         <AppIcon icon={Fire} size={15} style={{ color: 'var(--orange-text)' }} />
@@ -147,8 +145,10 @@ export function TopBar({ onOpenSettings, onOpenProfile, onInstall, showInstall, 
   )
 }
 
-export function IconBtn({ children, onClick, title, 'aria-label': ariaLabel }: {
+export function IconBtn({ children, onClick, title, 'aria-label': ariaLabel, pressed }: {
   children: React.ReactNode; onClick: () => void; title?: string; 'aria-label'?: string
+  /** Set on toggle buttons so the on/off state is announced, not only coloured. */
+  pressed?: boolean
 }) {
   return (
     <Magnetic>
@@ -156,8 +156,9 @@ export function IconBtn({ children, onClick, title, 'aria-label': ariaLabel }: {
         onClick={onClick}
         title={title}
         aria-label={ariaLabel}
+        aria-pressed={pressed}
         className="btn-shine icon-btn rounded-lg flex items-center justify-center text-[var(--text-base)] text-[var(--muted)] cursor-pointer font-[inherit] transition-all hover:-translate-y-0.5"
-        style={{ background: 'var(--btn-bg)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1px solid var(--btn-border)', boxShadow: 'var(--elev-1)' }}
+        style={{ background: 'var(--btn-bg)', backdropFilter: 'var(--glass-fx-control)', WebkitBackdropFilter: 'var(--glass-fx-control)', border: '1px solid var(--btn-border)', boxShadow: 'var(--elev-1)' }}
       >
         {children}
       </button>

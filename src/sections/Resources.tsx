@@ -11,6 +11,7 @@ import type { ExamEntry } from '@/data/examPdfs'
 import { EXAM_AUDIO } from '@/data/examAudio'
 import type { AudioTrack } from '@/data/examAudio'
 import { Callout } from '@/components/ui/Callout'
+import { IArrowSquareOut, IDownloadSimple } from '@/components/obs/icons'
 
 // Check which files actually exist on the server (HEAD request)
 async function checkAvail(filename: string): Promise<boolean> {
@@ -42,7 +43,7 @@ function PdfModal({ state, onClose }: { state: ModalState; onClose: () => void }
       onClick={(e) => { if (e.target === overlayRef.current) onClose() }}
       style={{
         position: 'fixed', inset: 0, zIndex: 1000,
-        background: 'rgba(0,0,0,.65)', backdropFilter: 'blur(4px)',
+        background: 'rgba(0,0,0,.65)', backdropFilter: 'var(--glass-fx-control)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 16,
       }}
@@ -69,14 +70,14 @@ function PdfModal({ state, onClose }: { state: ModalState; onClose: () => void }
               rel="noopener noreferrer"
               style={{ fontSize: 'var(--text-xs)', padding: '5px 12px', borderRadius: 'var(--r-xs)', border: '1px solid var(--blue)', color: 'var(--blue-text)', background: 'transparent', textDecoration: 'none', fontFamily: 'inherit', cursor: 'pointer' }}
             >
-              ↗ فتح في نافذة جديدة
+              <span className="icon-flip-rtl" style={{ display: 'inline-flex', verticalAlign: '-0.15em' }}><IArrowSquareOut size={16} aria-hidden /></span> فتح في نافذة جديدة
             </a>
             <a
               href={state.src}
               download
               style={{ fontSize: 'var(--text-xs)', padding: '5px 12px', borderRadius: 'var(--r-xs)', border: '1px solid var(--green, #965D3B)', color: 'var(--green, #965D3B)', background: 'transparent', textDecoration: 'none', fontFamily: 'inherit', cursor: 'pointer' }}
             >
-              ⬇ تنزيل
+              <span style={{ display: 'inline-flex', verticalAlign: '-0.15em' }}><IDownloadSimple size={16} aria-hidden /></span> تنزيل
             </a>
             <button
               onClick={onClose}
@@ -126,7 +127,7 @@ export default function Resources() {
   return (
     <div className="page">
       <h2 className="section-title">
-        <span style={{ color: 'var(--orange-text)' }}>🔗</span> مصادر رسمية وعلى الإنترنت <span aria-hidden="true">🌍</span>
+        <span aria-hidden="true">🌍</span> مصادر رسمية وعلى الإنترنت
       </h2>
 
       <Callout tone="info" icon="💡" style={{ marginBottom: 'var(--sp-4)' }}>
@@ -191,8 +192,8 @@ function ExamCard({
       className="relative overflow-hidden glow-card"
       style={{
         background: 'var(--glass-bg)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
+        backdropFilter: 'var(--glass-fx-panel)',
+        WebkitBackdropFilter: 'var(--glass-fx-panel)',
         border: '1px solid var(--glass-border)',
         borderRadius: 'var(--r-sm)',
         padding: '14px 14px 12px',
@@ -253,7 +254,7 @@ function ResourceLinkCard({ link }: { link: ResourceLink }) {
       className="relative overflow-hidden glow-card"
       style={{
         background: link.highlight ? 'var(--orange-l)' : 'var(--glass-bg)',
-        backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+        backdropFilter: 'var(--glass-fx-control)', WebkitBackdropFilter: 'var(--glass-fx-control)',
         border: `1px ${link.warn ? 'dashed' : 'solid'} ${link.highlight ? 'var(--orange)' : 'var(--glass-border)'}`,
         borderRadius: 'var(--r-sm)', padding: 14, textDecoration: 'none',
         color: 'inherit', display: 'block',
@@ -396,7 +397,7 @@ function ExamActionButton({
         onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--blue)' }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--glass-border)' }}
       >
-        ↗
+        <span className="icon-flip-rtl" style={{ display: 'inline-flex', verticalAlign: '-0.15em' }}><IArrowSquareOut size={16} aria-hidden /></span>
       </a>
       <a
         href={`/exams/${filename}`}
@@ -406,7 +407,7 @@ function ExamActionButton({
         onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--green, #965D3B)' }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--glass-border)' }}
       >
-        ⬇
+        <span style={{ display: 'inline-flex', verticalAlign: '-0.15em' }}><IDownloadSimple size={16} aria-hidden /></span>
       </a>
     </div>
   )

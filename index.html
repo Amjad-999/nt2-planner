@@ -28,11 +28,27 @@
     <meta name="apple-mobile-web-app-title" content="NT2 Planner" />
     <meta name="format-detection" content="telephone=no" />
 
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <style>
+      .boot{position:fixed;inset:0;display:grid;place-content:center;justify-items:center;gap:14px;background:#ECE9DF;color:#101820;font:700 1.15rem/1 system-ui,sans-serif;letter-spacing:-.01em}
+      @media (prefers-color-scheme:dark){.boot{background:#101820;color:#F5F3EB}}
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Startup mark: painted by the HTML itself, so the first frame shows the
+         brand instead of a blank page. React replaces it on its first render —
+         it adds no delay of its own. -->
+    <div id="root"><div class="boot" role="status" aria-label="NT2 Planner">
+      <svg viewBox="0 0 512 512" width="88" height="88" aria-hidden="true">
+        <defs><linearGradient id="boot-g" x1="56" y1="64" x2="456" y2="450" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#6D8AFF"/><stop offset="1" stop-color="#3149C4"/></linearGradient></defs>
+        <path d="M148 64H364A92 92 0 0 1 456 156V276A92 92 0 0 1 364 368H240L132 450Q116 461 120 442L140 368H148A92 92 0 0 1 56 276V156A92 92 0 0 1 148 64Z" fill="url(#boot-g)"/>
+        <path d="M184 268L328 168" fill="none" stroke="#F5F3EB" stroke-width="26" stroke-linecap="round"/>
+        <circle cx="184" cy="268" r="31" fill="#F5F3EB"/><circle cx="328" cy="168" r="45" fill="#D7FF72"/>
+      </svg>
+      <span dir="ltr" lang="nl">NT2 Planner</span>
+    </div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

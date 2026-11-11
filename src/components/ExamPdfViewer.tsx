@@ -4,6 +4,7 @@ import { Document, Page } from 'react-pdf'
 import 'react-pdf/dist/Page/AnnotationLayer.css'
 import 'react-pdf/dist/Page/TextLayer.css'
 import type { PDFDocumentProxy } from 'pdfjs-dist'
+import { pct } from '@/lib/utils'
 
 interface Props {
   /** Path or URL to the PDF file */
@@ -112,8 +113,8 @@ export function ExamPdfViewer({ src, title }: Props) {
           gap: 'var(--sp-1)',
           padding: '8px 10px',
           background: 'var(--glass-bg)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
+          backdropFilter: 'var(--glass-fx-control)',
+          WebkitBackdropFilter: 'var(--glass-fx-control)',
           borderBottom: '1px solid var(--glass-border)',
           flexWrap: 'wrap',
         }}
@@ -134,7 +135,7 @@ export function ExamPdfViewer({ src, title }: Props) {
         {/* Zoom controls */}
         <TbBtn onClick={zoomOut} disabled={!fitWidth && scale <= MIN_SCALE} aria-label="تصغير" title="تصغير (-)">−</TbBtn>
         <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text2)', minWidth: 40, textAlign: 'center' }}>
-          {fitWidth ? 'عرض' : `${Math.round(scale * 100)}%`}
+          {fitWidth ? 'عرض' : pct(Math.round(scale * 100))}
         </span>
         <TbBtn onClick={zoomIn} disabled={!fitWidth && scale >= MAX_SCALE} aria-label="تكبير" title="تكبير (+)">+</TbBtn>
         <TbBtn
@@ -143,7 +144,7 @@ export function ExamPdfViewer({ src, title }: Props) {
           title={fitWidth ? 'التكبير اليدوي' : 'ملاءمة العرض'}
           style={{ fontSize: 'var(--text-2xs)', padding: '5px 8px' }}
         >
-          {fitWidth ? '↔' : '⊡'}
+          {fitWidth ? '⟷' : '⊡'}
         </TbBtn>
       </div>
 
@@ -210,8 +211,8 @@ export function ExamPdfViewer({ src, title }: Props) {
             padding: '8px',
             borderTop: '1px solid var(--glass-border)',
             background: 'var(--glass-bg)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
+            backdropFilter: 'var(--glass-fx-control)',
+            WebkitBackdropFilter: 'var(--glass-fx-control)',
           }}
         >
           <TbBtn onClick={prev} disabled={page <= 1} aria-label="الصفحة السابقة"
@@ -255,8 +256,8 @@ function TbBtn({
         border: '1px solid var(--btn-border)',
         borderRadius: 'var(--r-xs)',
         background: 'var(--btn-bg)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
+        backdropFilter: 'var(--glass-fx-control)',
+        WebkitBackdropFilter: 'var(--glass-fx-control)',
         color: 'var(--text2)',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.4 : 1,

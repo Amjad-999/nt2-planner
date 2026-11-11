@@ -27,7 +27,7 @@ export function RoleplayReview({ sc, run, onRestart, onBack }: { sc: RoleplaySce
         <p className="o-small">تُفحص فقط: المخاطبة الرسمية، ترتيب الفعل، صيغة الطلب، وتغطية المطلوب. ليس تقييمًا شاملًا للغة.</p>
       </header>
 
-      <ol className="o-list" style={{ marginTop: 16 }}>
+      <ol className="o-list" style={{ marginTop: 'var(--sp-4)' }}>
         {sc.turns.map((spec, k) => {
           const t = run.turns[k]
           const list = issues[k]
@@ -48,7 +48,7 @@ export function RoleplayReview({ sc, run, onRestart, onBack }: { sc: RoleplaySce
                   <SpeakButton text={spec.modelNl} />
                 </div>
               </div>
-              <div className="o-row" style={{ gap: 6 }}>
+              <div className="o-row" style={{ gap: 'var(--sp-2)' }}>
                 {list.map((iss) => <Chip key={iss.key} tone="warn">{ISSUE_TITLES_AR[iss.key]}</Chip>)}
                 {!list.length && t?.text && <Chip tone="mint" icon={ICheckCircle}>لا ملاحظة قاعدية</Chip>}
               </div>
@@ -59,7 +59,7 @@ export function RoleplayReview({ sc, run, onRestart, onBack }: { sc: RoleplaySce
       </ol>
 
       {sc.expressionIds.length > 0 && (
-        <p className="o-small" style={{ marginTop: 12 }}>
+        <p className="o-small" style={{ marginTop: 'var(--sp-3)' }}>
           تعابير هذا الموقف: {sc.expressionIds.map((id) => expressionSeed(id)?.seed.nl).filter(Boolean).join(' · ')} — ما استخدمته بجملك يُضاف إلى «كلماتي» كاستخدام مستقل.
         </p>
       )}

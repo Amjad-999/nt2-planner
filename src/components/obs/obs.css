@@ -9,8 +9,8 @@
 
 /* ── page ── */
 .o-root { color: var(--o-ink); font-family: var(--o-font-ui); }
-.o-page { max-width: 1180px; margin: 0 auto; padding: 28px 24px 72px; }
-@media (max-width: 767px) { .o-page { padding: 16px 16px 32px; } }
+/* The page container is the app-wide `.page` shell (globals.css); the
+   workspaces add `.page--wide`. There is no second container here. */
 .o-stack > * + * { margin-top: var(--o-s5); }
 .o-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--o-s3); }
 .o-grow { flex: 1 1 auto; min-width: 0; }
@@ -39,7 +39,14 @@
   font-family: var(--o-font-display); font-weight: 560; font-variation-settings: 'opsz' 72, 'SOFT' 50;
   direction: ltr; unicode-bidi: isolate; letter-spacing: -0.015em; line-height: 1.08; overflow-wrap: anywhere; hyphens: auto;
 }
-.o-nl-display em, .o-nl-display.is-italic { font-style: italic; }
+/* `:lang(nl)` in globals.css matches every DESCENDANT of a Dutch element too
+   (language is inherited), so a <span> inside a display line was being reset
+   to the body face: the workspace headers rendered in Inter while the hero
+   rendered the same class in Fraunces. Children keep the line's own type. */
+.o-nl-display :lang(nl), .o-token__word :lang(nl) { font-family: inherit; line-height: inherit; letter-spacing: inherit; font-feature-settings: inherit; }
+/* Emphasis inside a Dutch display line is weight, never a slant: Fraunces is
+   loaded upright only, so `italic` here was a synthetic oblique. */
+.o-nl-display em { font-style: normal; font-weight: 700; }
 
 /* ── focus: ring + halo so it reads on paper, night and lime alike ── */
 .o-root :focus-visible, .o-sheet :focus-visible {
@@ -58,7 +65,8 @@
 
 .o-night {
   position: relative; isolation: isolate; overflow: hidden;
-  background: var(--o-night); color: var(--o-on-night); border-radius: var(--o-r-xl);
+  /* lit from the top-left, like every object that sits on it */
+  background: linear-gradient(155deg, var(--o-night-2) 0%, var(--o-night) 46%); color: var(--o-on-night); border-radius: var(--o-r-xl);
   box-shadow: var(--o-shadow-3); border: 1px solid var(--o-line-night);
 }
 .o-night::before { /* atmospheric light: cobalt key, mint rim, lime spark */
@@ -94,7 +102,7 @@
 .o-btn--ghost { background: transparent; color: var(--o-ink-2); border-color: transparent; padding: 0 12px; }
 .o-btn--ghost:hover:not(:disabled) { background: var(--o-paper-sunk); color: var(--o-ink); }
 .o-btn--night { background: var(--o-frost); color: var(--o-on-night); border-color: var(--o-frost-line); }
-.o-btn--night:hover:not(:disabled) { border-color: var(--o-on-night-2); }
+.o-btn--night:hover:not(:disabled) { background: var(--o-night-3); border-color: var(--o-on-night-2); }
 .o-btn--danger { background: transparent; color: var(--o-error-ink); border-color: var(--o-error-ink); }
 .o-btn--sm { min-height: 44px; padding: 0 14px; font-size: .9rem; }
 .o-btn--block { width: 100%; }
@@ -236,33 +244,39 @@
 /* ═════════════ 3D family ═════════════ */
 
 /* Word token — a tactile satin tile. The text is real HTML; depth is light,
-   edge and shadow. Reduced motion keeps the object, drops the tilt. */
+   edge and shadow. Reduced motion keeps the object, drops the tilt.
+   One light for the whole family, top-left: it lays a rim line along the top
+   of the face, lets the face roll off toward its lower edge, lights the upper
+   half of the wall more than the lower, and throws the cast shadow down and
+   to the right. --wall / --wall-2 are the only things a colour variant sets. */
 .o-token {
   --tilt-x: 10deg; --tilt-y: -8deg; --lift: 0px;
+  --wall: var(--o-satin-edge); --wall-2: var(--o-satin-edge-2);
+  --token-face: inset 0 1px 0 var(--o-satin-hi), inset 0 -10px 12px -10px var(--o-token-shade);
   position: relative; display: inline-grid; gap: 2px; justify-items: center; text-align: center;
   min-width: 112px; padding: 14px 18px 12px; border-radius: 20px; color: var(--o-ink);
-  background: var(--o-satin); border: 1px solid var(--o-line);
-  box-shadow: 0 6px 0 var(--o-satin-edge), var(--o-shadow-token), inset 0 1px 0 var(--o-satin-hi);
+  background: var(--o-satin); border: 1px solid var(--o-token-rim);
+  box-shadow: var(--token-face), 0 3px 0 var(--wall), 0 6px 0 var(--wall-2), var(--o-shadow-token);
   transform: perspective(700px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(var(--lift));
   transform-style: preserve-3d;
   transition: transform var(--o-dur-panel) var(--o-ease-emph), box-shadow var(--o-dur-panel) var(--o-ease-emph);
 }
 .o-token::before { /* specular sweep */
   content: ''; position: absolute; inset: 1px; border-radius: inherit; pointer-events: none;
-  background: linear-gradient(115deg, var(--o-satin-hi) 0%, transparent 38%);
-  opacity: .7;
+  background: radial-gradient(120% 95% at 10% 0%, var(--o-satin-hi), transparent 48%);
+  opacity: .55;
 }
 .o-token__word { font-family: var(--o-font-display); font-weight: 600; font-size: 1.12rem; direction: ltr; unicode-bidi: isolate; line-height: 1.2; overflow-wrap: anywhere; }
 .o-token__gloss { font-size: .78rem; color: var(--o-ink-2); line-height: 1.4; }
-.o-token--cobalt { background: var(--o-satin-cobalt); box-shadow: 0 6px 0 var(--o-satin-cobalt-edge), var(--o-shadow-token), inset 0 1px 0 var(--o-satin-hi); color: var(--o-on-lime); border-color: transparent; }
+.o-token--cobalt { --wall: var(--o-satin-cobalt-edge); --wall-2: var(--o-satin-cobalt-edge-2); background: var(--o-satin-cobalt); color: var(--o-on-lime); }
 .o-token--cobalt .o-token__gloss { color: var(--o-on-lime); }
-.o-token--mint { background: var(--o-satin-mint); box-shadow: 0 6px 0 var(--o-satin-mint-edge), var(--o-shadow-token), inset 0 1px 0 var(--o-satin-hi); color: var(--o-on-lime); border-color: transparent; }
+.o-token--mint { --wall: var(--o-satin-mint-edge); --wall-2: var(--o-satin-mint-edge-2); background: var(--o-satin-mint); color: var(--o-on-lime); }
 .o-token--mint .o-token__gloss { color: var(--o-on-lime); }
 /* Interactive tokens: the button is a plain wrapper (framer owns its transform
    during a layout morph); the tilt lives on the inner tile. */
 .o-token-btn { display: inline-block; padding: 0; border: 0; background: none; cursor: pointer; font: inherit; color: inherit; border-radius: 20px; }
 .o-token-btn:hover .o-token, .o-token-btn:focus-visible .o-token { --tilt-x: 2deg; --tilt-y: 0deg; --lift: -4px; }
-.o-token-btn:active .o-token { --lift: 2px; box-shadow: 0 2px 0 var(--o-satin-edge), var(--o-shadow-token), inset 0 1px 0 var(--o-satin-hi); }
+.o-token-btn:active .o-token { --lift: 3px; box-shadow: var(--token-face), 0 2px 0 var(--wall-2), var(--o-shadow-token); }
 .o-token--sm { min-width: 0; padding: 9px 12px 8px; border-radius: 14px; }
 .o-token--sm .o-token__word { font-size: .98rem; }
 .o-token__stage { position: absolute; inset-block-start: -8px; inset-inline-end: -8px; }
@@ -331,6 +345,9 @@ html[data-motion="reduced"] .o-settle { opacity: 1; }
   display: grid; place-items: center; color: var(--o-on-lime);
   transform: translateY(calc(var(--level) * -4px));
 }
+/* Sphere shading shared by every state: the terminator falls bottom-right,
+   away from the same top-left light the word objects use. */
+.o-orb__core::after { content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none; box-shadow: inset -12px -16px 24px -10px var(--o-token-shade), inset 2px 3px 2px -1px var(--o-satin-hi); }
 .o-orb[data-state="recording"] .o-orb__core { background: radial-gradient(circle at 34% 28%, var(--o-satin-hi), transparent 42%), var(--o-satin-lime); box-shadow: 0 10px 0 var(--o-lime-edge), 0 30px 40px -20px var(--o-ink); }
 .o-orb[data-state="recording"] .o-orb__ring { border-color: var(--o-night-lime); }
 .o-orb[data-state="playing"] .o-orb__ring { border-color: var(--o-night-cobalt); }
@@ -347,7 +364,7 @@ html[data-motion="reduced"] .o-orb__ring, html[data-motion="reduced"] .o-orb__co
 .o-stage .o-timer { font-family: var(--o-font-mono); font-size: 1.3rem; letter-spacing: .04em; direction: ltr; }
 
 /* ── sheet / drawer (dialog) ── */
-.o-sheet-backdrop { position: fixed; inset: 0; z-index: 960; background: var(--overlay-bg); display: flex; align-items: flex-end; justify-content: center; }
+.o-sheet-backdrop { position: fixed; inset: 0; z-index: var(--z-sheet); background: var(--overlay-bg); display: flex; align-items: flex-end; justify-content: center; }
 .o-sheet {
   width: 100%; max-height: 62dvh; overflow-y: auto; background: var(--o-paper); color: var(--o-ink);
   border-radius: var(--o-r-xl) var(--o-r-xl) 0 0; box-shadow: var(--o-shadow-3); padding: 12px 18px calc(20px + env(safe-area-inset-bottom));
@@ -407,6 +424,10 @@ html[data-motion="reduced"] .o-orb__ring, html[data-motion="reduced"] .o-orb__co
   padding: var(--o-s6) var(--o-s6) var(--o-s5);
 }
 .o-hero__text { display: grid; gap: 14px; align-content: start; }
+/* The neural field is the hero's own background layer: under the text and the
+   word objects, above the atmospheric light. */
+.o-neural { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; z-index: 0; pointer-events: none; }
+.o-hero > :not(.o-neural) { position: relative; z-index: 1; }
 .o-hero__nl { font-size: clamp(1.5rem, 3.2vw, 2.3rem); color: var(--o-night-cobalt); }
 .o-hero__next {
   display: grid; gap: 2px; padding: 12px 16px; border-radius: var(--o-r-md);

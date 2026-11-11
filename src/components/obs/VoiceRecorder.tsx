@@ -47,7 +47,7 @@ export function VoiceRecorder({ initialId, initialDuration, maxSec = 90, target 
         {statusText[s]}
       </p>
 
-      <div className="o-row" style={{ justifyContent: 'center', marginTop: 12 }}>
+      <div className="o-row" style={{ justifyContent: 'center', marginTop: 'var(--sp-3)' }}>
         {(s === 'idle') && <Button variant="primary" icon={IMicrophone} onClick={start}>ابدأ التسجيل</Button>}
         {s === 'requesting' && <Button variant="night" disabled>بانتظار الإذن…</Button>}
         {s === 'recording' && <Button variant="primary" icon={IStop} onClick={stop}>أوقف التسجيل</Button>}
@@ -62,7 +62,7 @@ export function VoiceRecorder({ initialId, initialDuration, maxSec = 90, target 
       </div>
 
       {s === 'denied' && (
-        <div style={{ marginTop: 12, textAlign: 'start' }}>
+        <div style={{ marginTop: 'var(--sp-3)', textAlign: 'start' }}>
           <Notice tone="warn" title="لا نستطيع التسجيل بلا إذن."
             actions={<Button size="sm" variant="secondary" onClick={retry}>حاولت تفعيله — أعد المحاولة</Button>}>
             افتح إعدادات الموقع في المتصفّح (رمز القفل بجانب العنوان) واسمح بالميكروفون، أو اكتب إجابتك بدلًا من ذلك.
@@ -70,11 +70,11 @@ export function VoiceRecorder({ initialId, initialDuration, maxSec = 90, target 
         </div>
       )}
       {s === 'unsupported' && (
-        <div style={{ marginTop: 12, textAlign: 'start' }}>
+        <div style={{ marginTop: 'var(--sp-3)', textAlign: 'start' }}>
           <Notice tone="warn" title="متصفّحك لا يدعم التسجيل هنا.">جرّب متصفّحًا حديثًا، أو اكتب إجابتك — الكتابة تُحفظ بالطريقة نفسها.</Notice>
         </div>
       )}
-      <p className="o-small" style={{ marginTop: 12 }}>التسجيل يبقى على هذا الجهاز فقط. لا يوجد في هذا التطبيق تفريغ نصي آلي ولا تقييم للنطق.</p>
+      <p className="o-small" style={{ marginTop: 'var(--sp-3)' }}>التسجيل يبقى على هذا الجهاز فقط. لا يوجد في هذا التطبيق تفريغ نصي آلي ولا تقييم للنطق.</p>
     </div>
   )
 }
