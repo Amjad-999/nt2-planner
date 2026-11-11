@@ -51,7 +51,7 @@ export default function Exam() {
     { id:'listening', label:'🎧 الاستماع (Luisteren)' },
     { id:'writing',   label:'✍️ الكتابة (Schrijven)' },
     { id:'speaking',  label:'🗣️ التحدّث (Spreken)' },
-    { id:'words',     label:'🆕 كلمات الامتحانات' },
+    { id:'words',     label:'🔤 كلمات الامتحانات' },
   ]
 
   return (
@@ -76,7 +76,7 @@ export default function Exam() {
 function PassBar({ pct }: { pct: number }) {
   const pass = pct >= PASS_THRESHOLD
   return (
-    <div style={{ padding:16, borderRadius:'var(--r)', background:'var(--glass-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--glass-border)', margin:'14px 0', textAlign:'center', boxShadow:'var(--elev-1)' }}>
+    <div style={{ padding:16, borderRadius:'var(--r)', background:'var(--glass-bg)', backdropFilter:'var(--glass-fx-control)', WebkitBackdropFilter:'var(--glass-fx-control)', border:'1px solid var(--glass-border)', margin:'14px 0', textAlign:'center', boxShadow:'var(--elev-1)' }}>
       <div style={{ fontFamily:'var(--font-latin)', fontSize:'var(--text-2xl)', fontWeight:'var(--fw-heading)', color:pass?'var(--green-text)':'var(--orange-text)', lineHeight:'var(--lh-tight)', fontFeatureSettings:"'tnum'" }}>{pct}%</div>
       <div style={{ fontSize:'var(--text-sm)', color:'var(--text2)', marginTop:'var(--sp-1)' }}>{pass?'✅ فوق عتبة النجاح (65%)':'❌ تحت العتبة — استمرّ!'}</div>
       <div style={{ height:8, background:'var(--surface3)', borderRadius:'var(--r-2xs)', margin:'14px 0 4px', overflow:'hidden', position:'relative' }}>
@@ -105,14 +105,14 @@ function WritingView({ s }: { s: S }) {
             <h3 dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', fontSize:'var(--text-lg)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'0 0 6px' }}>
               📝 {w.titleNl}
             </h3>
-            <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:'18px 20px', margin:'12px 0 10px', boxShadow:'var(--elev-1)' }}>
+            <div style={{ background:'var(--glass-bg)', backdropFilter:'var(--glass-fx-control)', WebkitBackdropFilter:'var(--glass-fx-control)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:'18px 20px', margin:'12px 0 10px', boxShadow:'var(--elev-1)' }}>
               {/* Dutch brief → LTR */}
               <p dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', lineHeight:'var(--lh-arabic)' }}><strong>Opdracht:</strong> {w.briefNl}</p>
               {/* Arabic UI guidance — stays RTL */}
               <p style={{ fontSize:'var(--text-sm)', color:'var(--muted)', marginTop:'var(--sp-2)' }}>عدد الكلمات المستهدف: <strong>{w.minWords}–{w.maxWords}</strong></p>
             </div>
             <textarea value={cur.text??''} aria-label={`إجابة مهمّة الكتابة: ${w.titleNl}`} onChange={(e)=>{ s.saveWriting(w.id,e.target.value); clearTimeout((window as unknown as Record<string,number>)._wSave); (window as unknown as Record<string,ReturnType<typeof setTimeout>>)._wSave=setTimeout(()=>s.save(),600) }} rows={8} placeholder="اكتب إجابتك بالهولندية هنا..." dir="ltr" lang="nl"
-              style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:'var(--r-sm)', background:'var(--glass-bg-strong)', backdropFilter:'blur(6px)', fontFamily:'var(--font-latin)', fontSize:'var(--text-base)', color:'var(--text)', resize:'vertical', minHeight:80, lineHeight:'var(--lh-ui)' }} />
+              style={{ width:'100%', padding:'10px 12px', border:'1px solid var(--border2)', borderRadius:'var(--r-sm)', background:'var(--glass-bg-strong)', backdropFilter:'var(--glass-fx-control)', fontFamily:'var(--font-latin)', fontSize:'var(--text-base)', color:'var(--text)', resize:'vertical', minHeight:80, lineHeight:'var(--lh-ui)' }} />
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'var(--sp-2)', flexWrap:'wrap', gap:'var(--sp-2)' }}>
               <div style={{ fontSize:'var(--text-sm)', color:inRange?'var(--green-text)':'var(--muted)' }}><strong>{wc}</strong> كلمة / {w.minWords}–{w.maxWords}</div>
               <div style={{ display:'flex', gap:'var(--sp-2)' }}>
@@ -166,10 +166,10 @@ function SpeakingView({ s }: { s: S }) {
                 {/* الترقيم داخل كل جزء يبدأ من واحد، فبدونه يبدو الجزء الثاني
                     وكأنّه كلّ البنك. إضافة المجموع تُزيل هذا الالتباس. */}
                 <div dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', fontWeight:'var(--fw-heading)', color:'var(--text)', marginBottom:'var(--sp-2)' }}>
-                  🎤 Spreektaak {idx + 1} / {grp.arr.length}
+                  🗣️ Spreektaak {idx + 1} / {grp.arr.length}
                 </div>
                 {/* Dutch situation + task → LTR, no Arabic translations */}
-                <div dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', background:'var(--glass-bg)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:'18px 20px', marginBottom:'var(--sp-3)', boxShadow:'var(--elev-1)', lineHeight:'var(--lh-arabic)' }}>
+                <div dir="ltr" lang="nl" style={{ fontFamily:'var(--font-latin)', background:'var(--glass-bg)', backdropFilter:'var(--glass-fx-control)', WebkitBackdropFilter:'var(--glass-fx-control)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:'18px 20px', marginBottom:'var(--sp-3)', boxShadow:'var(--elev-1)', lineHeight:'var(--lh-arabic)' }}>
                   <p><strong>Situatie:</strong> {sp.situatieNl}</p>
                   <p style={{ marginTop:'var(--sp-2)' }}><strong>Taak:</strong> {sp.taakNl}</p>
                 </div>
@@ -237,7 +237,7 @@ function WordsView({ s }: { s: S }) {
           )}
         </div>
         <PrimaryBtn onClick={openAdd}>➕ إضافة كلمة</PrimaryBtn>
-        {dueExam.length>0 && <GhostBtn onClick={()=>setReviewing(true)}>🎴 مراجعة ({dueExam.length})</GhostBtn>}
+        {dueExam.length>0 && <GhostBtn onClick={()=>setReviewing(true)}>🗂️ مراجعة ({dueExam.length})</GhostBtn>}
       </div>
       {search.trim() && (
         <div style={{ fontSize:'var(--text-sm)', color:'var(--muted)', marginBottom:'var(--sp-2)' }} aria-live="polite" aria-atomic="true">
@@ -248,7 +248,7 @@ function WordsView({ s }: { s: S }) {
         ? <FlashCard queue={dueExam} onGrade={(id,q)=>gradeFlash(id,q,true)} onDone={()=>setReviewing(false)} />
         : filtered.length===0
           ? <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--r-sm)', padding:'14px 18px', fontSize:'var(--text-base)', color:'var(--text2)' }}>
-              {examWords.length===0 ? '🆕 لا توجد كلمات بعد.' : '🔍 لا توجد نتائج تطابق بحثك.'}
+              {examWords.length===0 ? '🔤 لا توجد كلمات بعد.' : '🔍 لا توجد نتائج تطابق بحثك.'}
             </div>
           : filtered.map((w) => {
               const r = resultMap.get(w.id)
@@ -267,7 +267,7 @@ function WordsView({ s }: { s: S }) {
 
 /* ── Shared helpers ── */
 function Card({ children }: { children: React.ReactNode }) {
-  return <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:18, boxShadow:'var(--elev-1)', marginBottom:'var(--sp-4)' }}>{children}</div>
+  return <div style={{ background:'var(--glass-bg)', backdropFilter:'var(--glass-fx-panel)', WebkitBackdropFilter:'var(--glass-fx-panel)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:18, boxShadow:'var(--elev-1)', marginBottom:'var(--sp-4)' }}>{children}</div>
 }
 
 /* Chunked Dutch TTS play/stop button — long transcripts exceed the ~200-char
@@ -281,13 +281,13 @@ function TtsPlayer({ text, label = '🔊 استمع للنصّ' }: { text: strin
       style={{
         display:'inline-flex', alignItems:'center', gap:'var(--sp-2)', padding:'9px 16px', margin:'4px 0',
         borderRadius:'var(--r-sm)', border:'1px solid var(--btn-border)', cursor:'pointer',
-        backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)',
+        backdropFilter:'var(--glass-fx-control)', WebkitBackdropFilter:'var(--glass-fx-control)',
         background: speaking ? 'var(--orange-l)' : 'var(--btn-bg)',
         color: speaking ? 'var(--orange-text)' : 'var(--text2)',
         fontFamily:'inherit', fontSize:'var(--text-sm)', fontWeight:'var(--fw-heading)', boxShadow:'var(--elev-1)',
       }}
     >
-      {speaking ? '⏹ إيقاف' : label}
+      {speaking ? '⏹️ إيقاف' : label}
     </button>
   )
 }

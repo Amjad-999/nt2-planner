@@ -5,10 +5,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        arabic: ['Tajawal', 'sans-serif'],
-        latin: ['Inter', 'sans-serif'],
-        display: ['Tajawal', 'sans-serif'],
-        sans: ['Tajawal', 'sans-serif'],
+        arabic: ['NT2 Emoji', 'Tajawal', 'sans-serif'],
+        latin: ['NT2 Emoji', 'Inter', 'sans-serif'],
+        display: ['NT2 Emoji', 'Tajawal', 'sans-serif'],
+        sans: ['NT2 Emoji', 'Tajawal', 'sans-serif'],
       },
       colors: {
         accent: 'var(--orange)',

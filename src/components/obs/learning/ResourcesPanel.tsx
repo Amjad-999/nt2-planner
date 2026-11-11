@@ -16,10 +16,10 @@ export function ResourcesPanel() {
   const [all, setAll] = useState(false)
   const groups = all ? RESOURCE_GROUPS : RESOURCE_GROUPS.slice(0, 2)
   return (
-    <div className="o-stack" style={{ gap: 16 }}>
+    <div className="o-stack" style={{ gap: 'var(--sp-4)' }}>
       {groups.map((g) => (
         <section key={g.title} aria-label={g.title}>
-          <h3 className="o-label" style={{ marginBottom: 8 }}>{g.title}</h3>
+          <h3 className="o-label" style={{ marginBottom: 'var(--sp-2)' }}>{g.title}</h3>
           <ul className="o-list">
             {g.links.map((l) => (
               <li key={l.href} className="o-card" style={{ padding: 12 }}>
@@ -28,7 +28,7 @@ export function ResourcesPanel() {
                   <span className="o-sr"> (يفتح في نافذة جديدة)</span>
                 </a>
                 <span className="o-small">{l.desc}</span>
-                <span className="o-row" style={{ gap: 6 }}>
+                <span className="o-row" style={{ gap: 'var(--sp-2)' }}>
                   <span className="o-meta">{provider(l.href)}</span>
                   {l.warn ? <Chip tone="error" icon={IWarningCircle}>مُبلَّغ أنه معطّل</Chip> : <Chip>لم يتحقّق منه التطبيق</Chip>}
                 </span>

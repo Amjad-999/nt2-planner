@@ -40,7 +40,7 @@ export function ContextPanel({ item, showText }: { item: LessonItem; showText: b
       </ul>
 
       {showText && (
-        <details style={{ marginTop: 12 }}>
+        <details style={{ marginTop: 'var(--sp-3)' }}>
           <summary className="o-link" style={{ minHeight: 44, display: 'flex', alignItems: 'center' }}>النص كاملًا</summary>
           <Passage item={item} />
         </details>
@@ -48,7 +48,7 @@ export function ContextPanel({ item, showText }: { item: LessonItem; showText: b
 
       <h3>ملاحظاتي على هذا الموضوع</h3>
       {notes.length > 0 && (
-        <ul className="o-list" style={{ marginBottom: 8 }}>
+        <ul className="o-list" style={{ marginBottom: 'var(--sp-2)' }}>
           {notes.map((n) => <li key={n.id} className="o-card o-small" style={{ color: 'var(--o-ink)' }}>{n.text}</li>)}
         </ul>
       )}
@@ -56,7 +56,7 @@ export function ContextPanel({ item, showText }: { item: LessonItem; showText: b
         <span className="o-sr">ملاحظة جديدة</span>
         <textarea className="o-textarea" rows={3} value={draft} onChange={(e) => { setDraft(e.target.value); setSavedMsg('') }} placeholder="مثلًا: «ophalen» ينفصل: ik haal … op" />
       </label>
-      <div className="o-row" style={{ marginTop: 8 }}>
+      <div className="o-row" style={{ marginTop: 'var(--sp-2)' }}>
         <Button size="sm" variant="secondary" icon={INotePencil} onClick={addNote} disabled={!draft.trim()}>احفظ الملاحظة</Button>
         <span className="o-small" role="status">{savedMsg}</span>
       </div>

@@ -7,7 +7,12 @@ import type { ReactNode } from 'react'
    word is joined to the situations where the learner can use it. Lines are
    SVG (non-scaling stroke, drawn once on enter); nodes are HTML so the text
    stays crisp, translatable and readable by assistive tech via `summary`.
-   No continuous motion — it draws, settles, and stays still. */
+   No continuous motion — it draws, settles, and stays still.
+
+   links="field": the picture sits on a NeuralField (the Today hero). The SVG
+   lines are left out and every object is tagged with data-neural-id /
+   data-neural-to instead, so the field grows its fibres to these exact
+   objects and carries signals between them. */
 
 export interface CNode { id: string; nl: string; gloss?: string; badge?: ReactNode; contexts?: number[]; tone?: 'paper' | 'mint' | 'cobalt' }
 
@@ -19,6 +24,8 @@ interface Props {
   compact?: boolean
   animate?: boolean
   onOpen?: (id: string) => void
+  /** 'svg' draws the links here; 'field' hands them to a surrounding NeuralField. */
+  links?: 'svg' | 'field'
   /** Accessible description of what the picture shows. */
   summary: string
 }
@@ -43,7 +50,7 @@ function curve([x1, y1]: P, [x2, y2]: P, bend = 0.18): string {
   return `M ${x1} ${y1} Q ${mx - dy * bend} ${my + dx * bend} ${x2} ${y2}`
 }
 
-export function Constellation({ center, nodes, contexts, variant = 'night', compact, animate = true, onOpen, summary }: Props) {
+export function Constellation({ center, nodes, contexts, variant = 'night', compact, animate = true, onOpen, links = 'svg', summary }: Props) {
   // Phones get three word objects on a flatter plane: the start action must stay near the top.
   const list = nodes.slice(0, compact ? 3 : 4)
   const pos = (compact ? COMPACT : WIDE)[Math.max(1, list.length)] ?? WIDE[4]
@@ -54,12 +61,19 @@ export function Constellation({ center, nodes, contexts, variant = 'night', comp
   const C: P = [50, 50]
   const anim = animate ? ' o-draw' : ''
   const settle = animate ? ' o-settle' : ''
+  const field = links === 'field'
+  // Context chips a word is linked to — the labels that are actually on screen.
+  const shown = compact ? contexts.slice(0, 3) : ctx
+  const linksOf = (n: CNode) => ['c', ...(n.contexts ?? []).filter((c) => c < shown.length).map((c) => `ctx-${c}`)].join(' ')
 
   return (
     <>
     <figure className={`o-constellation${variant === 'paper' ? ' o-constellation--paper' : ''}`} style={compact ? { aspectRatio: '4 / 2.6', minHeight: 190 } : undefined}>
       <figcaption className="o-sr">{summary}</figcaption>
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      {field && (
+        <div className="o-cnode" data-neural-id="c" style={{ left: '50%', top: '50%', width: 1, height: 1 }} aria-hidden="true" />
+      )}
+      {!field && <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
         {list.map((n, i) => (
           <path key={n.id} className={'o-clink' + anim} d={curve(C, pos[i])} pathLength={100}
             vectorEffect="non-scaling-stroke" style={{ ['--d' as string]: `${120 + i * 70}ms` }} />
@@ -69,9 +83,9 @@ export function Constellation({ center, nodes, contexts, variant = 'night', comp
             vectorEffect="non-scaling-stroke" strokeDasharray={animate ? undefined : '2 3'}
             style={{ opacity: 0.55, ['--d' as string]: `${420 + i * 60}ms` }} />
         )))}
-      </svg>
+      </svg>}
       {ctx.map((label, i) => (
-        <span key={label} className={'o-ctx' + settle} aria-hidden="true"
+        <span key={label} className={'o-ctx' + settle} aria-hidden="true" data-neural-id={field ? `ctx-${i}` : undefined}
           style={{ left: `${ctxPos[i][0]}%`, top: `${ctxPos[i][1]}%`, ['--d' as string]: `${480 + i * 80}ms` }}>
           {label}
         </span>
@@ -80,7 +94,8 @@ export function Constellation({ center, nodes, contexts, variant = 'night', comp
         <WordToken nl={center.nl} gloss={center.gloss} tone="cobalt" />
       </div>
       {list.map((n, i) => (
-        <div key={n.id} className={'o-cnode' + settle} style={{ left: `${pos[i][0]}%`, top: `${pos[i][1]}%`, ['--d' as string]: `${200 + i * 70}ms` }}>
+        <div key={n.id} className={'o-cnode' + settle} data-neural-id={field ? `n-${n.id}` : undefined} data-neural-to={field ? linksOf(n) : undefined}
+          style={{ left: `${pos[i][0]}%`, top: `${pos[i][1]}%`, ['--d' as string]: `${200 + i * 70}ms` }}>
           <WordToken nl={n.nl} gloss={compact && !n.tone ? undefined : n.gloss} size="sm" badge={n.badge} tone={n.tone}
             onOpen={onOpen ? () => onOpen(n.id) : undefined} layoutId={onOpen ? `tok-${n.id}` : undefined}
             label={onOpen ? `${n.nl} — افتح التفاصيل` : undefined} />
@@ -88,8 +103,8 @@ export function Constellation({ center, nodes, contexts, variant = 'night', comp
       ))}
     </figure>
     {compact && contexts.length > 0 && (
-      <div className="o-row" aria-hidden="true" style={{ justifyContent: 'center', gap: 6, marginTop: 10 }}>
-        {contexts.slice(0, 3).map((c) => <span key={c} className="o-ctx" style={{ position: 'static', transform: 'none' }}>{c}</span>)}
+      <div className="o-row" aria-hidden="true" style={{ justifyContent: 'center', gap: 'var(--sp-2)', marginTop: 'var(--sp-3)' }}>
+        {contexts.slice(0, 3).map((c, i) => <span key={c} className="o-ctx" data-neural-id={field ? `ctx-${i}` : undefined} style={{ position: 'static', transform: 'none' }}>{c}</span>)}
       </div>
     )}
     </>

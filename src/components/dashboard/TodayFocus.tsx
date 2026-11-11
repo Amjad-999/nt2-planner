@@ -6,6 +6,7 @@ import { useNow } from '@/hooks/useNow'
 import { SKILL_AR } from '@/data/phases'
 import { Button } from '@/components/ui/Button'
 import { SKILL_NL } from './lastMock'
+import { IPlay } from '@/components/obs/icons'
 
 /** Why each kind of step matters — one sentence, so the button is never a bare order. */
 const WHY: Record<string, string> = {
@@ -74,7 +75,7 @@ export function TodayFocus({ onStartSession }: { onStartSession: () => void }) {
           <p style={{ margin: '0 0 var(--sp-1)', color: 'var(--text)', fontSize: 'var(--text-base)' }}>{task.detailAr}</p>
           <p style={{ margin: '0 0 var(--sp-4)', color: 'var(--text2)', fontSize: 'var(--text-sm)', lineHeight: 'var(--lh-arabic)' }}>{WHY[task.id]}</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--sp-3)' }}>
-            <Button variant="primary" size="lg" icon="▶" onClick={() => open(task)}>{cta(task)}</Button>
+            <Button variant="primary" size="lg" icon={<IPlay size={20} />} onClick={() => open(task)}>{cta(task)}</Button>
             {task.tab !== 'plan' && (
               <Button variant="ghost" onClick={onStartSession}>برنامج اليوم الكامل</Button>
             )}

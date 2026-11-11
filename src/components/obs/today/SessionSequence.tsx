@@ -34,7 +34,7 @@ export function SessionSequence({ title, run, item, planned, pace, minutesToday 
         <h2 className="o-h3" id="seq-title">{title ?? (run ? 'تسلسل هذه الجلسة' : 'كيف ستسير الجلسة')}</h2>
         <span className="o-small">مخطط: {Math.round(total)} د{pace ? ` · معدَّل ≈ ${Math.round(total * pace)} د` : ''}</span>
       </div>
-      <ol className="o-seq" style={{ marginTop: 10 }}>
+      <ol className="o-seq" style={{ marginTop: 'var(--sp-3)' }}>
         {STEP_ORDER.map((k, i) => {
           const s = run?.steps[i]
           const done = !!s?.doneAt
@@ -53,7 +53,7 @@ export function SessionSequence({ title, run, item, planned, pace, minutesToday 
           )
         })}
       </ol>
-      <div style={{ marginTop: 14, display: 'grid', gap: 6 }}>
+      <div style={{ marginTop: 'var(--sp-4)', display: 'grid', gap: 'var(--sp-2)' }}>
         <div className="o-row" style={{ justifyContent: 'space-between' }}>
           <span className="o-small">وقت فعلي في هذه الجلسة: {mins(actual)} د من ≈ {Math.round(total)} مخطط</span>
           <span className="o-small">اليوم كله: {mins(minutesToday)} د فعلية</span>

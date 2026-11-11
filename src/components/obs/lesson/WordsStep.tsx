@@ -111,7 +111,7 @@ function WordCard({ seed, index, total, item, run, update, onNext }: StepProps &
           <motion.div className="o-word__detail" layoutId={level === 'reduced' ? undefined : `w-${seed.id}`} transition={layoutTransition(level, 'panel')}>
             <div className="o-row" style={{ justifyContent: 'space-between' }}>
               <p className="o-nl-display" lang="nl">{seed.nl}</p>
-              <div className="o-row" style={{ gap: 6 }}>
+              <div className="o-row" style={{ gap: 'var(--sp-2)' }}>
                 <SpeakButton text={seed.nl} />
                 <Button size="sm" variant={saved ? 'secondary' : 'ghost'} icon={IBookmarkSimple} aria-pressed={saved} onClick={toggleSave}>
                   {saved ? 'محفوظة في «كلماتي» (اضغط للإلغاء)' : 'احفظ في «كلماتي»'}
@@ -161,7 +161,7 @@ function WordCard({ seed, index, total, item, run, update, onNext }: StepProps &
               <textarea className="o-textarea" lang="nl" dir="ltr" rows={2} value={own} onChange={(e) => setOwn(e.target.value)} placeholder="Bijvoorbeeld over uw eigen week…" />
             </label>
             <fieldset className="o-ctx-pick">
-              <legend className="o-small" style={{ marginBottom: 6 }}>في أي موقف ستقولها؟</legend>
+              <legend className="o-small" style={{ marginBottom: 'var(--sp-2)' }}>في أي موقف ستقولها؟</legend>
               {CONTEXTS.map((c) => (
                 <label key={c}><input type="radio" name={`ctx-${seed.id}`} checked={ctx === c} onChange={() => setCtx(c)} /><span>{CONTEXT_AR[c]}</span></label>
               ))}

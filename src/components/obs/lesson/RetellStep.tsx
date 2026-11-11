@@ -60,7 +60,7 @@ export function RetellStep({ item, run, readOnly, onComplete, update }: StepProp
       {readOnly ? (
         <p className="o-small">{a.skipped ? 'تخطّيت هذه الخطوة.' : `${a.recordingId ? `تسجيل (${Math.round(a.durationSec)} ث)` : ''}${a.recordingId && a.typed ? ' + ' : ''}${a.typed ? 'نص مكتوب' : ''}`}</p>
       ) : (
-        <div className="o-seg" role="radiogroup" aria-label="طريقة الإجابة" style={{ marginBottom: 12 }}>
+        <div className="o-seg" role="radiogroup" aria-label="طريقة الإجابة" style={{ marginBottom: 'var(--sp-3)' }}>
           <label><input type="radio" name="retell-mode" checked={mode === 'speak'} onChange={() => setMode('speak')} /><span><IMicrophone size={18} />&nbsp;تحدّث</span></label>
           <label><input type="radio" name="retell-mode" checked={mode === 'type'} onChange={() => setMode('type')} /><span><IKeyboard size={18} />&nbsp;اكتب</span></label>
         </div>
@@ -75,9 +75,9 @@ export function RetellStep({ item, run, readOnly, onComplete, update }: StepProp
             onDiscard={() => update((o) => recordRetell(o, { recordingId: '', durationSec: 0, selfCheck: [] }, Date.now()))}
             onTypeInstead={() => setMode('type')} />
           {a.recordingId && (
-            <fieldset className="o-plane" style={{ marginTop: 14 }}>
+            <fieldset className="o-plane" style={{ marginTop: 'var(--sp-4)' }}>
               <legend className="o-h3" style={{ padding: '0 6px' }}>تقييم ذاتي: ما الذي ذكرته؟</legend>
-              <p className="o-small" style={{ marginBottom: 8 }}>استمع لتسجيلك ثم علّم النقاط التي قلتها. هذا تقديرك أنت — لا يوجد تقييم آلي للكلام.</p>
+              <p className="o-small" style={{ marginBottom: 'var(--sp-2)' }}>استمع لتسجيلك ثم علّم النقاط التي قلتها. هذا تقديرك أنت — لا يوجد تقييم آلي للكلام.</p>
               <ul className="o-list">
                 {item.retell.points.map((pt, i) => (
                   <li key={i}>
@@ -95,7 +95,7 @@ export function RetellStep({ item, run, readOnly, onComplete, update }: StepProp
       )}
 
       {(mode === 'type' || readOnly) && (
-        <div className="o-field" style={{ marginTop: 6 }}>
+        <div className="o-field" style={{ marginTop: 'var(--sp-2)' }}>
           <label className="o-label" htmlFor="retell-text">إعادتك المكتوبة</label>
           <textarea id="retell-text" className="o-textarea" lang="nl" dir="ltr" rows={6} value={readOnly ? a.typed : typed} readOnly={readOnly}
             onChange={(e) => { setTyped(e.target.value); setChecked(false) }} placeholder="De tekst gaat over…" />
@@ -103,10 +103,10 @@ export function RetellStep({ item, run, readOnly, onComplete, update }: StepProp
           {!readOnly && <div><Button size="sm" variant="secondary" onClick={() => setChecked(true)} disabled={!typed.trim()}>أي النقاط ذكرت؟</Button></div>}
           {checked && (
             <div className="o-plane o-plane--quiet" style={{ border: '1px solid var(--o-line)' }} aria-live="polite">
-              <p className="o-small" style={{ marginBottom: 6 }}>فحص كلمات مفتاحية فقط — ليس تقييمًا للغتك:</p>
+              <p className="o-small" style={{ marginBottom: 'var(--sp-2)' }}>فحص كلمات مفتاحية فقط — ليس تقييمًا للغتك:</p>
               <ul className="o-list">
                 {item.retell.points.map((pt, i) => (
-                  <li key={i} className="o-row" style={{ gap: 8 }}>
+                  <li key={i} className="o-row" style={{ gap: 'var(--sp-2)' }}>
                     {hits.includes(i) ? <Chip tone="mint" icon={ICheck}>ذُكرت</Chip> : <Chip>لم تظهر</Chip>}
                     <span>{pt.ar}</span>
                   </li>

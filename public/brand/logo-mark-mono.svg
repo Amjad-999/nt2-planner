@@ -1,0 +1,14 @@
+<!-- One colour. The points and the link are cut out of the bubble, so it works on any background.
+     Change `color` (or the fill) to recolour. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="NT2 Planner">
+  <title>NT2 Planner</title>
+  <defs>
+    <mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+      <rect width="512" height="512" fill="#fff"/>
+      <path d="M184 268L328 168" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round"/>
+  <circle cx="184" cy="268" r="31" fill="#000"/>
+  <circle cx="328" cy="168" r="45" fill="#000"/>
+    </mask>
+  </defs>
+  <path d="M148 64H364A92 92 0 0 1 456 156V276A92 92 0 0 1 364 368H240L132 450Q116 461 120 442L140 368H148A92 92 0 0 1 56 276V156A92 92 0 0 1 148 64Z" fill="currentColor" mask="url(#m)"/>
+</svg>

@@ -222,7 +222,7 @@ export const PROGRAM_STATUS_AR: Record<ProgramHealth['status'], string> = {
 /** رمز لكل حالة — المعنى لا يُنقل باللون وحده. */
 export const PROGRAM_STATUS_ICON: Record<ProgramHealth['status'], string> = {
   ahead: '▲',
-  ontrack: '✔',
+  ontrack: '✓',
   behind: '▼',
   critical: '!',
   done: '★',

@@ -37,8 +37,8 @@ function Radio<T extends string | number>({ name, value, options, onChange, labe
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section className="o-plane" aria-labelledby={id}>
-      <h2 className="o-h3" id={id} style={{ marginBottom: 12 }}>{title}</h2>
-      <div className="o-stack" style={{ gap: 16 }}>{children}</div>
+      <h2 className="o-h3" id={id} style={{ marginBottom: 'var(--sp-3)' }}>{title}</h2>
+      <div className="o-stack" style={{ gap: 'var(--sp-4)' }}>{children}</div>
     </section>
   )
 }
@@ -57,7 +57,7 @@ export default function LearnSettings({ onOpenSettings }: { onOpenSettings?: () 
 
   return (
     <div className="o-root">
-      <div className="o-page">
+      <div className="page page--wide">
         <StatusStrip />
         <WorkspaceHead kicker="INSTELLINGEN" title="الإعدادات" nl="Uw voorkeuren" lede="كل خيار هنا يُحفظ فورًا على هذا الجهاز، ويُزامَن مع حسابك إن كنت مسجّلًا." />
         <div className="o-grid-2">
@@ -120,7 +120,7 @@ export default function LearnSettings({ onOpenSettings }: { onOpenSettings?: () 
                 <label>سياقات مختلفة <input className="o-input" type="number" min={1} max={5} value={s.activeRule.contexts} onChange={(e) => setRule({ contexts: Math.min(5, Math.max(1, Number(e.target.value) || 1)) })} /></label>
                 <label>أيام مختلفة <input className="o-input" type="number" min={1} max={7} value={s.activeRule.days} onChange={(e) => setRule({ days: Math.min(7, Math.max(1, Number(e.target.value) || 1)) })} /></label>
               </div>
-              <label className="o-check" style={{ marginTop: 8 }}>
+              <label className="o-check" style={{ marginTop: 'var(--sp-2)' }}>
                 <input type="checkbox" checked={s.activeRule.countSelfReports} onChange={(e) => setRule({ countSelfReports: e.target.checked })} />
                 <span>احسب التقارير الذاتية («استخدمتها خارج التطبيق»)</span>
               </label>
@@ -138,7 +138,7 @@ export default function LearnSettings({ onOpenSettings }: { onOpenSettings?: () 
         </div>
 
         {onOpenSettings && (
-          <div className="o-plane o-plane--quiet" style={{ marginTop: 24, border: '1px solid var(--o-line)' }}>
+          <div className="o-plane o-plane--quiet" style={{ marginTop: 'var(--sp-6)', border: '1px solid var(--o-line)' }}>
             <strong>إعدادات أخرى</strong>
             <p className="o-small">الاسم، تاريخ الامتحان، الحساب والمزامنة السحابية، واختيار الصوت بالتفصيل.</p>
             <Button size="sm" variant="secondary" icon={IGearSix} onClick={onOpenSettings}>افتح الإعدادات العامة</Button>

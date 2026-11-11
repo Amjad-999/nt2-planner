@@ -213,11 +213,11 @@ export function Overlay({ children, onClose, label }: { children: React.ReactNod
 
   return (
     <div
-      style={{ position:'fixed', inset:0, background:'var(--overlay-bg)', backdropFilter:'blur(10px) saturate(1.2)', WebkitBackdropFilter:'blur(10px) saturate(1.2)', zIndex:900, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
+      style={{ position:'fixed', inset:0, background:'var(--overlay-bg)', backdropFilter:'var(--glass-fx-control)', WebkitBackdropFilter:'var(--glass-fx-control)', zIndex:'var(--z-modal)', display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
       role="dialog" aria-modal="true" aria-label={label}
     >
-      <div ref={panelRef} tabIndex={-1} style={{ outline:'none', background:'var(--modal-bg)', backdropFilter:'blur(30px) saturate(2)', WebkitBackdropFilter:'blur(30px) saturate(2)', border:'1px solid var(--modal-border)', boxShadow:'var(--elev-3), inset 0 1px 0 var(--glass-hi)', borderRadius:'calc(var(--r) + 2px)', padding:24, maxWidth:520, width:'100%', maxHeight:'88vh', overflowY:'auto', animation:'popIn .28s cubic-bezier(.2,.8,.2,1) both' }}>
+      <div ref={panelRef} tabIndex={-1} style={{ outline:'none', background:'var(--modal-bg)', backdropFilter:'var(--glass-fx-float)', WebkitBackdropFilter:'var(--glass-fx-float)', border:'1px solid var(--modal-border)', boxShadow:'var(--elev-3), inset 0 1px 0 var(--glass-hi)', borderRadius:'calc(var(--r) + 2px)', padding:24, maxWidth:520, width:'100%', maxHeight:'88vh', overflowY:'auto', animation:'popIn .28s cubic-bezier(.2,.8,.2,1) both' }}>
         {children}
       </div>
     </div>
@@ -250,7 +250,7 @@ export function Field({ label, children }: { label: string; children: React.Reac
 // eslint-disable-next-line react-refresh/only-export-components -- مساعد أنماط (ليس مكوّنًا)
 export function btnStyle(variant: 'primary'|'ghost'|'danger') {
   const base = { display:'inline-flex', alignItems:'center', justifyContent:'center', gap:'var(--sp-2)', padding:'10px 18px', borderRadius:'var(--r-sm)', fontFamily:'inherit', fontSize:'var(--text-sm)', fontWeight:'var(--fw-heading)', cursor:'pointer', border:'1px solid transparent', transition:'.18s' } as const
-  if (variant==='primary') return { ...base, background:'var(--btn-bg)', backdropFilter:'blur(10px)' as const, WebkitBackdropFilter:'blur(10px)' as const, color:'var(--text)', fontWeight:'var(--fw-cta)', borderColor:'var(--btn-border)', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }
+  if (variant==='primary') return { ...base, background:'var(--btn-bg)', backdropFilter:'var(--glass-fx-control)' as const, WebkitBackdropFilter:'var(--glass-fx-control)' as const, color:'var(--text)', fontWeight:'var(--fw-cta)', borderColor:'var(--btn-border)', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }
   if (variant==='danger') return { ...base, background:'transparent', color: 'var(--red-text)', borderColor:'var(--red)' }
-  return { ...base, background:'var(--btn-bg)', backdropFilter:'blur(10px)' as const, WebkitBackdropFilter:'blur(10px)' as const, color:'var(--text2)', borderColor:'var(--btn-border)', boxShadow:'var(--elev-1)' }
+  return { ...base, background:'var(--btn-bg)', backdropFilter:'var(--glass-fx-control)' as const, WebkitBackdropFilter:'var(--glass-fx-control)' as const, color:'var(--text2)', borderColor:'var(--btn-border)', boxShadow:'var(--elev-1)' }
 }

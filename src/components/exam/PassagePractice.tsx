@@ -6,6 +6,7 @@ import { Callout } from '@/components/ui/Callout'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { ChoiceList } from '@/components/practice/ChoiceList'
 import { ListeningAudio } from './ListeningAudio'
+import { pct } from '@/lib/utils'
 
 type Item = ExamReadingItem | ExamListeningItem
 type Answers = Record<string, Record<number, number>>
@@ -62,7 +63,7 @@ export function PassagePractice({ kind, items, answers, onAnswer, onReset }: Pro
           {items.map((it, i) => {
             const s = scoreOf(it, answers[it.id] ?? {})
             const status = s.complete
-              ? `${s.pct! >= PASS_THRESHOLD ? '✓' : '◐'} النتيجة ${s.pct}%`
+              ? `${s.pct! >= PASS_THRESHOLD ? '✓' : '◐'} النتيجة ${pct(s.pct!)}`
               : s.answered > 0 ? `◐ أجبت ${s.answered} من ${it.questions.length}` : `○ ${it.questions.length} أسئلة`
             return (
               <li key={it.id}>
@@ -133,7 +134,7 @@ export function PassagePractice({ kind, items, answers, onAnswer, onReset }: Pro
         <Callout tone={s.pct! >= PASS_THRESHOLD ? 'success' : 'warn'} role="status" style={{ marginTop: 'var(--sp-4)' }}>
           <strong style={{ color: 'var(--text)', fontSize: 'var(--text-lg)' }}>النتيجة: {s.correct} من {item.questions.length} ({s.pct}%)</strong>
           <p style={{ margin: 'var(--sp-1) 0 var(--sp-3)' }}>
-            {s.pct! >= PASS_THRESHOLD ? `فوق هدف التدريب (${PASS_THRESHOLD}%).` : `تحت هدف التدريب (${PASS_THRESHOLD}%). راجع الإجابات الخاطئة وشرحها، ثم أعد المحاولة لاحقًا.`}
+            {s.pct! >= PASS_THRESHOLD ? `فوق هدف التدريب (${pct(PASS_THRESHOLD)}).` : `تحت هدف التدريب (${pct(PASS_THRESHOLD)}). راجع الإجابات الخاطئة وشرحها، ثم أعد المحاولة لاحقًا.`}
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-2)' }}>
             {nextItem

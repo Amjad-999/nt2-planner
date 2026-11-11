@@ -4,6 +4,7 @@ import { JourneyHero } from '@/components/hero/JourneyHero'
 import { useAppStore } from '@/store/useAppStore'
 import { todayKey } from '@/lib/utils'
 import { celebrate } from '@/lib/celebrate'
+import { pct } from '@/lib/utils'
 
 // Real confetti needs a canvas 2D context jsdom doesn't have (same reasoning
 // as exam-countdown.test.tsx) — and mocking lets us assert call counts.
@@ -198,15 +199,15 @@ describe('JourneyHero — three store states', () => {
     expect(screen.getAllByText('7').length).toBeGreaterThan(0)     // مواظبة
     expect(screen.getAllByText('25د').length).toBeGreaterThan(0)   // درست اليوم
     expect(screen.getAllByText('3/12').length).toBeGreaterThan(0)  // اليوم / الخطة
-    expect(screen.getAllByText('60%').length).toBeGreaterThan(0)   // جاهزية
-    expect(screen.getAllByText('42%').length).toBeGreaterThan(0)   // تقدم اليوم
+    expect(screen.getAllByText(pct(60)).length).toBeGreaterThan(0)   // جاهزية
+    expect(screen.getAllByText(pct(42)).length).toBeGreaterThan(0)   // تقدم اليوم
   })
 
   it('(c) goal met: bar saturates at 100% and the day is consumed without a first-paint celebration', () => {
     useAppStore.setState({ dailyHistory: { [todayKey()]: day(75) } })  // 75 ≥ 60
     render(<JourneyHero />)
 
-    expect(screen.getAllByText('100%').length).toBeGreaterThan(0)
+    expect(screen.getAllByText(pct(100)).length).toBeGreaterThan(0)
     expect(celebrate).not.toHaveBeenCalled()
     expect(useAppStore.getState().goalCelebratedOn).toBe(todayKey())
   })

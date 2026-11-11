@@ -48,7 +48,7 @@ export default function Learning() {
 
   return (
     <div className="o-root">
-      <motion.div className="o-page" variants={container} initial="hidden" animate="show">
+      <motion.div className="page page--wide" variants={container} initial="hidden" animate="show">
         <StatusStrip />
         <motion.div variants={item}>
           <WorkspaceHead kicker="LEREN · WAT U ECHT DEED" title="تعلّمي" nl="Uw bewijs, uw plan"
@@ -74,7 +74,7 @@ export default function Learning() {
               {obs.length === 0 ? (
                 <p className="o-small">لا ملاحظات بعد. تظهر هنا فقط صعوبات تكرّرت مرتين على الأقل في تمارينك المسجّلة.</p>
               ) : (
-                <ul className="o-list" style={{ marginTop: 10 }}>
+                <ul className="o-list" style={{ marginTop: 'var(--sp-3)' }}>
                   {obs.map((ob) => (
                     <li key={ob.id} className="o-card">
                       <strong>{ob.titleAr}</strong>
@@ -87,7 +87,7 @@ export default function Learning() {
             </motion.section>
 
             <motion.section variants={item} className="o-plane" aria-labelledby="hist-title">
-              <h2 className="o-h3" id="hist-title" style={{ marginBottom: 10 }}>سجلّ العمل</h2>
+              <h2 className="o-h3" id="hist-title" style={{ marginBottom: 'var(--sp-3)' }}>سجلّ العمل</h2>
               <HistoryList sessions={o.history} roleplays={o.roleplays} attempts={o.attempts} />
             </motion.section>
 
@@ -102,18 +102,18 @@ export default function Learning() {
             )}
 
             <motion.section variants={item} className="o-plane" aria-labelledby="notes-title">
-              <h2 className="o-h3" id="notes-title" style={{ marginBottom: 10 }}>ملاحظاتي</h2>
+              <h2 className="o-h3" id="notes-title" style={{ marginBottom: 'var(--sp-3)' }}>ملاحظاتي</h2>
               <NotesPanel />
             </motion.section>
           </div>
 
           <div className="o-stack">
             <motion.section variants={item} className="o-plane" aria-labelledby="plan-title">
-              <h2 className="o-h3" id="plan-title" style={{ marginBottom: 10 }}>خطتي</h2>
+              <h2 className="o-h3" id="plan-title" style={{ marginBottom: 'var(--sp-3)' }}>خطتي</h2>
               <PlanEditor />
               <hr className="o-divider" />
               <Meta>MEER PLANNING</Meta>
-              <div className="o-row" style={{ marginTop: 8 }}>
+              <div className="o-row" style={{ marginTop: 'var(--sp-2)' }}>
                 <Button size="sm" variant="secondary" icon={IArrowSquareOut} onClick={() => setActiveTab('plan')}>خطة الكتب (184 درسًا)</Button>
                 <Button size="sm" variant="secondary" icon={IArrowSquareOut} onClick={() => setActiveTab('stats')}>التحليلات</Button>
                 <Button size="sm" variant="secondary" icon={IArrowSquareOut} onClick={() => setActiveTab('grammar')}>القواعد</Button>
@@ -121,8 +121,8 @@ export default function Learning() {
             </motion.section>
 
             <motion.section variants={item} className="o-plane" aria-labelledby="res-title">
-              <h2 className="o-h3" id="res-title" style={{ marginBottom: 4 }}>مصادر</h2>
-              <p className="o-small o-row" style={{ gap: 6, marginBottom: 12 }}><IInfo size={16} />روابط خارجية كما هي في التطبيق، بلا تواريخ تحقّق مخترعة.</p>
+              <h2 className="o-h3" id="res-title" style={{ marginBottom: 'var(--sp-1)' }}>مصادر</h2>
+              <p className="o-small o-row" style={{ gap: 'var(--sp-2)', marginBottom: 'var(--sp-3)' }}><IInfo size={16} />روابط خارجية كما هي في التطبيق، بلا تواريخ تحقّق مخترعة.</p>
               <ResourcesPanel />
             </motion.section>
           </div>

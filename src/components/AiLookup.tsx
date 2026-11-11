@@ -56,7 +56,7 @@ export function AiLookup() {
   const dotColor = status === 'ready' ? 'var(--green)' : status === 'error' ? 'var(--red)' : 'var(--amber)'
 
   return (
-    <div style={{ background: 'linear-gradient(135deg,var(--purple-l),var(--orange-l))', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r)', padding: 18, marginBottom: 'var(--sp-4)', boxShadow: 'var(--elev-2), inset 0 1px 0 var(--glass-hi)' }}>
+    <div style={{ background: 'linear-gradient(135deg,var(--purple-l),var(--orange-l))', backdropFilter: 'var(--glass-fx-panel)', WebkitBackdropFilter: 'var(--glass-fx-panel)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r)', padding: 18, marginBottom: 'var(--sp-4)', boxShadow: 'var(--elev-2), inset 0 1px 0 var(--glass-hi)' }}>
       <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-xl)', fontWeight: 'var(--fw-heading)', color: 'var(--text)', marginBottom: 'var(--sp-1)' }}>🤖 ابحث عن كلمة هولندية بذكاء اصطناعي مجاني</h3>
       <div className="flex items-center gap-1.5 text-[var(--text-xs)] text-[var(--muted)] mb-2.5">
         <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: 'var(--r-full)', background: dotColor, verticalAlign: 'middle' }} />
@@ -68,12 +68,12 @@ export function AiLookup() {
           onKeyDown={(e) => e.key === 'Enter' && lookup()}
           placeholder="اكتب كلمة هولندية… مثل: vergadering, gezellig, afspraak"
           dir="ltr" lang="nl" autoComplete="off"
-          className="flex-1 px-3 py-2.5 rounded-xl border border-[var(--border2)] bg-[var(--glass-bg-strong)] text-[var(--text)] font-[inherit] text-[var(--text-sm)] focus:outline-none focus:border-[var(--orange)] focus:ring-[3px] focus:ring-[var(--ring-primary)]"
+          className="flex-1 min-w-0 px-3 py-2.5 rounded-xl border border-[var(--border2)] bg-[var(--glass-bg-strong)] text-[var(--text)] font-[inherit] text-[var(--text-sm)] focus:outline-none focus:border-[var(--orange)] focus:ring-[3px] focus:ring-[var(--ring-primary)]"
           aria-label="ابحث عن كلمة هولندية"
         />
         <button
           onClick={lookup} disabled={loading || !input.trim()}
-          className="btn-glass font-bold text-[var(--text)] px-5 py-2.5 rounded-xl cursor-pointer disabled:opacity-60"
+          className="btn-glass shrink-0 whitespace-nowrap font-bold text-[var(--text)] px-4 py-2.5 rounded-xl cursor-pointer disabled:opacity-60"
           style={{ boxShadow: 'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}
         >
           {loading ? '⏳' : '🔍 ابحث'}
@@ -100,7 +100,7 @@ export function AiLookup() {
               {result.examples.map((ex, i) => (
                 <div key={i} className="py-2 px-2.5 rounded-md mb-1.5" style={{ background: 'var(--surface2)' }}>
                   <div className="flex items-start gap-1.5">
-                    <span dir="ltr" lang="nl" className="flex-1 text-[var(--text2)] text-[var(--text-sm)] italic">"{ex.nl}"</span>
+                    <span dir="ltr" lang="nl" className="flex-1 text-[var(--text2)] text-[var(--text-sm)]">"{ex.nl}"</span>
                     <button
                       onClick={(e) => speakDutch(ex.nl, e.currentTarget)}
                       aria-label="استمع لنطق الجملة"
@@ -112,7 +112,7 @@ export function AiLookup() {
               ))}
             </div>
           ) : (
-            result.exampleNL && <div className="text-[var(--text2)] text-[var(--text-sm)] py-2 px-2.5 rounded-md italic mb-1" style={{ background: 'var(--surface2)' }}>"{result.exampleNL}"</div>
+            result.exampleNL && <div className="text-[var(--text2)] text-[var(--text-sm)] py-2 px-2.5 rounded-md mb-1" style={{ background: 'var(--surface2)' }}>"{result.exampleNL}"</div>
           )}
           <div className="flex gap-1.5 justify-end flex-wrap mt-2">
             <button onClick={addWithEdit} className="btn-glass text-[var(--text-xs)] px-3 py-1.5 rounded-[var(--r-sm)] text-[var(--text2)] cursor-pointer hover:text-[var(--orange-text)]">✏️ تعديل قبل الإضافة</button>

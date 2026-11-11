@@ -74,7 +74,7 @@ function BuildCard({ ex, index, total, run, update, onNext }: StepProps & { ex: 
     <StepFrame kicker={`STAP 04 · ZINNEN BOUWEN · ${index + 1}/${total}`} title={ex.promptAr} lede="اضغط الكلمات بالترتيب الصحيح. اضغط كلمة موضوعة لإعادتها.">
       <TileBuilder ex={ex} order={order} onChange={set} result={result} locked={resolved} solvedRight={!!saved?.correct} />
 
-      <div aria-live="polite" style={{ marginTop: 14 }}>
+      <div aria-live="polite" style={{ marginTop: 'var(--sp-4)' }}>
         <AnimatePresence mode="wait" initial={false}>
           {saved?.correct && (
             <motion.div key="ok" variants={revealVariants(level)} initial="hidden" animate="show" exit="exit">

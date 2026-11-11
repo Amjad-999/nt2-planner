@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useAppStore, sumLastNDays, sumPrevNDays } from '@/store/useAppStore'
 import { PASS_THRESHOLD, SKILL_AR } from '@/data/phases'
-import { dayKeyOffset, hexA } from '@/lib/utils'
+import { dayKeyOffset, hexA, pct } from '@/lib/utils'
 import { InsightCard } from '@/components/InsightCard'
 import { useCountUp } from '@/hooks/useCountUp'
 import { Callout } from '@/components/ui/Callout'
@@ -31,7 +31,7 @@ function SkillRing({ label, icon, v, att }: {
   // P5: اللون حسب القيمة — أحمر < 50، كهرماني 50–75، أخضر > 75
   const col = att === 0 ? 'var(--border)' : v >= PASS_THRESHOLD ? 'var(--green)' : 'var(--amber)'
   return (
-    <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, textAlign:'center', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
+    <div style={{ background:'var(--glass-bg)', backdropFilter:'var(--glass-fx-panel)', WebkitBackdropFilter:'var(--glass-fx-panel)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, textAlign:'center', boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
       <svg viewBox="0 0 100 100" style={{ width:96, height:96, display:'block', margin:'0 auto 8px' }} role="img" aria-label={att ? `${label}: أفضل نتيجة مسجّلة ${v}%` : `${label}: لا توجد محاولات بعد`}>
         <circle cx="50" cy="50" r="42" fill="none" stroke="var(--surface3)" strokeWidth="8"/>
         <circle cx="50" cy="50" r="42" fill="none" stroke={col} strokeWidth="8" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={offset} transform="rotate(-90 50 50)"/>
@@ -155,7 +155,7 @@ export default function Stats() {
           g.strokeStyle=c.green; g.lineWidth=2; g.setLineDash([6,4])
           g.beginPath(); g.moveTo(px,area.top); g.lineTo(px,area.bottom); g.stroke()
           g.setLineDash([]); g.fillStyle=c.green; g.font="600 11px 'Cairo',sans-serif"
-          g.textAlign='center'; g.textBaseline='bottom'; g.fillText('عتبة 65%',px,area.top-3); g.restore()
+          g.textAlign='center'; g.textBaseline='bottom'; g.fillText(`عتبة ${pct(65)}`,px,area.top-3); g.restore()
         }
       }
       const skL = [SKILL_AR.reading,SKILL_AR.listening,SKILL_AR.writing,SKILL_AR.speaking]
@@ -213,7 +213,7 @@ export default function Stats() {
 
       {/* P6: حالة فارغة ودّية عندما لا توجد بيانات بعد */}
       {Object.keys(dailyHistory).length === 0 && avgAttempts === 0 && (
-        <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:'var(--sp-8) 24px', marginBottom:'var(--sp-4)', textAlign:'center', boxShadow:'var(--elev-1)' }}>
+        <div style={{ background:'var(--glass-bg)', backdropFilter:'var(--glass-fx-panel)', WebkitBackdropFilter:'var(--glass-fx-panel)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:'var(--sp-8) 24px', marginBottom:'var(--sp-4)', textAlign:'center', boxShadow:'var(--elev-1)' }}>
           <div style={{ fontSize:'var(--glyph-lg)', marginBottom:'var(--sp-2)' }} aria-hidden="true">📊</div>
           <div style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-cta)', color:'var(--text)', marginBottom:'var(--sp-2)' }}>ابدأ سجلّ نشاطك</div>
           <div style={{ fontSize:'var(--text-sm)', color:'var(--muted)', marginBottom:'var(--sp-3)', lineHeight:'var(--lh-arabic)' }}>
@@ -251,7 +251,7 @@ export default function Stats() {
           { id:'chWords',  title:'الكلمات المُضافة يوميًا' },
           { id:'chSkills', title:'المهارات مقابل هدف التدريب' },
         ].map(({ id, title }) => (
-          <div key={id} style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
+          <div key={id} style={{ background:'var(--glass-bg)', backdropFilter:'var(--glass-fx-panel)', WebkitBackdropFilter:'var(--glass-fx-panel)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1), inset 0 1px 0 var(--glass-hi)' }}>
             <div style={{ fontSize:'var(--text-base)', fontWeight:'var(--fw-heading)', color:'var(--text)', marginBottom:'var(--sp-3)' }}>{title}</div>
             <div style={{ position:'relative', height:230 }}><canvas id={id} role="img" aria-label={title} aria-describedby="stats-data-note" /></div>
           </div>
@@ -261,25 +261,25 @@ export default function Stats() {
       {/* Streak + sparkline */}
       <h3 style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'18px 0 10px', display:'flex', alignItems:'center', gap:'var(--sp-2)' }}>
         <span aria-hidden="true" style={{ fontSize:'1em', display:'inline-block' }}>
-          {streakCount>=1?'🔥':'🕯️'}
+          {streakCount>=1?'🔥':'🌱'}
         </span>
         الاستمرارية
         <span style={{ display:'inline-flex', alignItems:'center', borderRadius:'var(--r-pill)', padding:'2px 10px', fontSize:'var(--text-xs)', fontWeight:'var(--fw-heading)', background:streakCount===0?'var(--surface3)':'var(--orange-l)', color:streakCount===0?'var(--muted)':'var(--orange-text)' }} aria-label="عدد أيام السلسلة">
           {streakCount} يوم متتالٍ
         </span>
       </h3>
-      <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1)', marginBottom:'var(--sp-4)' }}>
+      <div style={{ background:'var(--glass-bg)', backdropFilter:'var(--glass-fx-panel)', WebkitBackdropFilter:'var(--glass-fx-panel)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1)', marginBottom:'var(--sp-4)' }}>
         <div style={{ fontSize:'var(--text-xs)', color:'var(--muted)', marginBottom:'var(--sp-3)' }}>آخر 56 يوم — مجموع {act56Sum} دقيقة</div>
         <div style={{ position:'relative', height:260 }}><canvas id="chActivity" role="img" aria-label={`نشاط آخر 56 يومًا: ${act56Sum} دقيقة، وأعلى يوم ${peakVal} دقيقة`} /></div>
         <div style={{ marginTop:'var(--sp-3)', fontSize:'var(--text-xs)', color:'var(--muted)', display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:'var(--sp-2)' }}>
-          {peakDay ? <span>🌊 ذروتك: <strong style={{ color:'var(--text2)' }}>{peakVal} د</strong> ({peakDay})</span>
+          {peakDay ? <span>📈 ذروتك: <strong style={{ color:'var(--text2)' }}>{peakVal} د</strong> ({peakDay})</span>
             : <span>ابدأ جلستك الأولى لترى موجة نشاطك تكبر هنا</span>}
         </div>
       </div>
 
       {/* Exam trend */}
       <h3 style={{ fontSize:'var(--text-md)', fontWeight:'var(--fw-heading)', color:'var(--text)', margin:'18px 0 10px' }}>📈 تقدّم نتائج الامتحان</h3>
-      <div style={{ background:'var(--glass-bg)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1)', marginBottom:'var(--sp-4)' }}>
+      <div style={{ background:'var(--glass-bg)', backdropFilter:'var(--glass-fx-panel)', WebkitBackdropFilter:'var(--glass-fx-panel)', border:'1px solid var(--glass-border)', borderRadius:'var(--r)', padding:16, boxShadow:'var(--elev-1)', marginBottom:'var(--sp-4)' }}>
         <div style={{ fontSize:'var(--text-sm)', color:'var(--text2)', marginBottom:'var(--sp-3)' }}>المحاولات المسجّلة حسب التاريخ. قارن نتائجك داخل المهارة نفسها لتختار ما ستراجعه.</div>
         {avgAttempts > 0 ? <div style={{ position:'relative', height:300 }}><canvas id="chExamTrend" role="img" aria-label="نتائج محاولات التدريب حسب التاريخ" aria-describedby="stats-data-note" /></div> : <Callout tone="info" icon="○">ستظهر النتائج بعد تسجيل أول محاولة تدريب.</Callout>}
       </div>

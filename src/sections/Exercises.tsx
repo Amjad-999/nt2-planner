@@ -262,7 +262,7 @@ function MatchingExercise() {
           {/* AR drop targets */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
             <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--fw-heading)', color: 'var(--muted)', marginBottom: 'var(--sp-0)' }}>
-              🇸🇦 المعاني العربية
+              المعاني العربية
             </div>
             {s.arShuffled.map(p => {
               const nlId = placed[p.id]
@@ -308,7 +308,7 @@ function MatchingExercise() {
             aria-label={`تحقّق من ${placedCount} من ${s.pairs.length} إجابة`}
             style={{
               background: placedCount < s.pairs.length ? 'var(--surface3)' : 'var(--btn-bg)',
-              backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+              backdropFilter: 'var(--glass-fx-control)', WebkitBackdropFilter: 'var(--glass-fx-control)',
               color: placedCount < s.pairs.length ? 'var(--muted)' : 'var(--text)',
               border: '1px solid var(--btn-border)', borderRadius: 'var(--r-sm)', padding: '9px 22px',
               fontWeight: 'var(--fw-cta)', fontSize: 'var(--text-sm)', cursor: placedCount < s.pairs.length ? 'not-allowed' : 'pointer',
@@ -711,7 +711,7 @@ function FillGapExercise() {
             className="btn-shine"
             style={{
               background: placed ? 'var(--btn-bg)' : 'var(--surface3)',
-              backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+              backdropFilter: 'var(--glass-fx-control)', WebkitBackdropFilter: 'var(--glass-fx-control)',
               color: placed ? 'var(--text)' : 'var(--muted)',
               border: '1px solid var(--btn-border)', borderRadius: 'var(--r-sm)', padding: '9px 22px',
               fontWeight: 'var(--fw-cta)', fontSize: 'var(--text-sm)',
@@ -733,7 +733,7 @@ function FillGapExercise() {
 const MODES: { id: Mode; icon: string; label: string; desc: string }[] = [
   { id: 'matching', icon: '🔗', label: 'المطابقة',       desc: 'طابق الكلمات الهولندية مع معانيها العربية' },
   { id: 'sorting',  icon: '🔀', label: 'ترتيب الجملة',   desc: 'رتّب كلمات الجملة الهولندية بالترتيب الصحيح' },
-  { id: 'gap',      icon: '⬜', label: 'ملء الفراغ',      desc: 'اسحب الكلمة الصحيحة لإكمال الجملة' },
+  { id: 'gap',      icon: '🧩', label: 'ملء الفراغ',      desc: 'اسحب الكلمة الصحيحة لإكمال الجملة' },
 ]
 
 export default function Exercises() {
@@ -746,7 +746,7 @@ export default function Exercises() {
   return (
     <div dir="rtl" className="page page--narrow">
       <h2 className="section-title" style={{ marginBottom: 'var(--sp-1)' }}>
-        <span style={{ color: 'var(--orange-text)' }}>🎮</span> تمارين تفاعلية <span aria-hidden="true">🇳🇱</span>
+        <span aria-hidden="true">🎮</span> تمارين تفاعلية
       </h2>
       <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text2)', marginBottom: 'var(--sp-4)', lineHeight: 'var(--lh-arabic)' }}>
         تمارين مُولَّدة من مفرداتك. تدعم السحب والإفلات ولوحة المفاتيح واللمس.
@@ -771,7 +771,7 @@ export default function Exercises() {
               color: mode === m.id ? 'var(--orange-text)' : 'var(--text2)',
               fontWeight: mode === m.id ? 700 : 500,
               cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--text-sm)',
-              backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+              backdropFilter: 'var(--glass-fx-control)', WebkitBackdropFilter: 'var(--glass-fx-control)',
             }}
           >
             {m.icon} {m.label}
@@ -790,7 +790,7 @@ export default function Exercises() {
           style={{ display: mode === m.id ? undefined : 'none' }}
         >
           <div style={{
-            background: 'var(--glass-bg)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+            background: 'var(--glass-bg)', backdropFilter: 'var(--glass-fx-panel)', WebkitBackdropFilter: 'var(--glass-fx-panel)',
             border: '1px solid var(--glass-border)', borderRadius: 'var(--r)',
             padding: '20px 18px', boxShadow: 'var(--elev-1)',
           }}>

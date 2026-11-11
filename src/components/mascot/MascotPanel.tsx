@@ -123,7 +123,7 @@ export function MascotPanel({ batches, onClose, onDance }: Props) {
     {
       title: 'عن هولندا والعالم',
       items: [
-        { icon: '🔎', label: 'اسأليني عن أي شيء', onClick: () => setView('ask'), live: true },
+        { icon: '🔍', label: 'اسأليني عن أي شيء', onClick: () => setView('ask'), live: true },
         { icon: '🔤', label: 'تفاصيل كلمة هولندية', onClick: () => setView('word'), live: true },
         { icon: '🌤️', label: 'طقس هولندا الآن', onClick: () => setView('weather'), live: true },
         { icon: '📰', label: 'أخبار هولندا اليوم', onClick: () => setView('news'), live: true },
@@ -149,10 +149,11 @@ export function MascotPanel({ batches, onClose, onDance }: Props) {
         /* 302 + the container's 18px inset is exactly 320px — flush against
            the opposite edge of the narrowest common phone, and over it on
            anything smaller. The min() keeps the panel inside the viewport. */
-        width: 'min(302px, calc(100vw - 36px))', maxHeight: 440, overflowY: 'auto',
+        width: 'min(302px, calc(100vw - 36px))', maxHeight: 'min(440px, calc(100dvh - var(--o-bnav-h, 0px) - 150px))', overflowY: 'auto',
+        pointerEvents: 'auto',
         background: 'var(--modal-bg)',
-        backdropFilter: 'blur(24px) saturate(1.8)',
-        WebkitBackdropFilter: 'blur(24px) saturate(1.8)',
+        backdropFilter: 'var(--glass-fx-float)',
+        WebkitBackdropFilter: 'var(--glass-fx-float)',
         border: '1px solid var(--modal-border)',
         borderRadius: 'var(--r)',
         boxShadow: 'var(--elev-2), inset 0 1px 0 var(--glass-hi)',
@@ -165,7 +166,8 @@ export function MascotPanel({ batches, onClose, onDance }: Props) {
         </span>
         <button
           onClick={onClose} aria-label="إغلاق"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: 'var(--text-base)', lineHeight: 'var(--lh-none)', padding: 2 }}
+          className="icon-btn"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text2)', fontSize: 'var(--text-base)', lineHeight: 'var(--lh-none)', padding: 0, marginBlock: -8, marginInlineEnd: -8, display: 'grid', placeItems: 'center', borderRadius: 'var(--r-xs)' }}
         >
           ✕
         </button>

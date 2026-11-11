@@ -62,7 +62,7 @@ export function QuoteTicker() {
                 lang="nl"
                 dir="ltr"
                 style={{
-                  margin: 0, fontFamily: 'var(--font-latin)', fontStyle: 'italic',
+                  margin: 0, fontFamily: 'var(--font-latin)',
                   fontSize: 'var(--text-base)', color: 'var(--text)', lineHeight: 'var(--lh-ui)', textAlign: 'start',
                 }}
               >

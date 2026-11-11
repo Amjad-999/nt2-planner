@@ -36,15 +36,15 @@ export function NotesPanel() {
         <span className="o-label">ملاحظة جديدة</span>
         <textarea className="o-textarea" rows={2} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="قاعدة، كلمة، سؤال لمعلّمك…" />
       </label>
-      <div style={{ marginTop: 8 }}><Button size="sm" variant="secondary" icon={INotePencil} onClick={add} disabled={!draft.trim()}>احفظ</Button></div>
+      <div style={{ marginTop: 'var(--sp-2)' }}><Button size="sm" variant="secondary" icon={INotePencil} onClick={add} disabled={!draft.trim()}>احفظ</Button></div>
       {undo && (
-        <div className="o-notice o-notice--info" role="status" style={{ marginTop: 12 }}>
+        <div className="o-notice o-notice--info" role="status" style={{ marginTop: 'var(--sp-3)' }}>
           <span className="o-grow">حُذفت الملاحظة.</span>
           <Button size="sm" variant="secondary" icon={IArrowCounterClockwise} onClick={() => { setNote(undo, { deleted: false }); setUndo(null) }}>تراجع</Button>
         </div>
       )}
-      {notes.length === 0 ? <p className="o-small" style={{ marginTop: 12 }}>لا ملاحظات بعد. يمكنك أيضًا الكتابة من «لوحة السياق» داخل أي درس.</p> : (
-        <ul className="o-list" style={{ marginTop: 12 }}>
+      {notes.length === 0 ? <p className="o-small" style={{ marginTop: 'var(--sp-3)' }}>لا ملاحظات بعد. يمكنك أيضًا الكتابة من «لوحة السياق» داخل أي درس.</p> : (
+        <ul className="o-list" style={{ marginTop: 'var(--sp-3)' }}>
           {notes.map((n) => (
             <li key={n.id} className="o-card">
               <span className="o-small">{shortDate(n.updatedAt)}{n.ref && findItem(n.ref) ? ` · ${findItem(n.ref)!.topicAr}` : ''}</span>
@@ -60,8 +60,8 @@ export function NotesPanel() {
                 </>
               ) : (
                 <>
-                  <p style={{ whiteSpace: 'pre-wrap', lineHeight: 1.8 }}>{n.text}</p>
-                  <div className="o-row" style={{ gap: 4 }}>
+                  <p style={{ whiteSpace: 'pre-wrap', lineHeight: 'var(--lh-arabic)' }}>{n.text}</p>
+                  <div className="o-row" style={{ gap: 'var(--sp-1)' }}>
                     <Button size="sm" variant="ghost" icon={INotePencil} onClick={() => { setEditing(n.id); setEditText(n.text) }}>عدّل</Button>
                     <Button size="sm" variant="ghost" icon={ITrash} onClick={() => { setNote(n.id, { deleted: true }); setUndo(n.id) }}>احذف</Button>
                   </div>

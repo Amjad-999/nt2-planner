@@ -4,6 +4,7 @@ import { speakDutch, stopSpeak } from '@/features/tts/speakDutch'
 import { Button } from '@/components/ui/Button'
 import { Callout } from '@/components/ui/Callout'
 import { Segmented } from '@/components/ui/Segmented'
+import { IPlay, IStop } from '@/components/obs/icons'
 
 const NORMAL = 1
 const SLOW = 0.8
@@ -59,7 +60,7 @@ export function ListeningAudio({ text, unlocked }: Props) {
   return (
     <section aria-label="التسجيل الصوتي" className="card" style={{ marginBottom: 'var(--sp-4)' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: 'var(--sp-3)' }}>
-        <Button variant="primary" size="lg" icon={state === 'playing' ? '⏹' : '▶'} onClick={toggle}>
+        <Button variant="primary" size="lg" icon={state === 'playing' ? <IStop size={20} /> : <IPlay size={20} />} onClick={toggle}>
           {state === 'playing' ? 'إيقاف' : plays > 0 ? 'استمع مرّة أخرى' : 'استمع إلى التسجيل'}
         </Button>
         <div style={{ flex: '1 1 200px' }}>

@@ -39,14 +39,14 @@ export function TileBuilder({ ex, order, onChange, result, locked, solvedRight }
       <p className="o-sr" aria-live="polite">{sentence ? `الجملة الآن: ${sentence}` : ''}</p>
       {!locked && (
         <>
-          <div className="o-build-bank" role="group" aria-label="الكلمات المتاحة" style={{ marginTop: 12 }}>
+          <div className="o-build-bank" role="group" aria-label="الكلمات المتاحة" style={{ marginTop: 'var(--sp-3)' }}>
             {bank.map((i) => (
               <button key={i} type="button" className="o-tile" lang="nl" onClick={() => onChange([...order, i])} aria-label={`ضع «${ex.tokens[i]}» في الجملة`}>
                 {ex.tokens[i]}
               </button>
             ))}
           </div>
-          <div className="o-row" style={{ marginTop: 10, gap: 4 }}>
+          <div className="o-row" style={{ marginTop: 'var(--sp-3)', gap: 'var(--sp-1)' }}>
             <Button size="sm" variant="ghost" icon={IArrowCounterClockwise} onClick={() => onChange(order.slice(0, -1))} disabled={!order.length}>تراجع</Button>
             <Button size="sm" variant="ghost" icon={ITrash} onClick={() => onChange([])} disabled={!order.length}>امسح</Button>
           </div>

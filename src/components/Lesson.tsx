@@ -54,7 +54,7 @@ const components: Components = {
     <strong style={{ color: 'var(--text)', fontWeight: 'var(--fw-cta)' }}>{children}</strong>
   ),
   em: ({ children }) => (
-    <em style={{ color: 'var(--text)', fontStyle: 'italic' }}>{children}</em>
+    <em style={{ color: 'var(--text)', fontWeight: 'var(--fw-heading)' }}>{children}</em>
   ),
   ul: ({ children }) => (
     <ul style={{

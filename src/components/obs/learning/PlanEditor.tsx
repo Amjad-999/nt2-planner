@@ -48,14 +48,14 @@ export function PlanEditor() {
       </div>
 
       <fieldset className="o-ctx-pick">
-        <legend className="o-label" style={{ marginBottom: 8 }}>أيام الدراسة</legend>
+        <legend className="o-label" style={{ marginBottom: 'var(--sp-2)' }}>أيام الدراسة</legend>
         {DAYS_AR.map((name, d) => (
           <label key={d}><input type="checkbox" checked={plan.days.includes(d)} onChange={() => toggleDay(d)} /><span>{name}</span></label>
         ))}
       </fieldset>
 
       <fieldset className="o-ctx-pick">
-        <legend className="o-label" style={{ marginBottom: 8 }}>مدة الجلسة (تقدير)</legend>
+        <legend className="o-label" style={{ marginBottom: 'var(--sp-2)' }}>مدة الجلسة (تقدير)</legend>
         {([20, 25, 30] as SessionLength[]).map((m) => (
           <label key={m}><input type="radio" name="plan-len" checked={o.settings.sessionMinutes === m}
             onChange={() => update((x) => ({ ...x, settings: { ...x.settings, sessionMinutes: m }, updatedAt: Date.now() }))} /><span>{m} دقيقة</span></label>
@@ -63,7 +63,7 @@ export function PlanEditor() {
       </fieldset>
 
       <fieldset className="o-ctx-pick">
-        <legend className="o-label" style={{ marginBottom: 8 }}>مواقف أريد التركيز عليها</legend>
+        <legend className="o-label" style={{ marginBottom: 'var(--sp-2)' }}>مواقف أريد التركيز عليها</legend>
         {CONTEXTS.map((c) => (
           <label key={c}><input type="checkbox" checked={plan.focus.includes(c)} onChange={() => toggleFocus(c)} /><span>{CONTEXT_AR[c]}</span></label>
         ))}

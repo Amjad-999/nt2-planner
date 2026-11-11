@@ -21,9 +21,9 @@ export const LESSONS: LessonMeta[] = [
   { id: 'a1-vraagwoorden', level: 'A1', title: 'أدوات الاستفهام', subtitle: 'Vraagwoorden', icon: '❓', file: () => import('./a1-08-vraagwoorden.md?raw') as Promise<{ default: string }> },
   { id: 'a1-ontkenning', level: 'A1', title: 'النفي (niet/geen)', subtitle: 'Ontkenning', icon: '🚫', file: () => import('./a1-09-ontkenning.md?raw') as Promise<{ default: string }> },
   { id: 'a1-inversie', level: 'A1', title: 'القلب (inversie)', subtitle: 'Inversie', icon: '🔄', file: () => import('./a1-10-inversie.md?raw') as Promise<{ default: string }> },
-  { id: 'a1-gesloten-vragen', level: 'A1', title: 'الأسئلة المغلقة', subtitle: 'Ja/nee-vragen', icon: '✅', file: () => import('./a1-11-gesloten-vragen.md?raw') as Promise<{ default: string }> },
+  { id: 'a1-gesloten-vragen', level: 'A1', title: 'الأسئلة المغلقة', subtitle: 'Ja/nee-vragen', icon: '☑️', file: () => import('./a1-11-gesloten-vragen.md?raw') as Promise<{ default: string }> },
   // ── A2 — متوسّط ──
-  { id: 'a2-verleden-tijd', level: 'A2', title: 'الماضي البسيط', subtitle: 'Imperfectum', icon: '⏱️', file: () => import('./a2-01-verleden-tijd.md?raw') as Promise<{ default: string }> },
+  { id: 'a2-verleden-tijd', level: 'A2', title: 'الماضي البسيط', subtitle: 'Imperfectum', icon: '⌛', file: () => import('./a2-01-verleden-tijd.md?raw') as Promise<{ default: string }> },
   { id: 'a2-voltooide-tijd', level: 'A2', title: 'الماضي التام', subtitle: 'Perfectum', icon: '🕰️', file: () => import('./a2-02-voltooide-tijd.md?raw') as Promise<{ default: string }> },
   { id: 'a2-adjectief', level: 'A2', title: 'الصفة (-e)', subtitle: 'Adjectief', icon: '🎨', file: () => import('./a2-03-adjectief.md?raw') as Promise<{ default: string }> },
   { id: 'a2-vergelijking', level: 'A2', title: 'المقارنة والتفضيل', subtitle: 'Vergelijking', icon: '⚖️', file: () => import('./a2-04-vergelijking.md?raw') as Promise<{ default: string }> },
@@ -46,7 +46,7 @@ export const LESSONS: LessonMeta[] = [
   { id: 'b1-vaste-voorzetsels', level: 'B1', title: 'حروف الجرّ الثابتة', subtitle: 'Vaste voorzetsels', icon: '🧷', file: () => import('./b1-08-vaste-voorzetsels.md?raw') as Promise<{ default: string }> },
   { id: 'b1-betrekkelijk', level: 'B1', title: 'ضمائر الوصل', subtitle: 'Betrekkelijk vnw.', icon: '🪢', file: () => import('./b1-05-betrekkelijk.md?raw') as Promise<{ default: string }> },
   { id: 'de-het', level: 'B1', title: 'de / het', subtitle: 'Lidwoorden', icon: '📌', file: () => import('./02-de-het.md?raw') as Promise<{ default: string }> },
-  { id: 'comparatief', level: 'B1', title: 'المقارنة والتفضيل (B1)', subtitle: 'Comparatief & Superlatief', icon: '📊', file: () => import('./04-comparatief.md?raw') as Promise<{ default: string }> },
+  { id: 'comparatief', level: 'B1', title: 'المقارنة والتفضيل (B1)', subtitle: 'Comparatief & Superlatief', icon: '🪜', file: () => import('./04-comparatief.md?raw') as Promise<{ default: string }> },
   // ── B2 — Staatsexamen ──
   { id: 'b2-hoofdzin-bijzin', level: 'B2', title: 'الجملة الرئيسية والثانوية', subtitle: 'Hoofdzin & bijzin', icon: '🧱', file: () => import('./b2-01-hoofdzin-bijzin.md?raw') as Promise<{ default: string }> },
   { id: 'b2-irrealis', level: 'B2', title: 'الشرط غير الواقعي', subtitle: 'Irrealis', icon: '🌀', file: () => import('./b2-02-irrealis.md?raw') as Promise<{ default: string }> },

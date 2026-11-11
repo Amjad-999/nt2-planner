@@ -4,6 +4,7 @@ import {
 import { formatMinutes } from '@/features/plan/timer'
 import { AR_DAY, AR_LESSON, countAr } from '@/lib/arabicCount'
 import { Callout } from '@/components/ui/Callout'
+import { pct } from '@/lib/utils'
 
 /**
  * أرقام البرنامج: الحالة العامّة، التقدّم، المتأخّر، والمراجعات القادمة.
@@ -56,7 +57,7 @@ export function ProgramStats({ view, todayPct }: { view: ProgramView; todayPct: 
   const statusColor = PROGRAM_STATUS_COLOR[health.status]
 
   const kpis: Kpi[] = [
-    { label: 'إنجاز اليوم', value: `${todayPct}%`, hint: todayBlocks ? `من ${formatMinutes(todayBlocks.totalMinutes)}` : 'لا مهام اليوم' },
+    { label: 'إنجاز اليوم', value: pct(todayPct), hint: todayBlocks ? `من ${formatMinutes(todayBlocks.totalMinutes)}` : 'لا مهام اليوم' },
     { label: 'دروس منجزة', value: `${progress.covered} / ${progress.total}`, hint: `متبقٍّ ${countAr(progress.remaining, AR_LESSON)}` },
     { label: 'وقت الدراسة المتبقّي', value: formatMinutes(progress.minutesRemaining), hint: 'دروس جديدة فقط، بلا مراجعة' },
     { label: 'المطلوب يوميًّا', value: countAr(health.neededPerDay, AR_LESSON), hint: `على ${countAr(health.learningDaysLeft, AR_DAY)} للتعلّم` },
@@ -89,14 +90,14 @@ export function ProgramStats({ view, todayPct }: { view: ProgramView; todayPct: 
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)', color: 'var(--text2)', marginBottom: 'var(--sp-1)' }}>
             <span>تغطية المنهج</span>
-            <span style={{ fontVariantNumeric: 'tabular-nums' }}>{progress.coveredPct}%</span>
+            <span style={{ fontVariantNumeric: 'tabular-nums' }}>{pct(progress.coveredPct)}</span>
           </div>
           <Bar pct={progress.coveredPct} color="var(--orange)" />
         </div>
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)', color: 'var(--text2)', marginBottom: 'var(--sp-1)' }}>
             <span>الإتقان المرجّح</span>
-            <span style={{ fontVariantNumeric: 'tabular-nums' }}>{progress.masteryPct}%</span>
+            <span style={{ fontVariantNumeric: 'tabular-nums' }}>{pct(progress.masteryPct)}</span>
           </div>
           <Bar pct={progress.masteryPct} color="var(--purple)" />
         </div>

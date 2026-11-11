@@ -83,7 +83,7 @@ export function LessonView({ item, run, onExit }: { item: LessonItem; run: Sessi
           <span>احفظ واخرج</span>
         </Button>
         <div className="o-lesson-head__title">
-          <Nl display className="is-italic">{item.titleNl}</Nl>
+          <Nl display>{item.titleNl}</Nl>
           <Meta>{`STAP ${shown + 1}/7 · NOG ≈ ${remainingEst(run)} MIN`}</Meta>
         </div>
         {!wide && (
@@ -98,7 +98,7 @@ export function LessonView({ item, run, onExit }: { item: LessonItem; run: Sessi
       <div className="o-lesson-grid">
         <div ref={heading} style={{ scrollMarginTop: 140 }}>
           {review !== null && (
-            <div style={{ marginBottom: 12 }}>
+            <div style={{ marginBottom: 'var(--sp-3)' }}>
               <Notice tone="info" title={`تراجع: ${STEP_AR[kind]}.`}
                 actions={<Button size="sm" variant="secondary" iconEnd={IArrowRight} flipEnd onClick={() => { focusNext.current = `${run.steps[run.stepIndex].kind}-live`; setReview(null) }}>العودة إلى الخطوة الحالية</Button>}>
                 هذه خطوة مكتملة للعرض فقط؛ لا شيء هنا يغيّر تقدّمك.

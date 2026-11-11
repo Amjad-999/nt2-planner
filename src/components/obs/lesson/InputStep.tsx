@@ -27,8 +27,8 @@ export function InputStep({ item, readOnly, onComplete }: StepProps) {
       </div>
 
       {listen && (
-        <div className="o-night o-stage" style={{ marginBottom: 16 }}>
-          <p className="o-small" style={{ marginBottom: 12 }}>الاستماع يستخدم محرّك النطق في إعداداتك (الإنترنت أولًا، ثم صوت جهازك).</p>
+        <div className="o-night o-stage" style={{ marginBottom: 'var(--sp-4)' }}>
+          <p className="o-small" style={{ marginBottom: 'var(--sp-3)' }}>الاستماع يستخدم محرّك النطق في إعداداتك (الإنترنت أولًا، ثم صوت جهازك).</p>
           <SpeakButton text={full} label="استمع إلى النص" size="md" onUnavailable={() => setShowText(true)} />
         </div>
       )}
@@ -36,7 +36,7 @@ export function InputStep({ item, readOnly, onComplete }: StepProps) {
       {showText ? (
         <div className="o-plane o-plane--raised">
           <div className="o-passage__head">
-            <h3 className="o-nl-display" lang="nl" style={{ fontSize: '1.45rem' }}>{item.titleNl}</h3>
+            <h3 className="o-nl-display" lang="nl" style={{ fontSize: 'var(--text-xl)' }}>{item.titleNl}</h3>
             {!listen && <SpeakButton text={full} label="استمع" />}
           </div>
           <Passage item={item} />

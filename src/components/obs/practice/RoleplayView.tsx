@@ -60,7 +60,7 @@ export function RoleplayView({ sc, run, onBack }: { sc: RoleplayScenario; run: R
 
   return (
     <div className="o-rp">
-      <div className="o-row" style={{ justifyContent: 'space-between', marginBottom: 12 }}>
+      <div className="o-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sp-3)' }}>
         <Button variant="ghost" icon={IArrowLeft} flipIcon onClick={onBack}>كل المواقف</Button>
         <Chip tone="neutral" icon={IInfo}>محاور بسيناريو ثابت: لا يفهم ردّك، بل يتابع الحوار</Chip>
       </div>
@@ -86,7 +86,7 @@ export function RoleplayView({ sc, run, onBack }: { sc: RoleplayScenario; run: R
           <motion.section ref={onTurn} data-turn={String(i)} key={i} variants={stepVariants(level)} initial="enter" animate="center" exit="exit" className="o-step-plane o-rp__turn" aria-labelledby="rp-turn-title">
             <Bubble who="partner" label={sc.partnerAr} text={spec.partnerNl} current />
             <SpeakButton text={spec.partnerNl} label="استمع للجملة" />
-            <h2 id="rp-turn-title" className="o-h3" style={{ marginTop: 14 }}>دورك: {spec.goalAr}</h2>
+            <h2 id="rp-turn-title" className="o-h3" style={{ marginTop: 'var(--sp-4)' }}>دورك: {spec.goalAr}</h2>
             <div className="o-row">
               <Button size="sm" variant="ghost" icon={ILightbulb} aria-expanded={hint} onClick={() => setHint(!hint)}>{hint ? 'أخفِ التلميح' : 'تلميح: بداية جملة'}</Button>
               <div className="o-seg" role="radiogroup" aria-label="طريقة الرد">
@@ -103,17 +103,17 @@ export function RoleplayView({ sc, run, onBack }: { sc: RoleplayScenario; run: R
             </AnimatePresence>
 
             {mode === 'speak' && (
-              <div style={{ marginTop: 12 }}>
+              <div style={{ marginTop: 'var(--sp-3)' }}>
                 <VoiceRecorder key={i} maxSec={45} target="5–20" onSaved={(id) => setPendingRec(id)} onDiscard={() => setPendingRec('')} onTypeInstead={() => setMode('type')} />
               </div>
             )}
-            <form onSubmit={send} className="o-field" style={{ marginTop: 12 }} noValidate>
+            <form onSubmit={send} className="o-field" style={{ marginTop: 'var(--sp-3)' }} noValidate>
               <label className="o-label" htmlFor="rp-input">{mode === 'speak' ? 'اكتب ما قلته (اختياري — يسمح بمراجعة اللغة)' : 'ردّك بالهولندية'}</label>
               <textarea id="rp-input" ref={inputRef} className="o-textarea" lang="nl" dir="ltr" rows={3} value={draft}
                 onChange={(e) => { setDraft(e.target.value); setMsg('') }}
                 onKeyDown={(e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) send() }} />
               {msg && <p role="alert" className="o-small" style={{ color: 'var(--o-error-ink)' }}>{msg}</p>}
-              <div className="o-actions" style={{ marginTop: 8 }}>
+              <div className="o-actions" style={{ marginTop: 'var(--sp-2)' }}>
                 <Button type="submit" variant="primary" icon={IChatCircleText}>أرسل الرد <span className="o-kbd">Ctrl+Enter</span></Button>
                 {i > 0 && <Button variant="ghost" icon={IArrowCounterClockwise} onClick={() => { focusNext.current = String(i - 1); update((x) => undoTurn(x, Date.now())) }}>تراجع عن ردّي السابق</Button>}
               </div>
@@ -122,7 +122,7 @@ export function RoleplayView({ sc, run, onBack }: { sc: RoleplayScenario; run: R
         ) : (
           <motion.section ref={onTurn} data-turn="end" key="end" variants={stepVariants(level)} initial="enter" animate="center" exit="exit" className="o-step-plane">
             <Bubble who="partner" label={sc.partnerAr} text={sc.closingNl} current />
-            <h2 className="o-h3" tabIndex={-1} style={{ marginTop: 14, outline: 'none' }}>انتهى الحوار.</h2>
+            <h2 className="o-h3" tabIndex={-1} style={{ marginTop: 'var(--sp-4)', outline: 'none' }}>انتهى الحوار.</h2>
             <p className="o-small">الآن فقط نعرض ما جمعناه أثناء الحوار: جملك، ونسخة أكثر طبيعية، وشرح قصير واحد لكل ردّ.</p>
             <div className="o-actions">
               <Button variant="primary" iconEnd={IArrowRight} flipEnd onClick={() => update((x) => finishRoleplay(x, sc, Date.now(), todayKey()))}>اعرض المراجعة</Button>

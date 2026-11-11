@@ -77,7 +77,10 @@ export function AuthModal({ onClose }: Props) {
         type="button" disabled={status === 'syncing'} onClick={() => signInGoogle()}
         className="btn-shine" style={{ ...btnStyle('ghost'), width: '100%', marginBottom: 'var(--sp-3)' }}
       >
-        🇬 المتابعة بحساب Google
+        {/* was a lone regional-indicator letter (half of a flag sequence), which
+            renders as a boxed glyph or nothing depending on the device */}
+        <span aria-hidden="true" dir="ltr" style={{ fontFamily: 'var(--font-latin)', fontWeight: 'var(--fw-cta)', marginInlineEnd: 'var(--sp-2)' }}>G</span>
+        المتابعة بحساب Google
       </button>
 
       <button

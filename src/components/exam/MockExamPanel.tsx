@@ -138,7 +138,7 @@ export function MockExamPanel({ onGoToSkill }: { onGoToSkill?: (skill: SkillKey)
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>
-              <span aria-hidden>{expired ? '✕ ' : '⏱ '}</span>{expired ? 'انتهى الوقت' : 'الوقت المتبقّي'}
+              <span aria-hidden>{expired ? '✕ ' : '⏱️ '}</span>{expired ? 'انتهى الوقت' : 'الوقت المتبقّي'}
             </div>
             <div dir="ltr" style={{ fontFamily: 'var(--font-latin)', fontSize: 'var(--text-3xl)', fontWeight: 'var(--fw-cta)', lineHeight: 'var(--lh-heading)',
               color: expired ? 'var(--red-text)' : left < 120_000 ? 'var(--orange-text)' : 'var(--text)' }}>
@@ -189,7 +189,7 @@ export function MockExamPanel({ onGoToSkill }: { onGoToSkill?: (skill: SkillKey)
           {report.rows.map((r) => (
             <div key={r.skill} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--text-sm)', margin: '5px 0' }}>
               <span style={{ color: 'var(--text2)' }}>
-                <span aria-hidden style={{ color: r.passed ? 'var(--green-text)' : 'var(--red-text)' }}>{r.passed ? '✔' : '✕'}</span> {SKILL_AR[r.skill]}
+                <span aria-hidden style={{ color: r.passed ? 'var(--green-text)' : 'var(--red-text)' }}>{r.passed ? '✓' : '✕'}</span> {SKILL_AR[r.skill]}
               </span>
               <span style={{ color: 'var(--text)' }}>
                 {r.score}

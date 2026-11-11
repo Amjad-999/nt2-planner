@@ -4,6 +4,7 @@ import { InsightCard } from '@/components/InsightCard'
 import { Reveal } from '@/components/MotionFx'
 import { dueCount } from '@/features/vocab/queue'
 import { useNow } from '@/hooks/useNow'
+import { pct } from '@/lib/utils'
 
 type Insight = { kind: 'good' | 'warn' | 'bad' | ''; icon: string; title: string; desc: string }
 
@@ -37,7 +38,7 @@ export function SmartInsights() {
   else if (ph.status === 'tight') insights.push({ kind: 'warn', icon: '⚠️', title: 'الكثافة مشدودة', desc: `ارفع الإيقاع إلى نحو ${ph.needMins} دقيقة يوميًّا وأنجز المهام المتأخّرة أوّلًا.` })
   else insights.push({ kind: 'bad', icon: '🚨', title: 'حالة حرجة — أعد توزيع المهام', desc: `تحتاج نحو ${ph.needMins} دقيقة يوميًّا. افتح خطة الدراسة وأعد توزيع ما تبقّى.` })
   insights.push(skill[wkSk]?.attempts || wkBest
-    ? { kind: '', icon: '🧭', title: `تدرّب على ${SKILL_AR[wkSk]}`, desc: `أفضل نتيجة مسجّلة لهذه المهارة ${wkBest}%. جرّب تدريبًا جديدًا وراجع الأخطاء.` }
+    ? { kind: '', icon: '🧭', title: `تدرّب على ${SKILL_AR[wkSk]}`, desc: `أفضل نتيجة مسجّلة لهذه المهارة ${pct(wkBest)}. جرّب تدريبًا جديدًا وراجع الأخطاء.` }
     : { kind: '', icon: '🧭', title: `جرّب مهارة ${SKILL_AR[wkSk]}`, desc: 'لا توجد نتيجة مسجّلة لهذه المهارة. ستساعدك أول محاولة على تحديد نقطة البداية.' })
   if (weekM > lastWM && lastWM > 0) insights.push({ kind: 'good', icon: '📈', title: 'هذا الأسبوع أفضل', desc: `درست ${weekM - lastWM} دقيقة أكثر من الأسبوع الماضي.` })
   else if (lastWM > 0 && weekM < lastWM) insights.push({ kind: 'warn', icon: '📉', title: 'تباطؤ ملحوظ', desc: `انخفضت دقائق هذا الأسبوع بـ ${lastWM - weekM} دقيقة. جلسة قصيرة اليوم تكفي.` })

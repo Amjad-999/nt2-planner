@@ -45,7 +45,7 @@ export function ExamCountdowns() {
   return (
     <section aria-labelledby="inburgering-heading">
       <h2 id="inburgering-heading" className="section-title section-title--spaced">
-        <span style={{ color: 'var(--orange-text)' }}>🎓</span> امتحانات الاندماج
+        <span aria-hidden="true">🎓</span> امتحانات الاندماج
       </h2>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" style={{ marginBottom: 'var(--sp-4)' }}>
@@ -61,8 +61,8 @@ export function ExamCountdowns() {
               style={{
                 padding: '14px',
                 background: passed ? PASS_BG : 'var(--glass-bg)',
-                backdropFilter: passed ? 'blur(10px)' : 'blur(16px) saturate(1.3)',
-                WebkitBackdropFilter: passed ? 'blur(10px)' : 'blur(16px) saturate(1.3)',
+                backdropFilter: passed ? 'var(--glass-fx-control)' : 'var(--glass-fx-panel)',
+                WebkitBackdropFilter: passed ? 'var(--glass-fx-control)' : 'var(--glass-fx-panel)',
                 border: passed ? PASS_BORDER : '1px solid var(--glass-border)',
                 boxShadow: passed ? 'var(--elev-1)' : 'var(--elev-1), inset 0 1px 0 var(--glass-hi)',
                 transition: 'background .25s ease, border-color .25s ease',

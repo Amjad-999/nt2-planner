@@ -38,7 +38,7 @@ export const LESSON_STATUS_AR: Record<LessonStatus, string> = {
 export const LESSON_STATUS_ICON: Record<LessonStatus, string> = {
   new: '○',
   learning: '◐',
-  done: '✔',
+  done: '✓',
   review: '↻',
   weak: '!',
   mastered: '★',

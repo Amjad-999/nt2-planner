@@ -43,7 +43,7 @@ export function ReviewStep({ item, run, readOnly, update, onComplete }: StepProp
               initial={level === 'reduced' ? { opacity: 0 } : { opacity: 0, y: 26, scale: 0.9, rotateX: 30 }}
               animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
               transition={level === 'reduced' ? { duration: 0.12 } : { duration: 0.55, delay: 0.06 * i, ease: EASE_EMPH }}
-              style={{ display: 'grid', justifyItems: 'center', gap: 8 }}>
+              style={{ display: 'grid', justifyItems: 'center', gap: 'var(--sp-2)' }}>
               <WordToken nl={x.nl} gloss={x.ar} tone={o.expressions[id]?.savedAt ? 'mint' : 'paper'} />
               <StageBadge stage={stage} />
             </motion.div>
@@ -51,7 +51,7 @@ export function ReviewStep({ item, run, readOnly, update, onComplete }: StepProp
         })}
       </div>
 
-      <div className="o-stats" style={{ marginTop: 16 }}>
+      <div className="o-stats" style={{ marginTop: 'var(--sp-4)' }}>
         <div><b>{first}/{qa.length || run.questionIds.length}</b><span>أسئلة صحيحة من المحاولة الأولى</span></div>
         <div><b>{builds.filter((b) => b.correct).length}/{run.buildIds.length}</b><span>جمل بنيتها بترتيب صحيح</span></div>
         <div><b>{own}</b><span>جمل كتبتها بنفسك (استخدام مستقل)</span></div>
@@ -60,7 +60,7 @@ export function ReviewStep({ item, run, readOnly, update, onComplete }: StepProp
         <div><b>{mins(actual)}/{estTotal(run)}</b><span>دقائق فعلية / مخطَّطة</span></div>
       </div>
 
-      <p className="o-small" style={{ marginTop: 12 }}>
+      <p className="o-small" style={{ marginTop: 'var(--sp-3)' }}>
         {saved.length ? `حفظت ${saved.length} تعابير في «كلماتي». ` : 'لم تحفظ تعابير هذه المرة — يمكنك ذلك من «كلماتي». '}
         الحالات (شوهِد ← تدرّب ← استخدام مستقل ← نشِط) تتغيّر فقط بما تفعله أنت.
       </p>

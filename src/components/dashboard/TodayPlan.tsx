@@ -4,6 +4,7 @@ import { nextTask, weakest } from '@/features/plan/todayPlan'
 import { setNavIntent } from '@/lib/navIntent'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { headlineMock } from './lastMock'
+import { pct } from '@/lib/utils'
 
 /**
  * الحلقة اليومية: قائمة مهام اليوم بأرقامها الحقيقية.
@@ -56,7 +57,7 @@ export function TodayPlan() {
               >
                 {/* الحالة بأيقونة ونصّ مخفيّ، لا باللون وحده */}
                 <span aria-hidden="true" style={{ fontSize: 'var(--text-base)', lineHeight: 'var(--lh-heading)', color: t.done ? 'var(--green-text)' : isNext ? 'var(--orange-text)' : 'var(--text2)', minWidth: 20, textAlign: 'center' }}>
-                  {t.done ? '✓' : isNext ? '▶' : t.urgent ? '!' : '○'}
+                  {t.done ? '✓' : isNext ? '▸' : t.urgent ? '!' : '○'}
                 </span>
                 <span style={{ flex: 1, minWidth: 0 }}>
                   <span style={{
@@ -81,7 +82,7 @@ export function TodayPlan() {
       {last && (
         <div style={{ marginTop: 'var(--sp-3)', paddingTop: 'var(--sp-3)', borderTop: '1px solid var(--border)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--sp-2)', fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
           <span>
-            {last.full ? 'آخر امتحان كامل' : 'آخر محاكاة'}: <strong style={{ color: 'var(--text)' }}>{last.score}%</strong>
+            {last.full ? 'آخر امتحان كامل' : 'آخر محاكاة'}: <strong style={{ color: 'var(--text)' }}>{pct(last.score)}</strong>
             {' · '}
             {last.full ? last.label : <bdi dir="ltr" lang="nl">{last.label}</bdi>}
           </span>

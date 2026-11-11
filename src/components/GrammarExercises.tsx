@@ -73,7 +73,7 @@ function LessonExercises({ lessonId }: Props) {
     <section dir="rtl" style={{
       marginTop: 'var(--sp-5)',
       background: 'var(--glass-bg)',
-      backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+      backdropFilter: 'var(--glass-fx-panel)', WebkitBackdropFilter: 'var(--glass-fx-panel)',
       border: '1px solid var(--glass-border)',
       borderRadius: 'var(--r)',
       padding: '20px 18px',
@@ -81,7 +81,7 @@ function LessonExercises({ lessonId }: Props) {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--sp-3)' }}>
         <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-lg)', fontWeight: 'var(--fw-heading)', color: 'var(--text)', margin: 0, display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
-          <span style={{ color: 'var(--orange-text)' }}>✏️</span> تمارين
+          <span aria-hidden="true">✏️</span> تمارين
         </h3>
         <span aria-label={`${correctCount} إجابات صحيحة من ${list.length}`} style={{ fontSize: 'var(--text-sm)', color: 'var(--muted)', fontWeight: 'var(--fw-heading)' }}>{correctCount} / {list.length}</span>
       </div>
@@ -131,7 +131,7 @@ function LessonExercises({ lessonId }: Props) {
                     placeholder="Uw antwoord"
                     style={{ flex: 1, minWidth: 140, minHeight: 'var(--tap-min)', padding: '9px 12px', border: `1px solid ${done ? (st?.correct ? 'var(--green)' : 'var(--red)') : 'var(--border2)'}`, borderRadius: 'var(--r-xs)', background: 'var(--surface)', color: 'var(--text)', fontFamily: 'var(--font-latin)', fontSize: 'var(--text-base)' }} />
                   <button type="button" disabled={done || !norm(inputs[i] ?? '')} onClick={() => answerGap(i, ex.answer, ex.accept ?? [])} className="btn-shine"
-                    style={{ background: done ? 'var(--surface3)' : 'var(--btn-bg)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', color: done ? 'var(--muted)' : 'var(--text)', border: '1px solid var(--btn-border)', borderRadius: 'var(--r-xs)', padding: '9px 18px', fontWeight: 'var(--fw-cta)', fontSize: 'var(--text-sm)', fontFamily: 'inherit', cursor: done ? 'default' : 'pointer' }}>تحقّق</button>
+                    style={{ background: done ? 'var(--surface3)' : 'var(--btn-bg)', backdropFilter: 'var(--glass-fx-control)', WebkitBackdropFilter: 'var(--glass-fx-control)', color: done ? 'var(--muted)' : 'var(--text)', border: '1px solid var(--btn-border)', borderRadius: 'var(--r-xs)', padding: '9px 18px', fontWeight: 'var(--fw-cta)', fontSize: 'var(--text-sm)', fontFamily: 'inherit', cursor: done ? 'default' : 'pointer' }}>تحقّق</button>
                 </div>
               )}
 
@@ -143,7 +143,7 @@ function LessonExercises({ lessonId }: Props) {
                     <p dir="ltr" lang="nl" style={{ margin: 'var(--sp-1) 0', color: 'var(--text)', fontFamily: 'var(--font-latin)', fontSize: 'var(--text-base)' }}>{ex.kind === 'gap' ? ex.answer : ex.options[ex.answer]}</p>
                   </>}
                   <p style={{ color: 'var(--text2)', margin: 'var(--sp-2) 0' }}><BilingualText text={ex.explainAr} /></p>
-                  {!st.correct && <button type="button" onClick={() => retry(i)} className="btn-secondary" style={{ minHeight: 'var(--tap-min)' }}>إعادة هذا السؤال</button>}
+                  {!st.correct && <button type="button" onClick={() => retry(i)} className="btn">إعادة هذا السؤال</button>}
                 </div>
               )}
             </div>

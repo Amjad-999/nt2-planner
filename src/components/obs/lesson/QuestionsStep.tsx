@@ -81,7 +81,7 @@ function QuestionCard({ q, index, total, item, run, update, onNext }: StepProps 
 
         <form className="o-plane o-plane--raised o-q-panel" onSubmit={check} noValidate>
           <p className="o-q-prompt o-nl" lang="nl"><Highlight text={q.promptNl} keywords={q.keywords} on={help >= 1} /></p>
-          <div className="o-row" style={{ marginBottom: 12 }}>
+          <div className="o-row" style={{ marginBottom: 'var(--sp-3)' }}>
             <SpeakButton text={q.promptNl} label="استمع للسؤال" />
             {!resolved && help < maxHelp && (
               <Button size="sm" variant="ghost" icon={ILightbulb} onClick={() => setHelpRaw(String(help + 1))} aria-controls={`help-${q.id}`}>
@@ -113,7 +113,7 @@ function QuestionCard({ q, index, total, item, run, update, onNext }: StepProps 
             </AnimatePresence>
           </div>
 
-          <fieldset className={`o-options${resolved ? ' is-locked' : ''}`} style={{ marginTop: 14 }}>
+          <fieldset className={`o-options${resolved ? ' is-locked' : ''}`} style={{ marginTop: 'var(--sp-4)' }}>
             <legend className="o-sr">الخيارات</legend>
             {q.options.map((opt, i) => {
               const isRight = resolved && opt.id === q.correct
@@ -132,9 +132,9 @@ function QuestionCard({ q, index, total, item, run, update, onNext }: StepProps 
               )
             })}
           </fieldset>
-          {error && <p role="alert" className="o-small" style={{ color: 'var(--o-error-ink)', marginTop: 8 }}>{error}</p>}
+          {error && <p role="alert" className="o-small" style={{ color: 'var(--o-error-ink)', marginTop: 'var(--sp-2)' }}>{error}</p>}
 
-          <div aria-live="polite" style={{ marginTop: 14 }}>
+          <div aria-live="polite" style={{ marginTop: 'var(--sp-4)' }}>
             <AnimatePresence mode="wait" initial={false}>
               {saved && (
                 <motion.div key={`${saved.tries}-${saved.correct}`} variants={revealVariants(level)} initial="hidden" animate="show" exit="exit">
@@ -160,7 +160,7 @@ function QuestionCard({ q, index, total, item, run, update, onNext }: StepProps 
             {resolved && (
               <details className="o-evaluate">
                 <summary>قيّم اختيارك: لماذا الخيارات الأخرى غير صحيحة؟</summary>
-                <ul className="o-list" style={{ marginTop: 8 }}>
+                <ul className="o-list" style={{ marginTop: 'var(--sp-2)' }}>
                   {q.options.filter((o) => o.id !== q.correct).map((o) => (
                     <li key={o.id} className="o-small"><span className="o-nl" lang="nl">{o.textNl}</span> — {o.whyAr}</li>
                   ))}

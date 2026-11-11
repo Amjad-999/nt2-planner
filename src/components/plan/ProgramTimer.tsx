@@ -10,6 +10,7 @@ import { AR_BLOCK, countAr } from '@/lib/arabicCount'
 import { LESSON_STATUS_AR, LESSON_STATUS_ICON, statusOf } from '@/features/plan/progress'
 import { lessonById, sectionTitle } from '@/data/curriculum'
 import { Callout } from '@/components/ui/Callout'
+import { IPlay } from '@/components/obs/icons'
 
 /**
  * المؤقّت الحيّ: المهمّة الحالية، العدّ التنازلي، والمهمّة القادمة.
@@ -112,7 +113,7 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
     return shell(
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
         <h3 style={{ margin: 0, fontSize: 'var(--text-md)', fontWeight: 'var(--fw-cta)', color: 'var(--green-text)' }}>
-          <span aria-hidden>✔</span> انتهى وقت اليوم
+          <span aria-hidden>✓</span> انتهى وقت اليوم
         </h3>
         <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text2)' }}>
           علّم حالة دروس اليوم قبل الإغلاق، ثم أنهِ الجلسة.
@@ -239,7 +240,7 @@ export function ProgramTimer({ blocks }: { blocks: DayBlockPlan | null }) {
         {pos.paused
           ? <button type="button" onClick={() => resumeStudyDay(Date.now())}
               style={{ ...BTN, background: 'var(--orange)', border: '1px solid var(--orange)', color: '#fff' }}>
-              <span aria-hidden>▶</span> متابعة
+              <span aria-hidden className="glyph"><IPlay size={16} /></span> متابعة
             </button>
           : <button type="button" onClick={() => pauseStudyDay(Date.now())} style={BTN}>
               <span aria-hidden>❚❚</span> إيقاف مؤقّت

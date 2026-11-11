@@ -35,6 +35,9 @@ The owner is not a professional developer: prefer simple, working, verified solu
 - `src/data/` — static typed content: `dutchQuotes.ts` (30 quotes) `themas.ts` `situations.ts` (8 real-life dialogues) `grammarExercises.ts` `examPdfs.ts` `examAudio.ts` …
 - `src/styles/tokens.css` — **every color lives here** (`--o-*` observatory tokens + `data-skin` remap of the legacy tokens); `globals.css` for base styles; `components.css` for the shared control classes
 - `src/tests/` — `unit/` and `smoke/`
+- `src/components/brand/Logo.tsx` + `public/brand/` — the logo (vector masters, exports). App icons live in `public/icons/`
+- `src/data/emoji/registry.json` + `src/assets/emoji/` — every emoji the UI uses, drawn by one local font. A new emoji must be added to the registry and the font rebuilt with `scripts/build-emoji.py`, or `npm test` fails
+- `docs/refinement/REPORT.md` — visual direction, defect log and checks from the interface refinement pass
 - `public/exams/` — ~300 MB of PDFs and audio. **Never read, list, grep or open these files.** Only their filenames matter, and `npm run check:exams` verifies those.
 
 ## Commands
@@ -86,12 +89,13 @@ Build-only tools belong in `devDependencies`. Prefer a small local helper over a
 2. Colors come from `src/styles/tokens.css` only. Hard-coded hex breaks dark mode silently.
 3. Dutch quotes and UI copy: formal Dutch only (`u`/`uw`), never `je`/`jij`.
 4. ASCII digits only in source. Arabic-Indic digits (٠-٩) fail `npm run check:digits`.
-5. RTL + mobile-first. Directional icons must flip — see the `rtl-icon-check` skill.
-6. Never call `Date.now()` during React render — use `useNow()`.
-7. Never commit secrets. Only `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` and
+5. Upright type only: no `italic` (no italic face is loaded). Glass surfaces use the `--glass-fx-*` materials, never a hand-written `blur()`. Percentages in Arabic text go through `pct()` from `src/lib/utils.ts`.
+6. RTL + mobile-first. Directional icons must flip — see the `rtl-icon-check` skill.
+7. Never call `Date.now()` during React render — use `useNow()`.
+8. Never commit secrets. Only `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` and
    `VITE_PIXABAY_API_KEY` are public by design.
-8. New store fields that must sync need the full pattern — see the `add-synced-field` skill.
-9. After any change: run **every** gate in "Definition of done" above — not just three of them.
+9. New store fields that must sync need the full pattern — see the `add-synced-field` skill.
+10. After any change: run **every** gate in "Definition of done" above — not just three of them.
 
 ## Working style (keeps sessions fast and accurate)
 - Read only the files you need. Never open `node_modules/`, `dist/`, `.git/`, `public/exams/`, `package-lock.json`.

@@ -12,7 +12,7 @@ export function TopicPicker({ o, onPick, onClose }: { o: ObsState; onPick: (id: 
   const last = (id: string) => o.history.filter((h) => h.itemId === id).map((h) => h.finishedAt).sort().pop()
   return (
     <Sheet title="اختر موضوع الجلسة" onClose={onClose} placement="center">
-      <p className="o-small" style={{ marginBottom: 12 }}>كل النصوص تدريبية كُتبت لهذا التطبيق (أماكن وأشخاص متخيَّلون).</p>
+      <p className="o-small" style={{ marginBottom: 'var(--sp-3)' }}>كل النصوص تدريبية كُتبت لهذا التطبيق (أماكن وأشخاص متخيَّلون).</p>
       <ul className="o-list">
         {LESSON_ITEMS.map((it) => {
           const t = last(it.id)

@@ -53,3 +53,16 @@ export function wordCount(t: string): number {
 export function clampNum(val: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, val))
 }
+
+/**
+ * A percentage that reads the same everywhere: digits first, then the sign.
+ *
+ * In a right-to-left sentence the bidi algorithm treats `%` as a neutral, so
+ * "90%" written after an Arabic word came out as "%90" while the same value in
+ * a stat tile showed "90%". Wrapping the token in a left-to-right isolate
+ * (U+2066 … U+2069) pins its internal order without affecting the text around
+ * it. The isolates are invisible and ignored by screen readers.
+ */
+export function pct(value: number | string): string {
+  return `⁦${value}%⁩`
+}

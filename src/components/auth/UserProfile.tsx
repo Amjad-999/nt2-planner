@@ -3,6 +3,7 @@ import { useAppStore, totalLearnedWords, avgBestScore, getDaysLeft } from '@/sto
 import { useAuth } from '@/hooks/useAuth'
 import { Overlay, Field, btnStyle } from '../SettingsModal'
 import { toast } from '../Toast'
+import { pct } from '@/lib/utils'
 
 interface Props { onClose: () => void }
 
@@ -61,7 +62,7 @@ export function UserProfile({ onClose }: Props) {
         {[
           { icon: '🔥', value: String(s.streak.count), label: 'مواظبة' },
           { icon: '📚', value: `${totW.learned}/${totW.all}`, label: 'كلمات' },
-          { icon: '🎯', value: `${best}%`, label: 'أفضل نتيجة' },
+          { icon: '🎯', value: pct(best), label: 'أفضل نتيجة' },
         ].map((k) => (
           <div key={k.label} style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r-sm)', padding: '10px 6px', textAlign: 'center' }}>
             <div style={{ fontSize: 'var(--text-lg)' }}>{k.icon}</div>

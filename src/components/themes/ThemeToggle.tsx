@@ -2,7 +2,7 @@ import { useTheme } from '@/hooks/useTheme'
 import { useFocusMode } from '@/hooks/useFocusMode'
 import { AppIcon } from '../AppIcon'
 import { IconBtn } from '../TopBar'
-import { Moon, Sun } from '../icons'
+import { Moon, Sun, Target } from '../icons'
 
 /**
  * Theme + Focus Mode controls, grouped together in the TopBar.
@@ -21,11 +21,12 @@ export function ThemeToggle() {
       <IconBtn
         onClick={toggleFocusMode}
         aria-label="وضع التركيز"
+        pressed={focusMode}
         title={focusMode ? 'إيقاف وضع التركيز' : 'تفعيل وضع التركيز — واجهة أبسط بلا تشتيت'}
       >
-        <span aria-hidden="true" style={{ opacity: focusMode ? 1 : 0.7, color: focusMode ? 'var(--orange-text)' : undefined }}>
-          🧘
-        </span>
+        {/* A control, so it is an icon in the control colour — the old yoga emoji
+            could not take `color`, and was dimmed with opacity to fake "off". */}
+        <span style={{ color: focusMode ? 'var(--orange-text)' : undefined }}><AppIcon icon={Target} size={18} /></span>
       </IconBtn>
 
       <IconBtn onClick={toggleTheme} aria-label="تبديل المظهر" title={isDark ? 'الوضع الفاتح' : 'الوضع الداكن'}>
